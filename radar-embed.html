@@ -1,0 +1,64 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Radar Perene</title></head>
+<body style="margin:0;background:#0b0d10">
+<!-- Radar Perene — página embedável (iframe). Hospedada no Supabase Storage (text/html correto).
+     Idioma pela URL: ?lang=en. Embute: <iframe src="…/radar-embed.html?lang=pt" width="100%" height="1150" style="border:0"></iframe> -->
+<div class="mp" id="mp">
+  <style>
+    .mp{--bg:#0b0d10;--card:#13171c;--card2:#171c22;--line:#222a31;--txt:#e6e9ec;--dim:#8b97a3;
+      --accent:#c9a227;--hot:#e0533d;--warm:#d98a3d;--cool:#3d7de0;--neu:#6b7682;
+      --font:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:var(--bg);color:var(--txt);font-family:var(--font);max-width:860px;margin:0 auto;padding:24px;line-height:1.45}
+    .mp h2{font-size:20px;margin:0 0 2px;font-weight:700}
+    .mp h3{font-size:11px;margin:18px 0 8px;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+    .mp .sub{color:var(--dim);font-size:12px}
+    .mp .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media(max-width:640px){.mp .grid{grid-template-columns:1fr 1fr}}
+    .mp .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+    .mp .k{font-size:11px;color:var(--dim)}.mp .big{font-size:22px;font-weight:700;margin-top:2px}.mp .reg{font-size:11px;font-weight:600;margin-top:3px}
+    .mp .t{background:var(--card2);border:1px solid var(--line);border-left:3px solid var(--neu);border-radius:8px;padding:9px 10px}
+    .mp .t .nm{font-size:12px;font-weight:600}.mp .t .vl{font-size:18px;font-weight:700}.mp .t .rg{font-size:10.5px;color:var(--dim)}
+    .mp .chip{display:inline-flex;gap:5px;align-items:baseline;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;margin:0 5px 6px 0}
+    .mp .chip b{font-weight:700}.mp .chip .u{color:var(--dim);font-size:10px}
+    .mp .hl{background:linear-gradient(180deg,#171c22,#13171c);border:1px solid var(--accent);border-radius:12px;padding:16px}
+    .mp .hl .q{font-size:13px;color:var(--dim);margin-bottom:8px}.mp .hl .stat{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
+    .mp .hl .v{font-size:26px;font-weight:800;color:var(--accent)}.mp .hl .d{font-size:13px}
+    .mp ul.dv{margin:6px 0 0;padding:0;list-style:none}.mp ul.dv li{font-size:12.5px;padding:6px 0;border-top:1px solid var(--line)}.mp ul.dv li b{color:var(--accent)}
+    .mp .hip{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px}.mp .hip .ec{color:var(--dim);margin-top:6px}
+    .mp .prem{margin-top:18px;background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:14px}
+    .mp .prem .pt{font-size:12px;font-weight:700;color:var(--accent)}.mp .prem ul{margin:8px 0 0;padding-left:16px;color:var(--dim);font-size:12px}
+    .mp .cta{display:block;text-align:center;margin-top:14px;background:var(--accent);color:#111;text-decoration:none;font-weight:700;padding:13px;border-radius:10px;font-size:14px}
+    .mp .disc{color:var(--dim);font-size:10.5px;margin-top:12px;text-align:center}
+    .mp .hot{border-left-color:var(--hot)}.mp .warm{border-left-color:var(--warm)}.mp .cool{border-left-color:var(--cool)}.mp .lo{color:var(--dim)}
+  </style>
+  <h2>Radar Perene</h2>
+  <div class="sub" id="mp-intro">…</div><div id="mp-body"></div>
+  <a class="cta" id="mp-cta" href="#" rel="nofollow noopener">…</a><div class="disc" id="mp-disc"></div>
+</div>
+<script>
+(function(){
+  var BASE="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api";
+  var LANG=(new URLSearchParams(location.search).get("lang")==="en")?"en":"pt";
+  var T=LANG==="en"?{intro:"In-house regime-reading instrument for Brazil. As of",regime:"Today's regime",macro:"Essential macro (public data)",term:"9 thermometers (Vertice)",analog:"Analog study",div:"Divergences today",inter2:"BR intermarket (stocks)",extras:"Breadth / geographic",hip:"How the brain reasons (sample hypothesis)",contra:"Contradiction",cta:"Get history & alerts - notify me at launch",br:"Brazil",gl:"Global",inter:"BR intermarket",bus:"US breadth",bbr:"BR breadth",geo:"Geographic risk-on",jud:"Judicial highlight"}:{intro:"Instrumento in-house de leitura do regime regulatorio e de mercado do Brasil. Referencia de",regime:"Regime de hoje",macro:"Macro essencial (dado publico)",term:"9 termometros (Vertice)",analog:"Estudo de analogo",div:"Divergencias detectadas hoje",inter2:"Intermercado BR (bolsa)",extras:"Breadth / geografico",hip:"Como o cerebro raciocina (hipotese exemplo)",contra:"Contradicao",cta:"Quero historico e alertas - me avise no lancamento",br:"Brasil",gl:"Global",inter:"BR intermercado",bus:"Breadth US",bbr:"Breadth BR",geo:"Risk-on geografico",jud:"Destaque judicial"};
+  function el(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?"":s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c]})}
+  function cls(v){if(v==null)return "";return v>=75?"hot":v>=55?"warm":v<=45?"cool":""}
+  function card(k,score,reg){return '<div class="card"><div class="k">'+esc(k)+'</div><div class="big">'+(score==null?"-":esc(score))+'</div><div class="reg lo">'+esc(reg)+'</div></div>'}
+  var u="hello",dom="brazilcomplexity"+"."+"com",c=el("mp-cta");if(c)c.setAttribute("href","mailto:"+u+"@"+dom);
+  fetch(BASE+"/v1/digest?lang="+LANG).then(function(r){return r.json()}).then(function(d){
+    el("mp-cta").textContent=T.cta;var rr=d.radar||{},v=d.vertice||{},h="";
+    el("mp-intro").textContent=T.intro+" "+(d.data_referencia||"-")+".";
+    if(rr.regime){var g=rr.regime;h+='<h3>'+T.regime+'</h3><div class="grid">'+card(T.br,(g.brasil||{}).score,(g.brasil||{}).regime)+card(T.gl,(g.global||{}).score,(g.global||{}).regime)+card(T.inter,(g.br_intermercado||{}).score,(g.br_intermercado||{}).regime)+'</div>';}
+    if(rr.macro_essencial&&rr.macro_essencial.length){h+='<h3>'+T.macro+'</h3><div>'+rr.macro_essencial.map(function(m){return '<span class="chip"><b>'+esc(m.valor)+'</b> <span class="u">'+esc(m.unidade)+'</span> '+esc(m.nome)+'</span>'}).join("")+'</div>';}
+    if(rr.intermercado_br&&rr.intermercado_br.length){h+='<h3>'+T.inter2+'</h3><div class="grid">'+rr.intermercado_br.map(function(x){var k=x.z>=2?"hot":x.z>=1?"warm":x.z<=-1?"cool":"";return '<div class="t '+k+'"><div class="nm">'+esc(x.nome)+'</div><div class="vl">'+(x.z>=0?"+":"")+esc(x.z)+'</div><div class="rg">z · '+esc(x.regime)+'</div></div>'}).join("")+'</div>';}
+    if(v.termometros){h+='<h3>'+T.term+'</h3><div class="grid">'+v.termometros.map(function(t){return '<div class="t '+cls(t.valor)+'"><div class="nm">'+esc(t.nome)+'</div><div class="vl">'+(t.valor==null?'-':esc(t.valor))+'</div><div class="rg">'+esc(t.regime)+'</div></div>'}).join("")+'</div>';}
+    if(v.estudo_analogo){var a=v.estudo_analogo;h+='<h3>'+T.analog+'</h3><div class="hl"><div class="q">'+esc(a.pergunta)+'</div><div class="stat"><div><div class="v">'+esc(a.mediana_ret_pct)+'%</div><div class="d lo">mediana ('+a.n_analogos+')</div></div><div><div class="v">'+(a.delta_pp>=0?'+':'')+esc(a.delta_pp)+'pp</div><div class="d lo">vs base '+esc(a.base_rate_pct)+'%</div></div><div><div class="v">'+esc(a.hit_rate_pct)+'%</div><div class="d lo">hit-rate</div></div></div><div class="sub" style="margin-top:8px">'+esc(a.leitura)+'</div></div>';}
+    if(v.divergencias&&v.divergencias.length){h+='<h3>'+T.div+'</h3><ul class="dv">'+v.divergencias.map(function(x){return '<li><b>'+esc(x.codigo)+'</b> - '+esc(x.leitura)+'</li>'}).join("")+'</ul>';}
+    var ex=[];if(v.breadth){if(v.breadth.us)ex.push(card(T.bus,v.breadth.us.valor+'%',v.breadth.us.regime));if(v.breadth.br)ex.push(card(T.bbr,v.breadth.br.valor+'%',v.breadth.br.regime));}if(v.geo_riskon)ex.push(card(T.geo,v.geo_riskon.valor,v.geo_riskon.regime));
+    if(ex.length){h+='<h3>'+T.extras+'</h3><div class="grid">'+ex.join("")+'</div>';}
+    if(d.premium){h+='<div class="prem"><div class="pt">'+esc(d.premium.titulo)+'</div><ul>'+(d.premium.itens||[]).map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div>';}
+    el("mp-body").innerHTML=h;if(d.disclaimer)el("mp-disc").textContent=d.disclaimer[LANG]||d.disclaimer.pt;
+  }).catch(function(e){el("mp-body").innerHTML='<div class="sub">indisponivel.</div>'});
+})();
+</script>
+</body></html>

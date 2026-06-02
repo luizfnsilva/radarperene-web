@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Radar Perene — inteligência de regime do Brasil</title>
+<meta name="description" content="Instrumento in-house e descritivo que lê o regime regulatório, judicial, macro e de mercado do Brasil — e mostra o que acontece hoje, do básico ao avançado. Conteúdo educacional, fonte pública.">
+<meta property="og:title" content="Radar Perene — o regime do Brasil, lido como dado">
+<meta property="og:description" content="Inteligência operacional descritiva. A leitura de hoje, ao vivo. Lançamento: 100 fundadores.">
+<meta property="og:type" content="website">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/">
+<link rel="alternate" hreflang="en" href="https://radarperene.com/">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0c0f; --surface:#13171c; --surface2:#171c22; --line:#222a31; --txt:#e8ebee; --dim:#8b97a3;
+    --gold:#c9a227; --gold2:#e4c25a; --hot:#e0533d; --warm:#d98a3d; --cool:#3d7de0; --neu:#6b7682;
+    --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --max:1080px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--txt);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+  /* topbar */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;max-width:var(--max);margin:0 auto}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.3px}
+  .brand svg{display:block}
+  .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
+  .brand .nm b{color:var(--gold)}
+  .lang{font-size:12px;color:var(--dim)}.lang a{text-decoration:none;padding:0 4px}.lang a.on{color:var(--gold);font-weight:600}
+  /* hero */
+  .hero{text-align:center;padding:46px 0 18px}
+  .hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,52px);line-height:1.12;margin:0 auto 18px;max-width:18ch;letter-spacing:-.01em}
+  .hero h1 .g{color:var(--gold);font-style:italic}
+  .hero p.lead{font-size:clamp(15px,2.2vw,18px);color:var(--dim);max-width:60ch;margin:0 auto 26px}
+  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:700;
+    padding:13px 26px;border-radius:9px;font-size:15px;transition:transform .1s,background .15s}
+  .btn:hover{background:var(--gold2);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
+  .micro{font-size:11.5px;color:var(--dim);margin-top:14px}
+  section{padding:34px 0;border-top:1px solid var(--line)}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
+  h2.sec{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,32px);margin:0 0 8px}
+  .secsub{color:var(--dim);max-width:64ch;margin:0 0 22px;font-size:15px}
+  /* live radar mount */
+  #radar-live{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  /* value cards */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.cards{grid-template-columns:1fr}}
+  .vc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .vc h3{font-family:var(--serif);font-weight:600;font-size:18px;margin:0 0 6px}
+  .vc p{color:var(--dim);font-size:14px;margin:0}
+  .vc .ic{color:var(--gold);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  /* founder */
+  .founder{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--gold);border-radius:16px;padding:30px;text-align:center}
+  .founder .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:4px 14px;font-size:12px;font-weight:600;letter-spacing:.08em;margin-bottom:14px}
+  .founder h2{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,30px);margin:0 0 10px}
+  .founder p{color:var(--dim);max-width:54ch;margin:0 auto 20px;font-size:15px}
+  form.wl{display:flex;gap:8px;max-width:440px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  form.wl input[type=email]{flex:1;min-width:220px;background:#0a0c0f;border:1px solid var(--line);color:var(--txt);
+    border-radius:9px;padding:13px 14px;font-size:15px;font-family:var(--sans)}
+  form.wl input[type=email]:focus{outline:0;border-color:var(--gold)}
+  .hp{position:absolute;left:-9999px;opacity:0;height:0;width:0}
+  .wl-msg{margin-top:14px;font-size:14px;color:var(--gold2);min-height:18px}
+  /* api */
+  .api code,.api pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
+  .api pre{background:#0a0c0f;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;color:var(--dim)}
+  .api .url{color:var(--gold2)}
+  /* principles */
+  .princ{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.princ{grid-template-columns:1fr}}
+  .princ div{font-size:14px;color:var(--dim)}.princ b{color:var(--txt);font-family:var(--serif);font-weight:600}
+  footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--dim);font-size:12px;text-align:center}
+  footer .disc{max-width:70ch;margin:0 auto 10px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" stroke="#2a3340" stroke-width="1.2"/>
+      <circle cx="16" cy="16" r="9" stroke="#2a3340" stroke-width="1.2"/>
+      <circle cx="16" cy="16" r="4" stroke="#2a3340" stroke-width="1.2"/>
+      <path d="M16 16 L16 2 A14 14 0 0 1 29 13 Z" fill="#c9a227" fill-opacity="0.18"/>
+      <line x1="16" y1="16" x2="16" y2="2" stroke="#c9a227" stroke-width="1.6"/>
+      <circle cx="16" cy="16" r="2" fill="#c9a227"/>
+    </svg>
+    <span class="nm">Radar <b>Perene</b></span>
+  </div>
+  <div class="lang"><a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a></div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1 id="h1">O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.</h1>
+    <p class="lead" id="lead">Um instrumento in-house e descritivo que lê o ambiente regulatório, judicial, macro e de mercado — e mostra o que está acontecendo hoje, do básico ao avançado. Veja a leitura de hoje, ao vivo, abaixo.</p>
+    <a class="btn" href="#fundadores" id="cta1">Entrar para os 100 fundadores</a>
+    <a class="btn ghost" href="#radar" id="cta2">Ver o radar ao vivo</a>
+    <div class="micro" id="micro1">Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="radar">
+    <div class="eyebrow" id="eyb1">Ao vivo · hoje</div>
+    <h2 class="sec" id="s1">A leitura de hoje</h2>
+    <p class="secsub" id="s1s">Tudo abaixo é calculado pelo nosso motor sobre dados públicos. O histórico, os gráficos e os alertas ficam no plano assinado.</p>
+    <div id="radar-live"></div>
+  </section>
+
+  <section>
+    <div class="eyebrow" id="eyb2">O que é</div>
+    <h2 class="sec" id="s2">Dois cérebros, uma leitura honesta</h2>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section id="fundadores">
+    <div class="founder">
+      <div class="badge" id="fbadge">Lançamento · 100 fundadores</div>
+      <h2 id="fh">Os 100 primeiros entram com tudo aberto</h2>
+      <p id="fp">Acesso a todas as lentes por um preço promocional de fundador — anunciado no lançamento. Deixe seu email e receba o convite em primeira mão. Sem spam: só o aviso de lançamento.</p>
+      <form class="wl" id="wl" autocomplete="on">
+        <input type="text" class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="email" id="wl-email" placeholder="seu@email.com" required>
+        <button class="btn" type="submit" id="wl-btn">Quero meu convite</button>
+      </form>
+      <div class="wl-msg" id="wl-msg"></div>
+    </div>
+  </section>
+
+  <section class="api">
+    <div class="eyebrow" id="eyb3">Para o seu site · grátis</div>
+    <h2 class="sec" id="s3">Use nosso mini-radar onde quiser</h2>
+    <p class="secsub" id="s3s">Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.</p>
+    <pre id="apicode"><span class="url">GET https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest?lang=pt</span>
+
+&lt;iframe src="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest"&gt;&lt;/iframe&gt;</pre>
+  </section>
+
+  <section>
+    <div class="eyebrow" id="eyb4">Princípios</div>
+    <div class="princ" id="princ"></div>
+  </section>
+</div>
+
+<footer>
+  <div class="disc" id="disc">Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.</div>
+  <div>Radar Perene · <a href="mailto:hello@brazilcomplexity.com" id="mail">hello@brazilcomplexity.com</a> · radarperene.com</div>
+</footer>
+
+<script>
+(function(){
+  var DIGEST="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
+  var WAITLIST="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/waitlist";
+  // idioma: ?lang sobrepõe; senão pelo domínio (.com.br→pt, .com→en); pages.dev/local→pt
+  var _q=new URLSearchParams(location.search).get("lang");
+  var LANG=(_q==="en"||_q==="pt")?_q:(/\.com\.br$/i.test(location.hostname)?"pt":(/radarperene\.com$/i.test(location.hostname)?"en":"pt"));
+  document.documentElement.lang=LANG;
+  document.getElementById(LANG==="en"?"l-en":"l-pt").className="on";
+
+  var C=LANG==="en"?{
+    h1:'Brazil&rsquo;s regime, read as <span class="g">data</span> — not opinion.',
+    lead:"An in-house, descriptive instrument that reads the regulatory, judicial, macro and market environment — and shows what is happening today, from beginner to PhD. See today&rsquo;s reading, live, below.",
+    cta1:"Join the 100 founders",cta2:"See the live radar",micro:"Educational content, public sources. Descriptive — never a recommendation.",
+    eyb1:"Live · today",s1:"Today&rsquo;s reading",s1s:"Everything below is computed by our engine over public data. History, charts and alerts are in the paid plan.",
+    eyb2:"What it is",s2:"Two brains, one honest reading",
+    fbadge:"Launch · 100 founders",fh:"The first 100 get everything unlocked",fp:"Access to all lenses at a founder price — announced at launch. Leave your email to get the invite first. No spam: only the launch notice.",
+    wlph:"you@email.com",wlbtn:"Get my invite",
+    eyb3:"For your site · free",s3:"Use our mini-radar anywhere",s3s:"A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
+    eyb4:"Principles",
+    disc:"Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
+    cards:[["5 conservative lenses","Radar","Regulatory, rates/macro, BR intermarket, legal and wealth — a sober reading of the regime."],
+      ["The Vértice lens","Experimental","9 cross-asset thermometers, breadth, geographic risk-on/off and historical analog studies."],
+      ["Depth, never advice","Method","From a one-line read to PhD-level detail. We describe; we never tell you to buy or sell."]],
+    princ:[["Descriptive","We read and contextualize the regime — we never recommend or predict a price."],
+      ["Public sources","Built on public data. Low-noise, auditable, transparent."],
+      ["Contradiction on show","Every reading carries its own counter-evidence. No false certainty."]],
+    ok:"You&rsquo;re on the list — we&rsquo;ll be in touch.",err:"Couldn&rsquo;t register. Try again.",inv:"Enter a valid email."
+  }:{
+    h1:'O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.',
+    lead:"Um instrumento in-house e descritivo que lê o ambiente regulatório, judicial, macro e de mercado — e mostra o que está acontecendo hoje, do básico ao avançado. Veja a leitura de hoje, ao vivo, abaixo.",
+    cta1:"Entrar para os 100 fundadores",cta2:"Ver o radar ao vivo",micro:"Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.",
+    eyb1:"Ao vivo · hoje",s1:"A leitura de hoje",s1s:"Tudo abaixo é calculado pelo nosso motor sobre dados públicos. O histórico, os gráficos e os alertas ficam no plano assinado.",
+    eyb2:"O que é",s2:"Dois cérebros, uma leitura honesta",
+    fbadge:"Lançamento · 100 fundadores",fh:"Os 100 primeiros entram com tudo aberto",fp:"Acesso a todas as lentes por um preço promocional de fundador — anunciado no lançamento. Deixe seu email e receba o convite em primeira mão. Sem spam: só o aviso de lançamento.",
+    wlph:"seu@email.com",wlbtn:"Quero meu convite",
+    eyb3:"Para o seu site · grátis",s3:"Use nosso mini-radar onde quiser",s3s:"Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.",
+    eyb4:"Princípios",
+    disc:"Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.",
+    cards:[["5 lentes conservadoras","Radar","Regulatória, juros/macro, intermercado BR, jurídica e patrimonial — uma leitura sóbria do regime."],
+      ["A lente Vértice","Experimental","9 termômetros cross-asset, breadth, risk-on/off geográfico e estudos de análogo histórico."],
+      ["Profundidade, nunca conselho","Método","Da leitura de uma linha ao detalhe nível PhD. Descrevemos; nunca mandamos comprar ou vender."]],
+    princ:[["Descritivo","Lemos e contextualizamos o regime — nunca recomendamos nem prevemos preço."],
+      ["Fonte pública","Construído sobre dado público. Baixo ruído, auditável, transparente."],
+      ["Contradição à mostra","Toda leitura carrega a própria contra-evidência. Sem falsa certeza."]],
+    ok:"Você está na lista — entraremos em contato.",err:"Não consegui registrar. Tente de novo.",inv:"Digite um email válido."
+  };
+  function set(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html}
+  set("h1",C.h1);set("lead",C.lead);set("cta1",C.cta1);set("cta2",C.cta2);set("micro1",C.micro);
+  set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);set("eyb2",C.eyb2);set("s2",C.s2);
+  set("fbadge",C.fbadge);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
+  set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);
+  document.getElementById("wl-email").placeholder=C.wlph;
+  set("cards",C.cards.map(function(c){return '<div class="vc"><div class="ic">'+c[1]+'</div><h3>'+c[0]+'</h3><p>'+c[2]+'</p></div>'}).join(""));
+  set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));
+
+  // radar ao vivo — render inline (a landing é nossa página limpa; sem conflito de embed)
+  renderRadar();
+  function regClass(v){if(v==null)return "";return v>=75?"hot":v>=55?"warm":v<=45?"cool":""}
+  function esc(s){return String(s==null?"":s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c]})}
+  function renderRadar(){
+    fetch(DIGEST+"?lang="+LANG).then(function(r){return r.json()}).then(function(d){
+      var rr=d.radar||{},v=d.vertice||{},styleVars="--card:#171c22;--line:#222a31;--dim:#8b97a3;--gold:#c9a227;--hot:#e0533d;--warm:#d98a3d;--cool:#3d7de0;--neu:#6b7682";
+      var h='<div style="padding:18px">';
+      h+='<style>#radar-live .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}@media(max-width:600px){#radar-live .g3{grid-template-columns:1fr 1fr}}'+
+        '#radar-live .c{background:var(--card,#171c22);border:1px solid #222a31;border-radius:9px;padding:11px}'+
+        '#radar-live .c .k{font-size:10.5px;color:#8b97a3}#radar-live .c .b{font-size:20px;font-weight:700;margin-top:2px}#radar-live .c .r{font-size:10.5px;color:#8b97a3;margin-top:2px}'+
+        '#radar-live .t{background:#171c22;border:1px solid #222a31;border-left:3px solid #6b7682;border-radius:8px;padding:9px}'+
+        '#radar-live .t.hot{border-left-color:#e0533d}#radar-live .t.warm{border-left-color:#d98a3d}#radar-live .t.cool{border-left-color:#3d7de0}'+
+        '#radar-live .t .n{font-size:11.5px;font-weight:600}#radar-live .t .vv{font-size:17px;font-weight:700}#radar-live .t .rr{font-size:10px;color:#8b97a3}'+
+        '#radar-live h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8b97a3;margin:16px 0 7px}'+
+        '#radar-live .hl{background:linear-gradient(180deg,#1a2027,#13171c);border:1px solid #c9a227;border-radius:11px;padding:15px}'+
+        '#radar-live .hl .v{font-size:24px;font-weight:800;color:#e4c25a}#radar-live .hl .q{font-size:12.5px;color:#8b97a3;margin-bottom:8px}'+
+        '#radar-live .stat{display:flex;gap:18px;flex-wrap:wrap}#radar-live .chip{display:inline-flex;gap:5px;background:#171c22;border:1px solid #222a31;border-radius:999px;padding:4px 10px;font-size:12px;margin:0 5px 6px 0}'+
+        '#radar-live .dv{margin:6px 0 0;padding:0;list-style:none}#radar-live .dv li{font-size:12px;padding:5px 0;border-top:1px solid #222a31}#radar-live .dv b{color:#e4c25a}</style>';
+      function card(k,sc,rg){return '<div class="c"><div class="k">'+esc(k)+'</div><div class="b">'+(sc==null?"—":esc(sc))+'</div><div class="r">'+esc(rg)+'</div></div>'}
+      if(rr.regime){var g=rr.regime;h+='<h4>'+(LANG==="en"?"Today&rsquo;s regime":"Regime de hoje")+'</h4><div class="g3">'+
+        card(LANG==="en"?"Brazil":"Brasil",(g.brasil||{}).score,(g.brasil||{}).regime)+card("Global",(g.global||{}).score,(g.global||{}).regime)+
+        card(LANG==="en"?"BR intermarket":"BR intermercado",(g.br_intermercado||{}).score,(g.br_intermercado||{}).regime)+'</div>';}
+      if(rr.macro_essencial&&rr.macro_essencial.length){h+='<h4>'+(LANG==="en"?"Essential macro (public)":"Macro essencial (público)")+'</h4><div>'+
+        rr.macro_essencial.map(function(m){return '<span class="chip"><b>'+esc(m.valor)+'</b> <span style="color:#8b97a3;font-size:10px">'+esc(m.unidade)+'</span> '+esc(m.nome)+'</span>'}).join("")+'</div>';}
+      if(rr.intermercado_br&&rr.intermercado_br.length){h+='<h4>'+(LANG==="en"?"BR intermarket (stocks)":"Intermercado BR (bolsa)")+'</h4><div class="g3">'+
+        rr.intermercado_br.map(function(x){var k=x.z>=2?"hot":x.z>=1?"warm":x.z<=-1?"cool":"";return '<div class="t '+k+'"><div class="n">'+esc(x.nome)+'</div><div class="vv">'+(x.z>=0?"+":"")+esc(x.z)+'</div><div class="rr">z · '+esc(x.regime)+'</div></div>'}).join("")+'</div>';}
+      if(v.termometros){h+='<h4>'+(LANG==="en"?"9 thermometers":"9 termômetros")+'</h4><div class="g3">'+v.termometros.map(function(t){
+        return '<div class="t '+regClass(t.valor)+'"><div class="n">'+esc(t.nome)+'</div><div class="vv">'+(t.valor==null?"—":esc(t.valor))+'</div><div class="rr">'+esc(t.regime)+'</div></div>'}).join("")+'</div>';}
+      if(v.estudo_analogo){var a=v.estudo_analogo;h+='<h4>'+(LANG==="en"?"Analog study":"Estudo de análogo")+'</h4><div class="hl"><div class="q">'+esc(a.pergunta)+'</div><div class="stat">'+
+        '<div><div class="v">'+esc(a.mediana_ret_pct)+'%</div><div class="r" style="color:#8b97a3">mediana</div></div>'+
+        '<div><div class="v">'+(a.delta_pp>=0?"+":"")+esc(a.delta_pp)+'pp</div><div class="r" style="color:#8b97a3">vs base '+esc(a.base_rate_pct)+'%</div></div>'+
+        '<div><div class="v">'+esc(a.hit_rate_pct)+'%</div><div class="r" style="color:#8b97a3">hit-rate</div></div></div></div>';}
+      if(v.divergencias&&v.divergencias.length){h+='<h4>'+(LANG==="en"?"Divergences today":"Divergências hoje")+'</h4><ul class="dv">'+
+        v.divergencias.map(function(x){return '<li><b>'+esc(x.codigo)+'</b> · '+esc(x.leitura)+'</li>'}).join("")+'</ul>';}
+      h+='</div>';
+      document.getElementById("radar-live").innerHTML=h;
+    }).catch(function(){document.getElementById("radar-live").innerHTML='<div style="padding:24px;color:#8b97a3">—</div>'});
+  }
+
+  // waitlist
+  document.getElementById("wl").addEventListener("submit",function(ev){
+    ev.preventDefault();
+    var msg=document.getElementById("wl-msg"),email=document.getElementById("wl-email").value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){msg.innerHTML=C.inv;return}
+    msg.textContent="…";
+    fetch(WAITLIST,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email:email,hp:document.querySelector("#wl [name=hp]").value,lang:LANG,origem:"radarperene",lente:"todas"})})
+      .then(function(r){return r.json()}).then(function(j){msg.innerHTML=j&&j.ok?C.ok:C.err;if(j&&j.ok)document.getElementById("wl-email").value=""})
+      .catch(function(){msg.innerHTML=C.err});
+  });
+})();
+</script>
+</body>
+</html>
