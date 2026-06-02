@@ -187,11 +187,13 @@
   window.rpTrack=function(name){ if(localStorage.getItem(KEY)!=="granted")return;
     try{if(window.gtag)gtag("event",name);if(window.fbq)fbq("track",name==="Lead"?"Lead":"ViewContent");}catch(e){} };
   function loadAnalytics(){
-    /* >>> EDITE os IDs e descomente o que usar — carrega SÓ com consentimento (LGPD). <<<
-    var s=document.createElement("script");s.async=1;s.src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX";document.head.appendChild(s);
-    window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());gtag("config","G-XXXXXXXXXX");
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","META_PIXEL_ID");fbq("track","PageView");
-    */
+    // GA4 por domínio (carrega SÓ após consentimento — LGPD). .com.br=BR, .com/outros=internacional.
+    var GA=/\.com\.br$/i.test(location.hostname)?"G-4LVGNLRV9L":"G-CWB77T178R";
+    var s=document.createElement("script");s.async=1;s.src="https://www.googletagmanager.com/gtag/js?id="+GA;document.head.appendChild(s);
+    window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};
+    gtag("js",new Date());gtag("config",GA);
+    // Meta Pixel (descomente e ponha o ID quando criar — entra consent-gated):
+    // !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","META_PIXEL_ID");fbq("track","PageView");
   }
   var c=localStorage.getItem(KEY), bar=document.getElementById("rp-cookie");
   if(c==="granted"){loadAnalytics();} else if(c!=="denied"){bar.style.display="block";}
