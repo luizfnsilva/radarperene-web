@@ -108,7 +108,7 @@
     </svg>
     <span class="nm">Radar <b>Perene</b></span>
   </div>
-  <div class="lang"><a href="/sobre" id="l-sobre">O que é</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a></div>
+  <div class="lang"><a href="/sobre.html" id="l-sobre">O que é</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a></div>
 </div>
 
 <div class="wrap">
@@ -211,7 +211,7 @@
   var LANG=(_q==="en"||_q==="pt")?_q:(/\.com\.br$/i.test(location.hostname)?"pt":(/radarperene\.com$/i.test(location.hostname)?"en":"pt"));
   document.documentElement.lang=LANG;
   document.getElementById(LANG==="en"?"l-en":"l-pt").className="on";
-  if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about";}}
+  if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about.html";}}
 
   var C=LANG==="en"?{
     h1:'Brazil&rsquo;s regime, read as <span class="g">data</span> — not opinion.',
@@ -287,13 +287,15 @@
       if(rr.intermercado_br&&rr.intermercado_br.length){h+='<h4>'+(LANG==="en"?"BR intermarket (stocks)":"Intermercado BR (bolsa)")+'</h4><div class="g3">'+
         rr.intermercado_br.map(function(x){var k=x.z>=2?"hot":x.z>=1?"warm":x.z<=-1?"cool":"";return '<div class="t '+k+'"><div class="n">'+esc(x.nome)+'</div><div class="vv">'+(x.z>=0?"+":"")+esc(x.z)+'</div><div class="rr">z · '+esc(x.regime)+'</div></div>'}).join("")+'</div>';}
       if(v.termometros){h+='<h4>'+(LANG==="en"?"9 thermometers":"9 termômetros")+'</h4><div class="g3">'+v.termometros.map(function(t){
-        return '<div class="t '+regClass(t.valor)+'"><div class="n">'+esc(t.nome)+'</div><div class="vv">'+(t.valor==null?"—":esc(t.valor))+'</div><div class="rr">'+esc(t.regime)+'</div></div>'}).join("")+'</div>';}
+        var bw=t.valor==null?0:Math.max(0,Math.min(100,t.valor)),bc=t.valor>=75?"#e0533d":t.valor>=55?"#d98a3d":t.valor<=45?"#3d7de0":"#6b7682";
+        return '<div class="t '+regClass(t.valor)+'"><div class="n">'+esc(t.nome)+'</div><div class="vv">'+(t.valor==null?"—":esc(t.valor))+'</div><div class="rr">'+esc(t.regime)+'</div>'+(t.valor!=null?'<div style="height:5px;border-radius:3px;background:#222a31;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:'+bw+'%;background:'+bc+'"></i></div>':'')+'</div>'}).join("")+'</div>';}
       if(v.estudo_analogo){var a=v.estudo_analogo;h+='<h4>'+(LANG==="en"?"Analog study":"Estudo de análogo")+'</h4><div class="hl"><div class="q">'+esc(a.pergunta)+'</div><div class="stat">'+
         '<div><div class="v">'+esc(a.mediana_ret_pct)+'%</div><div class="r" style="color:#8b97a3">mediana</div></div>'+
         '<div><div class="v">'+(a.delta_pp>=0?"+":"")+esc(a.delta_pp)+'pp</div><div class="r" style="color:#8b97a3">vs base '+esc(a.base_rate_pct)+'%</div></div>'+
         '<div><div class="v">'+esc(a.hit_rate_pct)+'%</div><div class="r" style="color:#8b97a3">hit-rate</div></div></div></div>';}
       if(v.divergencias&&v.divergencias.length){h+='<h4>'+(LANG==="en"?"Divergences today":"Divergências hoje")+'</h4><ul class="dv">'+
         v.divergencias.map(function(x){return '<li><b>'+esc(x.codigo)+'</b> · '+esc(x.leitura)+'</li>'}).join("")+'</ul>';}
+      h+='<div style="margin-top:16px;background:#171c22;border:1px dashed #c9a227;border-radius:10px;padding:13px 15px;font-size:13px"><b style="color:#c9a227">'+(LANG==="en"?"Subscribe and cross everything:":"Assinando, você cruza tudo:")+'</b> '+(LANG==="en"?"any indicator with any other, in any window — with statistical testing, historical analogs and projections. This is a fraction of what the engine computes.":"qualquer indicador com qualquer outro, em qualquer janela — com teste estatístico, análogos históricos e projeções. Isto é uma fração do que o motor calcula.")+'</div>';
       h+='</div>';
       document.getElementById("radar-live").innerHTML=h;
     }).catch(function(){document.getElementById("radar-live").innerHTML='<div style="padding:24px;color:#8b97a3">—</div>'});
