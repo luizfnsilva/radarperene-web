@@ -51,7 +51,8 @@
       ".rp .live{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--_dim);margin:0 0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.rp .live .dot{width:7px;height:7px;border-radius:50%;background:var(--_accent);flex:none}" +
       ".rp .spk{display:block;width:100%;height:26px;margin-top:7px}" +
       ".rp .mg{display:block;margin-top:4px}.rp .mg .nd{animation:rpbreath 3.4s ease-in-out infinite}@keyframes rpbreath{0%,100%{opacity:.45}50%{opacity:1}}@media(prefers-reduced-motion:reduce){.rp .mg .nd{animation:none;opacity:.9}}" +
-      ".rp .tk .i[data-cod]{cursor:pointer}.rp .tk .i[data-cod]:hover{border-color:var(--_accent)}";
+      ".rp .tk .i[data-cod]{cursor:pointer}.rp .tk .i[data-cod]:hover{border-color:var(--_accent)}" +
+      ".rp [data-exp]{cursor:pointer}.rp .more{display:none;margin-top:6px;border-top:1px solid var(--_line);padding-top:5px}.rp .open .more{display:block}.rp .more .mi{font-size:10px;color:var(--_dim);padding:2px 0}";
     document.head.appendChild(s);
   }
 
@@ -85,6 +86,13 @@
       svg += '<text x="' + (p.x + dx).toFixed(1) + '" y="' + (p.y + dy).toFixed(1) + '" text-anchor="' + an + '" fill="var(--_dim)" font-size="9">' + esc(p.l.nome) + '</text>'; });
     return svg + '</svg>';
   }
+  // par curado: duas séries normalizadas [0,100] sobrepostas (gostinho do cruzamento livre)
+  function dualSpark(a, b) {
+    if (!a || !b || a.length < 2) return "";
+    var W = 280, H = 40, n = a.length - 1 || 1;
+    function pts(arr) { return arr.map(function (v, i) { return ((i / n) * W).toFixed(1) + "," + ((H - 3) - (v / 100) * (H - 6)).toFixed(1); }).join(" "); }
+    return '<svg class="spk" width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts(a) + '" fill="none" stroke="var(--_accent)" stroke-width="1.5"/><polyline points="' + pts(b) + '" fill="none" stroke="var(--_cool)" stroke-width="1.5"/></svg>';
+  }
 
   function render(node, d, lang, sections, chrome) {
     var L = lang === "en";
@@ -106,22 +114,24 @@
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>'; }
     if (show("lentes") && rr.lentes && rr.lentes.length) { h += '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="legend">' + (L ? "each lens = a domain of Brazil’s regime; color = intensity · dashed line = projection under current conditions, not a forecast" : "cada lente = um domínio do regime; a cor = intensidade · linha tracejada = projeção sob condições atuais, não previsão") + '</div><div class="lns">' +
-      rr.lentes.map(function (l) { return '<div class="ln ' + esc(l.tom) + '"><div class="lk">' + esc(l.nome) + '</div><div class="li">' + esc(l.indicador) + '</div>' +
+      rr.lentes.map(function (l) { var more = (l.indicadores && l.indicadores.length) ? '<div class="more">' + l.indicadores.map(function (ii) { return '<div class="mi">' + esc(ii.nome) + ' · ' + esc(ii.leitura || (ii.valor != null ? ii.valor + (ii.unidade || "") : "")) + '</div>'; }).join("") + '</div>' : '';
+        return '<div class="ln ' + esc(l.tom) + '"' + (more ? ' data-exp="1"' : '') + '><div class="lk">' + esc(l.nome) + (more ? ' <span class="lr" style="opacity:.55">＋</span>' : '') + '</div><div class="li">' + esc(l.indicador) + '</div>' +
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
-        '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + '</div>'; }).join("") + '</div>'; }
-    if (show("grafo") && rr.lentes && rr.lentes.length >= 5) { h += '<h4>' + (L ? "How the lenses connect" : "Como as lentes se cruzam") + '</h4><div class="legend">' + (L ? "a fiscal move lifts wealth → triggers institutional → echoes in real estate" : "um movimento fiscal eleva o patrimonial → aciona o institucional → repercute no imobiliário") + '</div>' + propGraph(rr.lentes); }
+        '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + more + '</div>'; }).join("") + '</div>'; }
     if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4>' +
       '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
       rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "BR intermarket (stocks)" : "Intermercado BR (bolsa)") + '</h4><div class="g3">' +
-      rr.intermercado_br.map(function (x) { return '<div class="t ' + esc(x.tom) + '"><div class="n">' + esc(x.nome) + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div></div>'; }).join("") + '</div>'; }
+      rr.intermercado_br.map(function (x) { return '<div class="t ' + esc(x.tom) + '"' + (x.fonte ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (x.fonte ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.fonte ? '<div class="more"><div class="mi">' + esc(x.fonte) + '</div></div>' : '') + '</div>'; }).join("") + '</div>'; }
     // tickers por lente (gostinho generoso): ações (V) · Tesouro (M) · FIIs (R)
     if (show("acoes") && rr.tickers_acoes && rr.tickers_acoes.length) { h += '<h4>' + (L ? "BR stocks · highlights" : "Ações BR · destaques") + '</h4><div class="tk">' +
-      rr.tickers_acoes.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.ticker).toLowerCase()) + '" data-cls="equity_br"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w range" : "% da faixa 52s") + '</span>' : '') + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+      rr.tickers_acoes.map(function (t) { var rel = (t.razao_nome ? "∈ " + t.razao_nome + (t.razao_leitura ? " · " + t.razao_leitura : "") : "") + (t.risk ? ((t.razao_nome ? " · " : "") + t.risk) : ""); return '<span class="i" data-cod="' + esc(String(t.ticker).toLowerCase()) + '" data-cls="equity_br"' + (rel ? ' data-rel="' + esc(rel) + '"' : '') + '><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w range" : "% da faixa 52s") + '</span>' : '') + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("tesouro") && rr.tickers_tesouro && rr.tickers_tesouro.length) { h += '<h4>' + (L ? "Treasury (rates)" : "Tesouro Direto (juros)") + '</h4><div class="tk">' +
       rr.tickers_tesouro.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">' + esc(t.taxa) + '</span></span>'; }).join("") + '</div>'; }
     if (show("fiis") && rr.tickers_fiis && rr.tickers_fiis.length) { h += '<h4>' + (L ? "REITs (FIIs) · 12m dividend yield" : "FIIs · dividend yield 12m") + '</h4><div class="tk">' +
       rr.tickers_fiis.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span>' + (t.dy != null ? '<span class="pr">' + esc(t.dy) + '%</span>' : '') + (t.pvp != null ? '<span class="mt">P/VP ' + esc(t.pvp) + (t.pvp < 0.98 ? (L ? " (disc.)" : " (desc.)") : t.pvp > 1.02 ? (L ? " (prem.)" : " (ágio)") : "") + '</span>' : '') + (t.segmento ? '<span class="mt">' + esc(t.segmento) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+
+    if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br; h += '<h4>' + (L ? "BR analog · past → future" : "Análogo BR · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(ab.pergunta) + '</div>' + (ab.datas_analogas && ab.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') + '<div class="stat"><div><div class="v">' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median (IBOV)" : "mediana (IBOV)") + '</div></div><div><div class="v">' + esc(ab.hit_rate_pct) + '%</div><div class="r">hit-rate</div></div></div></div>'; }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
@@ -129,8 +139,8 @@
       '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' +
       v.termometros.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
         (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + '</div>'; }).join("") + '</div>'; }
-    if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4><div class="tk">' +
-      v.cripto.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.simbolo).toLowerCase()) + '" data-cls="cripto"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span></span>'; }).join("") + '</div>'; }
+    if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4>' + (v.cripto_sentimento ? '<div class="legend">Fear &amp; Greed: ' + esc(v.cripto_sentimento.fng) + ' (' + esc(v.cripto_sentimento.leitura) + ')</div>' : '') + '<div class="tk">' +
+      v.cripto.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.simbolo).toLowerCase()) + '" data-cls="cripto"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w" : "% da faixa 52s") + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("extras")) { var ex = [];
       if (v.breadth) { if (v.breadth.us) ex.push(card(L ? "US breadth" : "Breadth US", v.breadth.us.valor + "%", v.breadth.us.regime)); if (v.breadth.br) ex.push(card(L ? "BR breadth" : "Breadth BR", v.breadth.br.valor + "%", v.breadth.br.regime)); }
       if (v.geo_riskon) ex.push(card(L ? "Geographic risk-on" : "Risk-on geográfico", v.geo_riskon.valor, v.geo_riskon.regime));
@@ -145,6 +155,7 @@
     if (show("divergencias") && v.divergencias && v.divergencias.length) { h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
       v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; }
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
+    if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; h += '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
     h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
       (L ? "The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across hundreds of assets and 50+ years of history."
          : "O plano completo acrescenta a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção — sobre centenas de ativos e 50+ anos de histórico.") +
@@ -165,18 +176,19 @@
       var sections = sa ? sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : null;
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
-        var t = ev.target, chip = null;
-        while (t && t !== node) { if (t.getAttribute && t.getAttribute("data-cod")) { chip = t; break; } t = t.parentNode; }
+        var t = ev.target, chip = null, exp = null;
+        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; } t = t.parentNode; }
+        if (exp && !chip) { exp.classList.toggle("open"); return; }                 // clique na lente/razão → abre/fecha 2ª camada
         if (!chip || chip.getAttribute("data-open")) return;
         chip.setAttribute("data-open", "1"); chip.style.opacity = ".6";
+        var rel = chip.getAttribute("data-rel");
         fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(chip.getAttribute("data-cod")) + "&classe=" + encodeURIComponent(chip.getAttribute("data-cls") || "equity_br"))
           .then(function (r) { return r.json(); }).then(function (s) {
             chip.style.opacity = "";
-            if (s && s.hist && s.hist.length > 1) {
-              var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
-              box.innerHTML = spark(s) + '<span class="mt" style="display:block;margin-top:2px">' + (lang === "en" ? "projection under current conditions — full view in the app →" : "projeção sob condições atuais — visão completa no app →") + '</span>';
-              chip.appendChild(box);
-            } else { chip.removeAttribute("data-open"); }
+            var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
+            var inner = (s && s.hist && s.hist.length > 1) ? spark(s) : "";
+            inner += '<span class="mt" style="display:block;margin-top:2px">' + (rel ? esc(rel) + ' · ' : '') + (lang === "en" ? "projection under current conditions — full in the app →" : "projeção sob condições atuais — completo no app →") + '</span>';
+            box.innerHTML = inner; chip.appendChild(box);
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
       fetch(API + "?lang=" + lang).then(function (r) { return r.json(); })
