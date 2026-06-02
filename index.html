@@ -108,7 +108,7 @@
     </svg>
     <span class="nm">Radar <b>Perene</b></span>
   </div>
-  <div class="lang"><a href="/sobre.html" id="l-sobre">O que é</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a></div>
+  <div class="lang"><a href="/sobre" id="l-sobre">O que é</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a></div>
 </div>
 
 <div class="wrap">
@@ -211,7 +211,7 @@
   var LANG=(_q==="en"||_q==="pt")?_q:(/\.com\.br$/i.test(location.hostname)?"pt":(/radarperene\.com$/i.test(location.hostname)?"en":"pt"));
   document.documentElement.lang=LANG;
   document.getElementById(LANG==="en"?"l-en":"l-pt").className="on";
-  if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about.html";}}
+  if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about";}}
 
   var C=LANG==="en"?{
     h1:'Brazil&rsquo;s regime, read as <span class="g">data</span> — not opinion.',

@@ -14,8 +14,12 @@ Funciona em HTML puro, WordPress, Wix, React, etc. Você estiliza por **variáve
 
 ```html
 <div id="radar-perene" data-lang="pt"></div>
+<!-- crédito (obrigatório no uso gratuito) — link ESTÁTICO = backlink real -->
+<p style="font-size:13px;color:#888">Radar de regime do Brasil, ao vivo, por <a href="https://radarperene.com">Radar Perene</a>.</p>
 <script src="https://radarperene.com/radar.js" defer></script>
 ```
+
+**Escolher quais seções mostrar** (opcional): `data-sections="regime,macro,intermercado,termometros,analogo,divergencias,extras"` no `<div>` (vazio = tudo).
 
 **Deixar com a identidade do seu site** (todas as variáveis são opcionais):
 ```html
@@ -70,7 +74,7 @@ Cola em minutos, sem renderizar nada. (Visual padrão Radar Perene; não herda s
 
 ## Regras (P7 — proteja a fonte e a si mesmo)
 - **Conteúdo educacional/informativo, descritivo** — **nunca** apresentar como recomendação de compra/venda. O disclaimer vem no payload; mantenha-o visível.
-- **Cite a fonte** com link para **`radarperene.com`** — é o combinado do uso gratuito (e gera o backlink).
+- **Crédito obrigatório (e é o "preço" do uso gratuito):** mantenha o **link estático** `<a href="https://radarperene.com">Radar Perene</a>` no HTML da página (como no snippet acima) — **dofollow, sem `nofollow`**. É um link real no código-fonte (não só no widget), então conta como backlink de verdade e dá autoridade pros dois lados (você fica associado à fonte; nós ganhamos o link). Os links dentro do widget também apontam pra `radarperene.com`, mas é o estático que garante o SEO.
 - Não remova o disclaimer nem reescreva os números.
 
 ## Por que atende o requisito
