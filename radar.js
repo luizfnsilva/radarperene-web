@@ -189,8 +189,12 @@
           .then(function (r) { return r.json(); }).then(function (s) {
             chip.style.opacity = "";
             var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
-            var inner = (s && s.hist && s.hist.length > 1) ? spark(s) : "";
-            inner += '<span class="mt" style="display:block;margin-top:2px">' + (meta ? esc(meta) + ' · ' : '') + (lang === "en" ? "projection under current conditions — full in the app →" : "projeção sob condições atuais — completo no app →") + '</span>';
+            var inner = "";
+            if (s && s.hist && s.hist.length > 1) {
+              inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection" : "preço · histórico → hoje → projeção") + '</span>' + spark({ hist: s.hist, proj: s.proj });
+              if (s.hist2 && s.hist2.length > 1) inner += '<span class="mt" style="display:block;margin-top:3px">' + esc(s.hist2_label || "") + '</span>' + spark({ hist: s.hist2 });
+            }
+            inner += '<span class="mt" style="display:block;margin-top:2px">' + (meta ? esc(meta) + ' · ' : '') + (lang === "en" ? "full in the app →" : "completo no app →") + '</span>';
             box.innerHTML = inner; chip.appendChild(box);
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
