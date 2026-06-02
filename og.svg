@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0a0c0f"/>
+  <g transform="translate(600,300)">
+    <circle r="240" fill="none" stroke="#1c242d" stroke-width="2"/>
+    <circle r="170" fill="none" stroke="#1c242d" stroke-width="2"/>
+    <circle r="100" fill="none" stroke="#1c242d" stroke-width="2"/>
+    <path d="M0 0 L0 -240 A240 240 0 0 1 200 -132 Z" fill="#c9a227" fill-opacity="0.10"/>
+    <line x1="0" y1="0" x2="0" y2="-240" stroke="#c9a227" stroke-width="3"/>
+    <circle r="6" fill="#c9a227"/>
+  </g>
+  <text x="80" y="300" font-family="Georgia,serif" font-size="74" fill="#e8ebee" font-weight="500">Radar <tspan fill="#c9a227">Perene</tspan></text>
+  <text x="82" y="360" font-family="Inter,Arial,sans-serif" font-size="30" fill="#8b97a3">O regime do Brasil, lido como dado — não como opinião.</text>
+  <text x="82" y="560" font-family="Inter,Arial,sans-serif" font-size="22" fill="#c9a227">radarperene.com</text>
+  <text x="82" y="595" font-family="Inter,Arial,sans-serif" font-size="15" fill="#5b6570">Inteligência de regime · descritivo · fonte pública · nunca recomendação</text>
+</svg>
