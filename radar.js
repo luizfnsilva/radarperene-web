@@ -8,6 +8,10 @@
  */
 (function () {
   var API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
+  // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
+  // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
+  var FOPT = { headers: { apikey: ANON, Authorization: "Bearer " + ANON } };
   var STYLE_ID = "rp-radar-style";
 
   function injectStyle() {
@@ -224,7 +228,7 @@
         if (!chip || chip.getAttribute("data-open")) return;
         chip.setAttribute("data-open", "1"); chip.style.opacity = ".6";
         var rel = chip.getAttribute("data-rel"), fund = chip.getAttribute("data-fund"), meta = [rel, fund].filter(Boolean).join(" · ");
-        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(chip.getAttribute("data-cod")) + "&classe=" + encodeURIComponent(chip.getAttribute("data-cls") || "equity_br"))
+        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(chip.getAttribute("data-cod")) + "&classe=" + encodeURIComponent(chip.getAttribute("data-cls") || "equity_br"), FOPT)
           .then(function (r) { return r.json(); }).then(function (s) {
             chip.style.opacity = "";
             var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
@@ -238,7 +242,7 @@
             box.innerHTML = inner; chip.appendChild(box);
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
-      fetch(API + "?lang=" + lang).then(function (r) { return r.json(); })
+      fetch(API + "?lang=" + lang, FOPT).then(function (r) { return r.json(); })
         .then(function (d) { render(node, d, lang, sections, chrome); })
         .catch(function () { node.innerHTML = '<div class="rp"><div class="sub">Radar Perene — indisponível.</div></div>'; });
     });
