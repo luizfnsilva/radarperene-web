@@ -60,7 +60,7 @@
     if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Essential macro (public)" : "Macro essencial (público)") + '</h4><div>' +
       rr.macro_essencial.map(function (m) { return '<span class="chip"><b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' + esc(m.nome) + '</span>'; }).join("") + '</div>'; }
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "BR intermarket (stocks)" : "Intermercado BR (bolsa)") + '</h4><div class="g3">' +
-      rr.intermercado_br.map(function (x) { return '<div class="t ' + clz(x.z) + '"><div class="n">' + esc(x.nome) + '</div><div class="v">' + (x.z >= 0 ? "+" : "") + esc(x.z) + '</div><div class="rr">z · ' + esc(x.regime) + '</div></div>'; }).join("") + '</div>'; }
+      rr.intermercado_br.map(function (x) { return '<div class="t ' + esc(x.tom) + '"><div class="n">' + esc(x.nome) + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div></div>'; }).join("") + '</div>'; }
     if (show("termometros") && v.termometros) { h += '<h4>' + (L ? "9 thermometers" : "9 termômetros") + '</h4>' +
       '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' +
       v.termometros.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +

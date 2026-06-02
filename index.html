@@ -93,6 +93,26 @@
   .princ div{font-size:14px;color:var(--dim)}.princ b{color:var(--txt);font-family:var(--serif);font-weight:600}
   footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--dim);font-size:12px;text-align:center}
   footer .disc{max-width:70ch;margin:0 auto 10px}
+  /* lentes (o que é o app) */
+  .lenses{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:760px){.lenses{grid-template-columns:1fr}}
+  .ln{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .ln .nm{font-family:var(--serif);font-weight:600;font-size:16px;margin:0 0 5px;display:flex;align-items:center;gap:7px}
+  .ln p{color:var(--dim);font-size:13.5px;margin:0}
+  .ln.vx{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface))}
+  .ln .tag{margin-left:auto;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:1px 8px}
+  .ln .micro{display:block;margin-top:8px;font-size:11px;color:var(--dim);font-style:italic}
+  /* escada de profundidade */
+  .ladder{display:flex;gap:8px;flex-wrap:wrap}
+  .ladder .st{flex:1;min-width:148px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+  .ladder .st .no{font-size:11px;color:var(--gold);font-weight:700}
+  .ladder .st .ti{font-family:var(--serif);font-weight:600;font-size:15px;margin:3px 0 2px}
+  .ladder .st .de{font-size:12px;color:var(--dim)}
+  /* faixa de escala / oceano */
+  .scale{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;text-align:center}
+  .scale .st{flex:1;min-width:118px;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:12px;padding:16px 12px}
+  .scale .st b{display:block;font-family:var(--serif);font-size:26px;font-weight:600;color:var(--gold2);line-height:1.1}
+  .scale .st span{font-size:11.5px;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -114,7 +134,7 @@
 <div class="wrap">
   <div class="hero">
     <h1 id="h1">O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.</h1>
-    <p class="lead" id="lead">Um instrumento in-house e descritivo que lê o ambiente regulatório, judicial, macro e de mercado — e mostra o que está acontecendo hoje, do básico ao avançado. Veja a leitura de hoje, ao vivo, abaixo.</p>
+    <p class="lead" id="lead">Cinco lentes de inteligência sobre o Brasil — patrimonial, eleitoral, macro, institucional e imobiliária — mais o experimento Vértice. Você escolhe a profundidade. Veja a leitura de hoje, ao vivo, abaixo.</p>
     <a class="btn" href="#fundadores" id="cta1">Entrar para os 100 fundadores</a>
     <a class="btn ghost" href="#radar" id="cta2">Ver o radar ao vivo</a>
     <div class="micro" id="micro1">Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.</div>
@@ -122,17 +142,36 @@
 </div>
 
 <div class="wrap">
+  <section id="paraquem">
+    <div class="eyebrow" id="eyb7">Para quem é</div>
+    <h2 class="sec" id="s7">Investidores, analistas, gestores — e curiosos sérios.</h2>
+    <p class="secsub" id="s7s">Para quem quer ler o regime do mercado brasileiro sem ruído e sem palpite, na profundidade que escolher — da leitura de uma linha ao dado que a sustenta.</p>
+  </section>
+
+  <section id="oque">
+    <div class="eyebrow" id="eyb2">O que é</div>
+    <h2 class="sec" id="s2">Cinco lentes do Brasil — e um experimento</h2>
+    <p class="secsub" id="s2s">Não é newsletter. É um instrumento que lê o regime de cada domínio regulatório do país, em camadas. Veja a estrutura; a leitura de hoje, ao vivo, vem logo abaixo.</p>
+    <div class="lenses" id="lenses"></div>
+  </section>
+
+  <section id="depth">
+    <div class="eyebrow" id="eyb5">Profundidade</div>
+    <h2 class="sec" id="s5">Você escolhe a profundidade</h2>
+    <p class="secsub" id="s5s">Cada lente abre em camadas — da manchete do regime ao cruzamento livre dos indicadores. Sem teto para quem quer ir fundo.</p>
+    <div class="ladder" id="ladder"></div>
+  </section>
+
+  <section id="escala">
+    <div class="eyebrow" id="eyb6">O que está por trás</div>
+    <div class="scale" id="scale"></div>
+  </section>
+
   <section id="radar">
     <div class="eyebrow" id="eyb1">Ao vivo · hoje</div>
     <h2 class="sec" id="s1">A leitura de hoje</h2>
-    <p class="secsub" id="s1s">Tudo abaixo é calculado pelo nosso motor sobre dados públicos. O histórico, os gráficos e os alertas ficam no plano assinado.</p>
+    <p class="secsub" id="s1s">Uma amostra do motor sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.</p>
     <div id="radar-live"></div>
-  </section>
-
-  <section>
-    <div class="eyebrow" id="eyb2">O que é</div>
-    <h2 class="sec" id="s2">Dois cérebros, uma leitura honesta</h2>
-    <div class="cards" id="cards"></div>
   </section>
 
   <section id="fundadores">
@@ -211,40 +250,61 @@
   var LANG=(_q==="en"||_q==="pt")?_q:(/\.com\.br$/i.test(location.hostname)?"pt":(/radarperene\.com$/i.test(location.hostname)?"en":"pt"));
   document.documentElement.lang=LANG;
   document.getElementById(LANG==="en"?"l-en":"l-pt").className="on";
+  // idioma = domínio (atrela à moeda futura): em produção PT→.com.br e EN→.com. Fora de prod, mantém ?lang.
+  var _prod=/(^|\.)radarperene\.com(\.br)?$/i.test(location.hostname);
+  var _lpt=document.getElementById("l-pt"),_len=document.getElementById("l-en");
+  if(_prod){if(_lpt)_lpt.href="https://radarperene.com.br/";if(_len)_len.href="https://radarperene.com/";}
+  else{if(_lpt)_lpt.href="?lang=pt";if(_len)_len.href="?lang=en";}
   if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about.html";}}
 
   var C=LANG==="en"?{
     h1:'Brazil&rsquo;s regime, read as <span class="g">data</span> — not opinion.',
-    lead:"An in-house, descriptive instrument that reads the regulatory, judicial, macro and market environment — and shows what is happening today, from beginner to PhD. See today&rsquo;s reading, live, below.",
+    lead:"Five lenses of intelligence on Brazil — wealth, electoral, macro, institutional and real-estate — plus the Vértice experiment. You choose the depth. See today&rsquo;s reading, live, below.",
     cta1:"Join the 100 founders",cta2:"See the live radar",micro:"Educational content, public sources. Descriptive — never a recommendation.",
-    eyb1:"Live · today",s1:"Today&rsquo;s reading",s1s:"Everything below is computed by our engine over public data. History, charts and alerts are in the paid plan.",
-    eyb2:"What it is",s2:"Two brains, one honest reading",
+    eyb7:"Who it&rsquo;s for",s7:"Investors, analysts, managers — and serious newcomers.",s7s:"For anyone who wants to read Brazil&rsquo;s market regime without noise or guesswork, at the depth they choose — from a one-line read to the data behind it.",
+    eyb2:"What it is",s2:"Five lenses on Brazil — and one experiment",s2s:"Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure; today&rsquo;s live reading is right below.",
+    eyb5:"Depth",s5:"You choose the depth",s5s:"Each lens opens in layers — from the regime headline to free cross-analysis of the indicators. No ceiling for those who want to go deep.",
+    eyb6:"What&rsquo;s underneath",
+    eyb1:"Live · today",s1:"Today&rsquo;s reading",s1s:"A sample of the engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge:"Launch · 100 founders",fh:"The first 100 get everything unlocked",fp:"Access to all lenses at a founder price — announced at launch. Leave your email to get the invite first. No spam: only the launch notice.",
     wlph:"you@email.com",wlbtn:"Get my invite",
     eyb3:"For your site · free",s3:"Use our mini-radar anywhere",s3s:"A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4:"Principles",
     disc:"Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
-    cards:[["5 conservative lenses","Radar","Regulatory, rates/macro, BR intermarket, legal and wealth — a sober reading of the regime."],
-      ["The Vértice lens","Experimental","9 cross-asset thermometers, breadth, geographic risk-on/off and historical analog studies."],
-      ["Depth, never advice","Method","From a one-line read to PhD-level detail. We describe; we never tell you to buy or sell."]],
+    lenses:[{n:"Wealth",d:"Succession, estate tax, holdings and structures — pressure on wealth."},
+      {n:"Electoral",d:"Electoral courts, eligibility, campaign finance and digital enforcement."},
+      {n:"Macro / Rates",d:"Rates, inflation, fiscal and debt — the country&rsquo;s macro regime."},
+      {n:"Institutional",d:"Audit courts, public contracts, integrity and oversight."},
+      {n:"Real estate",d:"REITs, real-estate credit, registries and sector regulation."},
+      {n:"Vértice",d:"The experiment: 9 cross-asset thermometers and historical analogs.",v:1,m:"Contextual hypothesis, not a forecast."}],
+    ladder:[{t:"Briefing",d:"the essentials in 5 seconds"},{t:"Lens",d:"stress by domain"},{t:"Scenarios",d:"trajectories and windows"},{t:"War Room",d:"proof and propagation"},{t:"Modeling",d:"cross everything · 50+ yrs · k-NN"}],
+    scale:[["56","years of history"],["217","instruments"],["1.2M","market rows"],["157","significant relationships (FDR)"],["29","courts tracked"]],
     princ:[["Descriptive","We read and contextualize the regime — we never recommend or predict a price."],
       ["Public sources","Built on public data. Low-noise, auditable, transparent."],
       ["Contradiction on show","Every reading carries its own counter-evidence. No false certainty."]],
     ok:"You&rsquo;re on the list — we&rsquo;ll be in touch.",err:"Couldn&rsquo;t register. Try again.",inv:"Enter a valid email."
   }:{
     h1:'O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.',
-    lead:"Um instrumento in-house e descritivo que lê o ambiente regulatório, judicial, macro e de mercado — e mostra o que está acontecendo hoje, do básico ao avançado. Veja a leitura de hoje, ao vivo, abaixo.",
+    lead:"Cinco lentes de inteligência sobre o Brasil — patrimonial, eleitoral, macro, institucional e imobiliária — mais o experimento Vértice. Você escolhe a profundidade. Veja a leitura de hoje, ao vivo, abaixo.",
     cta1:"Entrar para os 100 fundadores",cta2:"Ver o radar ao vivo",micro:"Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.",
-    eyb1:"Ao vivo · hoje",s1:"A leitura de hoje",s1s:"Tudo abaixo é calculado pelo nosso motor sobre dados públicos. O histórico, os gráficos e os alertas ficam no plano assinado.",
-    eyb2:"O que é",s2:"Dois cérebros, uma leitura honesta",
+    eyb7:"Para quem é",s7:"Investidores, analistas, gestores — e curiosos sérios.",s7s:"Para quem quer ler o regime do mercado brasileiro sem ruído e sem palpite, na profundidade que escolher — da leitura de uma linha ao dado que a sustenta.",
+    eyb2:"O que é",s2:"Cinco lentes do Brasil — e um experimento",s2s:"Não é newsletter. É um instrumento que lê o regime de cada domínio regulatório do país, em camadas. Veja a estrutura; a leitura de hoje, ao vivo, vem logo abaixo.",
+    eyb5:"Profundidade",s5:"Você escolhe a profundidade",s5s:"Cada lente abre em camadas — da manchete do regime ao cruzamento livre dos indicadores. Sem teto para quem quer ir fundo.",
+    eyb6:"O que está por trás",
+    eyb1:"Ao vivo · hoje",s1:"A leitura de hoje",s1s:"Uma amostra do motor sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.",
     fbadge:"Lançamento · 100 fundadores",fh:"Os 100 primeiros entram com tudo aberto",fp:"Acesso a todas as lentes por um preço promocional de fundador — anunciado no lançamento. Deixe seu email e receba o convite em primeira mão. Sem spam: só o aviso de lançamento.",
     wlph:"seu@email.com",wlbtn:"Quero meu convite",
     eyb3:"Para o seu site · grátis",s3:"Use nosso mini-radar onde quiser",s3s:"Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.",
     eyb4:"Princípios",
     disc:"Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.",
-    cards:[["5 lentes conservadoras","Radar","Regulatória, juros/macro, intermercado BR, jurídica e patrimonial — uma leitura sóbria do regime."],
-      ["A lente Vértice","Experimental","9 termômetros cross-asset, breadth, risk-on/off geográfico e estudos de análogo histórico."],
-      ["Profundidade, nunca conselho","Método","Da leitura de uma linha ao detalhe nível PhD. Descrevemos; nunca mandamos comprar ou vender."]],
+    lenses:[{n:"Patrimonial",d:"Sucessão, ITCMD, holdings e estruturas — a pressão sobre o patrimônio."},
+      {n:"Eleitoral",d:"TSE, elegibilidade, financiamento e enforcement digital."},
+      {n:"Macro / Juros",d:"Juros, inflação, fiscal e dívida — o regime macro do país."},
+      {n:"Institucional",d:"TCU/TCE, contratos públicos, integridade e fiscalização."},
+      {n:"Imobiliária",d:"FIIs, crédito imobiliário, registros e regulação do setor."},
+      {n:"Vértice",d:"O experimento: 9 termômetros cross-asset e análogos históricos.",v:1,m:"Hipótese contextual, não previsão."}],
+    ladder:[{t:"Briefing",d:"o essencial em 5 segundos"},{t:"Lente",d:"stress por domínio"},{t:"Cenários",d:"trajetórias e janelas"},{t:"War Room",d:"prova e propagação"},{t:"Modelagem",d:"cruzar tudo · 50+ anos · k-NN"}],
+    scale:[["56","anos de história"],["217","instrumentos"],["1,2 mi","linhas de mercado"],["157","relações com significância (FDR)"],["29","tribunais acompanhados"]],
     princ:[["Descritivo","Lemos e contextualizamos o regime — nunca recomendamos nem prevemos preço."],
       ["Fonte pública","Construído sobre dado público. Baixo ruído, auditável, transparente."],
       ["Contradição à mostra","Toda leitura carrega a própria contra-evidência. Sem falsa certeza."]],
@@ -252,11 +312,17 @@
   };
   function set(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html}
   set("h1",C.h1);set("lead",C.lead);set("cta1",C.cta1);set("cta2",C.cta2);set("micro1",C.micro);
-  set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);set("eyb2",C.eyb2);set("s2",C.s2);
+  set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
+  set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
+  set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
+  set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
   set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);
   document.getElementById("wl-email").placeholder=C.wlph;
-  set("cards",C.cards.map(function(c){return '<div class="vc"><div class="ic">'+c[1]+'</div><h3>'+c[0]+'</h3><p>'+c[2]+'</p></div>'}).join(""));
+  var expTag=LANG==="en"?"experiment":"experimento";
+  set("lenses",C.lenses.map(function(l){return '<div class="ln'+(l.v?' vx':'')+'"><div class="nm">'+(l.v?'<span style="color:var(--gold)">✦</span> ':'')+l.n+(l.v?'<span class="tag">'+expTag+'</span>':'')+'</div><p>'+l.d+'</p>'+(l.m?'<span class="micro">'+l.m+'</span>':'')+'</div>'}).join(""));
+  set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
+  set("scale",C.scale.map(function(s){return '<div class="st"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join(""));
   set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));
 
   // radar ao vivo — render inline (a landing é nossa página limpa; sem conflito de embed)
@@ -285,7 +351,7 @@
       if(rr.macro_essencial&&rr.macro_essencial.length){h+='<h4>'+(LANG==="en"?"Essential macro (public)":"Macro essencial (público)")+'</h4><div>'+
         rr.macro_essencial.map(function(m){return '<span class="chip"><b>'+esc(m.valor)+'</b> <span style="color:#8b97a3;font-size:10px">'+esc(m.unidade)+'</span> '+esc(m.nome)+'</span>'}).join("")+'</div>';}
       if(rr.intermercado_br&&rr.intermercado_br.length){h+='<h4>'+(LANG==="en"?"BR intermarket (stocks)":"Intermercado BR (bolsa)")+'</h4><div class="g3">'+
-        rr.intermercado_br.map(function(x){var k=x.z>=2?"hot":x.z>=1?"warm":x.z<=-1?"cool":"";return '<div class="t '+k+'"><div class="n">'+esc(x.nome)+'</div><div class="vv">'+(x.z>=0?"+":"")+esc(x.z)+'</div><div class="rr">z · '+esc(x.regime)+'</div></div>'}).join("")+'</div>';}
+        rr.intermercado_br.map(function(x){return '<div class="t '+esc(x.tom)+'"><div class="n">'+esc(x.nome)+'</div><div class="rr" style="margin-top:4px;color:#c3ccd5;font-size:11.5px">'+esc(x.leitura)+'</div></div>'}).join("")+'</div>';}
       if(v.termometros){h+='<h4>'+(LANG==="en"?"9 thermometers":"9 termômetros")+'</h4><div class="g3">'+v.termometros.map(function(t){
         var bw=t.valor==null?0:Math.max(0,Math.min(100,t.valor)),bc=t.valor>=75?"#e0533d":t.valor>=55?"#d98a3d":t.valor<=45?"#3d7de0":"#6b7682";
         return '<div class="t '+regClass(t.valor)+'"><div class="n">'+esc(t.nome)+'</div><div class="vv">'+(t.valor==null?"—":esc(t.valor))+'</div><div class="rr">'+esc(t.regime)+'</div>'+(t.valor!=null?'<div style="height:5px;border-radius:3px;background:#222a31;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:'+bw+'%;background:'+bc+'"></i></div>':'')+'</div>'}).join("")+'</div>';}
