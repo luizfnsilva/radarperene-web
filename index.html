@@ -64,7 +64,6 @@
   h2.sec{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,32px);margin:0 0 8px}
   .secsub{color:var(--dim);max-width:64ch;margin:0 0 22px;font-size:15px}
   /* live radar mount */
-  #radar-live{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
   /* value cards */
   .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   @media(max-width:760px){.cards{grid-template-columns:1fr}}
@@ -171,7 +170,7 @@
     <div class="eyebrow" id="eyb1">Ao vivo · hoje</div>
     <h2 class="sec" id="s1">A leitura de hoje</h2>
     <p class="secsub" id="s1s">Uma amostra do motor sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.</p>
-    <div id="radar-live"></div>
+    <div id="radar-perene" data-chrome="off" style="--rp-max:100%"></div>
   </section>
 
   <section id="fundadores">
@@ -325,47 +324,10 @@
   set("scale",C.scale.map(function(s){return '<div class="st"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join(""));
   set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));
 
-  // radar ao vivo — render inline (a landing é nossa página limpa; sem conflito de embed)
-  renderRadar();
-  function regClass(v){if(v==null)return "";return v>=75?"hot":v>=55?"warm":v<=45?"cool":""}
-  function esc(s){return String(s==null?"":s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c]})}
-  function renderRadar(){
-    fetch(DIGEST+"?lang="+LANG).then(function(r){return r.json()}).then(function(d){
-      var rr=d.radar||{},v=d.vertice||{},styleVars="--card:#171c22;--line:#222a31;--dim:#8b97a3;--gold:#c9a227;--hot:#e0533d;--warm:#d98a3d;--cool:#3d7de0;--neu:#6b7682";
-      var h='<div style="padding:18px">';
-      h+='<style>#radar-live .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}@media(max-width:600px){#radar-live .g3{grid-template-columns:1fr 1fr}}'+
-        '#radar-live .c{background:var(--card,#171c22);border:1px solid #222a31;border-radius:9px;padding:11px}'+
-        '#radar-live .c .k{font-size:10.5px;color:#8b97a3}#radar-live .c .b{font-size:20px;font-weight:700;margin-top:2px}#radar-live .c .r{font-size:10.5px;color:#8b97a3;margin-top:2px}'+
-        '#radar-live .t{background:#171c22;border:1px solid #222a31;border-left:3px solid #6b7682;border-radius:8px;padding:9px}'+
-        '#radar-live .t.hot{border-left-color:#e0533d}#radar-live .t.warm{border-left-color:#d98a3d}#radar-live .t.cool{border-left-color:#3d7de0}'+
-        '#radar-live .t .n{font-size:11.5px;font-weight:600}#radar-live .t .vv{font-size:17px;font-weight:700}#radar-live .t .rr{font-size:10px;color:#8b97a3}'+
-        '#radar-live h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8b97a3;margin:16px 0 7px}'+
-        '#radar-live .hl{background:linear-gradient(180deg,#1a2027,#13171c);border:1px solid #c9a227;border-radius:11px;padding:15px}'+
-        '#radar-live .hl .v{font-size:24px;font-weight:800;color:#e4c25a}#radar-live .hl .q{font-size:12.5px;color:#8b97a3;margin-bottom:8px}'+
-        '#radar-live .stat{display:flex;gap:18px;flex-wrap:wrap}#radar-live .chip{display:inline-flex;gap:5px;background:#171c22;border:1px solid #222a31;border-radius:999px;padding:4px 10px;font-size:12px;margin:0 5px 6px 0}'+
-        '#radar-live .dv{margin:6px 0 0;padding:0;list-style:none}#radar-live .dv li{font-size:12px;padding:5px 0;border-top:1px solid #222a31}#radar-live .dv b{color:#e4c25a}</style>';
-      function card(k,sc,rg){return '<div class="c"><div class="k">'+esc(k)+'</div><div class="b">'+(sc==null?"—":esc(sc))+'</div><div class="r">'+esc(rg)+'</div></div>'}
-      if(rr.regime){var g=rr.regime;h+='<h4>'+(LANG==="en"?"Today&rsquo;s regime":"Regime de hoje")+'</h4><div class="g3">'+
-        card(LANG==="en"?"Brazil":"Brasil",(g.brasil||{}).score,(g.brasil||{}).regime)+card("Global",(g.global||{}).score,(g.global||{}).regime)+
-        card(LANG==="en"?"BR intermarket":"BR intermercado",(g.br_intermercado||{}).score,(g.br_intermercado||{}).regime)+'</div>';}
-      if(rr.macro_essencial&&rr.macro_essencial.length){h+='<h4>'+(LANG==="en"?"Essential macro (public)":"Macro essencial (público)")+'</h4><div>'+
-        rr.macro_essencial.map(function(m){return '<span class="chip"><b>'+esc(m.valor)+'</b> <span style="color:#8b97a3;font-size:10px">'+esc(m.unidade)+'</span> '+esc(m.nome)+'</span>'}).join("")+'</div>';}
-      if(rr.intermercado_br&&rr.intermercado_br.length){h+='<h4>'+(LANG==="en"?"BR intermarket (stocks)":"Intermercado BR (bolsa)")+'</h4><div class="g3">'+
-        rr.intermercado_br.map(function(x){return '<div class="t '+esc(x.tom)+'"><div class="n">'+esc(x.nome)+'</div><div class="rr" style="margin-top:4px;color:#c3ccd5;font-size:11.5px">'+esc(x.leitura)+'</div></div>'}).join("")+'</div>';}
-      if(v.termometros){h+='<h4>'+(LANG==="en"?"9 thermometers":"9 termômetros")+'</h4><div class="g3">'+v.termometros.map(function(t){
-        var bw=t.valor==null?0:Math.max(0,Math.min(100,t.valor)),bc=t.valor>=75?"#e0533d":t.valor>=55?"#d98a3d":t.valor<=45?"#3d7de0":"#6b7682";
-        return '<div class="t '+regClass(t.valor)+'"><div class="n">'+esc(t.nome)+'</div><div class="vv">'+(t.valor==null?"—":esc(t.valor))+'</div><div class="rr">'+esc(t.regime)+'</div>'+(t.valor!=null?'<div style="height:5px;border-radius:3px;background:#222a31;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:'+bw+'%;background:'+bc+'"></i></div>':'')+'</div>'}).join("")+'</div>';}
-      if(v.estudo_analogo){var a=v.estudo_analogo;h+='<h4>'+(LANG==="en"?"Analog study":"Estudo de análogo")+'</h4><div class="hl"><div class="q">'+esc(a.pergunta)+'</div><div class="stat">'+
-        '<div><div class="v">'+esc(a.mediana_ret_pct)+'%</div><div class="r" style="color:#8b97a3">mediana</div></div>'+
-        '<div><div class="v">'+(a.delta_pp>=0?"+":"")+esc(a.delta_pp)+'pp</div><div class="r" style="color:#8b97a3">vs base '+esc(a.base_rate_pct)+'%</div></div>'+
-        '<div><div class="v">'+esc(a.hit_rate_pct)+'%</div><div class="r" style="color:#8b97a3">hit-rate</div></div></div></div>';}
-      if(v.divergencias&&v.divergencias.length){h+='<h4>'+(LANG==="en"?"Divergences today":"Divergências hoje")+'</h4><ul class="dv">'+
-        v.divergencias.map(function(x){return '<li><b>'+esc(x.codigo)+'</b> · '+esc(x.leitura)+'</li>'}).join("")+'</ul>';}
-      h+='<div style="margin-top:16px;background:#171c22;border:1px dashed #c9a227;border-radius:10px;padding:13px 15px;font-size:13px"><b style="color:#c9a227">'+(LANG==="en"?"Subscribe and cross everything:":"Assinando, você cruza tudo:")+'</b> '+(LANG==="en"?"any indicator with any other, in any window — with statistical testing, historical analogs and projections. This is a fraction of what the engine computes.":"qualquer indicador com qualquer outro, em qualquer janela — com teste estatístico, análogos históricos e projeções. Isto é uma fração do que o motor calcula.")+'</div>';
-      h+='</div>';
-      document.getElementById("radar-live").innerHTML=h;
-    }).catch(function(){document.getElementById("radar-live").innerHTML='<div style="padding:24px;color:#8b97a3">—</div>'});
-  }
+  // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
+  var rn=document.getElementById("radar-perene");
+  if(rn){ rn.setAttribute("data-lang",LANG);
+    var rs=document.createElement("script"); rs.src="radar.js"; rs.defer=true; document.body.appendChild(rs); }
 
   // waitlist
   document.getElementById("wl").addEventListener("submit",function(ev){
