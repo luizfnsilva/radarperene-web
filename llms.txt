@@ -1,0 +1,23 @@
+# Radar Perene
+
+> Radar Perene é um instrumento de inteligência de regime do Brasil — descritivo, in-house, de fontes públicas. Lê o ambiente regulatório, judicial, macroeconômico e de mercado e mostra o que está acontecendo HOJE, do básico ao avançado. NÃO é recomendação de investimento; é conteúdo educacional e informativo.
+
+## O que faz
+- Lê o "regime" do mercado e da regulação brasileira via 5 lentes conservadoras (regulatória, juros/macro, intermercado BR, jurídica, patrimonial) + a lente experimental Vértice (9 termômetros cross-asset, amplitude/breadth, risk-on/off geográfico, estudos de análogo histórico).
+- Produz scores de regime (0-100), divergências entre sinais e estudos de "isto já ocorreu N vezes desde 2000 → o que se seguiu".
+- Tudo determinístico e descritivo, sobre dados públicos (mercado, Banco Central, atividade regulatória/judicial).
+
+## Páginas principais
+- O que é (explicação completa + FAQ): https://radarperene.com/sobre.html
+- Leitura de hoje, ao vivo: https://radarperene.com/
+- Integração / API pública gratuita: https://radarperene.com/INTEGRACAO_RADAR.md
+
+## Oferta
+- Prévia da leitura de hoje: GRATUITA. API pública embedável em qualquer site (gratuita, citar a fonte).
+- Plano completo (histórico de 50+ anos, gráficos, alertas, profundidade): pago. Preço de fundador para os 100 primeiros.
+
+## Princípios
+- Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Bilíngue (PT em radarperene.com.br, EN em radarperene.com).
+
+## Contato
+hello@brazilcomplexity.com
