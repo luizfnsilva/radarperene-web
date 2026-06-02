@@ -45,7 +45,9 @@
       ".rp .ln{background:var(--_card2);border:1px solid var(--_line);border-left:3px solid var(--_neu);border-radius:8px;padding:9px}" +
       ".rp .ln.hot{border-left-color:var(--_hot)}.rp .ln.warm{border-left-color:var(--_warm)}.rp .ln.cool{border-left-color:var(--_cool)}" +
       ".rp .ln .lk{font-size:11.5px;font-weight:700}.rp .ln .li{font-size:9.5px;color:var(--_dim);margin:2px 0 5px;line-height:1.25;min-height:23px}.rp .ln .lv{font-size:14px;font-weight:700}.rp .ln .lr{font-size:9.5px;color:var(--_dim)}" +
-      ".rp ul.ll{margin:6px 0 0;padding:0;list-style:none}.rp ul.ll li{font-size:11.5px;padding:6px 0;border-top:1px solid var(--_line);color:var(--_txt)}.rp ul.ll .tag{color:var(--_dim);font-size:9.5px}";
+      ".rp ul.ll{margin:6px 0 0;padding:0;list-style:none}.rp ul.ll li{font-size:11.5px;padding:6px 0;border-top:1px solid var(--_line);color:var(--_txt)}.rp ul.ll .tag{color:var(--_dim);font-size:9.5px}" +
+      ".rp .tk{display:flex;flex-wrap:wrap;gap:6px}.rp .tk .i{background:var(--_card2);border:1px solid var(--_line);border-radius:7px;padding:5px 9px;font-size:11.5px;display:inline-flex;gap:6px;align-items:baseline}" +
+      ".rp .tk .i .sy{font-weight:700}.rp .tk .i .pr{color:var(--_txt)}.rp .tk .i .mt{color:var(--_dim);font-size:9.5px}";
     document.head.appendChild(s);
   }
 
@@ -66,17 +68,25 @@
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     h += brain("Radar", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);
-    if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Today’s regime" : "Regime de hoje") + '</h4><div class="g3">' +
+    if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Today’s regime" : "Regime de hoje") + '</h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>'; }
-    if (show("lentes") && rr.lentes && rr.lentes.length) { h += '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="lns">' +
+    if (show("lentes") && rr.lentes && rr.lentes.length) { h += '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="legend">' + (L ? "each lens = one domain of Brazil’s regime; color = today’s intensity (blue calm · gold/red pressure)" : "cada lente = um domínio do regime do Brasil; a cor = intensidade de hoje (azul calmo · dourado/vermelho pressão)") + '</div><div class="lns">' +
       rr.lentes.map(function (l) { return '<div class="ln ' + esc(l.tom) + '"><div class="lk">' + esc(l.nome) + '</div><div class="li">' + esc(l.indicador) + '</div>' +
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
         '<div class="lr">' + esc(l.leitura || "") + '</div></div>'; }).join("") + '</div>'; }
-    if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4><div>' +
-      rr.macro_essencial.map(function (m) { return '<span class="chip"><b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' + esc(m.nome) + '</span>'; }).join("") + '</div>'; }
+    if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4>' +
+      '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
+      rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "BR intermarket (stocks)" : "Intermercado BR (bolsa)") + '</h4><div class="g3">' +
       rr.intermercado_br.map(function (x) { return '<div class="t ' + esc(x.tom) + '"><div class="n">' + esc(x.nome) + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div></div>'; }).join("") + '</div>'; }
+    // tickers por lente (gostinho generoso): ações (V) · Tesouro (M) · FIIs (R)
+    if (show("acoes") && rr.tickers_acoes && rr.tickers_acoes.length) { h += '<h4>' + (L ? "BR stocks · a taste (dozens more in the app)" : "Ações BR · um gostinho (dezenas no app)") + '</h4><div class="tk">' +
+      rr.tickers_acoes.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+    if (show("tesouro") && rr.tickers_tesouro && rr.tickers_tesouro.length) { h += '<h4>' + (L ? "Treasury (rates) · a taste" : "Tesouro Direto (juros) · um gostinho") + '</h4><div class="tk">' +
+      rr.tickers_tesouro.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">' + esc(t.taxa) + '</span></span>'; }).join("") + '</div>'; }
+    if (show("fiis") && rr.tickers_fiis && rr.tickers_fiis.length) { h += '<h4>' + (L ? "REITs (FIIs) · 12m dividend yield" : "FIIs · dividend yield 12m") + '</h4><div class="tk">' +
+      rr.tickers_fiis.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span>' + (t.dy != null ? '<span class="pr">' + esc(t.dy) + '%</span>' : '') + (t.segmento ? '<span class="mt">' + esc(t.segmento) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
@@ -84,10 +94,13 @@
       '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' +
       v.termometros.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
         (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + '</div>'; }).join("") + '</div>'; }
+    if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · a taste (dozens more in the app)" : "Cripto · um gostinho (dezenas no app)") + '</h4><div class="tk">' +
+      v.cripto.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span></span>'; }).join("") + '</div>'; }
     if (show("extras")) { var ex = [];
       if (v.breadth) { if (v.breadth.us) ex.push(card(L ? "US breadth" : "Breadth US", v.breadth.us.valor + "%", v.breadth.us.regime)); if (v.breadth.br) ex.push(card(L ? "BR breadth" : "Breadth BR", v.breadth.br.valor + "%", v.breadth.br.regime)); }
       if (v.geo_riskon) ex.push(card(L ? "Geographic risk-on" : "Risk-on geográfico", v.geo_riskon.valor, v.geo_riskon.regime));
-      if (ex.length) h += '<h4>' + (L ? "Breadth (SentimenTrader-style) / geographic" : "Breadth (estilo SentimenTrader) / geográfico") + '</h4><div class="g3">' + ex.join("") + '</div>'; }
+      if (ex.length) h += '<h4>' + (L ? "Market breadth / geographic" : "Amplitude de mercado / geográfico") + '</h4>' +
+        '<div class="legend">' + (L ? "% of stocks above their 200-day average · geographic = emerging vs developed rotation" : "% de ações acima da média de 200 dias · geográfico = rotação emergentes vs desenvolvidos") + '</div><div class="g3">' + ex.join("") + '</div>'; }
     if (show("leadlag") && v.lead_lag && v.lead_lag.length) { h += '<h4>' + (L ? "Lead-lag · statistically significant (FDR)" : "Lead-lag · com significância (FDR)") + '</h4><ul class="ll">' +
       v.lead_lag.map(function (x) { return '<li><b>' + esc(x.leitura) + '</b> <span class="tag">· ' + esc(x.sentido) + ' · corr ' + esc(x.corr) + ' · ' + esc(x.janela_dias) + 'd · FDR ✓</span></li>'; }).join("") + '</ul>'; }
     if (show("analogo") && v.estudo_analogo) { var a = v.estudo_analogo; h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div><div class="stat">' +
@@ -97,9 +110,9 @@
     if (show("divergencias") && v.divergencias && v.divergencias.length) { h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
       v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; }
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
-    h += '<div class="teaser"><b>' + (L ? "Subscribe and cross everything:" : "Assinando, você cruza tudo:") + '</b> ' +
-      (L ? "any indicator with any other, in any window — with statistical testing, historical analogs and projections. This is a fraction of what the engine computes."
-         : "qualquer indicador com qualquer outro, em qualquer janela — com teste estatístico, análogos históricos e projeções. Isto é uma fração do que o motor calcula.") +
+    h += '<div class="teaser"><b>' + (L ? "This is just a taste:" : "Isto é só um gostinho:") + '</b> ' +
+      (L ? "the app holds hundreds of tickers and the depth — the provenance of each signal, free cross-analysis of any indicator with any other, historical analogs and projection. The free is a faithful sample; understanding it in depth is the paid plan."
+         : "o app tem centenas de tickers e a profundidade — a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção. O free é uma amostra fiel; entender a fundo é o plano pago.") +
       (chrome ? '<br><a href="https://radarperene.com?utm_source=embed&utm_medium=widget" target="_blank" rel="noopener">' + (L ? "See the full app →" : "Ver o app completo →") + '</a>' : '') + '</div>';
     if (chrome) h += '<div class="ft">' + (d.disclaimer ? esc(d.disclaimer[lang] || d.disclaimer.pt) : "") + ' · ' + (L ? "data by" : "dados de") + ' <a href="https://radarperene.com" target="_blank" rel="noopener">Radar Perene</a></div>';
     h += '</div>';
