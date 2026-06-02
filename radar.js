@@ -59,6 +59,11 @@
       ".rp .b,.rp .v,.rp .lv,.rp .vv,.rp .hl .v,.rp .tk .i .pr,.rp .live{font-family:var(--_mono);font-feature-settings:'tnum'}" +
       ".rp .tk .i[data-cod]{cursor:pointer}.rp .tk .i[data-cod]:hover{border-color:var(--_accent)}" +
       ".rp [data-exp]{cursor:pointer}.rp .more{display:none;margin-top:6px;border-top:1px solid var(--_line);padding-top:5px}.rp .open .more{display:block}.rp .more .mi{font-size:10px;color:var(--_dim);padding:2px 0}" +
+      ".rp .rp-zoom{margin-top:6px;border:1px solid var(--_line);background:var(--_card2);color:var(--_accent);border-radius:7px;font-size:10px;padding:3px 9px;cursor:pointer;font-family:var(--rp-font,'Inter',system-ui,sans-serif)}.rp .rp-zoom:hover{border-color:var(--_accent)}" +
+      ".rp-mw{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,10,14,.55)}" +
+      ".rp-mc{position:relative;max-width:560px!important;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px!important;box-shadow:0 18px 60px rgba(0,0,0,.4);cursor:default}" +
+      ".rp-mc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-mc .rp-x:hover{color:var(--_accent)}" +
+      ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -104,20 +109,43 @@
   }
   function fmtNum(v) { var a = Math.abs(v); return a >= 1e9 ? (Math.round(v / 1e8) / 10) + "B" : a >= 1e6 ? (Math.round(v / 1e5) / 10) + "M" : a >= 1e3 ? (Math.round(v / 100) / 10) + "k" : String(Math.round(v * 100) / 100); }
   // gráfico "de verdade" (parâmetros): faixa min/máx, "hoje", projeção tracejada destacada, último valor rotulado
-  function bigChart(s) {
+  function bigChart(s, opt) {
     if (!s || !s.hist || s.hist.length < 2) return "";
+    opt = opt || {}; var big = !!opt.big;
     var hist = s.hist, proj = (s.proj && s.proj.length > 1) ? s.proj : [], all = hist.concat(proj.slice(1));
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
-    var W = 280, H = 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = all.length - 1 || 1;
+    var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = all.length - 1 || 1;
     function X(i) { return pL + (i / tot) * pw; } function Y(v) { return pT + (1 - (v - mn) / rng) * ph; }
-    var o = '<svg class="bc" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
+    var o = '<svg class="bc' + (big ? ' big' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
     o += '<line x1="' + pL + '" y1="' + Y(mx).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(mx).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
     o += '<line x1="' + pL + '" y1="' + Y(mn).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(mn).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
-    o += '<polyline points="' + hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="1.6"/>';
+    if (proj.length && big) { var fx = X(hist.length - 1); // faixa de FUTURO realçada (só no modo grande)
+      o += '<rect x="' + fx.toFixed(1) + '" y="' + pT + '" width="' + (W - pR - fx).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_warm)" opacity="0.07"/>'; }
+    o += '<polyline points="' + hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.2 : 1.6) + '"/>';
     if (proj.length) { var nx = X(hist.length - 1);
       o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
-      o += '<polyline points="' + proj.map(function (v, i) { return X(hist.length - 1 + i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="1.8" stroke-dasharray="4 2"/>'; }
+      o += '<polyline points="' + proj.map(function (v, i) { return X(hist.length - 1 + i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>'; }
     return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '') + '</span>';
+  }
+  // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
+  function openBig(s, title, meta, lang) {
+    if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
+    var cur = s.hist[s.hist.length - 1], pe = (s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null;
+    var dpct = (pe != null && cur) ? Math.round(((pe - cur) / Math.abs(cur)) * 1000) / 10 : null;
+    var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
+    h += '<div class="rp-mt">' + esc(title) + '</div>';
+    h += '<div class="rp-ml">' + (L ? "price · history → today → projection (dashed) · shaded band = future under current conditions" : "preço · histórico → hoje → projeção (tracejada) · faixa = futuro sob condições atuais") + '</div>';
+    h += bigChart(s, { big: true });
+    if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection" : "projeção") + ' ' + (dpct >= 0 ? "+" : "") + dpct + '%</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>';
+    if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
+    if (s.hist3 && s.hist3.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist3_label || "") + '</div>' + bigChart({ hist: s.hist3 }, { big: true });
+    if (meta) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';
+    h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
+    var mw = document.createElement("div"); mw.className = "rp-mw"; mw.innerHTML = h;
+    function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
+    function onkey(e) { if (e.key === "Escape") close(); }
+    mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
+    document.addEventListener("keydown", onkey); document.body.appendChild(mw);
   }
 
   function render(node, d, lang, sections, chrome) {
@@ -238,8 +266,11 @@
               if (s.hist2 && s.hist2.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist2_label || "") + '</span>' + bigChart({ hist: s.hist2 });
               if (s.hist3 && s.hist3.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist3_label || "") + '</span>' + bigChart({ hist: s.hist3 });
             }
+            var canBig = s && s.hist && s.hist.length > 1;
+            if (canBig) inner += '<button class="rp-zoom" type="button">⤢ ' + (lang === "en" ? "expand chart" : "ampliar gráfico") + '</button>';
             inner += '<span class="mt" style="display:block;margin-top:4px">' + (meta ? esc(meta) + ' · ' : '') + (lang === "en" ? "full in the app →" : "completo no app →") + '</span>';
             box.innerHTML = inner; chip.appendChild(box);
+            if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang); }); }
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
       fetch(API + "?lang=" + lang, FOPT).then(function (r) { return r.json(); })
