@@ -151,7 +151,7 @@
               var clk = it.cod ? ' data-cod="' + esc(String(it.cod).toLowerCase()) + '" data-cls="' + esc(it.cls || 'equity_br') + '"' : ' style="cursor:default"';
               return '<span class="i"' + clk + '><span class="sy">' + esc(it.rot) + '</span>' + (it.meta ? '<span class="mt">' + esc(it.meta) + '</span>' : '') + '</span>';
             }).join('') + '</div>' +
-            (l.amostra.total && l.amostra.total > l.amostra.itens.length ? '<div class="legend">+ ' + (l.amostra.total - l.amostra.itens.length) + (L ? ' more under watch in the app' : ' em vigia no app') + '</div>' : '');
+            (l.amostra.total && l.amostra.total > l.amostra.itens.length ? '<div class="legend">+ ' + (l.amostra.total - l.amostra.itens.length) + ' ' + esc(l.amostra.nota || (L ? 'in the app' : 'no app')) + '</div>' : '');
         }
         var more = (l.desc || l.indicador_desc || am) ? '<div class="more">' + (l.desc ? '<div class="mi">' + (L ? "The lens — " : "A lente — ") + esc(l.desc) + '</div>' : '') + (l.indicador_desc ? '<div class="mi"><b>' + esc(l.indicador) + ':</b> ' + esc(l.indicador_desc) + '</div>' : '') + am + '</div>' : '';
         return '<div class="ln ' + esc(l.tom) + '"' + (more ? ' data-exp="1"' : '') + '><div class="lk">' + esc(l.nome) + (more ? ' <span class="lr" style="opacity:.55">＋</span>' : '') + '</div><div class="li">' + esc(l.indicador) + '</div>' +
