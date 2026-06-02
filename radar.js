@@ -47,7 +47,9 @@
       ".rp .ln .lk{font-size:11.5px;font-weight:700}.rp .ln .li{font-size:9.5px;color:var(--_dim);margin:2px 0 5px;line-height:1.25;min-height:23px}.rp .ln .lv{font-size:14px;font-weight:700}.rp .ln .lr{font-size:9.5px;color:var(--_dim)}" +
       ".rp ul.ll{margin:6px 0 0;padding:0;list-style:none}.rp ul.ll li{font-size:11.5px;padding:6px 0;border-top:1px solid var(--_line);color:var(--_txt)}.rp ul.ll .tag{color:var(--_dim);font-size:9.5px}" +
       ".rp .tk{display:flex;flex-wrap:wrap;gap:6px}.rp .tk .i{background:var(--_card2);border:1px solid var(--_line);border-radius:7px;padding:5px 9px;font-size:11.5px;display:inline-flex;gap:6px;align-items:baseline}" +
-      ".rp .tk .i .sy{font-weight:700}.rp .tk .i .pr{color:var(--_txt)}.rp .tk .i .mt{color:var(--_dim);font-size:9.5px}";
+      ".rp .tk .i .sy{font-weight:700}.rp .tk .i .pr{color:var(--_txt)}.rp .tk .i .mt{color:var(--_dim);font-size:9.5px}" +
+      ".rp .live{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--_dim);margin:0 0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.rp .live .dot{width:7px;height:7px;border-radius:50%;background:var(--_accent);flex:none}" +
+      ".rp .spk{display:block;width:100%;height:26px;margin-top:7px}";
     document.head.appendChild(s);
   }
 
@@ -65,16 +67,34 @@
       '<span>Radar <b>Perene</b></span></a><span class="sub">' + (L ? "as of " : "ref. ") + esc(d.data_referencia || "-") + '</span></div>';
     function card(k, sc, r) { return '<div class="c"><div class="k">' + esc(k) + '</div><div class="b">' + (sc == null ? "—" : esc(sc)) + '</div><div class="r">' + esc(r) + '</div></div>'; }
     function brain(n, t, exp, first) { return '<div class="brain' + (first ? ' first' : '') + '"><span class="bn">' + n + '</span><span class="bt">' + t + '</span>' + (exp ? '<span class="bx">' + (L ? "experiment" : "experimento") + '</span>' : '') + '</div>'; }
+    // sparkline tríade: histórico sólido → "hoje" (hairline) → projeção linear tracejada/fraca (P7: não é previsão)
+    function spark(s) {
+      if (!s || !s.hist || s.hist.length < 2) return "";
+      var hist = s.hist, proj = s.proj || [], all = hist.concat(proj.length ? proj.slice(1) : []);
+      var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1, W = 130, H = 26, tot = all.length - 1 || 1;
+      function X(i) { return (i / tot) * W; } function Y(val) { return (H - 3) - ((val - mn) / rng) * (H - 6); }
+      var hp = hist.map(function (vv, i) { return X(i).toFixed(1) + "," + Y(vv).toFixed(1); }).join(" ");
+      var out = '<svg class="spk" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">';
+      out += '<polyline points="' + hp + '" fill="none" stroke="var(--_accent)" stroke-width="1.4"/>';
+      if (proj.length > 1) { var nx = X(hist.length - 1);
+        var pp = proj.map(function (vv, i) { return X(hist.length - 1 + i).toFixed(1) + "," + Y(vv).toFixed(1); }).join(" ");
+        out += '<line x1="' + nx.toFixed(1) + '" y1="2" x2="' + nx.toFixed(1) + '" y2="' + (H - 2) + '" stroke="var(--_dim)" stroke-width="0.7" stroke-dasharray="1 2" opacity="0.6"/>';
+        out += '<polyline points="' + pp + '" fill="none" stroke="var(--_accent)" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.5"/>'; }
+      return out + '</svg>';
+    }
+    // selo de vida honesta: frescor + cobertura datada (estático, sem pulsação — GRAPH §13.5)
+    h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") +
+      ' · ' + (L ? "coverage: 217 assets · 1.2M rows · 29 courts · since 1970" : "cobertura: 217 ativos · 1,2M linhas · 29 tribunais · desde 1970") + '</div>';
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     h += brain("Radar", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);
     if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Today’s regime" : "Regime de hoje") + '</h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>'; }
-    if (show("lentes") && rr.lentes && rr.lentes.length) { h += '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="legend">' + (L ? "each lens = one domain of Brazil’s regime; color = today’s intensity (blue calm · gold/red pressure)" : "cada lente = um domínio do regime do Brasil; a cor = intensidade de hoje (azul calmo · dourado/vermelho pressão)") + '</div><div class="lns">' +
+    if (show("lentes") && rr.lentes && rr.lentes.length) { h += '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="legend">' + (L ? "each lens = a domain of Brazil’s regime; color = intensity · dashed line = projection under current conditions, not a forecast" : "cada lente = um domínio do regime; a cor = intensidade · linha tracejada = projeção sob condições atuais, não previsão") + '</div><div class="lns">' +
       rr.lentes.map(function (l) { return '<div class="ln ' + esc(l.tom) + '"><div class="lk">' + esc(l.nome) + '</div><div class="li">' + esc(l.indicador) + '</div>' +
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
-        '<div class="lr">' + esc(l.leitura || "") + '</div></div>'; }).join("") + '</div>'; }
+        '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + '</div>'; }).join("") + '</div>'; }
     if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4>' +
       '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
       rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
@@ -82,11 +102,11 @@
       rr.intermercado_br.map(function (x) { return '<div class="t ' + esc(x.tom) + '"><div class="n">' + esc(x.nome) + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div></div>'; }).join("") + '</div>'; }
     // tickers por lente (gostinho generoso): ações (V) · Tesouro (M) · FIIs (R)
     if (show("acoes") && rr.tickers_acoes && rr.tickers_acoes.length) { h += '<h4>' + (L ? "BR stocks · highlights" : "Ações BR · destaques") + '</h4><div class="tk">' +
-      rr.tickers_acoes.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+      rr.tickers_acoes.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w range" : "% da faixa 52s") + '</span>' : '') + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("tesouro") && rr.tickers_tesouro && rr.tickers_tesouro.length) { h += '<h4>' + (L ? "Treasury (rates)" : "Tesouro Direto (juros)") + '</h4><div class="tk">' +
       rr.tickers_tesouro.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span><span class="pr">' + esc(t.taxa) + '</span></span>'; }).join("") + '</div>'; }
     if (show("fiis") && rr.tickers_fiis && rr.tickers_fiis.length) { h += '<h4>' + (L ? "REITs (FIIs) · 12m dividend yield" : "FIIs · dividend yield 12m") + '</h4><div class="tk">' +
-      rr.tickers_fiis.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span>' + (t.dy != null ? '<span class="pr">' + esc(t.dy) + '%</span>' : '') + (t.segmento ? '<span class="mt">' + esc(t.segmento) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+      rr.tickers_fiis.map(function (t) { return '<span class="i"><span class="sy">' + esc(t.ticker) + '</span>' + (t.dy != null ? '<span class="pr">' + esc(t.dy) + '%</span>' : '') + (t.pvp != null ? '<span class="mt">P/VP ' + esc(t.pvp) + (t.pvp < 0.98 ? (L ? " (disc.)" : " (desc.)") : t.pvp > 1.02 ? (L ? " (prem.)" : " (ágio)") : "") + '</span>' : '') + (t.segmento ? '<span class="mt">' + esc(t.segmento) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
