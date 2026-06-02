@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://radarperene.com/sitemap.xml
