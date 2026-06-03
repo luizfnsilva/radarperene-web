@@ -143,7 +143,7 @@
     if (s.bands && s.bands.length) { // banding de regime (terminal): faixa de fundo sutil por regime BR
       for (var bd = 0; bd < s.bands.length; bd++) { var b = s.bands[bd], bx0 = X(b.i0), bx1 = X(Math.min(hist.length - 1, (b.i1 || b.i0) + 1));
         o += '<rect x="' + bx0.toFixed(1) + '" y="' + pT + '" width="' + Math.max(0, bx1 - bx0).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_' + (b.tom || 'neu') + ')" opacity="0.06"/>'; } }
-    if (cone && pro) { // cone assimétrico (estilo Cowen) — SÓ assinante; free vê só a mediana
+    if (cone && pro && opt.cone !== false) { // cone assimétrico (estilo Cowen) — SÓ assinante; free vê só a mediana; toggle via opt.cone
       if (cone.lo2 && cone.hi2) { // banda externa p10–p90 (mais clara), desenhada atrás da p25–p75
         var hi2Pts = cone.hi2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
         var lo2Rev = cone.lo2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); }).reverse();
@@ -166,7 +166,7 @@
       if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.1 : 1) + '" stroke-dasharray="3 2" opacity="0.75"/>';
     }
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
-    if (cone) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
+    if (cone && opt.cone !== false) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
     else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
     var tail = cone ? (pro ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (' · <span class="pj">⤳ ' + esc(fmtNum(cone.mid[cone.mid.length - 1])) + '</span>')) : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
     return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + tail + '</span>';
@@ -262,6 +262,7 @@
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
     if (s.fair && s.fair.premio_pct != null) h += '<div class="rp-ml" style="margin-top:6px">' + (L ? "Fair value (FASTgraphs) " : "Valor-justo (FASTgraphs) ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo") + '</div>';
+    if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '<b>R$ ' + esc(s.dcf.iv) + '</b> · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (L ? "model from cash flow (growth " : "modelo do fluxo de caixa (cresc. ") + esc(s.dcf.g) + '% · ' + (L ? "discount " : "desconto ") + esc(s.dcf.r) + '%) — ' + (L ? "assumptions shown, not a forecast" : "premissas à mostra, não previsão") + '</div>';
     if (s.risco && s.risco.serie && s.risco.serie.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes, alert only)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados, só alerta)") + '</div>' + riskPane(s.risco, { big: true });
     else if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
     if (s.hist3 && s.hist3.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist3_label || "") + '</div>' + bigChart({ hist: s.hist3 }, { big: true });
@@ -274,6 +275,7 @@
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
     var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
+    var ov = { fair: true, cone: true };  // overlays liga/desliga (personalização tipo TradingView)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
     var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
     var bsel = document.createElement("div"); bsel.className = "rp-bsel"; bsel.style.display = "none";  // retângulo de seleção do brush
@@ -290,16 +292,30 @@
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
     function paint(histArr, wf, fairSl) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null });  // opt.fair/cone = arquitetura de overlays (personalização TradingView)
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone });  // opt.fair/cone = overlays liga/desliga
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
     function setChart(frac) {
       curHist = frac >= 0.99 ? s.hist : s.hist.slice(s.hist.length - Math.max(8, Math.round(s.hist.length * frac)));
-      var fairSl = (s.fair && s.fair.serie) ? s.fair.serie.slice(s.fair.serie.length - curHist.length) : null;  // valor-justo (FASTgraphs) alinhado ao mesmo tail
+      var fairSl = (ov.fair && s.fair && s.fair.serie) ? s.fair.serie.slice(s.fair.serie.length - curHist.length) : null;  // valor-justo (FASTgraphs) alinhado ao mesmo tail; respeita o toggle
       rbtn.style.display = "none"; paint(curHist, true, fairSl);
     }
     setChart(1);
+    // ★ overlays liga/desliga (personalização tipo TradingView) — só assinante; semente da camada de "funções" por gráfico
+    if (gpaid && (s.fair || s.cone)) {
+      var ovRow = document.createElement("div"); ovRow.style.cssText = "display:flex;gap:6px;margin:6px 0 2px;flex-wrap:wrap";
+      var mkTog = function (key, labEn, labPt) {
+        if ((key === "fair" && !s.fair) || (key === "cone" && !s.cone)) return;
+        var b = document.createElement("button");
+        var setTxt = function () { b.textContent = (ov[key] ? "● " : "○ ") + (L ? labEn : labPt); };
+        b.style.cssText = "font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer"; setTxt();
+        b.addEventListener("click", function (e) { e.stopPropagation(); ov[key] = !ov[key]; setTxt(); var on = mw.querySelector(".rp-per button.on"); var fr = on && on.getAttribute("data-frac") ? parseFloat(on.getAttribute("data-frac")) : 1; setChart(isFinite(fr) ? fr : 1); });
+        ovRow.appendChild(b);
+      };
+      mkTog("fair", "Fair value", "Valor-justo"); mkTog("cone", "Cone", "Cone");
+      chartEl.parentNode.insertBefore(ovRow, chartEl);
+    }
     chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto)
       if (brushing) return;  // durante o arraste, quem manda é o brush
       var rect = chartEl.getBoundingClientRect(), fx = (e.clientX - rect.left) / rect.width;
@@ -481,6 +497,7 @@
             if (s && s.hist && s.hist.length > 1) {
               inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" + (s.fair ? " · gold = fair value (earnings × normal P/E)" : "") : "preço · histórico → hoje → projeção (tracejada)" + (s.fair ? " · ouro = valor-justo (lucro × P/E normal)" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj }, { fair: s.fair });
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
+              if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
               if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (lang === "en" ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados)") + '</span>' + riskPane(s.risco);
               else if (s.hist2 && s.hist2.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist2_label || "") + '</span>' + bigChart({ hist: s.hist2 });
               if (s.hist3 && s.hist3.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist3_label || "") + '</span>' + bigChart({ hist: s.hist3 });
