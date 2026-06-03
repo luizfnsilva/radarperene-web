@@ -412,13 +412,17 @@
         if (cmp.length < 3) html += '<button class="rp-add" type="button" style="font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px dashed var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer">+ ' + (L ? "compare" : "comparar") + '</button>';
         html += '</div>';
         if (cmp.length === 1) {
-          var togs = [["cone", s.cone, L ? "Cone + shadow" : "Cone + sombra"], ["ma200", s.ma200, "MM200"], ["ma50", s.ma50, "MM50"], ["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["bands", s.bands, L ? "Regime bands" : "Bandas regime"]].filter(function (t) { return t[1]; });
+          var curG = s.g === "m" ? "m" : "d";  // ★ cadência: muda a PROJEÇÃO (cone/valor-justo/MMs/vol recomputam diário vs mensal)
+          html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center"><span class="rp-ml" style="opacity:.6;margin-right:1px">' + (L ? "Cadence:" : "Cadência:") + '</span>' + [["d", L ? "Daily" : "Diário"], ["m", L ? "Monthly" : "Mensal"]].map(function (gg) { return '<button class="rp-gtog" data-g="' + gg[0] + '" style="' + btnCss + (curG === gg[0] ? ";border-color:var(--_accent);color:var(--_accent);font-weight:700" : "") + '">' + esc(gg[1]) + '</button>'; }).join("") + '</div>';
+          var mc = (s.ma_n && s.ma_n[0]) || 50, ml = (s.ma_n && s.ma_n[1]) || 200, mu = curG === "m" ? "m" : "d";
+          var togs = [["cone", s.cone, L ? "Cone + shadow" : "Cone + sombra"], ["ma200", s.ma200, "MM" + ml + mu], ["ma50", s.ma50, "MM" + mc + mu], ["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["bands", s.bands, L ? "Regime bands" : "Bandas regime"]].filter(function (t) { return t[1]; });
           if (togs.length) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">' + togs.map(function (t) { return '<button class="rp-tog" data-k="' + t[0] + '" style="' + btnCss + '">' + (ov[t[0]] !== false ? "● " : "○ ") + esc(t[2]) + '</button>'; }).join("") + '</div>';
         }
         studio.innerHTML = html;
         studio.querySelectorAll("[data-rm]").forEach(function (el) { var idx = +el.getAttribute("data-rm"); if (idx > 0) el.addEventListener("click", function () { cmp.splice(idx, 1); applyMode(); }); });
         var addb = studio.querySelector(".rp-add"); if (addb) addb.addEventListener("click", openPicker);
         studio.querySelectorAll(".rp-tog").forEach(function (el) { el.addEventListener("click", function () { var k = el.getAttribute("data-k"); ov[k] = ov[k] === false ? true : false; applyMode(); }); });
+        studio.querySelectorAll(".rp-gtog").forEach(function (el) { el.addEventListener("click", function () { var gg = el.getAttribute("data-g"); if (gg === (s.g === "m" ? "m" : "d")) return; close(); fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(s.codigo) + "&classe=" + encodeURIComponent(s.classe) + "&g=" + gg, FOPT).then(function (r) { return r.json(); }).then(function (ns) { if (ns && ns.hist && ns.hist.length) openBig(ns, title, meta, lang, fund); }); }); });  // troca diário↔mensal → re-busca + reabre (recomputa a projeção)
       };
       if (cmp.length >= 2) applyMode(); else renderStudio();  // pré-carga (intermercado) abre já em modo compare
     }
