@@ -56,6 +56,7 @@
       ".rp .live{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--_dim);margin:0 0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.rp .live .dot{width:7px;height:7px;border-radius:50%;background:var(--_accent);flex:none}" +
       ".rp .spk{display:block;width:100%;height:26px;margin-top:7px}" +
       ".rp .comp{display:flex;width:100%;height:15px;border-radius:4px;overflow:hidden;border:1px solid var(--_line);margin:3px 0 4px}.rp .seg{height:100%}.rp .seg.hot{background:var(--_hot)}.rp .seg.warm{background:var(--_warm)}.rp .seg.cool{background:var(--_cool)}.rp .seg.neu{background:var(--_dim)}" +
+      ".rp .rp-imxp{display:inline-block;margin-top:7px;font-family:var(--_mono);font-size:9.5px;background:var(--_card2);border:1px solid var(--_accent);color:var(--_accent);border-radius:5px;padding:3px 10px;cursor:pointer}.rp .rp-imxp:hover{background:var(--_accent);color:#fff}" +
       ".rp .bc{display:block;width:100%;height:54px;margin-top:5px;background:var(--_card2);border:1px solid var(--_line);border-radius:6px}.rp .bcx{display:block;font-family:var(--_mono);font-size:9.5px;color:var(--_dim);margin-top:2px}.rp .bcx b{color:var(--_accent)}.rp .bcx .pj{color:var(--_warm)}" +
       ".rp .mg{display:block;margin-top:4px}.rp .mg .nd{animation:rpbreath 3.4s ease-in-out infinite}@keyframes rpbreath{0%,100%{opacity:.45}50%{opacity:1}}@media(prefers-reduced-motion:reduce){.rp .mg .nd{animation:none;opacity:.9}}" +
       ".rp .b,.rp .v,.rp .lv,.rp .vv,.rp .hl .v,.rp .tk .i .pr,.rp .live{font-family:var(--_mono);font-feature-settings:'tnum'}" +
@@ -243,7 +244,7 @@
     return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0] };
   }
 
-  function openBig(s, title, meta, lang, fund) {
+  function openBig(s, title, meta, lang, fund, preCmp) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
     // ★ GATE MEDIDO (metered paywall): após X análises profundas grátis, sobe o paywall. Conta por navegador → vale também nos embeds/backlink.
     var GLIM = (window.RP_FREE_CLICKS != null ? window.RP_FREE_CLICKS : 2);  // 2 grátis → o 3º "⤢ ampliar" cobra
@@ -340,7 +341,7 @@
     setChart(1);
     // ★ ESTÚDIO (TradingView): cruzar até 3 séries (qualquer classe) + escolher camadas — só assinante
     if (gpaid) {
-      var cmp = [{ cod: s.codigo, cls: s.classe, nome: title }];  // A = ticker atual
+      var cmp = (preCmp && preCmp.length >= 2) ? preCmp.slice() : [{ cod: s.codigo, cls: s.classe, nome: title }];  // A = ticker atual (ou pré-carga do intermercado)
       var cmpCache = {}; cmpCache[s.classe + ":" + s.codigo] = s;
       var perRow = mw.querySelector(".rp-per");
       var studio = document.createElement("div"); studio.style.cssText = "margin:8px 0 4px";
@@ -397,7 +398,7 @@
         var addb = studio.querySelector(".rp-add"); if (addb) addb.addEventListener("click", openPicker);
         studio.querySelectorAll(".rp-tog").forEach(function (el) { el.addEventListener("click", function () { var k = el.getAttribute("data-k"); ov[k] = ov[k] === false ? true : false; applyMode(); }); });
       };
-      renderStudio();
+      if (cmp.length >= 2) applyMode(); else renderStudio();  // pré-carga (intermercado) abre já em modo compare
     }
     chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto)
       if (brushing || compareActive) return;  // durante o arraste/modo compare, o crosshair de ticker único não vale
@@ -504,7 +505,7 @@
       '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
       rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "Indicators ⇒ BR intermarket" : "Indicadores ⇒ intermercado BR") + '</h4><div class="g3">' +
-      rr.intermercado_br.map(function (x) { var hasTk = x.tickers && x.tickers.length, xp = x.fonte || hasTk || (x.leadlag && x.leadlag.txt); return '<div class="t ' + esc(x.tom) + '"' + (xp ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (xp ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.spark2 && x.spark2.a ? '<div class="legend" style="margin-top:5px"><span style="color:var(--_accent)">▬</span> ' + esc(x.spark2.an) + ' <span style="color:var(--_cool)">▬</span> ' + esc(x.spark2.bn) + (x.spark2.c ? ' <span style="color:var(--_warm)">▦</span> ' + esc(x.spark2.cn) : '') + (x.spark2.ar ? '<span style="opacity:.6;display:block;margin-top:1px">' + (L ? "left axis " : "eixo esq ") + esc(fmtNum(x.spark2.ar[0])) + '–' + esc(fmtNum(x.spark2.ar[1])) + ' · ' + (L ? "right axis " : "eixo dir ") + esc(fmtNum(x.spark2.br[0])) + '–' + esc(fmtNum(x.spark2.br[1])) + '</span>' : '') + '</div>' + dualSpark(x.spark2.a, x.spark2.b, x.spark2.c) : '') + (xp ? '<div class="more">' + (x.fonte ? '<div class="mi">' + (L ? "What it is — " : "O que é — ") + esc(x.fonte) + '</div>' : '') + (x.leadlag && x.leadlag.txt ? '<div class="mi"><b>Lead-lag</b> — ' + esc(x.leadlag.txt) + '</div>' : '') + (hasTk ? '<div class="mi" style="margin-bottom:3px">' + (L ? "components (click):" : "componentes (clique):") + '</div><div class="tk">' + x.tickers.map(function (tk) { return '<span class="i" data-cod="' + esc(String(tk.ticker).toLowerCase()) + '" data-cls="equity_br"><span class="sy">' + esc(tk.ticker) + '</span>' + (tk.dy != null ? '<span class="mt">DY ' + esc(tk.dy) + '%</span>' : '') + '</span>'; }).join("") + '</div>' : '') + '</div>' : '') + '</div>'; }).join("") + '</div>'; }
+      rr.intermercado_br.map(function (x) { var hasTk = x.tickers && x.tickers.length, xp = x.fonte || hasTk || (x.leadlag && x.leadlag.txt); return '<div class="t ' + esc(x.tom) + '"' + (xp ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (xp ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.spark2 && x.spark2.a ? '<div class="legend" style="margin-top:5px"><span style="color:var(--_accent)">▬</span> ' + esc(x.spark2.an) + ' <span style="color:var(--_cool)">▬</span> ' + esc(x.spark2.bn) + (x.spark2.c ? ' <span style="color:var(--_warm)">▦</span> ' + esc(x.spark2.cn) : '') + (x.spark2.ar ? '<span style="opacity:.6;display:block;margin-top:1px">' + (L ? "left axis " : "eixo esq ") + esc(fmtNum(x.spark2.ar[0])) + '–' + esc(fmtNum(x.spark2.ar[1])) + ' · ' + (L ? "right axis " : "eixo dir ") + esc(fmtNum(x.spark2.br[0])) + '–' + esc(fmtNum(x.spark2.br[1])) + '</span>' : '') + '</div>' + dualSpark(x.spark2.a, x.spark2.b, x.spark2.c) : '') + (xp ? '<div class="more">' + (x.fonte ? '<div class="mi">' + (L ? "What it is — " : "O que é — ") + esc(x.fonte) + '</div>' : '') + (x.leadlag && x.leadlag.txt ? '<div class="mi"><b>Lead-lag</b> — ' + esc(x.leadlag.txt) + '</div>' : '') + (hasTk ? '<div class="mi" style="margin-bottom:3px">' + (L ? "components (click):" : "componentes (clique):") + '</div><div class="tk">' + x.tickers.map(function (tk) { return '<span class="i" data-cod="' + esc(String(tk.ticker).toLowerCase()) + '" data-cls="equity_br"><span class="sy">' + esc(tk.ticker) + '</span>' + (tk.dy != null ? '<span class="mt">DY ' + esc(tk.dy) + '%</span>' : '') + '</span>'; }).join("") + '</div>' + '<button class="rp-imxp" data-tks="' + esc(x.tickers.map(function (q) { return q.ticker; }).join(",")) + '">⤢ ' + (L ? "compare big (Lead-Lag)" : "comparar grande (Lead-Lag)") + '</button>' : '') + '</div>' : '') + '</div>'; }).join("") + '</div>'; }
     // ações: tira diversa 1-por-setor (com relação risk-on/off). Tesouro (M) e FIIs (R) agora vivem DENTRO das lentes (amostra).
     if (show("acoes") && rr.tickers_acoes && rr.tickers_acoes.length) { h += '<h4>' + (L ? "BR stocks · one per sector" : "Ações BR · 1 por setor") + '</h4><div class="legend">' + (L ? "a diverse cut across sectors — click any for the chart; each lens above opens its own curated 5" : "uma tira diversa por setor — clique pra ver o gráfico; cada lente acima abre os 5 dela") + '</div><div class="tk">' +
       rr.tickers_acoes.map(function (t) { var rel = (t.razao_nome ? "∈ " + t.razao_nome + (t.razao_leitura ? " · " + t.razao_leitura : "") : "") + (t.risk ? ((t.razao_nome ? " · " : "") + t.risk) : ""); var fund = (t.pl != null ? "P/L " + t.pl : "") + (t.dy != null ? ((t.pl != null ? " · " : "") + "DY " + t.dy + "%") : "") + (t.roe != null ? " · ROE " + t.roe + "%" : ""); return '<span class="i" data-cod="' + esc(String(t.ticker).toLowerCase()) + '" data-cls="equity_br"' + (rel ? ' data-rel="' + esc(rel) + '"' : '') + (fund ? ' data-fund="' + esc(fund) + '"' : '') + '><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w range" : "% da faixa 52s") + '</span>' : '') + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
@@ -580,8 +581,18 @@
       var sections = sa ? sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : null;
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
-        var t = ev.target, chip = null, exp = null;
-        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; } t = t.parentNode; }
+        var t = ev.target, chip = null, exp = null, imxp = null;
+        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && t.getAttribute("data-tks")) imxp = t; } t = t.parentNode; }
+        if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em modo compare (componente + IBOV), estilo Lead-Lag
+          ev.stopPropagation();
+          var tks = (imxp.getAttribute("data-tks") || "").split(",").filter(Boolean);
+          var pre = []; if (tks[0]) pre.push({ cod: tks[0].toLowerCase(), cls: "equity_br", nome: tks[0] });
+          pre.push({ cod: "ibov", cls: "pulso", nome: "IBOV" });
+          if (tks[1] && pre.length < 3) pre.push({ cod: tks[1].toLowerCase(), cls: "equity_br", nome: tks[1] });
+          fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(pre[0].cod) + "&classe=" + encodeURIComponent(pre[0].cls), FOPT)
+            .then(function (r) { return r.json(); }).then(function (s0) { if (s0 && s0.hist) openBig(s0, pre[0].nome, "", lang, null, pre); }).catch(function () { });
+          return;
+        }
         if (exp && !chip) { exp.classList.toggle("open"); return; }                 // clique na lente/razão → abre/fecha 2ª camada
         if (!chip || chip.getAttribute("data-open")) return;
         chip.setAttribute("data-open", "1"); chip.style.opacity = ".6";
