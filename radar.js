@@ -152,7 +152,7 @@
       var shHP = [], shLR = [];
       for (var shi = 0; shi < hist.length; shi++) { if (opt.shadow.hi[shi] != null) shHP.push(X(shi).toFixed(1) + "," + Y(opt.shadow.hi[shi]).toFixed(1)); }
       for (var shj = hist.length - 1; shj >= 0; shj--) { if (opt.shadow.lo[shj] != null) shLR.push(X(shj).toFixed(1) + "," + Y(opt.shadow.lo[shj]).toFixed(1)); }
-      if (shHP.length > 1) o += '<polygon points="' + shHP.concat(shLR).join(" ") + '" fill="var(--_warm)" opacity="0.05" stroke="none"/>';
+      if (shHP.length > 1) o += '<polygon points="' + shHP.concat(shLR).join(" ") + '" fill="var(--_warm)" opacity="0.11" stroke="var(--_warm)" stroke-width="0.4" stroke-opacity="0.3"/>';  // sombra do passado mais visível
     }
     if (cone && pro && opt.cone !== false) { // cone assimétrico (estilo Cowen) — SÓ assinante; free vê só a mediana; toggle via opt.cone
       if (cone.lo2 && cone.hi2) { // banda externa p10–p90 (mais clara), desenhada atrás da p25–p75
@@ -176,7 +176,7 @@
     if (opt.ma50) { var mp5 = []; for (var ma5i = 0; ma5i < hist.length; ma5i++) { if (opt.ma50[ma5i] != null) mp5.push(X(ma5i).toFixed(1) + "," + Y(opt.ma50[ma5i]).toFixed(1)); } if (mp5.length > 1) o += '<polyline points="' + mp5.join(" ") + '" fill="none" stroke="var(--_dim)" stroke-width="' + (big ? 0.9 : 0.8) + '" opacity="0.72" stroke-dasharray="2 1.5"/>'; }  // MM50
     if (opt.fair && opt.fair.length) {  // FASTgraphs: linha de valor-justo (EPS × P/E normal) — ancora no fundamento
       var fpts = []; for (var fi = 0; fi < opt.fair.length && fi < hist.length; fi++) { if (opt.fair[fi] != null) fpts.push(X(fi).toFixed(1) + "," + Y(opt.fair[fi]).toFixed(1)); }
-      if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.1 : 1) + '" stroke-dasharray="3 2" opacity="0.75"/>';
+      if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.5 : 1.2) + '" stroke-dasharray="4 2" opacity="0.92"/>';
     }
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
     if (cone && opt.cone !== false) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
@@ -252,7 +252,7 @@
     function corr(a, b) { var da = [], db = []; for (var k = 1; k < a.length; k++) { if (a[k] != null && a[k - 1] != null && b[k] != null && b[k - 1] != null) { da.push(a[k] - a[k - 1]); db.push(b[k] - b[k - 1]); } } if (da.length < 4) return null; var ma = da.reduce(function (x, y) { return x + y; }, 0) / da.length, mb = db.reduce(function (x, y) { return x + y; }, 0) / db.length, num = 0, va = 0, vb = 0; for (var i = 0; i < da.length; i++) { num += (da[i] - ma) * (db[i] - mb); va += (da[i] - ma) * (da[i] - ma); vb += (db[i] - mb) * (db[i] - mb); } return Math.round((num / (Math.sqrt(va * vb) || 1)) * 100) / 100; }
     var pairs = [];
     for (var a = 0; a < reb.length; a++) for (var b = a + 1; b < reb.length; b++) { var c = corr(reb[a], reb[b]); if (c != null) pairs.push({ a: valid[a].nome, b: valid[b].nome, c: c }); }
-    return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0] };
+    return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0], mn: mn, mx: mx };
   }
 
   function openBig(s, title, meta, lang, fund, preCmp) {
@@ -322,7 +322,7 @@
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
     var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
-    var ov = { fair: false, cone: true, bands: false, ma200: true, ma50: false };  // 2 camadas por padrão (Cone+sombra · MM200) — evita poluir; resto a 1 clique
+    var ov = { fair: true, cone: true, bands: false, ma200: false, ma50: false };  // 2 camadas por padrão (Valor-justo · Cone+sombra) — passado×presente×futuro juntos; resto a 1 clique
     var compareActive = false;  // estúdio em modo cruzamento (desliga crosshair/brush de ticker único)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
     var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
@@ -377,6 +377,8 @@
         var cc = compareChart(got.filter(Boolean), lang, { big: true });
         if (!cc) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.7;padding:18px 0;text-align:center">' + (L ? "no time overlap between these series" : "sem sobreposição temporal entre essas séries") + '</div>'; legEl.innerHTML = ""; return; }
         chartEl.innerHTML = cc.svg;
+        yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");  // eixo-Y do cruzamento (base 100) — referência não some mais
+        chartEl.appendChild(yax);
         legEl.innerHTML = '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c; }).join(" · ") : '') + '</div>';
       };
       var applyMode = function () {
