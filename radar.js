@@ -169,10 +169,11 @@
   function openBig(s, title, meta, lang, fund) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
     // ★ GATE MEDIDO (metered paywall): após X análises profundas grátis, sobe o paywall. Conta por navegador → vale também nos embeds/backlink.
-    var GLIM = (window.RP_FREE_CLICKS != null ? window.RP_FREE_CLICKS : 5);
+    var GLIM = (window.RP_FREE_CLICKS != null ? window.RP_FREE_CLICKS : 2);  // 2 grátis → o 3º "⤢ ampliar" cobra
     var GURL = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));
+    var gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}  // login (vale em qq lugar) ou flag local
     var gused = 0; try { gused = parseInt(localStorage.getItem("rp_deep") || "0", 10) || 0; } catch (e) {}
-    if (gused >= GLIM) {
+    if (!gpaid && gused >= GLIM) {
       var gh = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>'
         + '<div class="rp-mt">' + (L ? "You’ve used your free deep views" : "Você usou suas análises profundas grátis") + '</div>'
         + '<div class="rp-lock" style="margin-top:10px"><b>' + (L ? "🔒 Unlimited depth + everything — Founder" : "🔒 Profundidade ilimitada + tudo — Founder") + '</b><small>' + (L ? "Lock all 6 lenses (incl. Vértice) and unlimited deep analysis for US$149/mo while active — the first 100 founders only." : "Trave as 6 lentes (incl. Vértice) e a análise profunda ilimitada por R$149/mês enquanto ativo — só os 100 primeiros fundadores.") + '</small><a class="cta" href="' + GURL + '" target="_blank" rel="noopener">' + (L ? "Get Founder · US$149/mo →" : "Quero o Founder · R$149/mês →") + '</a></div></div>';

@@ -135,8 +135,9 @@
       <circle cx="16" cy="16" r="2" fill="#b8801f"/>
     </svg>
     <span class="nm">Radar <b>Perene</b></span>
+    <span id="me-seal" style="display:none;margin-left:10px;font-size:11px;background:#b8801f;color:#0a0c0f;padding:2px 9px;border-radius:20px;font-weight:700;vertical-align:middle"></span>
   </div>
-  <div class="lang"><a href="/sobre.html" id="l-sobre">O que é</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a><button id="theme-tg" class="tg" type="button" aria-label="alternar tema">☾</button></div>
+  <div class="lang"><a href="/sobre.html" id="l-sobre">O que é</a> · <a href="#" id="me-login">Entrar</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a><button id="theme-tg" class="tg" type="button" aria-label="alternar tema">☾</button></div>
 </div>
 
 <div class="wrap">
@@ -401,5 +402,39 @@
   });
 })();
 </script>
+<!-- Login leve do Radar free (Supabase Auth) → selo do nº de fundador + desbloqueio em qq lugar. Atendimento/cobrança = Stripe. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>(function(){
+  if(!window.supabase)return;
+  var SBU="https://zcjtkgltrxdnlacezpny.supabase.co";
+  var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
+  var sb=window.supabase.createClient(SBU,ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  var EN=location.search.indexOf("lang=en")>=0;
+  var seal=document.getElementById("me-seal"),loginEl=document.getElementById("me-login");
+  async function refresh(){
+    var sess=(await sb.auth.getSession()).data.session;
+    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; window.RP_PREMIUM=false; return; }
+    if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
+    try{ var r=await fetch(SBU+"/functions/v1/radar-api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
+      if(d&&d.premium){ window.RP_PREMIUM=true; try{localStorage.setItem("rp_premium","1")}catch(e){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founder #":"Fundador #")+d.rank;} }
+      else{ window.RP_PREMIUM=false; if(seal)seal.style.display="none"; }
+    }catch(e){}
+  }
+  if(loginEl)loginEl.addEventListener("click",async function(e){ e.preventDefault();
+    var sess=(await sb.auth.getSession()).data.session;
+    if(sess){ await sb.auth.signOut(); try{localStorage.removeItem("rp_premium")}catch(x){} location.reload(); return; }
+    var old=document.getElementById("me-menu"); if(old){old.remove();return;}
+    var m=document.createElement("div"); m.id="me-menu";
+    m.style.cssText="position:absolute;top:46px;right:14px;z-index:10000;background:#13171c;border:1px solid #222a31;border-radius:10px;padding:7px;box-shadow:0 12px 40px rgba(0,0,0,.55);min-width:190px";
+    function opt(label,fn){var b=document.createElement("button");b.textContent=label;b.style.cssText="display:block;width:100%;text-align:left;background:transparent;border:0;color:#e8ebee;padding:9px 11px;border-radius:7px;cursor:pointer;font:13px 'Inter',system-ui,sans-serif";b.onmouseover=function(){b.style.background="#1c222b"};b.onmouseout=function(){b.style.background="transparent"};b.onclick=fn;m.appendChild(b);}
+    var prov=function(p){return function(){sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.href}})}};
+    opt(EN?"Continue with Google":"Entrar com Google",prov("google"));
+    opt(EN?"Continue with Apple":"Entrar com Apple",prov("apple"));
+    opt(EN?"Email magic link":"Link por e-mail",async function(){m.remove();var em=prompt(EN?"Your email:":"Seu e-mail:");if(!em)return;var res=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.href}});alert(res.error?("Erro: "+res.error.message):(EN?"Check your email for the link.":"Verifique seu e-mail — enviamos o link."))});
+    document.body.appendChild(m);
+    setTimeout(function(){document.addEventListener("click",function h(ev){if(!m.contains(ev.target)&&ev.target!==loginEl){m.remove();document.removeEventListener("click",h)}})},50);
+  });
+  sb.auth.onAuthStateChange(function(){refresh()}); refresh();
+})();</script>
 </body>
 </html>
