@@ -1,11 +1,14 @@
 # Radar Perene
 
-> Radar Perene é um instrumento de inteligência de regime do Brasil — descritivo, in-house, de fontes públicas. Lê o ambiente regulatório, judicial, macroeconômico e de mercado e mostra o que está acontecendo HOJE, do básico ao avançado. NÃO é recomendação de investimento; é conteúdo educacional e informativo.
+> Radar Perene (também "Método Perene") é um instrumento de inteligência de regime do Brasil — descritivo, in-house, de fontes públicas. Lê o ambiente regulatório, judicial, macroeconômico e de mercado e mostra o que está acontecendo HOJE, do básico ao avançado. NÃO é recomendação de investimento nem previsão de preço; é conteúdo educacional e informativo. Bilíngue: PT em radarperene.com.br, EN em radarperene.com.
 
 ## O que faz
-- Lê o "regime" do mercado e da regulação brasileira via 5 lentes conservadoras (regulatória, juros/macro, intermercado BR, jurídica, patrimonial) + a lente experimental Vértice (9 termômetros cross-asset, amplitude/breadth, risk-on/off geográfico, estudos de análogo histórico).
-- Produz scores de regime (0-100), divergências entre sinais e estudos de "isto já ocorreu N vezes desde 2000 → o que se seguiu".
-- Tudo determinístico e descritivo, sobre dados públicos (mercado, Banco Central, atividade regulatória/judicial).
+- Lê o "regime" do mercado e da regulação brasileira via 5 lentes conservadoras (regulatória/institucional, juros/macro, intermercado BR, jurídica, patrimonial) + a lente experimental Vértice (9 termômetros cross-asset, amplitude/breadth ao estilo SentimenTrader, risk-on/off geográfico, estudos de análogo histórico).
+- Produz scores de regime (0-100), divergências entre sinais e estudos de "isto já ocorreu N vezes desde 2000 → o que se seguiu" (com a amostra e a incerteza explícitas).
+- Valuation descritivo (estilo FASTgraphs): linha de valor-justo das ações (lucro × P/E normal histórico), DCF do fluxo de caixa, e o prêmio de risco das ações (earnings yield mediano − juro real) — a bolsa vs. a renda fixa real.
+- Mercado: macro, juros/Selic, risco Brasil, intermercado, câmbio, IBOV, FIIs (IFIX) e tickers individuais, Tesouro Direto, cripto — clicáveis, com gráfico, projeção e cone de cenários.
+- Gráficos: cone assimétrico p10–p90, médias móveis, bandas, indicadores (ex.: Bollinger) e um Estúdio que cruza até 3 séries de qualquer classe (ação × FII × fiscal × moeda) rebaseadas com correlação. No plano pago, os gráficos são manipuláveis (zoom livre, comparar A×B, ligar/desligar camadas).
+- Tudo determinístico e descritivo, sobre dados públicos (mercado, Banco Central, atividade regulatória/judicial). Cada leitura traz a data e a cobertura (vida honesta, sem falsa pulsação).
 
 ## Páginas principais
 - O que é (explicação completa + FAQ): https://radarperene.com/sobre.html
@@ -13,11 +16,11 @@
 - Integração / API pública gratuita: https://radarperene.com/INTEGRACAO_RADAR.md
 
 ## Oferta
-- Prévia da leitura de hoje: GRATUITA. API pública embedável em qualquer site (gratuita, citar a fonte).
-- Plano completo (histórico de 50+ anos, gráficos, alertas, profundidade): pago. Preço de fundador para os 100 primeiros.
+- Prévia da leitura de hoje: GRATUITA. API pública embedável em qualquer site (gratuita, citar a fonte) — widget temável, com skin "editorial" para sites premium.
+- Plano Fundador (completo): histórico longo, gráficos manipuláveis, cone p10–p90 com análogos sobrepostos, valor-justo e alertas de virada de regime. Preço de fundador para os 100 primeiros.
 
 ## Princípios
-- Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Bilíngue (PT em radarperene.com.br, EN em radarperene.com).
+- Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Educacional/informativo. Linguagem honesta sobre incerteza (amostra, janela, confiança). Bilíngue PT/EN.
 
 ## Contato
 hello@brazilcomplexity.com
