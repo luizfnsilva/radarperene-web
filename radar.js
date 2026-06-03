@@ -68,6 +68,7 @@
       ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
       ".rp-mc .rp-per{display:flex;gap:5px;margin:7px 0 3px;flex-wrap:wrap}.rp-mc .rp-per button{border:1px solid var(--_line);background:var(--_card2);color:var(--_dim);border-radius:6px;font-size:10px;padding:3px 10px;cursor:pointer;font-family:var(--rp-font,'Inter',system-ui,sans-serif)}.rp-mc .rp-per button.on{border-color:var(--_accent);color:var(--_accent)}.rp-mc .rp-per button.lock{color:var(--_accent);font-weight:600}" +
       ".rp-mc .rp-lock{border:1px dashed var(--_accent);border-radius:10px;padding:18px 16px;text-align:center;background:var(--_card2);min-height:120px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-lock b{display:block;font-size:13px;margin-bottom:5px;color:var(--_txt)}.rp-mc .rp-lock small{font-size:10.5px;color:var(--_dim);line-height:1.5}.rp-mc .rp-lock .cta{display:inline-block;margin-top:11px;background:var(--_accent);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none}" +
+      ".rp-mc .rp-chart{position:relative}.rp-mc .rp-xh{position:absolute;top:0;bottom:16px;width:1px;background:var(--_accent);opacity:.55;pointer-events:none;transform:translateX(-0.5px)}.rp-mc .rp-xt{position:absolute;top:0;transform:translateX(-50%);background:var(--_accent);color:#fff;font-size:9px;font-family:var(--rp-mono,ui-monospace,monospace);padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -149,6 +150,21 @@
     var tail = cone ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
     return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + tail + '</span>';
   }
+  // scatter de quadrantes (Lead-Lag): cada ponto = um mês; X=score do regime, Y=retorno do IBOV em 6m; vertical = hoje
+  function scatterChart(sc) {
+    if (!sc || !sc.points || sc.points.length < 10) return "";
+    var pts = sc.points, ys = pts.map(function (p) { return p.y; });
+    var ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys), yr = (ymax - ymin) || 1;
+    var W = 280, H = 150, pL = 4, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB;
+    function X(v) { return pL + (Math.max(0, Math.min(100, v)) / 100) * pw; }
+    function Y(v) { return pT + (1 - (v - ymin) / yr) * ph; }
+    var o = '<svg class="bc big" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
+    o += '<line x1="' + X(50).toFixed(1) + '" y1="' + pT + '" x2="' + X(50).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_line)" stroke-width="0.5"/>';
+    if (ymin < 0 && ymax > 0) o += '<line x1="' + pL + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.5"/>';
+    o += pts.map(function (p) { return '<rect x="' + (X(p.x) - 1).toFixed(1) + '" y="' + (Y(p.y) - 1).toFixed(1) + '" width="2" height="2" fill="var(--_' + (p.y >= 0 ? "warm" : "cool") + ')" opacity="0.5"/>'; }).join("");
+    o += '<line x1="' + X(sc.cur_x).toFixed(1) + '" y1="' + pT + '" x2="' + X(sc.cur_x).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_accent)" stroke-width="1.2" stroke-dasharray="3 2"/>';
+    return o + '</svg>';
+  }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   function openBig(s, title, meta, lang) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
@@ -193,11 +209,28 @@
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
+    var curHist = s.hist;
+    var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
+    var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
+    function setChart(frac) {
+      curHist = frac >= 0.99 ? s.hist : s.hist.slice(s.hist.length - Math.max(8, Math.round(s.hist.length * frac)));
+      chartEl.innerHTML = bigChart({ hist: curHist, proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true });
+      chartEl.appendChild(xh); chartEl.appendChild(xt);
+    }
+    setChart(1);
+    chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto)
+      var rect = chartEl.getBoundingClientRect(), fx = (e.clientX - rect.left) / rect.width;
+      if (fx < 0 || fx > 1 || !curHist || curHist.length < 2) { xh.style.display = "none"; xt.style.display = "none"; return; }
+      var val = curHist[Math.round(fx * (curHist.length - 1))];
+      xh.style.display = "block"; xh.style.left = (fx * 100) + "%";
+      xt.style.display = "block"; xt.style.left = (fx * 100) + "%"; xt.textContent = fmtNum(val);
+    });
+    chartEl.addEventListener("mouseleave", function () { xh.style.display = "none"; xt.style.display = "none"; });
     for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
       btn.addEventListener("click", function (e) { e.stopPropagation();
         for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
         if (btn.getAttribute("data-max")) { chartEl.innerHTML = lockHTML; return; }
-        chartEl.innerHTML = chartHTML(parseFloat(btn.getAttribute("data-frac")));
+        setChart(parseFloat(btn.getAttribute("data-frac")));
       });
     })(perBtns[pi]); }
     document.addEventListener("keydown", onkey); document.body.appendChild(mw);
@@ -262,6 +295,8 @@
         (rr.teses_total > 1 ? '<div class="legend">+ ' + (rr.teses_total - 1) + (L ? " other active theses in the app" : " outras teses ativas no app") + '</div>' : '');
     }
     if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br; h += '<h4>' + (L ? "BR analog · past → future" : "Análogo BR · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(ab.pergunta) + '</div>' + (ab.datas_analogas && ab.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') + '<div class="stat"><div><div class="v">' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median (IBOV)" : "mediana (IBOV)") + '</div></div><div><div class="v">' + esc(ab.hit_rate_pct) + '%</div><div class="r">hit-rate</div></div></div></div>'; }
+    if (rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter;
+      h += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "where we are today" : "onde estamos hoje") + ' · <span style="color:var(--_warm)">▪</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">▪</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' + scatterChart(sct) + (sct.leitura ? '<div class="legend" style="margin-top:4px">' + esc(sct.leitura) + '</div>' : ''); }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
