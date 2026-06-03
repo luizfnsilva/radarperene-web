@@ -108,7 +108,9 @@
     if (!a || !b || a.length < 2) return "";
     var W = 280, H = 44, n = a.length - 1 || 1;
     function pts(arr) { return arr.map(function (v, i) { return ((i / n) * W).toFixed(1) + "," + ((H - 3) - (v / 100) * (H - 6)).toFixed(1); }).join(" "); }
-    var s = '<svg class="spk" width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts(a) + '" fill="none" stroke="var(--_accent)" stroke-width="1.4"/><polyline points="' + pts(b) + '" fill="none" stroke="var(--_cool)" stroke-width="1.4"/>';
+    var s = '<svg class="spk" width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">';
+    for (var dg = 1; dg < 4; dg++) { var dy = ((H - 3) - (dg / 4) * (H - 6)).toFixed(1); s += '<line x1="0" y1="' + dy + '" x2="' + W + '" y2="' + dy + '" stroke="var(--_line)" stroke-width="0.3" opacity="0.4"/>'; }
+    s += '<polyline points="' + pts(a) + '" fill="none" stroke="var(--_accent)" stroke-width="1.4"/><polyline points="' + pts(b) + '" fill="none" stroke="var(--_cool)" stroke-width="1.4"/>';
     if (c && c.length) s += '<polyline points="' + pts(c) + '" fill="none" stroke="var(--_warm)" stroke-width="2" stroke-dasharray="5 2"/>'; // razão = rotação risk-on/off
     return s + '</svg>';
   }
