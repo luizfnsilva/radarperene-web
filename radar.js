@@ -486,7 +486,12 @@
       push(L ? "Currency" : "Moeda", rr.cambio ? [{ cod: rr.cambio.codigo, cls: "pulso", nome: rr.cambio.nome }] : []);
       push(L ? "Fiscal & macro" : "Fiscal & macro", ((rr.fiscal && rr.fiscal.series) || []).map(function (x) { return { cod: x.cod, cls: x.cls || "macro", nome: x.nome }; }));
       push(L ? "Real estate" : "Imóveis", (rr.imovel_m2 || []).map(function (m) { return { cod: m.cod, cls: m.cls || "macro", nome: m.cidade + " · m²" }; }));
-      push(L ? "Intermarket / sectors" : "Intermercado / setores", (rr.intermercado_br || []).filter(function (x) { return x.cod; }).map(function (x) { return { cod: x.cod, cls: "intermercado", nome: x.numn || x.nome }; }));  // compostos sintéticos (numerador da razão) cruzáveis
+      var imItens = []; (rr.intermercado_br || []).filter(function (x) { return x.cod; }).forEach(function (x) {  // composto + razão (÷) + denominador nativo (ex.: Ouro) — todos cruzáveis/selecionáveis
+        imItens.push({ cod: x.cod, cls: "intermercado", nome: x.numn || x.nome });
+        imItens.push({ cod: x.cod, cls: "intermercado_ratio", nome: (x.numn || x.nome) + "÷" + (x.denn || "IBOV") });
+        if (x.denn && x.denn.toUpperCase() !== "IBOV") imItens.push({ cod: x.cod, cls: "intermercado_den", nome: x.denn });
+      });
+      push(L ? "Intermarket / sectors" : "Intermercado / setores", imItens);
       push("Cripto", (v.cripto || []).map(function (t) { return { cod: String(t.simbolo).toLowerCase(), cls: "cripto", nome: t.simbolo }; }));
       RP_CAT = cat;
     })();
@@ -609,8 +614,7 @@
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
           ev.stopPropagation();
           var icod = imxp.getAttribute("data-cod"), inome = imxp.getAttribute("data-nome") || "Composto", idenn = imxp.getAttribute("data-denn") || "IBOV";
-          var pre = [{ cod: icod, cls: "intermercado", nome: inome }, { cod: "ibov", cls: "pulso", nome: "IBOV" }];  // × IBOV = risk-on/off clássico (default)
-          if (idenn && idenn.toUpperCase() !== "IBOV") pre.push({ cod: icod, cls: "intermercado_den", nome: idenn });  // + denominador nativo (ex.: ouro) → composto × IBOV × ouro
+          var pre = [{ cod: icod, cls: "intermercado", nome: inome }, { cod: "ibov", cls: "pulso", nome: "IBOV" }];  // default = composto × IBOV (risk-on/off clássico); × ouro e a razão ficam no picker do Estúdio
           fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(icod) + "&classe=intermercado", FOPT)
             .then(function (r) { return r.json(); }).then(function (s0) { if (s0 && s0.hist && s0.hist.length) openBig(s0, inome, "", lang, null, pre); }).catch(function () { });
           return;
