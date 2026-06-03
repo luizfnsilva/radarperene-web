@@ -235,6 +235,12 @@
       var fpts = []; for (var fi = 0; fi < opt.fair.length && fi < hist.length; fi++) { if (opt.fair[fi] != null) fpts.push(X(fi).toFixed(1) + "," + Y(opt.fair[fi]).toFixed(1)); }
       if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.5 : 1.2) + '" stroke-dasharray="4 2" opacity="0.92"/>';
     }
+    if (opt.futFair && opt.futFair.length && (cone || proj.length)) {  // valor-justo PROJETADO no futuro — âncora fundamental atravessa o cone de preço (bug 3)
+      var ffp = [], lastF = null; for (var lf = (opt.fair ? opt.fair.length : 0) - 1; lf >= 0; lf--) { if (opt.fair && opt.fair[lf] != null) { lastF = opt.fair[lf]; break; } }
+      if (lastF != null) ffp.push(X(bi).toFixed(1) + "," + Y(lastF).toFixed(1));  // conecta do último valor-justo histórico (hoje)
+      for (var fk = 0; fk < opt.futFair.length && fk < futN; fk++) { if (opt.futFair[fk] != null) ffp.push(X(bi + 1 + fk).toFixed(1) + "," + Y(opt.futFair[fk]).toFixed(1)); }
+      if (ffp.length > 1) o += '<polyline points="' + ffp.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.2 : 1) + '" stroke-dasharray="1 2.5" opacity="0.6"/>';
+    }
     // ── camadas-PLUGIN (Strategy): cada indicador drop-in desenha aqui, no foreground (já computado p/ o range) ──
     for (var _di = 0; _di < _plug.length; _di++) { try { o += _plug[_di].d.draw({ X: X, Y: Y }, _plug[_di].c); } catch (_e) { /* plugin isolado: nunca derruba o gráfico */ } }
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
@@ -316,22 +322,9 @@
 
   function openBig(s, title, meta, lang, fund, preCmp) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
-    // ★ GATE MEDIDO (metered paywall): após X análises profundas grátis, sobe o paywall. Conta por navegador → vale também nos embeds/backlink.
-    var GLIM = (window.RP_FREE_CLICKS != null ? window.RP_FREE_CLICKS : 2);  // 2 grátis → o 3º "⤢ ampliar" cobra
-    var GURL = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));
+    // O gráfico grande é a MAIOR isca → free SEMPRE abre (sem gate de abertura). O upsell vem das FEATURES gated
+    // dentro: manipular (zoom/brush), comparar A×B (Estúdio), cone completo p10–p90, overlays além dos 2 do free.
     var gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}  // login (vale em qq lugar) ou flag local
-    var gused = 0; try { gused = parseInt(localStorage.getItem("rp_deep") || "0", 10) || 0; } catch (e) {}
-    if (!gpaid && gused >= GLIM) {
-      var gh = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>'
-        + '<div class="rp-mt">' + (L ? "You’ve used your free deep views" : "Você usou suas análises profundas grátis") + '</div>'
-        + '<div class="rp-lock" style="margin-top:10px"><b>' + (L ? "🔒 Unlimited depth + everything — Founder" : "🔒 Profundidade ilimitada + tudo — Founder") + '</b><small>' + (L ? "Lock all 6 lenses (incl. Vértice) and unlimited deep analysis for US$149/mo while active — the first 100 founders only." : "Trave as 6 lentes (incl. Vértice) e a análise profunda ilimitada por R$149/mês enquanto ativo — só os 100 primeiros fundadores.") + '</small><a class="cta" href="' + GURL + '" target="_blank" rel="noopener">' + (L ? "Get Founder · US$149/mo →" : "Quero o Founder · R$149/mês →") + '</a></div></div>';
-      var mwg = document.createElement("div"); mwg.className = "rp-mw"; mwg.innerHTML = gh;
-      var closeg = function () { if (mwg.parentNode) mwg.parentNode.removeChild(mwg); document.removeEventListener("keydown", okg); };
-      var okg = function (e) { if (e.key === "Escape") closeg(); };
-      mwg.addEventListener("click", function (e) { var t = e.target; if (t === mwg || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) closeg(); });
-      document.addEventListener("keydown", okg); document.body.appendChild(mwg); return;
-    }
-    try { localStorage.setItem("rp_deep", String(gused + 1)); } catch (e) {}
     var cur = s.hist[s.hist.length - 1];
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
     var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
@@ -362,6 +355,11 @@
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
     h += '<div class="rp-per">' + [["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) { return '<button data-m="' + p[0] + '"' + (p[0] === "0" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
     h += '<div class="rp-chart">' + bigChart(s, { big: true }) + '</div>';
+    if (!gpaid) {  // FREE: 2 overlays (1 projeção = cone/mediana + 1 indicador) — "gostinho"; manipular/comparar/cone-completo ficam no Founder
+      var freeIds = ["cone"]; if (s.fair) freeIds.push("fair"); else if (s.ma200 && s.ma200.length) freeIds.push("ma200");
+      var fLbl = { cone: (L ? "Projection (median)" : "Projeção (mediana)"), fair: (L ? "Fair value" : "Valor-justo"), ma200: "MM200" };
+      h += '<div class="rp-tgf" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">' + freeIds.map(function (id) { var don = ((RP_LAYERS.filter(function (l) { return l.id === id; })[0]) || {}).defaultOn; return '<button class="rp-tog" data-fk="' + id + '" data-lbl="' + esc(fLbl[id]) + '" style="font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:6px;padding:3px 9px;cursor:pointer">' + (don ? "● " : "○ ") + esc(fLbl[id]) + '</button>'; }).join("") + '<span class="rp-ml" style="opacity:.5">' + (L ? "· compare A×B & manipulate in Founder" : "· comparar A×B & manipular no Founder") + '</span></div>';
+    }
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);
         if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (dlo2 != null ? 'p10–p90 ' + sgn(dlo2) + ' … ' + sgn(dhi2) : (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi)) + '</b> · ' + (dlo2 != null ? (L ? "core p25–p75 " : "núcleo p25–p75 ") + sgn(dlo) + '…' + sgn(dhi) + ' · ' : '') + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
@@ -381,7 +379,7 @@
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
-    var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
+    var curHist = s.hist, winStart = 0, brushing = false, bx0 = 0;  // winStart = índice ABSOLUTO em s.hist onde a janela atual começa (zoom/período); brushing = arrastando p/ zoom (só assinante)
     var ov = {}; RP_LAYERS.forEach(function (l) { if (l.available(s)) ov[l.id] = l.defaultOn; });  // estado dos overlays vem do REGISTRO (não mais hardcoded) — default: Valor-justo + Cone ligados, resto a 1 clique
     var compareActive = false;  // estúdio em modo cruzamento (desliga crosshair/brush de ticker único)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
@@ -399,12 +397,13 @@
       return [[5, mx], [27.5, mn + 0.75 * rg], [50, mn + 0.5 * rg], [72.5, mn + 0.25 * rg], [95, mn]].map(function (p) {  // 5 níveis alinhados às gridlines (eixo mais legível p/ análise precisa)
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
-    function paint(histArr, wf, fairSl) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
-      var off = s.hist.length - histArr.length;  // alinha sombra/MMs ao mesmo tail da janela
-      var shSl = (ov.cone !== false && s.shadow && s.shadow.lo) ? { lo: s.shadow.lo.slice(off), hi: s.shadow.hi.slice(off) } : null;
-      var ma2Sl = (ov.ma200 && s.ma200) ? s.ma200.slice(off) : null, ma5Sl = (ov.ma50 && s.ma50) ? s.ma50.slice(off) : null;
+    function paint(histArr, wf) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
+      var ws = winStart, we = winStart + histArr.length;  // janela ABSOLUTA em s.hist → fatia TUDO igual (sombra/MM/valor-justo), inclusive zoom não-tail
+      var shSl = (ov.cone !== false && s.shadow && s.shadow.lo) ? { lo: s.shadow.lo.slice(ws, we), hi: s.shadow.hi.slice(ws, we) } : null;
+      var ma2Sl = (ov.ma200 && s.ma200) ? s.ma200.slice(ws, we) : null, ma5Sl = (ov.ma50 && s.ma50) ? s.ma50.slice(ws, we) : null;
+      var fairSl = (ov.fair && s.fair && s.fair.serie) ? s.fair.serie.slice(ws, we) : null;  // valor-justo fatiado pela MESMA janela → não some mais no zoom (bug 2)
       var plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); });  // camadas-plugin habilitadas (drop-in)
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl, plugins: plugins });  // overlays liga/desliga + sombra + MMs + plugins
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl, plugins: plugins, futFair: (wf && ov.fair && s.fair && s.fair.serie_fut) ? s.fair.serie_fut : null });  // overlays + sombra + MMs + plugins + valor-justo futuro (bug 3)
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
@@ -415,11 +414,15 @@
         while (i0 < s.datas.length && s.datas[i0] < cs) i0++;
         if (i0 > s.datas.length - 6) i0 = Math.max(0, s.datas.length - 8);  // mínimo de pontos
       }
-      curHist = i0 ? s.hist.slice(i0) : s.hist;
-      var fairSl = (ov.fair && s.fair && s.fair.serie) ? s.fair.serie.slice(s.fair.serie.length - curHist.length) : null;  // valor-justo alinhado ao mesmo tail; respeita o toggle
-      rbtn.style.display = "none"; paint(curHist, true, fairSl);
+      curHist = i0 ? s.hist.slice(i0) : s.hist; winStart = i0;
+      rbtn.style.display = "none"; paint(curHist, true);
     }
     setChart(0);
+    if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
+      mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
+        el.addEventListener("click", function () { var k = el.getAttribute("data-fk"); ov[k] = !ov[k]; el.textContent = (ov[k] ? "● " : "○ ") + el.getAttribute("data-lbl"); paint(curHist, true); });
+      });
+    }
     // ★ ESTÚDIO (TradingView): cruzar até 3 séries (qualquer classe) + escolher camadas — só assinante
     if (gpaid) {
       var cmp = (preCmp && preCmp.length >= 2) ? preCmp.slice() : [{ cod: s.codigo, cls: s.classe, nome: title }];  // A = ticker atual (ou pré-carga do intermercado)
@@ -527,7 +530,7 @@
         var n = curHist.length - 1, i0 = Math.round(a * n), i1 = Math.round(b * n);
         if (i1 - i0 < 2) return;
         var includesEnd = i1 >= n;  // janela inclui hoje? mantém o cone de futuro
-        curHist = curHist.slice(i0, i1 + 1); paint(curHist, includesEnd); rbtn.style.display = "inline-block";
+        var ns = winStart + i0; curHist = s.hist.slice(ns, ns + (i1 - i0) + 1); winStart = ns; paint(curHist, includesEnd); rbtn.style.display = "inline-block";  // janela absoluta → overlays seguem o zoom
       };
       chartEl.style.touchAction = "none";  // o gráfico captura o gesto (toque/arraste) sem rolar a página
       chartEl.addEventListener("mousedown", startBrush); chartEl.addEventListener("mousemove", moveBrush);
