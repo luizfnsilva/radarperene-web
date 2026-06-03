@@ -127,6 +127,7 @@
     var all = hist.slice();
     if (cone) { if (pro) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free: range só até a mediana (sem espaço morto da banda); pro: até p10–p90
     else if (proj.length) all = all.concat(proj.slice(1));
+    if (opt.fair && opt.fair.length) all = all.concat(opt.fair.filter(function (v) { return v != null; }));  // FASTgraphs: a faixa de valor-justo entra no range
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
     var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = (hist.length - 1 + futN) || 1;
     function X(i) { return pL + (i / tot) * pw; } function Y(v) { return pT + (1 - (v - mn) / rng) * ph; }
@@ -159,6 +160,10 @@
     var histPts = hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); });
     o += '<polygon points="' + histPts.join(" ") + " " + X(bi).toFixed(1) + "," + (H - pB) + " " + X(0).toFixed(1) + "," + (H - pB) + '" fill="var(--_accent)" opacity="0.08" stroke="none"/>';
     o += '<polyline points="' + histPts.join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.3 : 1.6) + '"/>';
+    if (opt.fair && opt.fair.length) {  // FASTgraphs: linha de valor-justo (EPS × P/E normal) — ancora no fundamento
+      var fpts = []; for (var fi = 0; fi < opt.fair.length && fi < hist.length; fi++) { if (opt.fair[fi] != null) fpts.push(X(fi).toFixed(1) + "," + Y(opt.fair[fi]).toFixed(1)); }
+      if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.1 : 1) + '" stroke-dasharray="3 2" opacity="0.75"/>';
+    }
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
     if (cone) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
     else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
@@ -183,6 +188,22 @@
     if (ymin < 0 && ymax > 0) o += '<line x1="' + pL + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
     o += pts.map(function (p) { return '<rect x="' + (X(p.x) - 1).toFixed(1) + '" y="' + (Y(p.y) - 1).toFixed(1) + '" width="2" height="2" fill="var(--_' + (p.y >= 0 ? "warm" : "cool") + ')" opacity="0.5"/>'; }).join("");
     o += '<line x1="' + X(sc.cur_x).toFixed(1) + '" y1="' + pT + '" x2="' + X(sc.cur_x).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_accent)" stroke-width="1.2" stroke-dasharray="3 2"/>';
+    return o + '</svg>';
+  }
+  // Risk-on/off (SentimenTrader, P7: SEM buy signal): oscilador 0-100 com threshold 50, zonas de extremo e MARCAÇÃO de alerta nos extremos passados
+  function riskPane(rk, opt) {
+    if (!rk || !rk.serie || rk.serie.length < 2) return "";
+    opt = opt || {}; var big = !!opt.big;
+    var s = rk.serie, n = s.length - 1 || 1, W = 280, H = big ? 70 : 40, pL = 3, pR = 4, pT = 4, pB = 4, pw = W - pL - pR, ph = H - pT - pB;
+    function X(i) { return pL + (i / n) * pw; } function Y(v) { return pT + (1 - Math.max(0, Math.min(100, v)) / 100) * ph; }
+    var o = '<svg class="bc' + (big ? ' big' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
+    o += '<rect x="' + pL + '" y="' + pT + '" width="' + pw.toFixed(1) + '" height="' + (Y(rk.hi) - pT).toFixed(1) + '" fill="var(--_hot)" opacity="0.06"/>';            // zona risco-off (defensivo)
+    o += '<rect x="' + pL + '" y="' + Y(rk.lo).toFixed(1) + '" width="' + pw.toFixed(1) + '" height="' + ((H - pB) - Y(rk.lo)).toFixed(1) + '" fill="var(--_cool)" opacity="0.06"/>'; // zona risco-on
+    o += '<line x1="' + pL + '" y1="' + Y(rk.hi).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(rk.hi).toFixed(1) + '" stroke="var(--_hot)" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>';
+    o += '<line x1="' + pL + '" y1="' + Y(rk.lo).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(rk.lo).toFixed(1) + '" stroke="var(--_cool)" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>';
+    o += '<line x1="' + pL + '" y1="' + Y(rk.thr).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(rk.thr).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.5"/>';
+    o += '<polyline points="' + s.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.3 : 1.4) + '"/>';
+    if (rk.marks) for (var mi = 0; mi < rk.marks.length; mi++) { var mk = rk.marks[mi], mx = X(mk.i); o += '<line x1="' + mx.toFixed(1) + '" y1="' + (H - pB - 3) + '" x2="' + mx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_' + (mk.tom || 'neu') + ')" stroke-width="1.4"/>'; }  // marca de alerta (extremo), sem direção de trade
     return o + '</svg>';
   }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
@@ -239,7 +260,9 @@
       else if (dmid != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "median " : "mediana ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go — not a forecast" : "pra onde costumou ir — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 full cone (p10–p90) + overlaid analogs in Founder" : "🔒 cone completo (p10–p90) + análogos sobrepostos no Founder") + '</span></div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
-    if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
+    if (s.fair && s.fair.premio_pct != null) h += '<div class="rp-ml" style="margin-top:6px">' + (L ? "Fair value (FASTgraphs) " : "Valor-justo (FASTgraphs) ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo") + '</div>';
+    if (s.risco && s.risco.serie && s.risco.serie.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes, alert only)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados, só alerta)") + '</div>' + riskPane(s.risco, { big: true });
+    else if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
     if (s.hist3 && s.hist3.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist3_label || "") + '</div>' + bigChart({ hist: s.hist3 }, { big: true });
     if (meta) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';
     h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
@@ -265,14 +288,15 @@
       return [[5, mx], [50, mn + 0.5 * rg], [95, mn]].map(function (p) {
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
-    function paint(histArr, wf) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf ? s.bands : null) }, { big: true, pro: gpaid });
+    function paint(histArr, wf, fairSl) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null });  // opt.fair/cone = arquitetura de overlays (personalização TradingView)
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
     function setChart(frac) {
       curHist = frac >= 0.99 ? s.hist : s.hist.slice(s.hist.length - Math.max(8, Math.round(s.hist.length * frac)));
-      rbtn.style.display = "none"; paint(curHist, true);
+      var fairSl = (s.fair && s.fair.serie) ? s.fair.serie.slice(s.fair.serie.length - curHist.length) : null;  // valor-justo (FASTgraphs) alinhado ao mesmo tail
+      rbtn.style.display = "none"; paint(curHist, true, fairSl);
     }
     setChart(1);
     chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto)
@@ -445,8 +469,10 @@
             var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
             var inner = "";
             if (s && s.hist && s.hist.length > 1) {
-              inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)") + '</span>' + bigChart({ hist: s.hist, proj: s.proj });
-              if (s.hist2 && s.hist2.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist2_label || "") + '</span>' + bigChart({ hist: s.hist2 });
+              inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" + (s.fair ? " · gold = fair value (earnings × normal P/E)" : "") : "preço · histórico → hoje → projeção (tracejada)" + (s.fair ? " · ouro = valor-justo (lucro × P/E normal)" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj }, { fair: s.fair });
+              if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
+              if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (lang === "en" ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados)") + '</span>' + riskPane(s.risco);
+              else if (s.hist2 && s.hist2.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist2_label || "") + '</span>' + bigChart({ hist: s.hist2 });
               if (s.hist3 && s.hist3.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist3_label || "") + '</span>' + bigChart({ hist: s.hist3 });
             }
             var canBig = s && s.hist && s.hist.length > 1;
