@@ -417,7 +417,7 @@
   if(!window.supabase)return;
   var SBU="https://zcjtkgltrxdnlacezpny.supabase.co";
   var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
-  var sb=window.supabase.createClient(SBU,ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  var sb=window.supabase.createClient(SBU,ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});
   var EN=location.search.indexOf("lang=en")>=0;
   var seal=document.getElementById("me-seal"),loginEl=document.getElementById("me-login");
   async function refresh(){
@@ -425,7 +425,7 @@
     if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; window.RP_PREMIUM=false; return; }
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     try{ var r=await fetch(SBU+"/functions/v1/radar-api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
-      if(d&&d.premium){ window.RP_PREMIUM=true; try{localStorage.setItem("rp_premium","1")}catch(e){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founder #":"Fundador #")+d.rank;} }
+      if(d&&d.premium){ window.RP_PREMIUM=true; try{localStorage.setItem("rp_premium","1")}catch(e){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founding Member #":"Membro Fundador #")+d.rank;} }
       else{ window.RP_PREMIUM=false; if(seal)seal.style.display="none"; }
     }catch(e){}
   }
