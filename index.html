@@ -379,6 +379,9 @@
   var fby=document.getElementById("founder-buy-year");if(fby){fby.href=STRIPEY;fby.textContent=(LANG==="en"?"Annual · US$ 1,490 (2 months free)":"Anual · R$ 1.490 (2 meses grátis)")}
   var pt=document.getElementById("portal");if(pt)pt.textContent=(LANG==="en"?"Manage subscription":"Gerenciar assinatura");
   try{var ld={"@context":"https://schema.org","@type":"FAQPage","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
+  // contador de fundadores ao vivo (escassez X/100) — degrada p/ "vagas limitadas" se o endpoint/secret não responder
+  try{var FANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
+  fetch("https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/founders",{headers:{apikey:FANON,Authorization:"Bearer "+FANON}}).then(function(r){return r.json()}).then(function(f){var b=document.getElementById("fbadge");if(b&&f&&f.founders!=null)b.textContent=(LANG==="en"?(f.founders+"/100 founder seats taken · "+f.restantes+" left"):(f.founders+"/100 vagas preenchidas · "+f.restantes+" restantes"))}).catch(function(){})}catch(e){}
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   var rn=document.getElementById("radar-perene");
