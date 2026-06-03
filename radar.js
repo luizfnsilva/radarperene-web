@@ -119,13 +119,14 @@
   // gráfico "de verdade" (parâmetros): faixa min/máx, "hoje", projeção tracejada destacada, último valor rotulado
   function bigChart(s, opt) {
     if (!s || !s.hist || s.hist.length < 2) return "";
-    opt = opt || {}; var big = !!opt.big;
+    opt = opt || {}; var big = !!opt.big, pro = !!opt.pro;  // pro=assinante: vê o cone completo; free vê só a mediana (gancho)
     var hist = s.hist;
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;       // cone de quantis (assimétrico, estilo Cowen)
     var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : [];                   // fallback: projeção linear
     var futN = cone ? (cone.mid.length - 1) : (proj.length ? proj.length - 1 : 0);
     var all = hist.slice();
-    if (cone) all = all.concat(cone.lo.slice(1), cone.hi.slice(1)); else if (proj.length) all = all.concat(proj.slice(1));
+    if (cone) { if (pro) all = all.concat(cone.lo.slice(1), cone.hi.slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free: range só até a mediana (sem espaço morto da banda)
+    else if (proj.length) all = all.concat(proj.slice(1));
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
     var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = (hist.length - 1 + futN) || 1;
     function X(i) { return pL + (i / tot) * pw; } function Y(v) { return pT + (1 - (v - mn) / rng) * ph; }
@@ -140,7 +141,7 @@
     if (s.bands && s.bands.length) { // banding de regime (terminal): faixa de fundo sutil por regime BR
       for (var bd = 0; bd < s.bands.length; bd++) { var b = s.bands[bd], bx0 = X(b.i0), bx1 = X(Math.min(hist.length - 1, (b.i1 || b.i0) + 1));
         o += '<rect x="' + bx0.toFixed(1) + '" y="' + pT + '" width="' + Math.max(0, bx1 - bx0).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_' + (b.tom || 'neu') + ')" opacity="0.06"/>'; } }
-    if (cone) { // banda p25–p75 (assimétrica) + bordas + mediana tracejada
+    if (cone && pro) { // banda p25–p75 (assimétrica) + bordas + mediana tracejada — SÓ assinante; free vê só a mediana
       var hiPts = cone.hi.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
       var loRev = cone.lo.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); }).reverse();
       o += '<polygon points="' + hiPts.concat(loRev).join(" ") + '" fill="var(--_warm)" opacity="0.13" stroke="none"/>';
@@ -156,7 +157,7 @@
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
     if (cone) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
     else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
-    var tail = cone ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
+    var tail = cone ? (pro ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (' · <span class="pj">⤳ ' + esc(fmtNum(cone.mid[cone.mid.length - 1])) + '</span>')) : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
     return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + tail + '</span>';
   }
   // scatter de quadrantes (Lead-Lag): cada ponto = um mês; X=score do regime, Y=retorno do IBOV em 6m; vertical = hoje
@@ -205,8 +206,8 @@
     // gate embed-friendly: o widget só LINKA pro fluxo hospedado (login Google/Apple + Stripe vivem no domínio) — funciona de qualquer site (backlink)
     var checkout = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));  // Stripe Founder: EN=US$149 · PT=R$149
     var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
-      return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true }); };
-    var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Full history since 2010 — Founder" : "🔒 Histórico completo desde 2010 — Founder") + '</b><small>' + (L ? "See today's regime against past crises (2015, 2020). Unlock long history, regime anomalies and L3 reports." : "Veja o regime de hoje contra crises passadas (2015, 2020). Desbloqueie o histórico longo, as anomalias de regime e os relatórios L3.") + '</small><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';
+      return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid }); };
+    var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Manipulate & project the future — Founder" : "🔒 Manipular & projetar o futuro — Founder") + '</b><small>' + (L ? "Free range (drag-zoom), compare A×B and toggle overlays — plus the full asymmetric cone (p10–p90) with the past analogs overlaid. The history is here; with Founder you actually work it. Lock it all for US$149/mo while active — first 100 only." : "Período livre (arrasta-zoom), comparar A×B e ligar/desligar overlays — e o cone assimétrico completo (p10–p90) com os análogos passados sobrepostos. O histórico está aqui; com o Founder você trabalha ele. Trave tudo por R$149/mês enquanto ativo — só os 100 primeiros.") + '</small><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
     if (fund) h += '<div class="rp-ml" style="margin-top:2px"><b>' + (L ? "Fundamentals · " : "Fundamentos · ") + '</b>' + esc(fund) + '</div>';
@@ -225,10 +226,12 @@
       h += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b></div>';
       if (st.sharpe != null) h += '<div class="rp-ml"><b style="color:var(--_' + (st.sharpe >= 0 ? "warm" : "cool") + ')">Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
-    h += '<div class="rp-per">' + [["0.33", "3M"], ["0.66", "6M"], ["1", L ? "all" : "tudo"]].map(function (p) { return '<button data-frac="' + p[0] + '"' + (p[0] === "1" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + '<button class="lock" data-max="1">MAX 🔒</button></div>';
+    h += '<div class="rp-per">' + [["0.33", "3M"], ["0.66", "6M"], ["1", L ? "all" : "tudo"]].map(function (p) { return '<button data-frac="' + p[0] + '"' + (p[0] === "1" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
     h += '<div class="rp-chart">' + bigChart(s, { big: true }) + '</div>';
-    if (cone) { var dlo = dp(cone.lo[cone.lo.length - 1]), dmid = dp(cone.mid[cone.mid.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]);
-      if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi) + '</b> · ' + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
+    if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
+      if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]);
+        if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi) + '</b> · ' + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
+      else if (dmid != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "median " : "mediana ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go — not a forecast" : "pra onde costumou ir — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 full cone (p10–p90) + overlaid analogs in Founder" : "🔒 cone completo (p10–p90) + análogos sobrepostos no Founder") + '</span></div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
     if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
@@ -249,7 +252,7 @@
     // mesmo range que o bigChart (inclui cone/proj); posições alinhadas às linhas mín/centro/máx (pT/pB=6 de H=120 → banda 5%–95%).
     function buildYax(hist) {
       var all = hist.slice();
-      if (s.cone && s.cone.lo && s.cone.lo.length > 1) all = all.concat(s.cone.lo.slice(1), s.cone.hi.slice(1));
+      if (s.cone && s.cone.mid && s.cone.mid.length > 1) { if (gpaid) all = all.concat(s.cone.lo.slice(1), s.cone.hi.slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart (free=só mediana)
       else if (s.proj && s.proj.length > 1) all = all.concat(s.proj.slice(1));
       var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rg = (mx - mn) || 1;
       return [[5, mx], [50, mn + 0.5 * rg], [95, mn]].map(function (p) {
@@ -257,7 +260,7 @@
     }
     function setChart(frac) {
       curHist = frac >= 0.99 ? s.hist : s.hist.slice(s.hist.length - Math.max(8, Math.round(s.hist.length * frac)));
-      chartEl.innerHTML = bigChart({ hist: curHist, proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true });
+      chartEl.innerHTML = bigChart({ hist: curHist, proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid });
       yax.innerHTML = buildYax(curHist);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt);
     }
