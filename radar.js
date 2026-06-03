@@ -608,8 +608,9 @@
         while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; } t = t.parentNode; }
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
           ev.stopPropagation();
-          var icod = imxp.getAttribute("data-cod"), inome = imxp.getAttribute("data-nome") || "Composto";
-          var pre = [{ cod: icod, cls: "intermercado", nome: inome }, { cod: "ibov", cls: "pulso", nome: "IBOV" }];
+          var icod = imxp.getAttribute("data-cod"), inome = imxp.getAttribute("data-nome") || "Composto", idenn = imxp.getAttribute("data-denn") || "IBOV";
+          var pre = [{ cod: icod, cls: "intermercado", nome: inome }, { cod: "ibov", cls: "pulso", nome: "IBOV" }];  // × IBOV = risk-on/off clássico (default)
+          if (idenn && idenn.toUpperCase() !== "IBOV") pre.push({ cod: icod, cls: "intermercado_den", nome: idenn });  // + denominador nativo (ex.: ouro) → composto × IBOV × ouro
           fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(icod) + "&classe=intermercado", FOPT)
             .then(function (r) { return r.json(); }).then(function (s0) { if (s0 && s0.hist && s0.hist.length) openBig(s0, inome, "", lang, null, pre); }).catch(function () { });
           return;
