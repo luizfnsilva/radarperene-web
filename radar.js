@@ -436,28 +436,36 @@
       chartEl.style.cursor = "crosshair";
       chartEl.parentNode.insertBefore(rbtn, chartEl.nextSibling);
       var hint = document.createElement("div"); hint.className = "rp-ml"; hint.style.opacity = ".6"; hint.style.marginTop = "3px";
-      hint.textContent = (L ? "↔ drag on the chart to zoom into any period" : "↔ arraste no gráfico pra dar zoom em qualquer período"); chartEl.parentNode.insertBefore(hint, rbtn);
-      chartEl.addEventListener("mousedown", function (e) {
-        if (compareActive) return;  // sem brush no modo compare
-        var rect = chartEl.getBoundingClientRect(); bx0 = (e.clientX - rect.left) / rect.width;
-        if (bx0 < 0 || bx0 > 1) return; brushing = true; xh.style.display = "none"; xt.style.display = "none";
-        bsel.style.display = "block"; bsel.style.left = (bx0 * 100) + "%"; bsel.style.width = "0"; e.preventDefault();
-      });
-      chartEl.addEventListener("mousemove", function (e) {
-        if (!brushing) return; var rect = chartEl.getBoundingClientRect(), fx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      hint.textContent = (L ? "↔ drag (or touch-drag on mobile) to zoom any period · tap = crosshair · ↺ resets" : "↔ arraste (ou toque-e-arraste no celular) pra dar zoom · toque = crosshair · ↺ reseta"); chartEl.parentNode.insertBefore(hint, rbtn);
+      // ── manipulação unificada MOUSE + TOQUE (mobile/tablet) — tocar mostra o crosshair, arrastar dá zoom livre. Meta: zerar limitações no avançado.
+      var getX = function (e) { return (e.touches && e.touches[0]) ? e.touches[0].clientX : (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : e.clientX; };
+      var showXt = function (fx) { if (curHist && curHist.length > 1) { xt.style.display = "block"; xt.style.left = (fx * 100) + "%"; xt.textContent = fmtNum(curHist[Math.round(fx * (curHist.length - 1))]); } };
+      var startBrush = function (e) {
+        if (compareActive) return; var rect = chartEl.getBoundingClientRect(); bx0 = (getX(e) - rect.left) / rect.width;
+        if (bx0 < 0 || bx0 > 1) return; brushing = true;
+        bsel.style.display = "block"; bsel.style.left = (bx0 * 100) + "%"; bsel.style.width = "0";
+        xh.style.display = "block"; xh.style.left = (bx0 * 100) + "%"; showXt(bx0); if (e.cancelable) e.preventDefault();
+      };
+      var moveBrush = function (e) {
+        if (!brushing) return; if (e.cancelable) e.preventDefault();
+        var rect = chartEl.getBoundingClientRect(), fx = Math.max(0, Math.min(1, (getX(e) - rect.left) / rect.width));
         var a = Math.min(bx0, fx), b = Math.max(bx0, fx); bsel.style.left = (a * 100) + "%"; bsel.style.width = ((b - a) * 100) + "%";
-      });
+        xh.style.left = (fx * 100) + "%"; showXt(fx);
+      };
       var endBrush = function (e) {
-        if (!brushing) return; brushing = false; bsel.style.display = "none";
-        var rect = chartEl.getBoundingClientRect(), fx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        if (!brushing) return; brushing = false; bsel.style.display = "none"; xh.style.display = "none"; xt.style.display = "none";
+        var rect = chartEl.getBoundingClientRect(), fx = Math.max(0, Math.min(1, (getX(e) - rect.left) / rect.width));
         var a = Math.min(bx0, fx), b = Math.max(bx0, fx);
-        if (b - a < 0.04 || !curHist || curHist.length < 4) return;  // clique/seleção mínima → ignora
+        if (b - a < 0.04 || !curHist || curHist.length < 4) return;  // toque/clique curto → só mostrou o crosshair, sem zoom
         var n = curHist.length - 1, i0 = Math.round(a * n), i1 = Math.round(b * n);
         if (i1 - i0 < 2) return;
-        var includesEnd = i1 >= n;  // janela inclui hoje? então mantém o cone de futuro
+        var includesEnd = i1 >= n;  // janela inclui hoje? mantém o cone de futuro
         curHist = curHist.slice(i0, i1 + 1); paint(curHist, includesEnd); rbtn.style.display = "inline-block";
       };
+      chartEl.style.touchAction = "none";  // o gráfico captura o gesto (toque/arraste) sem rolar a página
+      chartEl.addEventListener("mousedown", startBrush); chartEl.addEventListener("mousemove", moveBrush);
       chartEl.addEventListener("mouseup", endBrush); chartEl.addEventListener("mouseleave", endBrush);
+      chartEl.addEventListener("touchstart", startBrush, { passive: false }); chartEl.addEventListener("touchmove", moveBrush, { passive: false }); chartEl.addEventListener("touchend", endBrush);
       rbtn.addEventListener("click", function (e) { e.stopPropagation();
         var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 0;
         setChart(isFinite(fr) ? fr : 0);
