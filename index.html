@@ -439,7 +439,7 @@
     var prov=function(p){return function(){sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.href}})}};
     opt(EN?"Continue with Google":"Entrar com Google",prov("google"));
     opt(EN?"Continue with Apple":"Entrar com Apple",prov("apple"));
-    opt(EN?"Email magic link":"Link por e-mail",async function(){m.remove();var em=prompt(EN?"Your email:":"Seu e-mail:");if(!em)return;var res=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.href}});alert(res.error?("Erro: "+res.error.message):(EN?"Check your email for the link.":"Verifique seu e-mail — enviamos o link."))});
+    opt(EN?"Email magic link":"Link por e-mail",async function(){m.remove();var em=(prompt(EN?"Your email:":"Seu e-mail:")||"").trim().toLowerCase();if(!em)return;if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){alert(EN?"Invalid email format — check for spaces/typos.":"Formato de e-mail inválido — confira espaços/erros de digitação.");return;}var res=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+"/",shouldCreateUser:true}});alert(res.error?("Erro: "+res.error.message):(EN?"Check your email for the link (and spam).":"Verifique seu e-mail — enviamos o link (veja o spam também)."))});
     document.body.appendChild(m);
     setTimeout(function(){document.addEventListener("click",function h(ev){if(!m.contains(ev.target)&&ev.target!==loginEl){m.remove();document.removeEventListener("click",h)}})},50);
   });
