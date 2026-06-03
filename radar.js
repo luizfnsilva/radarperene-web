@@ -64,6 +64,8 @@
       ".rp-mc{position:relative;max-width:560px!important;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px!important;box-shadow:0 18px 60px rgba(0,0,0,.4);cursor:default}" +
       ".rp-mc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-mc .rp-x:hover{color:var(--_accent)}" +
       ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}" +
+      ".rp-mc .rp-strip{display:flex;gap:12px;flex-wrap:wrap;margin-top:3px}.rp-mc .rp-st{display:flex;flex-direction:column;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-st b{font-size:13px;line-height:1.1}.rp-mc .rp-st span{font-size:9px;color:var(--_dim)}" +
+      ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -161,6 +163,12 @@
     if (s.trend_rel && s.trend_rel.score != null) { var trr = s.trend_rel.score;
       var trl = trr >= 8 ? (L ? "strongly outperforming the IBOV" : "forte vs IBOV") : trr >= 6 ? (L ? "outperforming the IBOV" : "acima do IBOV") : trr >= 4 ? (L ? "in line with the IBOV" : "em linha com o IBOV") : trr >= 2 ? (L ? "lagging the IBOV" : "abaixo do IBOV") : (L ? "strongly lagging the IBOV" : "fraco vs IBOV");
       h += '<div class="rp-ml"><b>' + (L ? "Relative trend vs IBOV " : "Tendência relativa vs IBOV ") + trr + '/10</b> · ' + esc(trl) + ' <span style="opacity:.6">(' + (L ? "the intermarket as a score" : "o intermercado com cara de score") + ')</span></div>'; }
+    if (s.stats) { var st = s.stats;
+      var labs = st.monthly ? [["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]] : [["d1", "1d"], ["w1", "1sem"], ["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]];
+      var cells = labs.map(function (p) { var val = st.ret[p[0]]; if (val == null) return ""; var col = val >= 0 ? "var(--_warm)" : "var(--_cool)"; return '<span class="rp-st"><b style="color:' + col + '">' + (val >= 0 ? "+" : "") + val + '%</b><span>' + esc(L && p[1] === "1sem" ? "1w" : p[1]) + '</span></span>'; }).join("");
+      if (cells) h += '<div class="rp-ml" style="margin-top:9px"><b>' + (L ? "Returns" : "Retornos") + '</b></div><div class="rp-strip">' + cells + '</div>';
+      if (st.pos52 != null) h += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(st.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(st.hi52)) + '</div><div class="rp-52"><i style="left:' + st.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + st.pos52 + (L ? "% of range" : "% da faixa") + '</div>';
+      h += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b></div>'; }
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
     h += bigChart(s, { big: true });
     if (cone) { var dlo = dp(cone.lo[cone.lo.length - 1]), dmid = dp(cone.mid[cone.mid.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]);
