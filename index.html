@@ -64,6 +64,11 @@
   .hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,52px);line-height:1.12;margin:0 auto 18px;max-width:18ch;letter-spacing:-.01em}
   .hero h1 .g{color:var(--gold);font-style:italic}
   .hero p.lead{font-size:clamp(15px,2.2vw,18px);color:var(--dim);max-width:60ch;margin:0 auto 26px}
+  .qtag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 15px;margin:0 auto 20px;text-decoration:none;transition:border-color .15s}
+  .qtag:hover{border-color:var(--gold)}
+  .qtag .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;animation:qpulse 2.4s ease-out infinite}
+  @keyframes qpulse{0%{box-shadow:0 0 0 0 rgba(168,101,26,.45)}70%{box-shadow:0 0 0 7px rgba(168,101,26,0)}100%{box-shadow:0 0 0 0 rgba(168,101,26,0)}}
+  @media(prefers-reduced-motion:reduce){.qtag .dot{animation:none}}
   .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:700;
     padding:13px 26px;border-radius:9px;font-size:15px;transition:transform .1s,background .15s}
   .btn:hover{background:var(--gold2);transform:translateY(-1px)}
@@ -142,6 +147,7 @@
 
 <div class="wrap">
   <div class="hero">
+    <a class="qtag" id="qtag" href="#radar" aria-label="regime ao vivo"><span class="dot"></span><span id="qtag-txt">REGIME BR · ao vivo</span></a>
     <h1 id="h1">O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.</h1>
     <p class="lead" id="lead">Cinco lentes de inteligência sobre o Brasil — patrimonial, eleitoral, macro, institucional e imobiliária — mais o experimento Vértice. Você escolhe a profundidade. Veja a leitura de hoje, ao vivo, abaixo.</p>
     <a class="btn" href="#fundadores" id="cta1">Entrar para os 100 fundadores</a>
@@ -383,6 +389,9 @@
   // contador de fundadores ao vivo (escassez X/100) — degrada p/ "vagas limitadas" se o endpoint/secret não responder
   try{var FANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
   fetch("https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/founders",{headers:{apikey:FANON,Authorization:"Bearer "+FANON}}).then(function(r){return r.json()}).then(function(f){var b=document.getElementById("fbadge");if(b&&f&&f.founders!=null)b.textContent=(LANG==="en"?(f.founders+"/100 founder seats taken · "+f.restantes+" left"):(f.founders+"/100 vagas preenchidas · "+f.restantes+" restantes"))}).catch(function(){})}catch(e){}
+  // Hero quant-terminal: tag de regime AO VIVO (puxa o dado real, soma ao H1 editorial)
+  try{var QA="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
+  fetch("https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/radar?lang="+LANG,{headers:{apikey:QA,Authorization:"Bearer "+QA}}).then(function(r){return r.json()}).then(function(d){var br=(d&&d.regime&&d.regime.brasil)||null,el=document.getElementById("qtag-txt");if(br&&el){var lbl=String(br.regime||"").toUpperCase().replace(/_/g," ");el.textContent=(LANG==="en"?"BR REGIME · ":"REGIME BR · ")+lbl+" · "+Math.round(br.score)+"/100 · "+(LANG==="en"?"live":"ao vivo");}}).catch(function(){})}catch(e){}
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   var rn=document.getElementById("radar-perene");

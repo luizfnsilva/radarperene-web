@@ -131,6 +131,9 @@
     var o = '<svg class="bc' + (big ? ' big' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
     o += '<line x1="' + pL + '" y1="' + Y(mx).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(mx).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
     o += '<line x1="' + pL + '" y1="' + Y(mn).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(mn).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
+    // grid de terminal (Bloomberg): horizontais intermediárias + verticais faint — escalam limpo (sem texto SVG, que distorce)
+    for (var gi = 1; gi < 4; gi++) { var gy = (pT + (gi / 4) * ph).toFixed(1); o += '<line x1="' + pL + '" y1="' + gy + '" x2="' + (W - pR) + '" y2="' + gy + '" stroke="var(--_line)" stroke-width="0.35" opacity="0.5"/>'; }
+    for (var gj = 1; gj < 6; gj++) { var gx = (pL + (gj / 6) * pw).toFixed(1); o += '<line x1="' + gx + '" y1="' + pT + '" x2="' + gx + '" y2="' + (H - pB) + '" stroke="var(--_line)" stroke-width="0.35" opacity="0.32"/>'; }
     if (s.bands && s.bands.length) { // banding de regime (terminal): faixa de fundo sutil por regime BR
       for (var bd = 0; bd < s.bands.length; bd++) { var b = s.bands[bd], bx0 = X(b.i0), bx1 = X(Math.min(hist.length - 1, (b.i1 || b.i0) + 1));
         o += '<rect x="' + bx0.toFixed(1) + '" y="' + pT + '" width="' + Math.max(0, bx1 - bx0).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_' + (b.tom || 'neu') + ')" opacity="0.06"/>'; } }
@@ -143,7 +146,10 @@
     } else if (proj.length && big) {
       o += '<rect x="' + nx.toFixed(1) + '" y="' + pT + '" width="' + (W - pR - nx).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_warm)" opacity="0.07"/>';
     }
-    o += '<polyline points="' + hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.2 : 1.6) + '"/>';
+    // área preenchida sob o preço (corpo/profundidade do gráfico) — região histórica
+    var histPts = hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); });
+    o += '<polygon points="' + histPts.join(" ") + " " + X(bi).toFixed(1) + "," + (H - pB) + " " + X(0).toFixed(1) + "," + (H - pB) + '" fill="var(--_accent)" opacity="0.08" stroke="none"/>';
+    o += '<polyline points="' + histPts.join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.3 : 1.6) + '"/>';
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
     if (cone) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
     else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
@@ -159,8 +165,13 @@
     function X(v) { return pL + (Math.max(0, Math.min(100, v)) / 100) * pw; }
     function Y(v) { return pT + (1 - (v - ymin) / yr) * ph; }
     var o = '<svg class="bc big" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
+    // zonas: ganhos (acima de 0) warm sutil · perdas (abaixo) cool sutil
+    if (ymin < 0 && ymax > 0) { var y0 = Y(0);
+      o += '<rect x="' + pL + '" y="' + pT + '" width="' + pw.toFixed(1) + '" height="' + Math.max(0, y0 - pT).toFixed(1) + '" fill="var(--_warm)" opacity="0.045"/>';
+      o += '<rect x="' + pL + '" y="' + y0.toFixed(1) + '" width="' + pw.toFixed(1) + '" height="' + Math.max(0, (H - pB) - y0).toFixed(1) + '" fill="var(--_cool)" opacity="0.045"/>'; }
+    for (var sgg = 1; sgg < 4; sgg++) { var sgy = (pT + (sgg / 4) * ph).toFixed(1); o += '<line x1="' + pL + '" y1="' + sgy + '" x2="' + (W - pR) + '" y2="' + sgy + '" stroke="var(--_line)" stroke-width="0.3" opacity="0.4"/>'; }
     o += '<line x1="' + X(50).toFixed(1) + '" y1="' + pT + '" x2="' + X(50).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_line)" stroke-width="0.5"/>';
-    if (ymin < 0 && ymax > 0) o += '<line x1="' + pL + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.5"/>';
+    if (ymin < 0 && ymax > 0) o += '<line x1="' + pL + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
     o += pts.map(function (p) { return '<rect x="' + (X(p.x) - 1).toFixed(1) + '" y="' + (Y(p.y) - 1).toFixed(1) + '" width="2" height="2" fill="var(--_' + (p.y >= 0 ? "warm" : "cool") + ')" opacity="0.5"/>'; }).join("");
     o += '<line x1="' + X(sc.cur_x).toFixed(1) + '" y1="' + pT + '" x2="' + X(sc.cur_x).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_accent)" stroke-width="1.2" stroke-dasharray="3 2"/>';
     return o + '</svg>';
