@@ -68,7 +68,7 @@
       ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
       ".rp-mc .rp-per{display:flex;gap:5px;margin:7px 0 3px;flex-wrap:wrap}.rp-mc .rp-per button{border:1px solid var(--_line);background:var(--_card2);color:var(--_dim);border-radius:6px;font-size:10px;padding:3px 10px;cursor:pointer;font-family:var(--rp-font,'Inter',system-ui,sans-serif)}.rp-mc .rp-per button.on{border-color:var(--_accent);color:var(--_accent)}.rp-mc .rp-per button.lock{color:var(--_accent);font-weight:600}" +
       ".rp-mc .rp-lock{border:1px dashed var(--_accent);border-radius:10px;padding:18px 16px;text-align:center;background:var(--_card2);min-height:120px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-lock b{display:block;font-size:13px;margin-bottom:5px;color:var(--_txt)}.rp-mc .rp-lock small{font-size:10.5px;color:var(--_dim);line-height:1.5}.rp-mc .rp-lock .cta{display:inline-block;margin-top:11px;background:var(--_accent);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none}" +
-      ".rp-mc .rp-chart{position:relative}.rp-mc .rp-xh{position:absolute;top:0;bottom:16px;width:1px;background:var(--_accent);opacity:.55;pointer-events:none;transform:translateX(-0.5px)}.rp-mc .rp-xt{position:absolute;top:0;transform:translateX(-50%);background:var(--_accent);color:#fff;font-size:9px;font-family:var(--rp-mono,ui-monospace,monospace);padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}.rp-mc .rp-yax{position:absolute;top:0;left:0;right:0;bottom:16px;pointer-events:none}.rp-mc .rp-yl{position:absolute;right:3px;transform:translateY(-50%);font-family:var(--_mono);font-size:8px;color:var(--_dim);background:var(--_card2);padding:0 2px;border-radius:2px;opacity:.82;letter-spacing:-.2px;font-feature-settings:'tnum'}" +
+      ".rp-mc .rp-chart{position:relative}.rp-mc .rp-xh{position:absolute;top:0;bottom:16px;width:1px;background:var(--_accent);opacity:.55;pointer-events:none;transform:translateX(-0.5px)}.rp-mc .rp-xt{position:absolute;top:0;transform:translateX(-50%);background:var(--_accent);color:#fff;font-size:9px;font-family:var(--rp-mono,ui-monospace,monospace);padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}.rp-mc .rp-yax{position:absolute;top:0;left:0;right:0;bottom:16px;pointer-events:none}.rp-mc .rp-yl{position:absolute;right:3px;transform:translateY(-50%);font-family:var(--_mono);font-size:8px;color:var(--_dim);background:var(--_card2);padding:0 2px;border-radius:2px;opacity:.82;letter-spacing:-.2px;font-feature-settings:'tnum'}.rp-mc .rp-bsel{position:absolute;top:0;bottom:16px;background:var(--_accent);opacity:.14;pointer-events:none;border-left:1px solid var(--_accent);border-right:1px solid var(--_accent)}.rp-mc .rp-reset{margin-top:6px;font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -125,7 +125,7 @@
     var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : [];                   // fallback: projeção linear
     var futN = cone ? (cone.mid.length - 1) : (proj.length ? proj.length - 1 : 0);
     var all = hist.slice();
-    if (cone) { if (pro) all = all.concat(cone.lo.slice(1), cone.hi.slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free: range só até a mediana (sem espaço morto da banda)
+    if (cone) { if (pro) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free: range só até a mediana (sem espaço morto da banda); pro: até p10–p90
     else if (proj.length) all = all.concat(proj.slice(1));
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
     var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = (hist.length - 1 + futN) || 1;
@@ -141,7 +141,12 @@
     if (s.bands && s.bands.length) { // banding de regime (terminal): faixa de fundo sutil por regime BR
       for (var bd = 0; bd < s.bands.length; bd++) { var b = s.bands[bd], bx0 = X(b.i0), bx1 = X(Math.min(hist.length - 1, (b.i1 || b.i0) + 1));
         o += '<rect x="' + bx0.toFixed(1) + '" y="' + pT + '" width="' + Math.max(0, bx1 - bx0).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_' + (b.tom || 'neu') + ')" opacity="0.06"/>'; } }
-    if (cone && pro) { // banda p25–p75 (assimétrica) + bordas + mediana tracejada — SÓ assinante; free vê só a mediana
+    if (cone && pro) { // cone assimétrico (estilo Cowen) — SÓ assinante; free vê só a mediana
+      if (cone.lo2 && cone.hi2) { // banda externa p10–p90 (mais clara), desenhada atrás da p25–p75
+        var hi2Pts = cone.hi2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
+        var lo2Rev = cone.lo2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); }).reverse();
+        o += '<polygon points="' + hi2Pts.concat(lo2Rev).join(" ") + '" fill="var(--_warm)" opacity="0.07" stroke="none"/>';
+      }
       var hiPts = cone.hi.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
       var loRev = cone.lo.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); }).reverse();
       o += '<polygon points="' + hiPts.concat(loRev).join(" ") + '" fill="var(--_warm)" opacity="0.13" stroke="none"/>';
@@ -229,8 +234,8 @@
     h += '<div class="rp-per">' + [["0.33", "3M"], ["0.66", "6M"], ["1", L ? "all" : "tudo"]].map(function (p) { return '<button data-frac="' + p[0] + '"' + (p[0] === "1" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
     h += '<div class="rp-chart">' + bigChart(s, { big: true }) + '</div>';
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
-      if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]);
-        if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi) + '</b> · ' + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
+      if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);
+        if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (dlo2 != null ? 'p10–p90 ' + sgn(dlo2) + ' … ' + sgn(dhi2) : (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi)) + '</b> · ' + (dlo2 != null ? (L ? "core p25–p75 " : "núcleo p25–p75 ") + sgn(dlo) + '…' + sgn(dhi) + ' · ' : '') + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
       else if (dmid != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "median " : "mediana ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go — not a forecast" : "pra onde costumou ir — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 full cone (p10–p90) + overlaid analogs in Founder" : "🔒 cone completo (p10–p90) + análogos sobrepostos no Founder") + '</span></div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
@@ -244,28 +249,34 @@
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
-    var curHist = s.hist;
+    var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
     var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
+    var bsel = document.createElement("div"); bsel.className = "rp-bsel"; bsel.style.display = "none";  // retângulo de seleção do brush
+    var rbtn = document.createElement("button"); rbtn.className = "rp-reset"; rbtn.textContent = "↺ reset zoom"; rbtn.style.display = "none";  // volta ao período ativo
     var yax = document.createElement("div"); yax.className = "rp-yax";
     // rótulos de valor (eixo-Y) em HTML — SVG sob preserveAspectRatio=none distorce texto; HTML escala fiel.
     // mesmo range que o bigChart (inclui cone/proj); posições alinhadas às linhas mín/centro/máx (pT/pB=6 de H=120 → banda 5%–95%).
-    function buildYax(hist) {
+    function buildYax(hist, wf) { wf = wf !== false;
       var all = hist.slice();
-      if (s.cone && s.cone.mid && s.cone.mid.length > 1) { if (gpaid) all = all.concat(s.cone.lo.slice(1), s.cone.hi.slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart (free=só mediana)
-      else if (s.proj && s.proj.length > 1) all = all.concat(s.proj.slice(1));
+      if (wf && s.cone && s.cone.mid && s.cone.mid.length > 1) { if (gpaid) all = all.concat((s.cone.lo2 || s.cone.lo).slice(1), (s.cone.hi2 || s.cone.hi).slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart (free=só mediana; pro=p10–p90)
+      else if (wf && s.proj && s.proj.length > 1) all = all.concat(s.proj.slice(1));
       var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rg = (mx - mn) || 1;
       return [[5, mx], [50, mn + 0.5 * rg], [95, mn]].map(function (p) {
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
+    function paint(histArr, wf) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf ? s.bands : null) }, { big: true, pro: gpaid });
+      yax.innerHTML = buildYax(histArr, wf);
+      chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
+    }
     function setChart(frac) {
       curHist = frac >= 0.99 ? s.hist : s.hist.slice(s.hist.length - Math.max(8, Math.round(s.hist.length * frac)));
-      chartEl.innerHTML = bigChart({ hist: curHist, proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid });
-      yax.innerHTML = buildYax(curHist);
-      chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt);
+      rbtn.style.display = "none"; paint(curHist, true);
     }
     setChart(1);
     chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto)
+      if (brushing) return;  // durante o arraste, quem manda é o brush
       var rect = chartEl.getBoundingClientRect(), fx = (e.clientX - rect.left) / rect.width;
       if (fx < 0 || fx > 1 || !curHist || curHist.length < 2) { xh.style.display = "none"; xt.style.display = "none"; return; }
       var val = curHist[Math.round(fx * (curHist.length - 1))];
@@ -273,6 +284,37 @@
       xt.style.display = "block"; xt.style.left = (fx * 100) + "%"; xt.textContent = fmtNum(val);
     });
     chartEl.addEventListener("mouseleave", function () { xh.style.display = "none"; xt.style.display = "none"; });
+    // ★ MANIPULAÇÃO (só assinante): arrastar no gráfico dá zoom num período livre. Visitante free nunca recebe estes handlers.
+    if (gpaid) {
+      chartEl.style.cursor = "crosshair";
+      chartEl.parentNode.insertBefore(rbtn, chartEl.nextSibling);
+      var hint = document.createElement("div"); hint.className = "rp-ml"; hint.style.opacity = ".6"; hint.style.marginTop = "3px";
+      hint.textContent = (L ? "↔ drag on the chart to zoom into any period" : "↔ arraste no gráfico pra dar zoom em qualquer período"); chartEl.parentNode.insertBefore(hint, rbtn);
+      chartEl.addEventListener("mousedown", function (e) {
+        var rect = chartEl.getBoundingClientRect(); bx0 = (e.clientX - rect.left) / rect.width;
+        if (bx0 < 0 || bx0 > 1) return; brushing = true; xh.style.display = "none"; xt.style.display = "none";
+        bsel.style.display = "block"; bsel.style.left = (bx0 * 100) + "%"; bsel.style.width = "0"; e.preventDefault();
+      });
+      chartEl.addEventListener("mousemove", function (e) {
+        if (!brushing) return; var rect = chartEl.getBoundingClientRect(), fx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        var a = Math.min(bx0, fx), b = Math.max(bx0, fx); bsel.style.left = (a * 100) + "%"; bsel.style.width = ((b - a) * 100) + "%";
+      });
+      var endBrush = function (e) {
+        if (!brushing) return; brushing = false; bsel.style.display = "none";
+        var rect = chartEl.getBoundingClientRect(), fx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        var a = Math.min(bx0, fx), b = Math.max(bx0, fx);
+        if (b - a < 0.04 || !curHist || curHist.length < 4) return;  // clique/seleção mínima → ignora
+        var n = curHist.length - 1, i0 = Math.round(a * n), i1 = Math.round(b * n);
+        if (i1 - i0 < 2) return;
+        var includesEnd = i1 >= n;  // janela inclui hoje? então mantém o cone de futuro
+        curHist = curHist.slice(i0, i1 + 1); paint(curHist, includesEnd); rbtn.style.display = "inline-block";
+      };
+      chartEl.addEventListener("mouseup", endBrush); chartEl.addEventListener("mouseleave", endBrush);
+      rbtn.addEventListener("click", function (e) { e.stopPropagation();
+        var on = mw.querySelector(".rp-per button.on"); var fr = on && on.getAttribute("data-frac") ? parseFloat(on.getAttribute("data-frac")) : 1;
+        setChart(isFinite(fr) ? fr : 1);
+      });
+    }
     for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
       btn.addEventListener("click", function (e) { e.stopPropagation();
         for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
