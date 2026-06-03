@@ -228,7 +228,7 @@
 
 <footer>
   <div class="disc" id="disc">Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.</div>
-  <div>Radar Perene · <a href="mailto:hello@brazilcomplexity.com" id="mail">hello@brazilcomplexity.com</a> · radarperene.com</div>
+  <div>Radar Perene · <a href="mailto:hello@brazilcomplexity.com" id="mail">hello@brazilcomplexity.com</a> · <a href="https://billing.stripe.com/p/login/14A14mbaWcwH2Dp58bb3q00" target="_blank" rel="noopener" id="portal">Gerenciar assinatura</a> · radarperene.com</div>
 </footer>
 
 <!-- Consentimento LGPD: analytics/ads carregam SÓ após opt-in -->
@@ -372,6 +372,7 @@
   var STRIPE=LANG==="en"?"https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03":"https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01";
   var c1=document.getElementById("cta1");if(c1){c1.href=STRIPE;c1.target="_blank";c1.rel="noopener"}
   var fb=document.getElementById("founder-buy");if(fb){fb.href=STRIPE;fb.textContent=(LANG==="en"?"Secure my Founder seat · US$ 149/mo":"Garantir minha vaga Founder · R$ 149/mês")}
+  var pt=document.getElementById("portal");if(pt)pt.textContent=(LANG==="en"?"Manage subscription":"Gerenciar assinatura");
   try{var ld={"@context":"https://schema.org","@type":"FAQPage","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
