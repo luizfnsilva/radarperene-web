@@ -31,6 +31,15 @@
 {"@type":"Service","@id":"https://radarperene.com/#service","name":"Radar Perene Founder","serviceType":"Inteligência de mercado e regulatória descritiva","provider":{"@id":"https://radarperene.com/#org"},"areaServed":{"@type":"Country","name":"Brasil"},"description":"Plano completo: histórico longo, gráficos manipuláveis (zoom livre, comparar A×B, overlays e indicadores), cone de cenários p10–p90, valor-justo e alertas de virada de regime. Preço de fundador para os 100 primeiros. Descritivo, nunca recomendação."}
 ]}
 </script>
+<script type="application/ld+json" id="rp-faq-ld">
+{"@context":"https://schema.org","@type":"FAQPage","inLanguage":"pt-BR","mainEntity":[
+{"@type":"Question","name":"Como o Radar Perene calcula o regime macro do Brasil?","acceptedAnswer":{"@type":"Answer","text":"Um sensor mensal cross-market gera o score Risk-BR (0–100) a partir de 8 sub-scores domésticos (liquidez, rotação defensiva, stress de crédito e mais), calibrado em expectativas do Focus (desde 2001) e curvas de juro real (NTN-B longo desde 2006), isolando anomalias com significância estatística em janelas de 36 meses."}},
+{"@type":"Question","name":"Qual é o preço Founder e o que muda no futuro?","acceptedAnswer":{"@type":"Answer","text":"R$ 149/mês (ou R$ 1.490/ano · 2 meses grátis), travado na sua recorrência enquanto a assinatura ficar ativa — inclui as cinco Lentes e o Experimento Vértice. No futuro, as Lentes serão vendidas à la carte; o Founder garante todas por R$ 149. É o mesmo produto, não um premium à parte."}},
+{"@type":"Question","name":"Como funciona o pagamento e os 7 dias de arrependimento?","acceptedAnswer":{"@type":"Answer","text":"O pagamento é no ato da assinatura (R$ no .com.br, US$ no .com), processado pelo Stripe. Você tem 7 dias de arrependimento com estorno integral e automático — direito garantido por lei. Passados os 7 dias, segue a recorrência normal. Cancele quando quiser pelo portal, sem contato humano."}},
+{"@type":"Question","name":"Como funciona o atendimento, cancelamento e exclusão de dados?","acceptedAnswer":{"@type":"Answer","text":"Todo o gerenciamento da assinatura — cancelamento, reembolso, troca de cartão e faturas — é 100% self-service pelo Stripe Customer Portal, em 1 clique. A exclusão de conta e dados também é em 1 clique no perfil — não guardamos nada além do login Google/Apple e e-mail."}},
+{"@type":"Question","name":"Isto é recomendação de investimento?","acceptedAnswer":{"@type":"Answer","text":"Não. Sob o protocolo P7 o sistema é estritamente descritivo — lê regimes e anomalias de fontes públicas e nunca recomenda, prevê preço ou dá consultoria financeira."}}
+]}
+</script>
 <link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/">
 <link rel="alternate" hreflang="en" href="https://radarperene.com/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com/">
@@ -293,11 +302,13 @@
   var _lpt=document.getElementById("l-pt"),_len=document.getElementById("l-en");
   if(_prod){if(_lpt)_lpt.href="https://radarperene.com.br/";if(_len)_len.href="https://radarperene.com/";}
   else{if(_lpt)_lpt.href="?lang=pt";if(_len)_len.href="?lang=en";}
-  // SEO bilíngue: título/descrição por idioma (Google renderiza JS; .com herda EN, .com.br fica PT)
+  // SEO bilíngue: título/descrição/OG/lang por idioma (Google renderiza JS; .com herda EN, .com.br fica PT)
   var _seo=LANG==="en"
-    ? {t:"Radar Perene — Brazil market regime & country risk, read as data",d:"Read Brazil’s market regime without noise: macro overview, rates, country risk, intermarket and FX — across 5 lenses of regulatory intelligence plus the Vértice experiment. Educational, public-source, descriptive."}
-    : {t:"Radar Perene — regime de mercado e risco Brasil, lido como dado",d:"Leia o regime do mercado brasileiro sem ruído: panorama macro, juros e Selic, risco Brasil, intermercado e câmbio — em 5 lentes de inteligência regulatória mais o experimento Vértice. Conteúdo educacional, de fonte pública, descritivo."};
-  document.title=_seo.t; var _md=document.querySelector('meta[name="description"]'); if(_md)_md.setAttribute("content",_seo.d);
+    ? {t:"Radar Perene — Brazil market regime & country risk, read as data",d:"Brazil's market and regulatory regime, read as data: macro, rates/Selic, country risk, intermarket, FX, REITs and the equity risk premium (earnings yield vs real rate) — across 5 lenses plus the Vértice experiment. Charts with fair value and a scenario cone. Descriptive, public-source, never a recommendation."}
+    : {t:"Radar Perene — regime de mercado e risco Brasil, lido como dado",d:"Regime do mercado e da regulação do Brasil, lido como dado: macro, juros e Selic, risco Brasil, intermercado, câmbio, FIIs e prêmio de risco das ações (earnings yield vs juro real) — em 5 lentes + o experimento Vértice. Gráficos com valor-justo e cone de cenários. Descritivo, fonte pública, nunca recomendação."};
+  document.title=_seo.t; try{document.documentElement.lang=LANG;}catch(e){}
+  ['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]'].forEach(function(sel){var e=document.querySelector(sel);if(e)e.setAttribute("content",_seo.d);});
+  ['meta[property="og:title"]','meta[name="twitter:title"]'].forEach(function(sel){var e=document.querySelector(sel);if(e)e.setAttribute("content",_seo.t);});
   // toggle de tema claro/escuro (persiste; ícone = próximo modo)
   var _tg=document.getElementById("theme-tg");
   function _themeIcon(){if(_tg)_tg.textContent=document.documentElement.getAttribute("data-theme")==="dark"?"☀":"☾";}
@@ -390,7 +401,7 @@
   var STRIPEY=LANG==="en"?"https://buy.stripe.com/3cIdR85QC40bgufgQTb3q04":"https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05";
   var fby=document.getElementById("founder-buy-year");if(fby){fby.href=STRIPEY;fby.textContent=(LANG==="en"?"Annual · US$ 1,490 (2 months free)":"Anual · R$ 1.490 (2 meses grátis)")}
   var pt=document.getElementById("portal");if(pt)pt.textContent=(LANG==="en"?"Manage subscription":"Gerenciar assinatura");
-  try{var ld={"@context":"https://schema.org","@type":"FAQPage","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
+  try{var _of=document.getElementById("rp-faq-ld");if(_of)_of.remove();var ld={"@context":"https://schema.org","@type":"FAQPage","inLanguage":LANG==="en"?"en":"pt-BR","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.id="rp-faq-ld";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
   // contador de fundadores ao vivo (escassez X/100) — degrada p/ "vagas limitadas" se o endpoint/secret não responder
   try{var FANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
   fetch("https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/founders",{headers:{apikey:FANON,Authorization:"Bearer "+FANON}}).then(function(r){return r.json()}).then(function(f){var b=document.getElementById("fbadge");if(b&&f&&f.founders!=null)b.textContent=(LANG==="en"?(f.founders+"/100 founder seats taken · "+f.restantes+" left"):(f.founders+"/100 vagas preenchidas · "+f.restantes+" restantes"))}).catch(function(){})}catch(e){}
