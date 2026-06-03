@@ -131,6 +131,9 @@
     if (cone) { if (pro) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free: range só até a mediana (sem espaço morto da banda); pro: até p10–p90
     else if (proj.length) all = all.concat(proj.slice(1));
     if (opt.fair && opt.fair.length) all = all.concat(opt.fair.filter(function (v) { return v != null; }));  // FASTgraphs: a faixa de valor-justo entra no range
+    if (opt.shadow && opt.shadow.lo) all = all.concat(opt.shadow.lo.filter(function (v) { return v != null; }), opt.shadow.hi.filter(function (v) { return v != null; }));  // sombra (cone no passado)
+    if (opt.ma200) all = all.concat(opt.ma200.filter(function (v) { return v != null; }));
+    if (opt.ma50) all = all.concat(opt.ma50.filter(function (v) { return v != null; }));
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
     var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = (hist.length - 1 + futN) || 1;
     function X(i) { return pL + (i / tot) * pw; } function Y(v) { return pT + (1 - (v - mn) / rng) * ph; }
@@ -145,6 +148,12 @@
     if (s.bands && s.bands.length) { // banding de regime (terminal): faixa de fundo sutil por regime BR
       for (var bd = 0; bd < s.bands.length; bd++) { var b = s.bands[bd], bx0 = X(b.i0), bx1 = X(Math.min(hist.length - 1, (b.i1 || b.i0) + 1));
         o += '<rect x="' + bx0.toFixed(1) + '" y="' + pT + '" width="' + Math.max(0, bx1 - bx0).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_' + (b.tom || 'neu') + ')" opacity="0.06"/>'; } }
+    if (opt.shadow && opt.shadow.lo && pro && opt.cone !== false) { // SOMBRA: a MESMA distribuição do cone aplicada ao passado → preenche o gráfico (passado×presente×futuro)
+      var shHP = [], shLR = [];
+      for (var shi = 0; shi < hist.length; shi++) { if (opt.shadow.hi[shi] != null) shHP.push(X(shi).toFixed(1) + "," + Y(opt.shadow.hi[shi]).toFixed(1)); }
+      for (var shj = hist.length - 1; shj >= 0; shj--) { if (opt.shadow.lo[shj] != null) shLR.push(X(shj).toFixed(1) + "," + Y(opt.shadow.lo[shj]).toFixed(1)); }
+      if (shHP.length > 1) o += '<polygon points="' + shHP.concat(shLR).join(" ") + '" fill="var(--_warm)" opacity="0.05" stroke="none"/>';
+    }
     if (cone && pro && opt.cone !== false) { // cone assimétrico (estilo Cowen) — SÓ assinante; free vê só a mediana; toggle via opt.cone
       if (cone.lo2 && cone.hi2) { // banda externa p10–p90 (mais clara), desenhada atrás da p25–p75
         var hi2Pts = cone.hi2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
@@ -163,6 +172,8 @@
     var histPts = hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); });
     o += '<polygon points="' + histPts.join(" ") + " " + X(bi).toFixed(1) + "," + (H - pB) + " " + X(0).toFixed(1) + "," + (H - pB) + '" fill="var(--_accent)" opacity="0.08" stroke="none"/>';
     o += '<polyline points="' + histPts.join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.3 : 1.6) + '"/>';
+    if (opt.ma200) { var mp2 = []; for (var ma2i = 0; ma2i < hist.length; ma2i++) { if (opt.ma200[ma2i] != null) mp2.push(X(ma2i).toFixed(1) + "," + Y(opt.ma200[ma2i]).toFixed(1)); } if (mp2.length > 1) o += '<polyline points="' + mp2.join(" ") + '" fill="none" stroke="var(--_cool)" stroke-width="' + (big ? 1 : 0.9) + '" opacity="0.78"/>'; }  // MM200
+    if (opt.ma50) { var mp5 = []; for (var ma5i = 0; ma5i < hist.length; ma5i++) { if (opt.ma50[ma5i] != null) mp5.push(X(ma5i).toFixed(1) + "," + Y(opt.ma50[ma5i]).toFixed(1)); } if (mp5.length > 1) o += '<polyline points="' + mp5.join(" ") + '" fill="none" stroke="var(--_dim)" stroke-width="' + (big ? 0.9 : 0.8) + '" opacity="0.72" stroke-dasharray="2 1.5"/>'; }  // MM50
     if (opt.fair && opt.fair.length) {  // FASTgraphs: linha de valor-justo (EPS × P/E normal) — ancora no fundamento
       var fpts = []; for (var fi = 0; fi < opt.fair.length && fi < hist.length; fi++) { if (opt.fair[fi] != null) fpts.push(X(fi).toFixed(1) + "," + Y(opt.fair[fi]).toFixed(1)); }
       if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.1 : 1) + '" stroke-dasharray="3 2" opacity="0.75"/>';
@@ -311,7 +322,7 @@
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
     var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
-    var ov = { fair: true, cone: true, bands: true };  // overlays liga/desliga (personalização tipo TradingView)
+    var ov = { fair: false, cone: true, bands: false, ma200: true, ma50: false };  // 2 camadas por padrão (Cone+sombra · MM200) — evita poluir; resto a 1 clique
     var compareActive = false;  // estúdio em modo cruzamento (desliga crosshair/brush de ticker único)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
     var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
@@ -329,7 +340,10 @@
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
     function paint(histArr, wf, fairSl) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands !== false ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone });  // opt.fair/cone/bands = overlays liga/desliga
+      var off = s.hist.length - histArr.length;  // alinha sombra/MMs ao mesmo tail da janela
+      var shSl = (ov.cone !== false && s.shadow && s.shadow.lo) ? { lo: s.shadow.lo.slice(off), hi: s.shadow.hi.slice(off) } : null;
+      var ma2Sl = (ov.ma200 && s.ma200) ? s.ma200.slice(off) : null, ma5Sl = (ov.ma50 && s.ma50) ? s.ma50.slice(off) : null;
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands !== false ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl });  // overlays liga/desliga + sombra + MMs
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
@@ -396,7 +410,7 @@
         if (cmp.length < 3) html += '<button class="rp-add" type="button" style="font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px dashed var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer">+ ' + (L ? "compare" : "comparar") + '</button>';
         html += '</div>';
         if (cmp.length === 1) {
-          var togs = [["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["cone", s.cone, "Cone"], ["bands", s.bands, L ? "Regime bands" : "Bandas regime"]].filter(function (t) { return t[1]; });
+          var togs = [["cone", s.cone, L ? "Cone + shadow" : "Cone + sombra"], ["ma200", s.ma200, "MM200"], ["ma50", s.ma50, "MM50"], ["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["bands", s.bands, L ? "Regime bands" : "Bandas regime"]].filter(function (t) { return t[1]; });
           if (togs.length) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">' + togs.map(function (t) { return '<button class="rp-tog" data-k="' + t[0] + '" style="' + btnCss + '">' + (ov[t[0]] !== false ? "● " : "○ ") + esc(t[2]) + '</button>'; }).join("") + '</div>';
         }
         studio.innerHTML = html;
