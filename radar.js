@@ -168,6 +168,21 @@
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   function openBig(s, title, meta, lang, fund) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
+    // ★ GATE MEDIDO (metered paywall): após X análises profundas grátis, sobe o paywall. Conta por navegador → vale também nos embeds/backlink.
+    var GLIM = (window.RP_FREE_CLICKS != null ? window.RP_FREE_CLICKS : 5);
+    var GURL = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));
+    var gused = 0; try { gused = parseInt(localStorage.getItem("rp_deep") || "0", 10) || 0; } catch (e) {}
+    if (gused >= GLIM) {
+      var gh = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>'
+        + '<div class="rp-mt">' + (L ? "You’ve used your free deep views" : "Você usou suas análises profundas grátis") + '</div>'
+        + '<div class="rp-lock" style="margin-top:10px"><b>' + (L ? "🔒 Unlimited depth + everything — Founder" : "🔒 Profundidade ilimitada + tudo — Founder") + '</b><small>' + (L ? "Lock all 6 lenses (incl. Vértice) and unlimited deep analysis for US$149/mo while active — the first 100 founders only." : "Trave as 6 lentes (incl. Vértice) e a análise profunda ilimitada por R$149/mês enquanto ativo — só os 100 primeiros fundadores.") + '</small><a class="cta" href="' + GURL + '" target="_blank" rel="noopener">' + (L ? "Get Founder · US$149/mo →" : "Quero o Founder · R$149/mês →") + '</a></div></div>';
+      var mwg = document.createElement("div"); mwg.className = "rp-mw"; mwg.innerHTML = gh;
+      var closeg = function () { if (mwg.parentNode) mwg.parentNode.removeChild(mwg); document.removeEventListener("keydown", okg); };
+      var okg = function (e) { if (e.key === "Escape") closeg(); };
+      mwg.addEventListener("click", function (e) { var t = e.target; if (t === mwg || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) closeg(); });
+      document.addEventListener("keydown", okg); document.body.appendChild(mwg); return;
+    }
+    try { localStorage.setItem("rp_deep", String(gused + 1)); } catch (e) {}
     var cur = s.hist[s.hist.length - 1];
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
     var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
