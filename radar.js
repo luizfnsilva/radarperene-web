@@ -66,6 +66,8 @@
       ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}" +
       ".rp-mc .rp-strip{display:flex;gap:12px;flex-wrap:wrap;margin-top:3px}.rp-mc .rp-st{display:flex;flex-direction:column;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-st b{font-size:13px;line-height:1.1}.rp-mc .rp-st span{font-size:9px;color:var(--_dim)}" +
       ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
+      ".rp-mc .rp-per{display:flex;gap:5px;margin:7px 0 3px;flex-wrap:wrap}.rp-mc .rp-per button{border:1px solid var(--_line);background:var(--_card2);color:var(--_dim);border-radius:6px;font-size:10px;padding:3px 10px;cursor:pointer;font-family:var(--rp-font,'Inter',system-ui,sans-serif)}.rp-mc .rp-per button.on{border-color:var(--_accent);color:var(--_accent)}.rp-mc .rp-per button.lock{color:var(--_accent);font-weight:600}" +
+      ".rp-mc .rp-lock{border:1px dashed var(--_accent);border-radius:10px;padding:18px 16px;text-align:center;background:var(--_card2);min-height:120px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-lock b{display:block;font-size:13px;margin-bottom:5px;color:var(--_txt)}.rp-mc .rp-lock small{font-size:10.5px;color:var(--_dim);line-height:1.5}.rp-mc .rp-lock .cta{display:inline-block;margin-top:11px;background:var(--_accent);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -154,6 +156,11 @@
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
     var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
     var sgn = function (x) { return (x >= 0 ? "+" : "") + x + "%"; };
+    // gate embed-friendly: o widget só LINKA pro fluxo hospedado (login Google/Apple + Stripe vivem no domínio) — funciona de qualquer site (backlink)
+    var checkout = (window.RP_CHECKOUT || (L ? "https://radarperene.com/?premium=1" : "https://radarperene.com.br/?premium=1"));
+    var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
+      return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true }); };
+    var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Full history since 2010 — Founder" : "🔒 Histórico completo desde 2010 — Founder") + '</b><small>' + (L ? "See today's regime against past crises (2015, 2020). Unlock long history, regime anomalies and L3 reports." : "Veja o regime de hoje contra crises passadas (2015, 2020). Desbloqueie o histórico longo, as anomalias de regime e os relatórios L3.") + '</small><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
     if (s.trend && s.trend.score != null) { var tr = s.trend, sc = tr.score, seg = "";
@@ -170,7 +177,8 @@
       if (st.pos52 != null) h += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(st.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(st.hi52)) + '</div><div class="rp-52"><i style="left:' + st.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + st.pos52 + (L ? "% of range" : "% da faixa") + '</div>';
       h += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b></div>'; }
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
-    h += bigChart(s, { big: true });
+    h += '<div class="rp-per">' + [["0.33", "3M"], ["0.66", "6M"], ["1", L ? "all" : "tudo"]].map(function (p) { return '<button data-frac="' + p[0] + '"' + (p[0] === "1" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + '<button class="lock" data-max="1">MAX 🔒</button></div>';
+    h += '<div class="rp-chart">' + bigChart(s, { big: true }) + '</div>';
     if (cone) { var dlo = dp(cone.lo[cone.lo.length - 1]), dmid = dp(cone.mid[cone.mid.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]);
       if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi) + '</b> · ' + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
@@ -183,6 +191,15 @@
     function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
+    // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
+    var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
+    for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
+      btn.addEventListener("click", function (e) { e.stopPropagation();
+        for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
+        if (btn.getAttribute("data-max")) { chartEl.innerHTML = lockHTML; return; }
+        chartEl.innerHTML = chartHTML(parseFloat(btn.getAttribute("data-frac")));
+      });
+    })(perBtns[pi]); }
     document.addEventListener("keydown", onkey); document.body.appendChild(mw);
   }
 
