@@ -289,7 +289,7 @@
       h += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b></div>';
       if (st.sharpe != null) h += '<div class="rp-ml"><b style="color:var(--_' + (st.sharpe >= 0 ? "warm" : "cool") + ')">Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
-    h += '<div class="rp-per">' + [["0.33", "3M"], ["0.66", "6M"], ["1", L ? "all" : "tudo"]].map(function (p) { return '<button data-frac="' + p[0] + '"' + (p[0] === "1" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
+    h += '<div class="rp-per">' + [["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) { return '<button data-m="' + p[0] + '"' + (p[0] === "0" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
     h += '<div class="rp-chart">' + bigChart(s, { big: true }) + '</div>';
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);
@@ -311,7 +311,7 @@
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
     var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
-    var ov = { fair: true, cone: true };  // overlays liga/desliga (personalização tipo TradingView)
+    var ov = { fair: true, cone: true, bands: true };  // overlays liga/desliga (personalização tipo TradingView)
     var compareActive = false;  // estúdio em modo cruzamento (desliga crosshair/brush de ticker único)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
     var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
@@ -329,16 +329,22 @@
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
     function paint(histArr, wf, fairSl) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone });  // opt.fair/cone = overlays liga/desliga
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands !== false ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone });  // opt.fair/cone/bands = overlays liga/desliga
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
-    function setChart(frac) {
-      curHist = frac >= 0.99 ? s.hist : s.hist.slice(s.hist.length - Math.max(8, Math.round(s.hist.length * frac)));
-      var fairSl = (ov.fair && s.fair && s.fair.serie) ? s.fair.serie.slice(s.fair.serie.length - curHist.length) : null;  // valor-justo (FASTgraphs) alinhado ao mesmo tail; respeita o toggle
+    function setChart(m) {  // m = meses de janela (0 = MAX) — corte por DATA (s.datas), pra ações de ~5a manterem os períodos curtos
+      var i0 = 0;
+      if (m && s.datas && s.datas.length === s.hist.length) {
+        var last = s.datas[s.datas.length - 1], cut = new Date(last); cut.setMonth(cut.getMonth() - m); var cs = cut.toISOString().slice(0, 10);
+        while (i0 < s.datas.length && s.datas[i0] < cs) i0++;
+        if (i0 > s.datas.length - 6) i0 = Math.max(0, s.datas.length - 8);  // mínimo de pontos
+      }
+      curHist = i0 ? s.hist.slice(i0) : s.hist;
+      var fairSl = (ov.fair && s.fair && s.fair.serie) ? s.fair.serie.slice(s.fair.serie.length - curHist.length) : null;  // valor-justo alinhado ao mesmo tail; respeita o toggle
       rbtn.style.display = "none"; paint(curHist, true, fairSl);
     }
-    setChart(1);
+    setChart(0);
     // ★ ESTÚDIO (TradingView): cruzar até 3 séries (qualquer classe) + escolher camadas — só assinante
     if (gpaid) {
       var cmp = (preCmp && preCmp.length >= 2) ? preCmp.slice() : [{ cod: s.codigo, cls: s.classe, nome: title }];  // A = ticker atual (ou pré-carga do intermercado)
@@ -367,7 +373,7 @@
           cmp.forEach(function (c, i) { fetchSerie(c.cod, c.cls, function (d) { got[i] = (d && d.hist) ? { nome: c.nome, hist: d.hist, datas: d.datas } : null; if (--pend === 0) drawCompare(got); }); });
         } else {
           compareActive = false; if (perRow) perRow.style.display = ""; legEl.innerHTML = "";
-          var on = mw.querySelector(".rp-per button.on"); var fr = on && on.getAttribute("data-frac") ? parseFloat(on.getAttribute("data-frac")) : 1; setChart(isFinite(fr) ? fr : 1);
+          var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 0; setChart(isFinite(fr) ? fr : 0);
         }
       };
       var openPicker = function () {
@@ -390,7 +396,7 @@
         if (cmp.length < 3) html += '<button class="rp-add" type="button" style="font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px dashed var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer">+ ' + (L ? "compare" : "comparar") + '</button>';
         html += '</div>';
         if (cmp.length === 1) {
-          var togs = [["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["cone", s.cone, "Cone"]].filter(function (t) { return t[1]; });
+          var togs = [["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["cone", s.cone, "Cone"], ["bands", s.bands, L ? "Regime bands" : "Bandas regime"]].filter(function (t) { return t[1]; });
           if (togs.length) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">' + togs.map(function (t) { return '<button class="rp-tog" data-k="' + t[0] + '" style="' + btnCss + '">' + (ov[t[0]] !== false ? "● " : "○ ") + esc(t[2]) + '</button>'; }).join("") + '</div>';
         }
         studio.innerHTML = html;
@@ -437,15 +443,15 @@
       };
       chartEl.addEventListener("mouseup", endBrush); chartEl.addEventListener("mouseleave", endBrush);
       rbtn.addEventListener("click", function (e) { e.stopPropagation();
-        var on = mw.querySelector(".rp-per button.on"); var fr = on && on.getAttribute("data-frac") ? parseFloat(on.getAttribute("data-frac")) : 1;
-        setChart(isFinite(fr) ? fr : 1);
+        var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 0;
+        setChart(isFinite(fr) ? fr : 0);
       });
     }
     for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
       btn.addEventListener("click", function (e) { e.stopPropagation();
         for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
         if (btn.getAttribute("data-max")) { chartEl.innerHTML = lockHTML; return; }
-        setChart(parseFloat(btn.getAttribute("data-frac")));
+        setChart(parseFloat(btn.getAttribute("data-m")));
       });
     })(perBtns[pi]); }
     document.addEventListener("keydown", onkey); document.body.appendChild(mw);
