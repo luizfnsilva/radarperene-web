@@ -480,7 +480,7 @@
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
       push(L ? "Stocks" : "Ações", (rr.tickers_acoes || []).map(function (t) { return { cod: String(t.ticker).toLowerCase(), cls: "equity_br", nome: t.ticker }; }));
       push(L ? "Indices" : "Índices", (rr.indices || []).map(function (x) { return { cod: x.codigo, cls: x.classe, nome: x.nome }; }));
-      push(L ? "REITs" : "FIIs", [{ cod: "IFIX", cls: "indice_ms", nome: "IFIX" }]);
+      push(L ? "REITs" : "FIIs", [{ cod: "IFIX", cls: "indice_ms", nome: "IFIX" }].concat((rr.tickers_fiis || []).map(function (t) { return { cod: String(t.ticker).toLowerCase(), cls: "fii", nome: t.ticker }; })));
       push(L ? "Currency" : "Moeda", rr.cambio ? [{ cod: rr.cambio.codigo, cls: "pulso", nome: rr.cambio.nome }] : []);
       push(L ? "Fiscal & macro" : "Fiscal & macro", ((rr.fiscal && rr.fiscal.series) || []).map(function (x) { return { cod: x.cod, cls: x.cls || "macro", nome: x.nome }; }));
       push(L ? "Real estate" : "Imóveis", (rr.imovel_m2 || []).map(function (m) { return { cod: m.cod, cls: m.cls || "macro", nome: m.cidade + " · m²" }; }));
