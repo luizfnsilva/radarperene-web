@@ -19,6 +19,35 @@
   var RP_CAT = [];  // catálogo de séries cruzáveis (estúdio) — montado no render a partir do digest, cresce sozinho com novos tickers
   var STYLE_ID = "rp-radar-style";
 
+  // ── REGISTRO DE CAMADAS (Strategy/Factory) — fonte única dos overlays do gráfico ──────────────
+  // Cada camada se descreve: id, rótulo, default, disponibilidade. 'core' = desenhada pelo bigChart
+  // (acoplada às escalas, estável — NÃO mexer). 'plugin' = traz o próprio compute+draw → indicador
+  // DROP-IN (some os booleans ad-hoc; novo indicador = nova entrada aqui, sem tocar no bigChart/toggles).
+  function rpSMAband(hist, per, k) {  // Bollinger: SMA(per) ± k·σ — base do 1º plugin
+    per = per || 20; k = k || 2; var up = [], lo = [], mid = [];
+    for (var i = 0; i < hist.length; i++) {
+      if (i < per - 1) { up.push(null); lo.push(null); mid.push(null); continue; }
+      var sm = 0; for (var a = i - per + 1; a <= i; a++) sm += hist[a]; var m = sm / per;
+      var vv = 0; for (var b = i - per + 1; b <= i; b++) vv += (hist[b] - m) * (hist[b] - m); var sd = Math.sqrt(vv / per);
+      mid.push(m); up.push(m + k * sd); lo.push(m - k * sd);
+    }
+    return { up: up, lo: lo, mid: mid };
+  }
+  var RP_LAYERS = [
+    { id: "cone",  kind: "core", defaultOn: true,  available: function (s) { return !!(s.cone && s.cone.mid && s.cone.mid.length > 1); }, label: function (c) { return c.L ? "Cone + shadow" : "Cone + sombra"; } },
+    { id: "ma200", kind: "core", defaultOn: false, available: function (s) { return s.ma200 && s.ma200.length; }, label: function (c) { return "MM" + c.ml + c.mu; } },
+    { id: "ma50",  kind: "core", defaultOn: false, available: function (s) { return s.ma50 && s.ma50.length; }, label: function (c) { return "MM" + c.mc + c.mu; } },
+    { id: "fair",  kind: "core", defaultOn: true,  available: function (s) { return !!s.fair; }, label: function (c) { return c.L ? "Fair value" : "Valor-justo"; } },
+    { id: "bands", kind: "core", defaultOn: false, available: function (s) { return s.bands && s.bands.length; }, label: function (c) { return c.L ? "Regime bands" : "Bandas regime"; } },
+    // ── 1º PLUGIN drop-in (prova da arquitetura): Bollinger (20,2), computado do hist no cliente ──
+    { id: "boll", kind: "plugin", defaultOn: false, available: function (s) { return s.hist && s.hist.length >= 20; }, label: function (c) { return "Bollinger (20,2)"; },
+      compute: function (hist) { return rpSMAband(hist, 20, 2); },
+      draw: function (g, c) {
+        var poly = function (arr, st, w, dash) { var p = []; for (var i = 0; i < arr.length; i++) if (arr[i] != null) p.push(g.X(i).toFixed(1) + "," + g.Y(arr[i]).toFixed(1)); return p.length > 1 ? '<polyline points="' + p.join(" ") + '" fill="none" stroke="' + st + '" stroke-width="' + w + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + ' opacity="0.6"/>' : ''; };
+        return poly(c.up, "var(--_cool)", 0.7, "3 2") + poly(c.lo, "var(--_cool)", 0.7, "3 2") + poly(c.mid, "var(--_dim)", 0.55, "1 2");
+      } },
+  ];
+
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var s = document.createElement("style");
@@ -159,6 +188,9 @@
     if (opt.shadow && opt.shadow.lo) all = all.concat(opt.shadow.lo.filter(function (v) { return v != null; }), opt.shadow.hi.filter(function (v) { return v != null; }));  // sombra (cone no passado)
     if (opt.ma200) all = all.concat(opt.ma200.filter(function (v) { return v != null; }));
     if (opt.ma50) all = all.concat(opt.ma50.filter(function (v) { return v != null; }));
+    // plugins computados UMA vez, ANTES do range → bandas (Bollinger etc.) entram no mín/máx (sem clipping)
+    var _plug = [];
+    if (opt.plugins && opt.plugins.length) for (var _pi = 0; _pi < opt.plugins.length; _pi++) { try { var _pl = opt.plugins[_pi], _pc = _pl.compute(hist); if (_pc) { _plug.push({ d: _pl, c: _pc }); for (var _k in _pc) if (_pc[_k] && _pc[_k].length) all = all.concat(_pc[_k].filter(function (v) { return v != null && isFinite(v); })); } } catch (_e) { } }
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
     var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = (hist.length - 1 + futN) || 1;
     function X(i) { return pL + (i / tot) * pw; } function Y(v) { return pT + (1 - (v - mn) / rng) * ph; }
@@ -203,6 +235,8 @@
       var fpts = []; for (var fi = 0; fi < opt.fair.length && fi < hist.length; fi++) { if (opt.fair[fi] != null) fpts.push(X(fi).toFixed(1) + "," + Y(opt.fair[fi]).toFixed(1)); }
       if (fpts.length > 1) o += '<polyline points="' + fpts.join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.5 : 1.2) + '" stroke-dasharray="4 2" opacity="0.92"/>';
     }
+    // ── camadas-PLUGIN (Strategy): cada indicador drop-in desenha aqui, no foreground (já computado p/ o range) ──
+    for (var _di = 0; _di < _plug.length; _di++) { try { o += _plug[_di].d.draw({ X: X, Y: Y }, _plug[_di].c); } catch (_e) { /* plugin isolado: nunca derruba o gráfico */ } }
     if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
     if (cone && opt.cone !== false) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
     else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
@@ -348,7 +382,7 @@
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
     var chartEl = mw.querySelector(".rp-chart"), perBtns = mw.querySelectorAll(".rp-per button");
     var curHist = s.hist, brushing = false, bx0 = 0;  // brushing = arrastando p/ dar zoom (período livre, só assinante)
-    var ov = { fair: true, cone: true, bands: false, ma200: false, ma50: false };  // 2 camadas por padrão (Valor-justo · Cone+sombra) — passado×presente×futuro juntos; resto a 1 clique
+    var ov = {}; RP_LAYERS.forEach(function (l) { if (l.available(s)) ov[l.id] = l.defaultOn; });  // estado dos overlays vem do REGISTRO (não mais hardcoded) — default: Valor-justo + Cone ligados, resto a 1 clique
     var compareActive = false;  // estúdio em modo cruzamento (desliga crosshair/brush de ticker único)
     var xh = document.createElement("div"); xh.className = "rp-xh"; xh.style.display = "none";
     var xt = document.createElement("div"); xt.className = "rp-xt"; xt.style.display = "none";
@@ -369,7 +403,8 @@
       var off = s.hist.length - histArr.length;  // alinha sombra/MMs ao mesmo tail da janela
       var shSl = (ov.cone !== false && s.shadow && s.shadow.lo) ? { lo: s.shadow.lo.slice(off), hi: s.shadow.hi.slice(off) } : null;
       var ma2Sl = (ov.ma200 && s.ma200) ? s.ma200.slice(off) : null, ma5Sl = (ov.ma50 && s.ma50) ? s.ma50.slice(off) : null;
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands !== false ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl });  // overlays liga/desliga + sombra + MMs
+      var plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); });  // camadas-plugin habilitadas (drop-in)
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl || null, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl, plugins: plugins });  // overlays liga/desliga + sombra + MMs + plugins
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
@@ -441,8 +476,9 @@
           var curG = s.g === "m" ? "m" : "d";  // ★ cadência: muda a PROJEÇÃO (cone/valor-justo/MMs/vol recomputam diário vs mensal)
           html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center"><span class="rp-ml" style="opacity:.6;margin-right:1px">' + (L ? "Cadence:" : "Cadência:") + '</span>' + [["d", L ? "Daily" : "Diário"], ["m", L ? "Monthly" : "Mensal"]].map(function (gg) { return '<button class="rp-gtog" data-g="' + gg[0] + '" style="' + btnCss + (curG === gg[0] ? ";border-color:var(--_accent);color:var(--_accent);font-weight:700" : "") + '">' + esc(gg[1]) + '</button>'; }).join("") + '</div>';
           var mc = (s.ma_n && s.ma_n[0]) || 50, ml = (s.ma_n && s.ma_n[1]) || 200, mu = curG === "m" ? "m" : "d";
-          var togs = [["cone", s.cone, L ? "Cone + shadow" : "Cone + sombra"], ["ma200", s.ma200, "MM" + ml + mu], ["ma50", s.ma50, "MM" + mc + mu], ["fair", s.fair, L ? "Fair value" : "Valor-justo"], ["bands", s.bands, L ? "Regime bands" : "Bandas regime"]].filter(function (t) { return t[1] && (!Array.isArray(t[1]) || t[1].length); });  // P1: array vazio (MM gateada p/ não-ativo) é truthy em JS → descartar explicitamente
-          if (togs.length) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">' + togs.map(function (t) { return '<button class="rp-tog" data-k="' + t[0] + '" style="' + btnCss + '">' + (ov[t[0]] !== false ? "● " : "○ ") + esc(t[2]) + '</button>'; }).join("") + '</div>';
+          var lctx = { L: L, s: s, mu: mu, mc: mc, ml: ml };
+          var togs = RP_LAYERS.filter(function (l) { return l.available(s); }).map(function (l) { return [l.id, l.label(lctx)]; });  // chips vêm do REGISTRO — disponibilidade + rótulo declarativos; novo plugin aparece sozinho
+          if (togs.length) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">' + togs.map(function (t) { return '<button class="rp-tog" data-k="' + t[0] + '" style="' + btnCss + '">' + (ov[t[0]] ? "● " : "○ ") + esc(t[1]) + '</button>'; }).join("") + '</div>';
         }
         studio.innerHTML = html;
         studio.querySelectorAll("[data-rm]").forEach(function (el) { var idx = +el.getAttribute("data-rm"); if (idx > 0) el.addEventListener("click", function () { cmp.splice(idx, 1); applyMode(); }); });
