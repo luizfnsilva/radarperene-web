@@ -166,7 +166,7 @@
     return o + '</svg>';
   }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
-  function openBig(s, title, meta, lang) {
+  function openBig(s, title, meta, lang, fund) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
     var cur = s.hist[s.hist.length - 1];
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
@@ -179,6 +179,7 @@
     var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Full history since 2010 — Founder" : "🔒 Histórico completo desde 2010 — Founder") + '</b><small>' + (L ? "See today's regime against past crises (2015, 2020). Unlock long history, regime anomalies and L3 reports." : "Veja o regime de hoje contra crises passadas (2015, 2020). Desbloqueie o histórico longo, as anomalias de regime e os relatórios L3.") + '</small><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
+    if (fund) h += '<div class="rp-ml" style="margin-top:2px"><b>' + (L ? "Fundamentals · " : "Fundamentos · ") + '</b>' + esc(fund) + '</div>';
     if (s.trend && s.trend.score != null) { var tr = s.trend, sc = tr.score, seg = "";
       var tlab = sc >= 8 ? (L ? "strong uptrend" : "tendência forte") : sc >= 6 ? (L ? "uptrend" : "tendência de alta") : sc >= 4 ? (L ? "neutral" : "neutra") : sc >= 2 ? (L ? "weak" : "tendência fraca") : (L ? "downtrend" : "tendência de baixa");
       for (var si = 0; si < 10; si++) seg += '<span style="display:inline-block;width:8%;height:7px;margin-right:1.5%;border-radius:2px;background:' + (si < sc ? 'var(--_' + (tr.tom || 'neu') + ')' : 'var(--_line)') + '"></span>';
@@ -350,7 +351,7 @@
         if (exp && !chip) { exp.classList.toggle("open"); return; }                 // clique na lente/razão → abre/fecha 2ª camada
         if (!chip || chip.getAttribute("data-open")) return;
         chip.setAttribute("data-open", "1"); chip.style.opacity = ".6";
-        var rel = chip.getAttribute("data-rel"), fund = chip.getAttribute("data-fund"), meta = [rel, fund].filter(Boolean).join(" · ");
+        var rel = chip.getAttribute("data-rel"), fund = chip.getAttribute("data-fund"), meta = rel || "";
         fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(chip.getAttribute("data-cod")) + "&classe=" + encodeURIComponent(chip.getAttribute("data-cls") || "equity_br"), FOPT)
           .then(function (r) { return r.json(); }).then(function (s) {
             chip.style.opacity = "";
@@ -365,7 +366,7 @@
             if (canBig) inner += '<button class="rp-zoom" type="button">⤢ ' + (lang === "en" ? "expand chart" : "ampliar gráfico") + '</button>';
             inner += '<span class="mt" style="display:block;margin-top:4px">' + (meta ? esc(meta) + ' · ' : '') + (lang === "en" ? "full in the app →" : "completo no app →") + '</span>';
             box.innerHTML = inner; chip.appendChild(box);
-            if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang); }); }
+            if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang, fund); }); }
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
       fetch(API + "?lang=" + lang, FOPT).then(function (r) { return r.json(); })
