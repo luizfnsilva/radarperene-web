@@ -427,7 +427,13 @@
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     if(pw)pw.style.display="inline";
     try{ var r=await fetch(SBU+"/functions/v1/radar-api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
-      if(d&&d.premium){ window.RP_PREMIUM=true; try{localStorage.setItem("rp_premium","1")}catch(e){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founding Member #":"Membro Fundador #")+d.rank;} }
+      if(d&&d.premium){ window.RP_PREMIUM=true; try{localStorage.setItem("rp_premium","1")}catch(e){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founding Member #":"Membro Fundador #")+d.rank;}
+        try{ var rd=document.getElementById("radar"), he=document.querySelector(".hero");
+          if(rd&&he&&!document.getElementById("rp-welcome")){ // logado: sobe o Radar pro topo + saudação do fundador (experiência premium)
+            var w=document.createElement("div"); w.id="rp-welcome"; w.style.cssText="max-width:1100px;margin:16px auto -6px;padding:0 22px;font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600;color:var(--gold)";
+            w.innerHTML=(EN?"Welcome back, Founding Member #":"Bem-vindo de volta, Membro Fundador #")+(d.rank||"")+" · "+(EN?"your live Radar":"seu Radar ao vivo")+" ↓";
+            he.parentNode.insertBefore(rd, he); he.parentNode.insertBefore(w, rd); }
+        }catch(e){} }
       else{ window.RP_PREMIUM=false; if(seal)seal.style.display="none"; }
     }catch(e){}
   }
