@@ -112,31 +112,51 @@
   function bigChart(s, opt) {
     if (!s || !s.hist || s.hist.length < 2) return "";
     opt = opt || {}; var big = !!opt.big;
-    var hist = s.hist, proj = (s.proj && s.proj.length > 1) ? s.proj : [], all = hist.concat(proj.slice(1));
+    var hist = s.hist;
+    var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;       // cone de quantis (assimétrico, estilo Cowen)
+    var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : [];                   // fallback: projeção linear
+    var futN = cone ? (cone.mid.length - 1) : (proj.length ? proj.length - 1 : 0);
+    var all = hist.slice();
+    if (cone) all = all.concat(cone.lo.slice(1), cone.hi.slice(1)); else if (proj.length) all = all.concat(proj.slice(1));
     var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rng = (mx - mn) || 1;
-    var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = all.length - 1 || 1;
+    var W = 280, H = big ? 120 : 60, pL = 3, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB, tot = (hist.length - 1 + futN) || 1;
     function X(i) { return pL + (i / tot) * pw; } function Y(v) { return pT + (1 - (v - mn) / rng) * ph; }
+    var bi = hist.length - 1, nx = X(bi);
+    function path(arr, base) { return arr.map(function (v, i) { return X(base + i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" "); }
     var o = '<svg class="bc' + (big ? ' big' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
     o += '<line x1="' + pL + '" y1="' + Y(mx).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(mx).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
     o += '<line x1="' + pL + '" y1="' + Y(mn).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(mn).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
-    if (proj.length && big) { var fx = X(hist.length - 1); // faixa de FUTURO realçada (só no modo grande)
-      o += '<rect x="' + fx.toFixed(1) + '" y="' + pT + '" width="' + (W - pR - fx).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_warm)" opacity="0.07"/>'; }
+    if (cone) { // banda p25–p75 (assimétrica) + bordas + mediana tracejada
+      var hiPts = cone.hi.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
+      var loRev = cone.lo.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); }).reverse();
+      o += '<polygon points="' + hiPts.concat(loRev).join(" ") + '" fill="var(--_warm)" opacity="0.13" stroke="none"/>';
+      o += '<polyline points="' + path(cone.hi, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="0.6" opacity="0.55"/>';
+      o += '<polyline points="' + path(cone.lo, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="0.6" opacity="0.55"/>';
+    } else if (proj.length && big) {
+      o += '<rect x="' + nx.toFixed(1) + '" y="' + pT + '" width="' + (W - pR - nx).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_warm)" opacity="0.07"/>';
+    }
     o += '<polyline points="' + hist.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.2 : 1.6) + '"/>';
-    if (proj.length) { var nx = X(hist.length - 1);
-      o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
-      o += '<polyline points="' + proj.map(function (v, i) { return X(hist.length - 1 + i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>'; }
-    return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '') + '</span>';
+    if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
+    if (cone) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
+    else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
+    var tail = cone ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
+    return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + tail + '</span>';
   }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   function openBig(s, title, meta, lang) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
-    var cur = s.hist[s.hist.length - 1], pe = (s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null;
-    var dpct = (pe != null && cur) ? Math.round(((pe - cur) / Math.abs(cur)) * 1000) / 10 : null;
+    var cur = s.hist[s.hist.length - 1];
+    var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
+    var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
+    var sgn = function (x) { return (x >= 0 ? "+" : "") + x + "%"; };
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
-    h += '<div class="rp-ml">' + (L ? "price · history → today → projection (dashed) · shaded band = future under current conditions" : "preço · histórico → hoje → projeção (tracejada) · faixa = futuro sob condições atuais") + '</div>';
+    h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
     h += bigChart(s, { big: true });
-    if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection" : "projeção") + ' ' + (dpct >= 0 ? "+" : "") + dpct + '%</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>';
+    if (cone) { var dlo = dp(cone.lo[cone.lo.length - 1]), dmid = dp(cone.mid[cone.mid.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]);
+      if (dlo != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi) + '</b> · ' + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
+    else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
+      if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
     if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
     if (s.hist3 && s.hist3.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist3_label || "") + '</div>' + bigChart({ hist: s.hist3 }, { big: true });
     if (meta) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';
