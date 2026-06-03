@@ -4,6 +4,10 @@
  *    <script src="https://radarperene.com/radar.js" defer></script>
  *  Identidade própria: defina variáveis CSS no container (ou no :root):
  *    #radar-perene{ --rp-accent:#0aa; --rp-bg:#fff; --rp-txt:#111; --rp-card:#f4f4f4; --rp-line:#e2e2e2; --rp-dim:#666 }
+ *    + ganchos finos: --rp-radius, --rp-max, --rp-hot/warm/cool, --rp-font/mono,
+ *      --rp-card-border, --rp-chip-bg, --rp-number-weight, --rp-number-font, --rp-space
+ *  Skin pronto (premium "quiet luxury", opt-in): <div id="radar-perene" data-skin="editorial">
+ *    → hairlines no lugar de cards, números serif leves, paleta contida, mais ar. Default = marca Radar Perene.
  *  Dado: API pública (CORS aberto). P7: descritivo, nunca recomenda. Atualiza ao carregar a página.
  */
 (function () {
@@ -24,16 +28,36 @@
       "--_line:var(--rp-line,#e6e3dc);--_txt:var(--rp-txt,#1a1a2e);--_dim:var(--rp-dim,#6e6e78);" +
       "--_accent:var(--rp-accent,#a8651a);--_hot:var(--rp-hot,#b02e22);--_warm:var(--rp-warm,#7a3b0e);--_cool:var(--rp-cool,#1a3a5c);--_neu:var(--rp-neu,#9c9c96);" +
       "--_font:var(--rp-font,'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif);--_mono:var(--rp-mono,'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace);" +
+      // ganchos de tema p/ embeds premium (briefing editorial): número (peso/fonte), espaçamento, pílula, borda do card
+      "--_numw:var(--rp-number-weight,700);--_numf:var(--rp-number-font,inherit);--_space:var(--rp-space,1);--_chip:var(--rp-chip-bg,var(--_card2));--_cardb:var(--rp-card-border,var(--_line));" +
       "background:var(--_bg);color:var(--_txt);font-family:var(--_font);border:1px solid var(--_line);border-radius:var(--rp-radius,14px);padding:22px;line-height:1.5;max-width:var(--rp-max,880px);margin:0 auto}" +
       ".rp *{box-sizing:border-box}" +
       ".rp h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--_dim);margin:16px 0 7px;font-weight:600}" +
       ".rp .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:8px}" +
-      ".rp .c{background:var(--_card);border:1px solid var(--_line);border-radius:9px;padding:11px}" +
-      ".rp .c .k{font-size:10.5px;color:var(--_dim)}.rp .c .b{font-size:20px;font-weight:700;margin-top:2px}.rp .c .r{font-size:10.5px;color:var(--_dim);margin-top:2px}" +
+      ".rp .c{background:var(--_card);border:1px solid var(--_cardb);border-radius:9px;padding:11px}" +
+      ".rp .c .k{font-size:10.5px;color:var(--_dim)}.rp .c .b{font-size:20px;font-weight:var(--_numw);font-family:var(--_numf);margin-top:2px}.rp .c .r{font-size:10.5px;color:var(--_dim);margin-top:2px}" +
+      ".rp .valstrip{margin-top:8px;background:var(--_card);border:1px solid var(--_line);border-left:3px solid var(--gold,#c8a24a);border-radius:9px;padding:10px 12px;cursor:pointer;transition:border-color .15s}" +
+      ".rp .valstrip:hover{border-color:var(--gold,#c8a24a)}" +
+      ".rp .valstrip .vl-l{display:flex;justify-content:space-between;align-items:baseline;gap:8px}" +
+      ".rp .valstrip .vl-t{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--gold,#c8a24a)}" +
+      ".rp .valstrip .vl-r{font-size:10.5px;color:var(--_dim)}" +
+      ".rp .valstrip .vl-b{margin-top:3px}.rp .valstrip .vl-s{font-size:19px;font-weight:var(--_numw);font-family:var(--_numf)}.rp .valstrip .vl-x{font-size:10.5px;color:var(--_dim)}" +
+      // ── data-skin="editorial": preset "quiet luxury" opt-in (hairlines, números leves, paleta contida, mais ar) ──
+      // Nosso default (marca Radar Perene) fica intacto; embeds premium ativam com data-skin="editorial".
+      ".rp.skin-editorial{--rp-radius:2px;--_numw:540;--_numf:Georgia,'Times New Roman',serif;--_chip:transparent;--_card:transparent;--_cardb:transparent;padding:30px}" +
+      ".rp.skin-editorial h4{margin:26px 0 10px;letter-spacing:.16em}" +
+      ".rp.skin-editorial .g3{gap:1px;background:var(--_line)}" +  // filetes de 1px entre cards (a grade vira hairline)
+      ".rp.skin-editorial .c{border:0;border-radius:0;background:var(--_bg);padding:14px 16px}" +
+      ".rp.skin-editorial .c .b{font-size:23px;letter-spacing:-.01em}" +
+      ".rp.skin-editorial .t{border-radius:0;border:0;border-left:2px solid var(--_neu);background:transparent;border-bottom:1px solid var(--_line);padding:11px 4px 11px 12px}" +
+      ".rp.skin-editorial .chip{border:0;border-radius:0;background:transparent;padding:4px 14px 4px 0;margin:0 2px 4px 0;border-right:1px solid var(--_line)}" +
+      ".rp.skin-editorial .tk .i{border-radius:0;background:transparent;border:0;border-bottom:1px solid var(--_line);padding:6px 10px 6px 0}" +
+      ".rp.skin-editorial .valstrip{border-radius:0;border:0;border-left:2px solid var(--gold,#c8a24a);background:transparent;padding:12px 4px 12px 14px}" +
+      ".rp.skin-editorial .sub{letter-spacing:.02em}" +
       ".rp .t{background:var(--_card2);border:1px solid var(--_line);border-left:3px solid var(--_neu);border-radius:8px;padding:9px}" +
       ".rp .t.hot{border-left-color:var(--_hot)}.rp .t.warm{border-left-color:var(--_warm)}.rp .t.cool{border-left-color:var(--_cool)}" +
-      ".rp .t .n{font-size:11.5px;font-weight:600}.rp .t .v{font-size:17px;font-weight:700}.rp .t .rr{font-size:10px;color:var(--_dim)}" +
-      ".rp .chip{display:inline-flex;gap:5px;background:var(--_card2);border:1px solid var(--_line);border-radius:999px;padding:4px 10px;font-size:12px;margin:0 5px 6px 0}.rp .chip b{font-weight:700}.rp .chip .u{color:var(--_dim);font-size:10px}" +
+      ".rp .t .n{font-size:11.5px;font-weight:600}.rp .t .v{font-size:17px;font-weight:var(--_numw);font-family:var(--_numf)}.rp .t .rr{font-size:10px;color:var(--_dim)}" +
+      ".rp .chip{display:inline-flex;gap:5px;background:var(--_chip);border:1px solid var(--_line);border-radius:999px;padding:4px 10px;font-size:12px;margin:0 5px 6px 0}.rp .chip b{font-weight:var(--_numw)}.rp .chip .u{color:var(--_dim);font-size:10px}" +
       ".rp .hl{background:var(--_card2);border:1px solid var(--_accent);border-radius:11px;padding:15px}.rp .hl .q{font-size:12.5px;color:var(--_dim);margin-bottom:8px}.rp .hl .v{font-size:24px;font-weight:800;color:var(--_accent)}.rp .stat{display:flex;gap:18px;flex-wrap:wrap}.rp .stat .r{font-size:11px;color:var(--_dim)}" +
       ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent)}" +
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
@@ -485,10 +509,10 @@
     document.addEventListener("keydown", onkey); document.body.appendChild(mw);
   }
 
-  function render(node, d, lang, sections, chrome) {
+  function render(node, d, lang, sections, chrome, skin) {
     var L = lang === "en";
     function show(k){ return !sections || sections.indexOf(k) >= 0; }  // data-sections escolhe o que mostrar
-    var rr = d.radar || {}, v = d.vertice || {}, h = '<div class="rp">';
+    var rr = d.radar || {}, v = d.vertice || {}, h = '<div class="rp' + (skin === "editorial" ? " skin-editorial" : "") + '">';
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
@@ -521,7 +545,8 @@
     h += brain("Radar", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);
     if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + '</h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
-      card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>'; }
+      card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
+      if (g.valuation) { var vl = g.valuation; var erpTxt = vl.erp == null ? "" : ((vl.erp >= 0 ? "+" : "") + vl.erp + "pp"); h += '<div class="i valstrip" data-cod="erp_br" data-cls="macro" data-nome="' + esc(L ? "Equity risk premium (Lyn Alden)" : "Prêmio de risco ações (Lyn Alden)") + '"><div class="vl-l"><span class="vl-t">' + (L ? "Valuation BR · Lyn Alden" : "Valuation BR · Lyn Alden") + '</span><span class="vl-r">' + esc(vl.regime) + '</span></div><div class="vl-b"><span class="vl-s">' + esc(vl.score) + '%</span> <span class="vl-x">' + (L ? "below fair value" : "abaixo do valor-justo") + (vl.n ? " · " + vl.n + (L ? " stocks" : " ações") : "") + (erpTxt ? " · ERP " + erpTxt : "") + '</span></div></div>'; } }
     if (rr.cambio) { h += '<div class="tk" style="margin-top:8px"><span class="i" data-cod="' + esc(rr.cambio.codigo) + '" data-cls="pulso"><span class="sy">' + esc(rr.cambio.nome) + '</span><span class="pr">R$ ' + esc(rr.cambio.valor) + '</span>' + (rr.cambio.var30 != null ? '<span class="mt">' + (rr.cambio.var30 >= 0 ? "+" : "") + esc(rr.cambio.var30) + '% 30d</span>' : '') + '</span></div>'; }
     if (rr.indices && rr.indices.length) { h += '<h4>' + (L ? "Indices · overview" : "Índices · panorama") + '</h4><div class="legend">' + (L ? "click to chart · + more in the app" : "clique pra ver o gráfico · + outros no app") + '</div><div class="tk">' +
       rr.indices.map(function (ix) { return '<span class="i" data-cod="' + esc(ix.codigo) + '" data-cls="' + esc(ix.classe) + '"><span class="sy">' + esc(ix.nome) + '</span><span class="pr">' + esc(ix.valor) + '</span>' + (ix.var12m != null ? '<span class="mt">' + (ix.var12m >= 0 ? "+" : "") + esc(ix.var12m) + '% 12m</span>' : '') + '</span>'; }).join("") + '</div>'; }
@@ -619,6 +644,7 @@
       var chrome = node.getAttribute("data-chrome") !== "off";  // "off" = sem marca/teaser-link/rodapé (uso na própria página)
       var sa = node.getAttribute("data-sections");  // ex.: "regime,macro,termometros,analogo" — vazio = tudo
       var sections = sa ? sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : null;
+      var skin = node.getAttribute("data-skin") === "editorial" ? "editorial" : null;  // "editorial" = preset quiet-luxury (hairlines, números serif leves, paleta contida) p/ embeds premium
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
         var t = ev.target, chip = null, exp = null, imxp = null;
@@ -656,7 +682,7 @@
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
       fetch(API + "?lang=" + lang, FOPT).then(function (r) { return r.json(); })
-        .then(function (d) { render(node, d, lang, sections, chrome); })
+        .then(function (d) { render(node, d, lang, sections, chrome, skin); })
         .catch(function () { node.innerHTML = '<div class="rp"><div class="sub">Radar Perene — indisponível.</div></div>'; });
     });
   }
