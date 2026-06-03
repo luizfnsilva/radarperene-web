@@ -173,7 +173,7 @@
     var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
     var sgn = function (x) { return (x >= 0 ? "+" : "") + x + "%"; };
     // gate embed-friendly: o widget só LINKA pro fluxo hospedado (login Google/Apple + Stripe vivem no domínio) — funciona de qualquer site (backlink)
-    var checkout = (window.RP_CHECKOUT || (L ? "https://radarperene.com/?premium=1" : "https://radarperene.com.br/?premium=1"));
+    var checkout = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));  // Stripe Founder: EN=US$149 · PT=R$149
     var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
       return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true }); };
     var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Full history since 2010 — Founder" : "🔒 Histórico completo desde 2010 — Founder") + '</b><small>' + (L ? "See today's regime against past crises (2015, 2020). Unlock long history, regime anomalies and L3 reports." : "Veja o regime de hoje contra crises passadas (2015, 2020). Desbloqueie o histórico longo, as anomalias de regime e os relatórios L3.") + '</small><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';

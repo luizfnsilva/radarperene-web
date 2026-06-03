@@ -170,6 +170,13 @@
     <div class="ladder" id="ladder"></div>
   </section>
 
+  <section id="acesso">
+    <div class="eyebrow" id="eyb8">Free × Founder</div>
+    <h2 class="sec" id="s8">O que abre quando você assina</h2>
+    <p class="secsub" id="s8s">O free mostra o clima do dia e a profundidade-vitrine. O aprofundamento decisório — histórico completo, anomalias e projeção longa — entra no plano Founder.</p>
+    <div id="tiers"></div>
+  </section>
+
   <section id="escala">
     <div class="eyebrow" id="eyb6">O que está por trás</div>
     <div class="scale" id="scale"></div>
@@ -186,7 +193,9 @@
     <div class="founder">
       <div class="badge" id="fbadge">Lançamento · 100 fundadores</div>
       <h2 id="fh">Os 100 primeiros entram com tudo aberto</h2>
-      <p id="fp">Acesso a todas as lentes por um preço promocional de fundador — anunciado no lançamento. Deixe seu email e receba o convite em primeira mão. Sem spam: só o aviso de lançamento.</p>
+      <p id="fp">Acesso de fundador por R$ 149/mês — travado nessa recorrência enquanto a assinatura ficar ativa. Você entra agora no produto em fase preliminar e recebe o acesso completo quando ele ficar pronto. Cancele com 1 clique pelo Stripe.</p>
+      <a class="btn" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener" style="margin:4px 0 14px">Garantir minha vaga Founder · R$ 149/mês</a>
+      <p id="fp2" style="font-size:13px;opacity:.7;margin:0 0 10px">Ou deixe seu email e receba o aviso primeiro:</p>
       <form class="wl" id="wl" autocomplete="on">
         <input type="text" class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="email" id="wl-email" placeholder="seu@email.com" required>
@@ -208,6 +217,12 @@
   <section>
     <div class="eyebrow" id="eyb4">Princípios</div>
     <div class="princ" id="princ"></div>
+  </section>
+
+  <section id="faq">
+    <div class="eyebrow" id="eyb9">Perguntas frequentes</div>
+    <h2 class="sec" id="s9">Como funciona</h2>
+    <div id="faqbox"></div>
   </section>
 </div>
 
@@ -300,6 +315,10 @@
     princ:[["Descriptive","We read and contextualize the regime — we never recommend or predict a price."],
       ["Public sources","Built on public data. Low-noise, auditable, transparent."],
       ["Contradiction on show","Every reading carries its own counter-evidence. No false certainty."]],
+    eyb8:"Free × Founder",s8:"What unlocks when you subscribe",s8s:"The free shows today&rsquo;s climate and the showcase depth. Decisional depth — full history, anomalies and long projection — is in the Founder plan.",
+    eyb9:"FAQ",s9:"How it works",
+    tiers:[["Recent feed &amp; vectors (L1/L2)","✓","✓"],["Neutral signal briefing","✓","✓"],["Recent window (30d) + showcase charts","✓","✓"],["Full history (197 months · since 2010)","—","✓"],["Risk-BR composite (8 sub-scores)","raw trend","full mapping"],["Anomaly layer (EWMA/OLS) on the chart","—","✓"],["Long projection / quantile cone","recent only","full"],["3 specialized L3 reports (econ/law/tax)","—","✓"]],
+    faq:[["How does Radar Perene compute Brazil&rsquo;s macro regime?","A monthly cross-market sensor outputs a Risk-BR score (0–100) from 8 domestic sub-scores (liquidity, defensive rotation, credit stress and more), calibrated on central-bank expectations (Focus since 2001) and real-rate curves (long NTN-B since 2006), isolating statistically-significant anomalies in 36-month windows."],["What is the Founder price?","US$ 149/month, locked for your subscription while it stays active. You join the preliminary product now and get full access when it is ready — the same product, not a separate premium."],["How do I cancel or delete my data?","Full control via the Stripe Customer Portal — one-click cancellation, no human support. We honor the 7-day refund window and offer one-click account &amp; data deletion in your profile. We store nothing beyond your Google/Apple login and email."],["Is this investment advice?","No. Under our P7 protocol the system is strictly descriptive — it reads regimes and anomalies from public sources and never recommends, predicts a price, or gives financial advice."]],
     ok:"You&rsquo;re on the list — we&rsquo;ll be in touch.",err:"Couldn&rsquo;t register. Try again.",inv:"Enter a valid email."
   }:{
     h1:'O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.',
@@ -326,6 +345,10 @@
     princ:[["Descritivo","Lemos e contextualizamos o regime — nunca recomendamos nem prevemos preço."],
       ["Fonte pública","Construído sobre dado público. Baixo ruído, auditável, transparente."],
       ["Contradição à mostra","Toda leitura carrega a própria contra-evidência. Sem falsa certeza."]],
+    eyb8:"Free × Founder",s8:"O que abre quando você assina",s8s:"O free mostra o clima do dia e a profundidade-vitrine. O aprofundamento decisório — histórico completo, anomalias e projeção longa — entra no plano Founder.",
+    eyb9:"Perguntas frequentes",s9:"Como funciona",
+    tiers:[["Feed recente e vetores (L1/L2)","✓","✓"],["Resumo neutro do sinal","✓","✓"],["Janela recente (30d) + gráficos-vitrine","✓","✓"],["Histórico completo (197 meses · desde 2010)","—","✓"],["Composto Risk-BR (8 sub-scores)","tendência bruta","mapeamento completo"],["Camada de anomalias (EWMA/OLS) no gráfico","—","✓"],["Projeção longa / cone de quantis","só recente","completo"],["3 resumos L3 especializados (econ/adv/contador)","—","✓"]],
+    faq:[["Como o Radar Perene calcula o regime macro do Brasil?","Um sensor mensal cross-market gera o score Risk-BR (0–100) a partir de 8 sub-scores domésticos (liquidez, rotação defensiva, stress de crédito e mais), calibrado em expectativas do Focus (desde 2001) e curvas de juro real (NTN-B longo desde 2006), isolando anomalias com significância estatística em janelas de 36 meses."],["Qual é o preço Founder?","R$ 149/mês, travado na sua recorrência enquanto a assinatura ficar ativa. Você entra no produto preliminar agora e recebe o acesso completo quando ele ficar pronto — é o mesmo produto, não um premium à parte."],["Como cancelo ou excluo meus dados?","Controle total pelo Stripe Customer Portal — cancelamento em 1 clique, sem suporte humano. Respeitamos os 7 dias de arrependimento com estorno e há exclusão de conta e dados em 1 clique no perfil. Não guardamos nada além do login Google/Apple e e-mail."],["Isto é recomendação de investimento?","Não. Sob o protocolo P7 o sistema é estritamente descritivo — lê regimes e anomalias de fontes públicas e nunca recomenda, prevê preço ou dá consultoria financeira."]],
     ok:"Você está na lista — entraremos em contato.",err:"Não consegui registrar. Tente de novo.",inv:"Digite um email válido."
   };
   function set(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html}
@@ -342,6 +365,14 @@
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
   set("scale",C.scale.map(function(s){return '<div class="st"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join(""));
   set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));
+  set("eyb8",C.eyb8);set("s8",C.s8);set("s8s",C.s8s);set("eyb9",C.eyb9);set("s9",C.s9);
+  set("tiers",'<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:9px 6px;border-bottom:1px solid #222a31;color:#8b97a3;font-weight:600"></th><th style="padding:9px 6px;border-bottom:1px solid #222a31;color:#8b97a3;font-weight:600;width:25%">Free</th><th style="padding:9px 6px;border-bottom:1px solid #222a31;color:#c9a227;font-weight:700;width:25%">Founder</th></tr></thead><tbody>'+C.tiers.map(function(r){return '<tr><td style="text-align:left;padding:9px 6px;border-bottom:1px solid #222a31">'+r[0]+'</td><td style="text-align:center;padding:9px 6px;border-bottom:1px solid #222a31;color:#8b97a3">'+r[1]+'</td><td style="text-align:center;padding:9px 6px;border-bottom:1px solid #222a31">'+r[2]+'</td></tr>'}).join("")+'</tbody></table>');
+  set("faqbox",C.faq.map(function(f){return '<div style="border-top:1px solid #222a31;padding:13px 0"><b style="display:block;margin-bottom:5px">'+f[0]+'</b><p style="margin:0;color:#8b97a3;font-size:14px;line-height:1.6">'+f[1]+'</p></div>'}).join(""));
+  // Stripe Founder (lang-aware) nos CTAs + FAQ JSON-LD (IA-SEO: ChatGPT Search / Perplexity)
+  var STRIPE=LANG==="en"?"https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03":"https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01";
+  var c1=document.getElementById("cta1");if(c1){c1.href=STRIPE;c1.target="_blank";c1.rel="noopener"}
+  var fb=document.getElementById("founder-buy");if(fb){fb.href=STRIPE;fb.textContent=(LANG==="en"?"Secure my Founder seat · US$ 149/mo":"Garantir minha vaga Founder · R$ 149/mês")}
+  try{var ld={"@context":"https://schema.org","@type":"FAQPage","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   var rn=document.getElementById("radar-perene");
