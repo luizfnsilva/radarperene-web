@@ -19,6 +19,7 @@ const COPY1 = burst("SITE_COPY_BURST_1.md");
 const COPY2 = burst("SITE_COPY_BURST_2_CONCEITOS.md");
 const COPY3 = burst("SITE_COPY_BURST_3_COMPLEMENTOS.md");   // home "linguagem"/"últimas leituras", /conceitos umbrella, diário, founder
 const COPY4 = burst("SITE_COPY_BURST_4_METODOLOGIA.md");    // /metodologia v3 — "mãe das citações" (substitui Burst1§5/Burst2§2)
+const COPY5 = burst("SITE_COPY_BURST_5_OPERACIONAIS.md");   // /termos, /privacidade, /api/docs, /founder
 const INDEX = readFileSync(join(ROOT, "index.html"), "utf8");
 
 // chrome compartilhado: o <link rel=preconnect…> até </head> do index, p/ casar fontes/tema/estilo 100%
@@ -53,6 +54,11 @@ const PAGES = [
   { slug: "lentes/institucional", src: 1, sec: ["3.7", "3.8"], type: "lente" },
   { slug: "lentes/imobiliaria",   src: 1, sec: ["3.9", "3.10"], type: "lente" },
   { slug: "lentes/vertice",       src: 1, sec: ["3.11", "3.12"], type: "lente" },
+  // ── Burst 5: páginas operacionais ──
+  { slug: "termos",        src: 5, sec: ["1.1", "1.2"], type: "legal" },
+  { slug: "privacidade",   src: 5, sec: ["2.1", "2.2"], type: "legal" },
+  { slug: "api/docs",      src: 5, sec: ["3.1", "3.2"], type: "apidocs" },
+  { slug: "founder",       src: 5, sec: ["4.1", "4.2"], type: "founder" },
 ];
 
 // ─── SEO_OVERRIDE: title ≤ 60c, description ≤ 158c. Ajusta SÓ os metas (knobs de SEO), preservando
@@ -61,6 +67,10 @@ const SEO_OVERRIDE = {
   "como-ler-o-radar": { tPt: "Como ler o Radar Perene — seis passos para o regime do dia" },
   "metodologia": { tPt: "Metodologia do Radar Perene — regime e percentil histórico", tEn: "Radar Perene methodology — regime & historical percentile", dPt: "Como o Radar Perene lê o mercado brasileiro: regime, intermercado, valuation, sentimento, análogos. Método declarado e auditável — sem previsão, sem parecer." },
   "conceitos": { tPt: "A linguagem do Radar — todos os conceitos do Radar Perene", tEn: "The Radar's language — every Radar Perene concept" },
+  "termos": { dPt: "Termos de uso do Radar Perene: serviço, camadas Free e Founder, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade." },
+  "privacidade": { dEn: "Radar Perene privacy policy: data collected (Google/Apple login, email), how it is used, your LGPD/GDPR rights, retention and one-click deletion." },
+  "api/docs": { dPt: "Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed." },
+  "founder": { dPt: "Founder Access do Radar Perene: 100 contas, R$ 149/mês travado, cinco lentes + Vértice, 7 dias de reembolso via Stripe. A fase fundadora.", dEn: "Founder Access at Radar Perene: 100 seats, US$ 149/mo locked, the five lenses + Vértice, 7-day Stripe refund. Join the founding phase." },
   "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o Brasil em cinco dimensões regulatórias e de mercado. A Lente Vértice é o experimento cross-domínio; Intermercado é leitura paralela." },
   "conceitos/regime-brasil": { tPt: "Regime Brasil — como o Radar lê o mercado brasileiro", tEn: "Brazil Regime — how the Radar reads Brazil's market", dEn: "Brazil Regime: the aggregate reading of the Brazilian market — defensive, neutral, or pro-risk. Categorical, with a 0–100 auxiliary scale." },
   "conceitos/intermercado-br": { tPt: "Intermercado BR — razões patrimoniais como regime", dPt: "Intermercado BR: leitura cruzada de razões patrimoniais brasileiras (finanças, utilities, commodities, FIIs, café/ouro). Camada paralela às lentes.", dEn: "Intermarket BR: cross-reading of Brazilian wealth-sector ratios (finance, utilities, commodities, REITs, coffee/gold). A layer parallel to the lenses." },
@@ -108,7 +118,24 @@ function fencedBlocks(md) {
   return out;
 }
 const MET4 = fencedBlocks(COPY4);  // [0]=pt, [1]=en
-const BLOCKS = { 1: parseBlocks(COPY1), 2: parseBlocks(COPY2), 3: parseBlocks(COPY3), 4: { "m_pt": MET4[0] || "", "m_en": MET4[1] || "" } };
+// extrai o conteúdo bruto de uma seção "### key" (até o próximo ###/##), removendo o wrapper ``` externo.
+// usado p/ /api/docs (Burst 5 §3), que tem fences ``` ANINHADOS (GET/JSON/iframe) — parseBlocks por toggle quebraria.
+function sectionRaw(md, key) {
+  const lines = md.split("\n");
+  let i = lines.findIndex((l) => new RegExp("^###\\s+" + key.replace(".", "\\.") + "\\b").test(l));
+  if (i < 0) return "";
+  const buf = []; i++;
+  for (; i < lines.length; i++) { if (/^###?\s/.test(lines[i])) break; buf.push(lines[i]); }
+  let s = 0, e = buf.length - 1;
+  while (s < buf.length && buf[s].trim() === "") s++;
+  while (e > s && buf[e].trim() === "") e--;
+  if (buf[s] && buf[s].trim().startsWith("```")) s++;          // tira o ``` de abertura do wrapper da página
+  if (buf[e] && buf[e].trim().startsWith("```")) e--;          // tira o ``` de fechamento
+  return buf.slice(s, e + 1).join("\n");
+}
+const B5 = parseBlocks(COPY5);
+B5["3.1"] = sectionRaw(COPY5, "3.1"); B5["3.2"] = sectionRaw(COPY5, "3.2");  // api/docs: override (fences aninhados)
+const BLOCKS = { 1: parseBlocks(COPY1), 2: parseBlocks(COPY2), 3: parseBlocks(COPY3), 4: { "m_pt": MET4[0] || "", "m_en": MET4[1] || "" }, 5: B5 };
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -129,13 +156,17 @@ const SLUG_MAP = [
   ["/lenses/", "/lentes/"],
   ["/lenses", "/lentes"],
   ["/about", "/sobre"],
+  ["/api/todays-reading.json", "/api/leitura-do-dia.json"],  // endpoint público (1 rota, rótulo EN diferente na copy)
+  ["/diary", "/diario"],
+  ["/terms", "/termos"],
+  ["/privacy", "/privacidade"],
   ["#integrity", "#integridade"],
 ];
 function normPath(url) {
   for (const [en, pt] of SLUG_MAP) url = url.split(en).join(pt);
   // trailing slash p/ rotas-diretório internas (não p/ arquivos /sobre /about, /ativo, âncoras, externos)
-  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo")) {
-    if (!url.endsWith("/")) url += "/";
+  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo") && !/\.[a-z0-9]+$/i.test(url)) {
+    if (!url.endsWith("/")) url += "/";  // rotas-diretório → barra; arquivos (.json/.xml) ficam intactos
   }
   return url;
 }
@@ -160,6 +191,15 @@ function renderBlock(raw) {
   for (i = 0; i < lines.length;) {
     const ln = lines[i];
     const t = ln.trim();
+
+    // bloco de código ``` … ``` (api/docs: GET, JSON de response, iframe) → <pre> indexável
+    if (t.startsWith("```")) {
+      flush(); i++; const code = [];
+      while (i < lines.length && !lines[i].trim().startsWith("```")) code.push(lines[i++]);
+      i++;  // consome o ``` de fechamento
+      if (code.length) body.push(`<pre class="api"><code>${esc(code.join("\n"))}</code></pre>`);
+      continue;
+    }
 
     // marcadores de comentário
     const cm = t.match(/^<!--\s*(.*?)\s*-->$/);
@@ -270,8 +310,32 @@ function buildSchemas(p, ptRaw, pt, path, tPt, dPt) {
   else if (p.type === "lentes") s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" });
   else if (p.type === "lente") s.push({ "@context": "https://schema.org", "@type": "Service", "name": pt.h1, "description": dPt, "url": url, "provider": { "@type": "Organization", "name": "Radar Perene" }, "areaServed": "BR", "serviceType": "Regulatory & market intelligence" });
   else if (p.type === "guia") s.push({ "@context": "https://schema.org", "@type": "HowTo", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" });
-  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": pt.h1, "description": dPt, "url": url, "documentation": ORG_BR + "/free/", "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": pt.h1, "description": dPt, "url": url, "documentation": ORG_BR + "/api/docs/", "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  else if (p.type === "apidocs") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": pt.h1, "description": dPt, "url": url, "documentation": url, "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  else if (p.type === "founder") s.push({ "@context": "https://schema.org", "@type": "Product", "name": "Radar Perene — Founder Access", "description": dPt, "url": url, "brand": { "@type": "Brand", "name": "Radar Perene" }, "offers": { "@type": "Offer", "price": "149", "priceCurrency": "BRL", "availability": "https://schema.org/LimitedAvailability", "url": url } });
   return s.map((x) => `<script type="application/ld+json">${JSON.stringify(x).replace(/</g, "\\u003c")}</script>`).join("\n");
+}
+
+// ─── RelatedConcepts (briefing §5.2) — grafo hub-spoke + link bidirecional p/ a metodologia ───
+const CONCEPT_NAMES = {
+  "regime-brasil": { pt: "Regime Brasil", en: "Brazil Regime" }, "regime-global": { pt: "Regime Global", en: "Global Regime" },
+  "intermercado-br": { pt: "Intermercado BR", en: "Intermarket BR" }, "erp-br": { pt: "ERP_BR", en: "ERP_BR" },
+  "cone-de-regressao-logaritmica": { pt: "Cone de Regressão Logarítmica", en: "Logarithmic Regression Cone" },
+  "indice-anima": { pt: "Índice Ânima", en: "Ânima Index" }, "risk-on-risk-off": { pt: "Risk-on / Risk-off", en: "Risk-on / Risk-off" },
+  "analogos-historicos": { pt: "Análogos Históricos", en: "Historical Analogs" }, "vertice": { pt: "Vértice", en: "Vértice" },
+};
+const CONCEPT_GRAPH = {
+  "regime-brasil": ["intermercado-br", "erp-br", "analogos-historicos"], "regime-global": ["regime-brasil", "risk-on-risk-off"],
+  "intermercado-br": ["regime-brasil", "risk-on-risk-off", "indice-anima"], "erp-br": ["cone-de-regressao-logaritmica", "regime-brasil"],
+  "cone-de-regressao-logaritmica": ["erp-br", "analogos-historicos"], "indice-anima": ["risk-on-risk-off", "intermercado-br"],
+  "risk-on-risk-off": ["indice-anima", "regime-global", "regime-brasil"], "analogos-historicos": ["regime-brasil", "vertice"],
+  "vertice": ["analogos-historicos", "intermercado-br", "regime-global"],
+};
+function relatedHtml(bareSlug, L) {
+  const rel = (CONCEPT_GRAPH[bareSlug] || []).filter((r) => CONCEPT_NAMES[r]);
+  const links = rel.map((r) => `<a href="/conceitos/${r}/">${esc(CONCEPT_NAMES[r][L ? "en" : "pt"])}</a>`).join(" · ");
+  const method = `<a href="/metodologia/">${L ? "see the full method" : "ver no método completo"}</a>`;
+  return `<p class="rel" style="margin-top:26px">${L ? "Related concepts" : "Conceitos relacionados"}: ${links} · ${method}</p>`;
 }
 
 const out = [];
@@ -282,6 +346,10 @@ function page(p) {
   if (!pt.h1 && !pt.title) {  // fonte ausente (ex.: Burst removido da pasta) → NÃO regenera; preserva o HTML já no disco
     console.log(`  ⤼ /${p.slug.padEnd(40)} PULADO (fonte ${p.src}:${p.sec[0]} ausente — HTML existente preservado)`);
     return;
+  }
+  if (p.type === "conceito") {  // RelatedConcepts no rodapé de cada conceito (hub-spoke + ponte p/ metodologia)
+    const bare = p.slug.split("/")[1];
+    pt.bodyHtml += relatedHtml(bare, false); en.bodyHtml += relatedHtml(bare, true);
   }
   const sov = SEO_OVERRIDE[p.slug] || {};     // metas encurtados p/ limite SEO (corpo segue verbatim)
   const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = sov.dPt || pt.desc, dEn = sov.dEn || en.desc;
@@ -296,10 +364,18 @@ function page(p) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title data-pt="${esc(tPt)}" data-en="${esc(tEn)}">${esc(tPt)}</title>
 <meta name="description" id="m-desc" content="${esc(dPt)}">
-<meta name="robots" content="index,follow">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="article">
+<meta property="og:site_name" content="Radar Perene">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://radarperene.com.br${path}">
+<meta property="og:image" content="https://radarperene.com.br/og.png">
 <meta property="og:title" id="og-t" content="${esc(tPt)}">
 <meta property="og:description" id="og-d" content="${esc(dPt)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://radarperene.com.br/og.png">
+<meta name="twitter:title" id="tw-t" content="${esc(tPt)}">
+<meta name="twitter:description" id="tw-d" content="${esc(dPt)}">
 <link rel="canonical" id="rp-canonical" href="https://radarperene.com.br${path}">
 <link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}">
 <link rel="alternate" hreflang="en" href="https://radarperene.com${path}">
@@ -358,8 +434,8 @@ ${headStyle}
   document.documentElement.lang=en?"en":"pt-BR";
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
-    if(d)d.content="${esc(dEn)}";if(ot)ot.content="${esc(tEn)}";if(od)od.content="${esc(dEn)}";}
+  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),tt=document.getElementById("tw-t"),td=document.getElementById("tw-d"),ou=document.querySelector('meta[property=\\"og:url\\"]'),ol=document.querySelector('meta[property=\\"og:locale\\"]');
+    if(d)d.content="${esc(dEn)}";if(ot)ot.content="${esc(tEn)}";if(od)od.content="${esc(dEn)}";if(tt)tt.content="${esc(tEn)}";if(td)td.content="${esc(dEn)}";if(ou)ou.content=location.origin+location.pathname;if(ol)ol.content="en_US";}
   var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>

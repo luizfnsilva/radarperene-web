@@ -20,6 +20,7 @@ const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-ap
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
 const SNAP_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshot";
 const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshots";
+const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 
 // escape p/ texto em HTML (defensivo: catálogo é a única fonte, mas nunca confiamos cego)
 function _esc(s) {
@@ -207,6 +208,14 @@ export default {
       } catch (e) {
         return new Response("Not found.", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
       }
+    }
+    // ── /api/leitura-do-dia.json — endpoint público (documentado em /api/docs): proxy do edge, CORS aberto, cache 4h ──
+    if (_url.pathname === "/api/leitura-do-dia.json") {
+      try {
+        const r = await fetch(LDD_API + "?lang=" + (_isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } });
+        const body = r.ok ? await r.text() : '{"erro":"indisponivel"}';
+        return new Response(body, { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=14400", "access-control-allow-origin": "*" } });
+      } catch (e) { return new Response('{"erro":"indisponivel"}', { headers: { "content-type": "application/json", "access-control-allow-origin": "*" } }); }
     }
     // ── /sitemap-snapshots.xml — sitemap programático do arquivo diário (/diario): datas reais via /v1/snapshots ──
     if (_url.pathname === "/sitemap-snapshots.xml") {
