@@ -680,6 +680,27 @@
     node.innerHTML = h;
   }
 
+  // ★ modo ATIVO ÚNICO (página /ativo/{ticker}) — gráfico rico inline (cone+valor-justo) + readout honesto + "ampliar & manipular" (openBig).
+  // Reusa bigChart/openBig; o embed normal não passa por aqui (aditivo, backlink intacto).
+  function renderAtivo(node, codigo, classe, lang, skin) {
+    var L = lang === "en", cls = "rp" + (skin === "editorial" ? " skin-editorial" : "");
+    node.innerHTML = '<div class="' + cls + '"><div class="sub">' + (L ? "loading…" : "carregando…") + '</div></div>';
+    fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(codigo) + "&classe=" + encodeURIComponent(classe), FOPT)
+      .then(function (r) { return r.json(); }).then(function (s) {
+        var nm = (codigo || "").toUpperCase();
+        if (!s || !s.hist || s.hist.length < 2) { node.innerHTML = '<div class="' + cls + '"><div class="sub">' + (L ? "no data for " : "sem dados para ") + esc(nm) + '</div></div>'; return; }
+        var h = '<div class="' + cls + '"><div class="hd"><h4 style="margin:0">' + esc(nm) + '</h4><span class="sub">' + (L ? "descriptive engine · today" : "motor descritivo · hoje") + '</span></div>';
+        h += '<div>' + bigChart(s, { big: true }) + '</div>';
+        if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii"; h += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : (L ? "Fair value " : "Valor-justo ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : '') + '</div>'; }
+        if (s.trend && s.trend.score != null) h += '<div class="rp-ml">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
+        h += '<div class="rp-ml" style="margin-top:8px;opacity:.7">' + (L ? "descriptive, never a recommendation · distribution, not a forecast" : "descritivo, nunca recomendação · distribuição, não previsão") + '</div>';
+        h += '<button class="rp-zoom" type="button" style="margin-top:9px">⤢ ' + (L ? "expand & manipulate" : "ampliar & manipular") + '</button>';
+        h += '</div>';
+        node.innerHTML = h;
+        var zb = node.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function () { openBig(s, nm, "", lang, null); });
+      }).catch(function () { node.innerHTML = '<div class="' + cls + '"><div class="sub">—</div></div>'; });
+  }
+
   function boot() {
     injectStyle();
     var nodes = document.querySelectorAll("#radar-perene,[data-radar-perene]");
@@ -690,6 +711,8 @@
       var sa = node.getAttribute("data-sections");  // ex.: "regime,macro,termometros,analogo" — vazio = tudo
       var sections = sa ? sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : null;
       var skin = node.getAttribute("data-skin") === "editorial" ? "editorial" : null;  // "editorial" = preset quiet-luxury (hairlines, números serif leves, paleta contida) p/ embeds premium
+      var asset = node.getAttribute("data-asset");  // ★ modo ATIVO ÚNICO (opt-in, p/ páginas /ativo/{ticker}) — embed normal (SEM data-asset) fica IDÊNTICO, não quebra backlink
+      if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
         var t = ev.target, chip = null, exp = null, imxp = null;

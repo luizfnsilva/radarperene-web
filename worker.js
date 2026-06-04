@@ -20,6 +20,36 @@ const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-ap
 
 export default {
   async fetch(request, env) {
+    const _url = new URL(request.url);
+    const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
+    // ── /ativo/{ticker} — página por ativo (SEO programático B.1): reusa a home shell + widget em modo ativo + narrativa per-ativo ──
+    const _am = _url.pathname.match(/^\/ativo\/([a-z0-9]{2,8})\/?$/i);
+    if (_am) {
+      try {
+        const tk = _am[1].toUpperCase();
+        const cls = /\d11$/.test(tk) ? "fii" : "equity_br"; // FII = XXXX11
+        const lang = _isEN ? "en" : "pt";
+        const shell = await env.ASSETS.fetch(new Request(_url.origin + "/"));
+        if (!(shell.headers.get("content-type") || "").includes("text/html")) return shell;
+        let narr = null;
+        try { const nr = await fetch(NARR_API + "?codigo=" + tk + "&classe=" + cls + "&lang=" + lang, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (nr.ok) narr = await nr.json(); } catch (e) {}
+        const titulo = tk + (lang === "en" ? " — Radar Perene · descriptive reading" : " — Radar Perene · leitura descritiva");
+        const desc = (narr && narr.resumo) ? narr.resumo.slice(0, 155) : tk;
+        let rw = new HTMLRewriter()
+          .on("title", { element(e) { e.setInnerContent(titulo); } })
+          .on('meta[name="description"]', { element(e) { e.setAttribute("content", desc); } })
+          .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", titulo); } })
+          .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", desc); } })
+          .on("link#rp-canonical", { element(e) { e.setAttribute("href", _url.origin + "/ativo/" + tk.toLowerCase()); } })
+          .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
+          .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
+        if (narr && narr.texto_html) {
+          rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
+          if (narr.jsonld) { const ld = JSON.stringify(narr.jsonld).replace(/</g, "\\u003c"); rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } }); }
+        }
+        return rw.transform(shell);
+      } catch (e) { /* falha → segue normal */ }
+    }
     const res = await env.ASSETS.fetch(request); // serve o asset estático
     try {
       const url = new URL(request.url);
