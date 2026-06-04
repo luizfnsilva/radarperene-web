@@ -308,7 +308,7 @@
       height: opt.height || (opt.big === false ? 60 : 150),
       // tema/fonte do uPlot herdados do container
       cursor: cursor,
-      legend: { show: false },
+      legend: { show: true },                        // readout AO VIVO: data na posição da cruz + valor de cada série ali
       scales: { x: { time: true } },                 // eixo-X temporal de verdade
       axes: [
         { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.6), width: 0.5 }, ticks: { stroke: withAlpha(T.line, 0.6) }, font: "10px ui-monospace, monospace" },

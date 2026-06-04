@@ -526,10 +526,12 @@
       }
       curHist = i0 ? s.hist.slice(i0) : s.hist; winStart = i0;
       rbtn.style.display = "none";
-      if (useUp) {  // uPlot: o eixo-X já mostra TUDO; período = setScale("x") no range de datas (sem re-fatiar/repintar SVG)
-        if (!_upInst || !_upInst.root || !_upInst.root.isConnected) drawUp(chartEl);  // re-instancia se o canvas saiu do DOM (ex.: voltou do Estúdio A×B)
-        if (_upInst) { var mn = tsAt(i0), mx = tsAt(s.hist.length - 1);
-          if (mn != null && mx != null) _upInst.setScale("x", m ? { min: mn, max: mx + (mx - mn) * 0.18 } : null); }  // MAX (m=0) → autoscale; janela → deixa folga p/ o cone futuro à direita
+      if (useUp) {  // uPlot: período = setScale("x") no range de datas; MAX = re-render (range completo). uPlot NÃO aceita setScale(x,null) → crash.
+        var fresh = (!_upInst || !_upInst.root || !_upInst.root.isConnected);
+        if (fresh) drawUp(chartEl);  // (re)cria — auto-range já inclui hist+futuro
+        if (_upInst && m) { var mn = tsAt(i0), mx = tsAt(s.hist.length - 1);  // janela: zoom, com folga à direita p/ o cone
+          if (mn != null && mx != null) _upInst.setScale("x", { min: mn, max: mx + (mx - mn) * 0.18 }); }
+        else if (_upInst && !m && !fresh) drawUp(chartEl);  // voltou pro MAX após zoom → re-render pro range completo
         return;
       }
       paint(curHist, true);
