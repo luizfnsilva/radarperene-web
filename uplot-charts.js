@@ -264,6 +264,16 @@
       bands.push({ series: [iSh, iShLo], fill: withAlpha(T.warm, 0.10) });
     }
 
+    // plugins (Bollinger etc.): {up,lo,mid} alinhados a hist → séries de linha tracejadas (paridade com o SVG bigChart).
+    if (s._plugins && s._plugins.length) {
+      for (var pgi = 0; pgi < s._plugins.length; pgi++) {
+        var pc = s._plugins[pgi].data, pid = s._plugins[pgi].id; if (!pc) continue;
+        if (pc.up)  addSeries(padTail(pc.up,  total), { label: pid + "↑",  stroke: T.cool, width: 0.7, dash: [3, 2], points: { show: false } });
+        if (pc.lo)  addSeries(padTail(pc.lo,  total), { label: pid + "↓",  stroke: T.cool, width: 0.7, dash: [3, 2], points: { show: false } });
+        if (pc.mid) addSeries(padTail(pc.mid, total), { label: pid + " ·", stroke: T.dim,  width: 0.55, dash: [1, 2], points: { show: false } });
+      }
+    }
+
     // timestamp de "hoje" (pra linha vertical e split passado/futuro do fundo).
     var todayTs = xs[bi];
 

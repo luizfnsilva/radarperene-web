@@ -18,6 +18,8 @@ const EN_FAQ = JSON.stringify({
 const NARR_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
 const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/narrative";
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
+const SNAP_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshot";
+const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshots";
 
 // escape p/ texto em HTML (defensivo: catálogo é a única fonte, mas nunca confiamos cego)
 function _esc(s) {
@@ -94,6 +96,79 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
+// ── ARQUIVO DIÁRIO (/diario) — páginas citáveis congeladas + verificação do desfecho ──
+function _diarioFetch(url) {
+  return fetch(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
+}
+function _renderDiarioDia(snap, date, origin, lang) {
+  const en = lang === "en";
+  const inds = snap.indicadores || [];
+  const narr = snap.narrativa || {};
+  const ver = snap.verificacao || null;
+  const canon = origin + "/diario/" + date;
+  const regime = inds.find(function (i) { return i.slug === "regime-br"; });
+  const title = "Radar Perene — " + date + (en ? " · Brazil market regime" : " · regime do mercado BR");
+  const desc = _esc(String(narr.resumo || (regime ? regime.leitura : "") || date)).slice(0, 155);
+  let verHtml = "";
+  if (ver && ver.horizontes && ver.horizontes.length) {
+    const lines = ver.horizontes.map(function (h) {
+      if (h.status !== "ok") return h.horizonte.toUpperCase() + ": " + (en ? "awaiting " : "aguardando ") + h.alvo;
+      let base = h.horizonte.toUpperCase() + ": IBOV " + (h.realizado_pct >= 0 ? "+" : "") + h.realizado_pct + "% (" + _fmtVal(h.ibov_inicio, "pts") + " → " + _fmtVal(h.ibov_fim, "pts") + ")";
+      if (h.analogo_previa_pct != null) base += " · " + (en ? "analog predicted " : "análogo previa ") + (h.analogo_previa_pct >= 0 ? "+" : "") + h.analogo_previa_pct + "% → " + (h.direcao_confirmou ? (en ? "direction confirmed" : "direção confirmou") : (en ? "direction did not confirm" : "direção não confirmou"));
+      return base;
+    });
+    verHtml = "<div class=\"ver\"><b>" + (en ? "Verification — outcome vs. the reading" : "Verificação — desfecho vs. a leitura") + "</b><ul>" + lines.map(function (l) { return "<li>" + _esc(l) + "</li>"; }).join("") + "</ul></div>";
+  }
+  const indHtml = inds.map(function (i) {
+    const v = i.valor != null ? " <b>" + _esc(_fmtVal(i.valor, i.unidade)) + "</b>" : "";
+    return "<li><a href=\"/indicador/" + _esc(i.slug) + "\">" + _esc(i.nome) + "</a>" + v + (i.leitura ? " — " + _esc(i.leitura) : "") + "</li>";
+  }).join("");
+  const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
+  const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
+    "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">" +
+    "<link rel=\"canonical\" href=\"" + canon + "\">" +
+    "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
+    "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario/" + date + "\">" +
+    "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario/" + date + "\">" +
+    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\">" +
+    "<script type=\"application/ld+json\">" + ld + "</script>" +
+    "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:46rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:1.6}h1{font-size:1.5rem;margin:0 0 .3rem}.dt{color:#666;font-size:.85rem;margin-bottom:1.2rem}a{color:#0b3d91}ul{padding-left:1.1rem}li{margin:.4rem 0}.ver{background:#fff;border:1px solid #e6e3dc;border-left:3px solid #b8801f;border-radius:0 8px 8px 0;padding:.8rem 1rem;margin:1rem 0}.ver ul{margin:.4rem 0 0}.foot{margin-top:2rem;font-size:.85rem;color:#666}.nf{color:#999;font-size:.8rem;margin-top:.6rem}</style>" +
+    "</head><body>" +
+    "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
+    "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
+    verHtml +
+    (narr.resumo ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
+    "<ul>" + indHtml + "</ul>" +
+    (narr.texto_html ? "<div>" + narr.texto_html + "</div>" : "") +
+    "<p class=\"foot\"><a href=\"/diario\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a></p>" +
+    "<p class=\"nf\">" + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</p>" +
+    "</body></html>";
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+}
+function _renderDiarioIndex(data, origin, lang) {
+  const en = lang === "en";
+  const itens = data.itens || [];
+  const canon = origin + "/diario";
+  const title = en ? "Daily archive — Radar Perene" : "Arquivo diário — Radar Perene";
+  const desc = en ? "Brazil's market-regime reading by Radar Perene, archived daily and citable — see what the Radar showed on each date and what followed." : "A leitura do regime do mercado brasileiro pelo Radar Perene, arquivada todo dia e citável — veja o que o Radar mostrou em cada data e o que se seguiu.";
+  const rows = itens.map(function (s) {
+    const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
+    return "<li><a href=\"/diario/" + s.data + "\">" + s.data + "</a> — " + _esc(rg) + (s.global ? " · " + (en ? "global " : "global ") + _esc(s.global) : "") + "</li>";
+  }).join("");
+  const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
+  const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
+    "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
+    "<link rel=\"canonical\" href=\"" + canon + "\">" +
+    "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario\">" +
+    "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario\">" +
+    "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario\">" +
+    "<script type=\"application/ld+json\">" + ld + "</script>" +
+    "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:46rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:1.7}h1{font-size:1.6rem}a{color:#0b3d91}ul{padding-left:1.1rem}li{margin:.3rem 0}p.lead{color:#444}</style>" +
+    "</head><body><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><ul>" + rows + "</ul>" +
+    "<p style=\"margin-top:1.5rem\"><a href=\"/\">" + (en ? "Full radar →" : "Radar completo →") + "</a></p></body></html>";
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+}
+
 export default {
   async fetch(request, env) {
     const _url = new URL(request.url);
@@ -134,6 +209,57 @@ export default {
         return new Response("Not found.", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
       }
     }
+    // ── /sitemap-snapshots.xml — sitemap programático do arquivo diário (/diario): datas reais via /v1/snapshots ──
+    if (_url.pathname === "/sitemap-snapshots.xml") {
+      try {
+        const sr = await _diarioFetch(SNAPS_API);
+        const sj = sr.ok ? await sr.json() : { itens: [] };
+        const urls = (sj.itens || []).filter(function (s) { return s && s.data; }).map(function (s) { return "<url><loc>" + _url.origin + "/diario/" + s.data + "</loc><changefreq>monthly</changefreq></url>"; }).join("");
+        return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+      } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
+    }
+    // ── /diario — índice cronológico do arquivo diário citável ──
+    if (_url.pathname === "/diario") {
+      try {
+        const r = await _diarioFetch(SNAPS_API + "?lang=" + (_isEN ? "en" : "pt"));
+        if (!r.ok) return env.ASSETS.fetch(request);
+        return _renderDiarioIndex(await r.json(), _url.origin, _isEN ? "en" : "pt");
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
+    // ── /diario/{YYYY-MM-DD} — a foto citável congelada daquele dia + verificação do desfecho ──
+    const _dm = _url.pathname.match(/^\/diario\/(\d{4}-\d{2}-\d{2})$/);
+    if (_dm) {
+      try {
+        const r = await _diarioFetch(SNAP_API + "?date=" + _dm[1] + "&lang=" + (_isEN ? "en" : "pt"));
+        if (!r.ok) return new Response((_isEN ? "No reading for " : "Sem leitura para ") + _dm[1], { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
+        return _renderDiarioDia(await r.json(), _dm[1], _url.origin, _isEN ? "en" : "pt");
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
+    // ── /ativos — hub crawlável que DE-ORFANIZA as páginas /ativo (Ahrefs #3): links reais via /v1/tickers. 1 rota, língua por hostname. ──
+    if (_url.pathname === "/ativos") {
+      try {
+        const en = _isEN;
+        const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
+        const tj = tr.ok ? await tr.json() : { ativos: [] };
+        const ativos = (tj.ativos || []).map(function (t) { return String(t).toUpperCase(); }).sort();
+        const canon = _url.origin + "/ativos";
+        const title = en ? "Assets covered — Radar Perene" : "Ativos cobertos — Radar Perene";
+        const desc = en ? "Every Brazilian stock, REIT and index with a descriptive Radar Perene reading: price, fair value, regime and historical analogs." : "Todas as ações, FIIs e índices brasileiros com leitura descritiva do Radar Perene: preço, valor-justo, regime e análogos históricos.";
+        const links = ativos.map(function (t) { return '<a href="/ativo/' + t.toLowerCase() + '">' + _esc(t) + "</a>"; }).join(" · ");
+        const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
+        const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
+          "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
+          "<link rel=\"canonical\" href=\"" + canon + "\">" +
+          "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
+          "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
+          "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/ativos\">" +
+          "<script type=\"application/ld+json\">" + ld + "</script>" +
+          "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:52rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:2}h1{font-size:1.6rem;line-height:1.3}a{color:#0b3d91;text-decoration:none;white-space:nowrap}p.lead{color:#444;line-height:1.6}</style>" +
+          "</head><body><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p>" + links + "</p>" +
+          "<p style=\"margin-top:2rem\"><a href=\"/\">" + (en ? "Full radar &rarr;" : "Radar completo &rarr;") + "</a></p></body></html>";
+        return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=21600" } });
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
     // ── /ativo/{ticker} — página por ativo (SEO programático B.1): reusa a home shell + widget em modo ativo + narrativa per-ativo ──
     const _am = _url.pathname.match(/^\/ativo\/([a-z0-9]{2,8})\/?$/i);
     if (_am) {
@@ -153,6 +279,10 @@ export default {
           .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", titulo); } })
           .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", desc); } })
           .on("link#rp-canonical", { element(e) { e.setAttribute("href", _url.origin + "/ativo/" + tk.toLowerCase()); } })
+          // hreflang self-referente (Ahrefs #4/5): senão herda os do index apontando p/ a home "/"
+          .on('link[rel="alternate"][hreflang="pt-br"]', { element(e) { e.setAttribute("href", "https://radarperene.com.br/ativo/" + tk.toLowerCase()); } })
+          .on('link[rel="alternate"][hreflang="en"]', { element(e) { e.setAttribute("href", "https://radarperene.com/ativo/" + tk.toLowerCase()); } })
+          .on('link[rel="alternate"][hreflang="x-default"]', { element(e) { e.setAttribute("href", "https://radarperene.com/ativo/" + tk.toLowerCase()); } })
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
         if (narr && narr.texto_html) {

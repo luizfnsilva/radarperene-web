@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-pt="Lente Patrimonial — regime tributário e sucessório do Brasil" data-en="Wealth Lens — Brazil's estate tax, holding &amp; offshore regime">Lente Patrimonial — regime tributário e sucessório do Brasil</title>
-<meta name="description" id="m-desc" content="Trajetória regulatória do ITCMD, holding familiar, Lei 14.754, sucessão e proteção patrimonial — em código probabilístico, com convergência de fontes.">
+<title data-pt="Cone de Regressão Logarítmica — assimetria de valuation" data-en="Logarithmic Regression Cone — valuation asymmetry">Cone de Regressão Logarítmica — assimetria de valuation</title>
+<meta name="description" id="m-desc" content="O Cone de Regressão Logarítmica enquadra o preço atual contra a trajetória histórica de longo prazo. Mostra desvio relativo, não previsão pontual.">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="article">
-<meta property="og:title" id="og-t" content="Lente Patrimonial — regime tributário e sucessório do Brasil">
-<meta property="og:description" id="og-d" content="Trajetória regulatória do ITCMD, holding familiar, Lei 14.754, sucessão e proteção patrimonial — em código probabilístico, com convergência de fontes.">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/lentes/patrimonial/">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/lentes/patrimonial/">
-<link rel="alternate" hreflang="en" href="https://radarperene.com/lentes/patrimonial/">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com/lentes/patrimonial/">
+<meta property="og:title" id="og-t" content="Cone de Regressão Logarítmica — assimetria de valuation">
+<meta property="og:description" id="og-d" content="O Cone de Regressão Logarítmica enquadra o preço atual contra a trajetória histórica de longo prazo. Mostra desvio relativo, não previsão pontual.">
+<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/conceitos/cone-de-regressao-logaritmica/">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/conceitos/cone-de-regressao-logaritmica/">
+<link rel="alternate" hreflang="en" href="https://radarperene.com/conceitos/cone-de-regressao-logaritmica/">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com/conceitos/cone-de-regressao-logaritmica/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -149,30 +149,44 @@
 </div>
 <div class="wrap">
   <article class="pg">
-    <p class="crumb"><a href="/">Radar Perene</a> / <span data-lang="pt">lente patrimonial</span><span data-lang="en">lens patrimonial</span></p>
+    <p class="crumb"><a href="/">Radar Perene</a> / <span data-lang="pt">conceito</span><span data-lang="en">concept</span></p>
     <div data-lang="pt">
-      <h1>Lente Patrimonial</h1>
-      <p>A Lente Patrimonial lê o terreno regulatório que define como o patrimônio brasileiro é taxado, sucedido e estruturado. ITCMD em movimento estado a estado, holding familiar sob revisão jurisprudencial, Lei 14.754 e a tributação de offshore, proteção patrimonial sob nova doutrina. Cada sinal entra com fonte primária, data, vetor de classificação e confiança contextual. Nada de previsão; trajetória.</p>
-<h2 class="sec">Estado atual da lente</h2>
-<p class="livestate">[Stress regulatório: —] · [Convergência: — fontes nas últimas —] · [Janela de atenção: —] · [Confiança contextual: —]</p>
-<h2 class="sec">O que esta lente cobre</h2>
-<p>A Patrimonial cruza cinco recortes internos: offshore e bens no exterior (Lei 14.754, COAF, BACEN cambial), forma jurídica e holdings (legislativo estadual e teses STJ/STF), tributação empresarial (RFB, instruções normativas), ITCMD e sucessão (legislativo estadual, PLP 108, reforma tributária) e proteção patrimonial (doutrina e jurisprudência). O cérebro lê todas as cinco juntas — uma alteração no offshore reverbera no ITCMD, e o motor mostra o caminho.</p>
-<h2 class="sec">Como o Perene lê esta lente</h2>
-<p>Cada item recebe score original (imutável) e score ajustado (auditável) por convergência e regime. O sistema indica trajetória — em formação, estável, acelerando ou desacelerando — e a janela em que a pressão regulatória tende a aparecer no calendário fiscal e judicial. Quando a densidade histórica é insuficiente para sustentar a leitura, a tela mostra &quot;em calibração&quot; e diz por quê.</p>
-<p class="rel">Conceitos relacionados: <a href="/conceitos/itcmd-trajetoria/">ITCMD em trajetória</a> · <a href="/conceitos/lei-14754/">Lei 14.754 e o terreno offshore</a> · <a href="/conceitos/convergencia/">Convergência de fontes</a></p>
-<p class="ctarow"><a class="btn" href="/#fundadores">Acessar a Lente Patrimonial completa como fundador · R$ 149/mês</a></p>
+      <h1>Cone de Regressão Logarítmica</h1>
+      <p>O Cone de Regressão Logarítmica enquadra o preço atual de um ativo ou índice contra sua trajetória histórica de longo prazo, em escala logarítmica.</p>
+<h2 class="sec">O que é</h2>
+<p>Uma regressão logarítmica ajusta a tendência de longo prazo do preço (a &quot;linha central&quot;) sobre uma janela histórica declarada; o cone é a faixa que mostra desvios típicos em torno dessa linha, expressos por bandas calibradas pelo desvio-padrão histórico do resíduo.</p>
+<p>Preço acima do topo do cone: ativo esticado em relação à própria trajetória de longo prazo. Preço dentro do cone: dentro da faixa típica. Preço abaixo do cone: ativo contraído.</p>
+<h2 class="sec">Por que existe</h2>
+<p>Porque a pergunta <em>o ativo está caro ou barato?</em> é difícil quando o ativo viveu décadas de regimes diferentes. O Cone normaliza essa pergunta: <em>está caro ou barato em relação à sua própria trajetória de longo prazo, descontada a tendência?</em></p>
+<p>A escala logarítmica importa porque retornos compõem multiplicativamente. Em linear, IBOV em 30 mil pontos parece &quot;longe&quot; de IBOV em 130 mil — em log, a distância percentual é a que conta.</p>
+<h2 class="sec">Como interpretar</h2>
+<table class="tb"><thead><tr><th>Posição</th><th>Leitura</th></tr></thead><tbody><tr><td>Acima da banda superior</td><td>Ativo esticado contra a trajetória de longo prazo</td></tr><tr><td>Entre banda superior e central</td><td>Acima da tendência, mas dentro da faixa típica</td></tr><tr><td>Próximo da linha central</td><td>No eixo da tendência de longo prazo</td></tr><tr><td>Entre central e banda inferior</td><td>Abaixo da tendência, mas dentro da faixa típica</td></tr><tr><td>Abaixo da banda inferior</td><td>Ativo contraído contra a trajetória de longo prazo</td></tr></tbody></table>
+<h2 class="sec">O que não significa</h2>
+<p>Não significa que o preço vai retornar à média. Mercados podem permanecer em desvio por anos. O cone descreve assimetria atual; reversão à média é hipótese estatística que pode demorar ou nunca acontecer dentro do horizonte do leitor.</p>
+<p>Não significa previsão de preço. O cone é descritivo — <em>aqui está onde o preço está em relação à sua história</em>. O Radar nunca prevê o ponto de chegada.</p>
+<h2 class="sec">Limitações</h2>
+<p>A janela histórica escolhida afeta a inclinação da regressão e a largura do cone. O Radar declara janela e parâmetros usados em cada gráfico. Ativos com mudança estrutural (split, mudança regulatória profunda, listagem recente) podem ter cone instável.</p>
+<h2 class="sec">Exemplo de uso</h2>
+<blockquote class="ex"><em>IBOV — Cone de Regressão Logarítmica, janela 2000-atual. Preço atual 14% acima da linha central, dentro da banda superior típica. Sem desvio extremo; trajetória dentro da faixa histórica esperada.</em></blockquote>
     </div>
     <div data-lang="en">
-      <h1>Wealth Lens</h1>
-      <p>The Wealth Lens reads the regulatory terrain that defines how Brazilian wealth is taxed, transferred, and structured. ITCMD shifting state by state, family holdings under judicial review, Law 14.754 and the taxation of offshore structures, asset protection under new doctrine. Each signal enters with a primary source, a date, a classification vector, and contextual confidence. No forecast; trajectory.</p>
-<h2 class="sec">Lens — current state</h2>
-<p class="livestate">[Regulatory stress: —] · [Convergence: — sources in the last —] · [Attention window: —] · [Contextual confidence: —]</p>
-<h2 class="sec">What this lens covers</h2>
-<p>The Wealth Lens crosses five internal slices: offshore and assets abroad (Law 14.754, COAF, central-bank FX), legal form and holdings (state legislatures and STJ/STF rulings), corporate taxation (Federal Revenue, normative instructions), ITCMD and succession (state legislatures, PLP 108, tax reform), and asset protection (doctrine and case law). The engine reads all five together — an offshore change reverberates into ITCMD, and the engine shows the path.</p>
-<h2 class="sec">How Perene reads this lens</h2>
-<p>Each item carries an original score (immutable) and an adjusted score (auditable), reflecting convergence and regime. The system marks trajectory — forming, stable, accelerating, decelerating — and the window over which regulatory pressure tends to land on the fiscal and judicial calendar. When historical density is insufficient, the screen shows &quot;in calibration&quot; and says why.</p>
-<p class="rel">Related concepts: <a href="/conceitos/itcmd-trajectory/">ITCMD trajectory</a> · <a href="/conceitos/law-14754/">Law 14.754 and the offshore terrain</a> · <a href="/conceitos/convergence/">Source convergence</a></p>
-<p class="ctarow"><a class="btn" href="/#fundadores">Unlock the full Wealth Lens as a founder · US$ 149/mo</a></p>
+      <h1>Logarithmic Regression Cone</h1>
+      <p>The Logarithmic Regression Cone frames the current price of an asset or index against its long-term historical trajectory, on a logarithmic scale.</p>
+<h2 class="sec">What it is</h2>
+<p>A logarithmic regression fits the long-term price trend (the &quot;central line&quot;) over a declared historical window; the cone is the band showing typical deviations around that line, expressed by bands calibrated by the historical standard deviation of the residual.</p>
+<p>Price above the upper band: asset stretched relative to its own long-term trajectory. Price inside the cone: within the typical band. Price below the cone: asset contracted.</p>
+<h2 class="sec">Why it exists</h2>
+<p>Because the question <em>is the asset expensive or cheap?</em> is hard when the asset has lived through decades of different regimes. The Cone normalizes that question: <em>is it expensive or cheap relative to its own long-term trajectory, with trend discounted?</em></p>
+<p>The logarithmic scale matters because returns compound multiplicatively. On a linear scale, IBOV at 30,000 looks &quot;far&quot; from IBOV at 130,000 — on log, percentage distance is what counts.</p>
+<h2 class="sec">How to read it</h2>
+<table class="tb"><thead><tr><th>Position</th><th>Reading</th></tr></thead><tbody><tr><td>Above the upper band</td><td>Asset stretched against long-term trajectory</td></tr><tr><td>Between upper and central band</td><td>Above trend, within the typical band</td></tr><tr><td>Near the central line</td><td>On the long-term trend axis</td></tr><tr><td>Between central and lower band</td><td>Below trend, within the typical band</td></tr><tr><td>Below the lower band</td><td>Asset contracted against long-term trajectory</td></tr></tbody></table>
+<h2 class="sec">What it does not mean</h2>
+<p>It does not mean price will revert to the mean. Markets can remain in deviation for years. The cone describes current asymmetry; mean reversion is a statistical hypothesis that may take long or never occur within the reader's horizon.</p>
+<p>It does not mean a price forecast. The cone is descriptive — <em>here is where price is relative to its history</em>. The Radar never forecasts the destination point.</p>
+<h2 class="sec">Limits</h2>
+<p>The chosen historical window affects the slope of the regression and the width of the cone. The Radar declares window and parameters used in each chart. Assets with structural change (split, deep regulatory shift, recent listing) may have an unstable cone.</p>
+<h2 class="sec">Example</h2>
+<blockquote class="ex"><em>IBOV — Logarithmic Regression Cone, window 2000-present. Current price 14% above the central line, within the upper typical band. No extreme deviation; trajectory within the expected historical range.</em></blockquote>
     </div>
   </article>
 </div>
@@ -188,7 +202,7 @@
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
   if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
-    if(d)d.content="Regulatory trajectory of ITCMD, family holdings, Law 14.754, succession, and asset protection — read in probabilistic code, with source convergence.";if(ot)ot.content="Wealth Lens — Brazil's estate tax, holding &amp; offshore regime";if(od)od.content="Regulatory trajectory of ITCMD, family holdings, Law 14.754, succession, and asset protection — read in probabilistic code, with source convergence.";}
+    if(d)d.content="The Logarithmic Regression Cone frames current price against the long-term historical trajectory. Shows relative deviation, not point forecast.";if(ot)ot.content="Logarithmic Regression Cone — valuation asymmetry";if(od)od.content="The Logarithmic Regression Cone frames current price against the long-term historical trajectory. Shows relative deviation, not point forecast.";}
   var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>

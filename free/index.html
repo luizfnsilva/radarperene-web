@@ -9,10 +9,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" id="og-t" content="Leitura do dia — endpoint JSON público do Radar Perene">
 <meta property="og:description" id="og-d" content="A leitura de regime do Brasil hoje em endpoint JSON público. Embute no seu site, cita a fonte, atualiza sozinho. Sem cadastro, sem chave.">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/free">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/free">
-<link rel="alternate" hreflang="en" href="https://radarperene.com/free">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com/free">
+<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/free/">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/free/">
+<link rel="alternate" hreflang="en" href="https://radarperene.com/free/">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com/free/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -122,14 +122,19 @@
 <style>
   .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
   .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}
-  .pg h2.sec{margin-top:30px}
+  .pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}
+  .pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}
   .pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}
-  .pg .rel{font-size:13px;color:var(--dim)}
+  .pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}
   .pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}
-  .pg .methodnote{font-size:12.5px;color:var(--dim);font-style:italic;border-left:2px solid var(--gold);padding-left:11px}
   .pg .ctarow{margin:22px 0 6px}
-  .pg .bullet{margin:0 0 4px;font-size:14.5px}
-  .pg ol{color:var(--txt2);font-size:15px;padding-left:22px}.pg ol li{margin:5px 0}
+  .pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}
+  .pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}
+  .pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
+  .pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}
+  .pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}
+  .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
+  .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
   .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
   [data-lang]{display:none}
 </style>
@@ -153,11 +158,11 @@
 <h2 class="sec">Como usar</h2>
 <pre class="api"><code>GET https://radarperene.com.br/api/leitura-do-dia.json</code></pre>
 <p>Resposta com:</p>
-<p class="bullet">• data_referencia · score_risk_br · regime · componentes · divergencias · cadencia · fonte · disclaimer</p>
+<ul><li>data_referencia · score_risk_br · regime · componentes · divergencias · cadencia · fonte · disclaimer</li></ul>
 <h2 class="sec">Widget embedável</h2>
 <p>Um snippet de uma linha para inserir a leitura em qualquer site. Citação automática. Atualização sem cron próprio.</p>
 <pre class="api"><code>&lt;iframe src=&quot;https://radarperene.com.br/widget/leitura-do-dia&quot; ...&gt;&lt;/iframe&gt;</code></pre>
-<p>Veja <a href="/api/docs">a documentação completa</a> para schema, exemplos em curl e três tamanhos de widget.</p>
+<p>Veja <a href="/api/docs/">a documentação completa</a> para schema, exemplos em curl e três tamanhos de widget.</p>
 <h2 class="sec">O que não está aqui</h2>
 <p>A leitura do dia é o estado de hoje. Não é a série histórica, não é o forecasting por lente, não é o cone de quantis manipulável, não é a Lente Vértice. Isso entra com o <a href="/">Founder Access</a> — R$ 149/mês, 100 vagas.</p>
     </div>
@@ -169,11 +174,11 @@
 <h2 class="sec">How to use it</h2>
 <pre class="api"><code>GET https://radarperene.com/api/todays-reading.json</code></pre>
 <p>Returns:</p>
-<p class="bullet">• reference_date · risk_br_score · regime · components · divergences · cadence · source · disclaimer</p>
+<ul><li>reference_date · risk_br_score · regime · components · divergences · cadence · source · disclaimer</li></ul>
 <h2 class="sec">Embeddable widget</h2>
 <p>A one-line snippet to drop the reading into any site. Automatic citation. No cron of your own.</p>
 <pre class="api"><code>&lt;iframe src=&quot;https://radarperene.com/widget/todays-reading&quot; ...&gt;&lt;/iframe&gt;</code></pre>
-<p>See <a href="/api/docs">the full documentation</a> for schema, curl examples, and three widget sizes.</p>
+<p>See <a href="/api/docs/">the full documentation</a> for schema, curl examples, and three widget sizes.</p>
 <h2 class="sec">What is not here</h2>
 <p>Today's reading is today's state. It is not the historical series, not lens-level forecasting, not the manipulable quantile cone, not Lente Vértice. Those come with <a href="/">Founder Access</a> — US$ 149/mo, 100 seats.</p>
     </div>
@@ -190,10 +195,9 @@
   document.documentElement.lang=en?"en":"pt-BR";
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  ["m-desc","og-t","og-d"].forEach(function(id){var e=document.getElementById(id);});
-  var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),T2=document.querySelector("title");
-  if(en){if(d)d.content="Brazil's market-regime reading today as a public JSON endpoint. Embed it, cite the source, let it refresh itself. No signup, no key.";if(ot)ot.content="Today's reading — Radar Perene's public JSON endpoint";if(od)od.content="Brazil's market-regime reading today as a public JSON endpoint. Embed it, cite the source, let it refresh itself. No signup, no key.";}
-  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname.replace(/\/$/,"")||location.origin+location.pathname;
+  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
+    if(d)d.content="Brazil's market-regime reading today as a public JSON endpoint. Embed it, cite the source, let it refresh itself. No signup, no key.";if(ot)ot.content="Today's reading — Radar Perene's public JSON endpoint";if(od)od.content="Brazil's market-regime reading today as a public JSON endpoint. Embed it, cite the source, let it refresh itself. No signup, no key.";}
+  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>
 </body>

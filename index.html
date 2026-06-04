@@ -276,7 +276,7 @@
 <script>
 (function(){
   var EN=/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname);
-  var can=document.getElementById("rp-canonical"); if(can) can.href=location.origin+"/";  // canonical self-referente
+  var can=document.getElementById("rp-canonical"); if(can) can.href=location.origin+location.pathname;  // canonical self-referente NA forma servida (home "/" ou /ativo/{tk}) — NÃO força "/" (senão clobera o canonical do /ativo)
   if(EN){var t=document.getElementById("rp-ck-txt");if(t)t.textContent="We use measurement (analytics) cookies to improve the site. Your choice — nothing is tracked without it.";
     document.getElementById("rp-ck-no").textContent="Decline";document.getElementById("rp-ck-yes").textContent="Accept";}
   var KEY="rp-consent";
@@ -340,7 +340,7 @@
     eyb3:"For your site · free",s3:"Use our mini-radar anywhere",s3s:"A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4:"Principles",
     disc:"Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
-    ftnav:'<a href="/metodologia">Methodology</a> · <a href="/free">Free</a> · <a href="/about">About</a> · <a href="/lentes/patrimonial">Wealth</a> · <a href="/lentes/eleitoral">Electoral</a> · <a href="/lentes/macro">Macro</a> · <a href="/lentes/institucional">Institutional</a> · <a href="/lentes/imobiliaria">Real estate</a> · <a href="/lentes/vertice">Vértice</a>',
+    ftnav:'<a href="/diario">Daily archive</a> · <a href="/como-ler-o-radar/">How to read</a> · <a href="/metodologia/">Methodology</a> · <a href="/lentes/">Lenses</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lentes/patrimonial/">Wealth</a> · <a href="/lentes/eleitoral/">Electoral</a> · <a href="/lentes/macro/">Macro</a> · <a href="/lentes/institucional/">Institutional</a> · <a href="/lentes/imobiliaria/">Real estate</a> · <a href="/lentes/vertice/">Vértice</a> · <a href="/conceitos/regime-brasil/">Brazil Regime</a> · <a href="/conceitos/regime-global/">Global Regime</a> · <a href="/conceitos/intermercado-br/">Intermarket BR</a> · <a href="/conceitos/erp-br/">ERP_BR</a> · <a href="/conceitos/cone-de-regressao-logaritmica/">Regression Cone</a> · <a href="/conceitos/indice-anima/">Ânima</a> · <a href="/conceitos/risk-on-risk-off/">Risk-on/off</a> · <a href="/conceitos/analogos-historicos/">Historical analogs</a> · <a href="/conceitos/vertice/">Vértice (concept)</a>',
     lenses:[{n:"Wealth",d:"Succession, estate tax, holdings and structures — pressure on wealth."},
       {n:"Electoral",d:"Electoral courts, eligibility, campaign finance and digital enforcement."},
       {n:"Macro / Rates",d:"Rates, inflation, fiscal and debt — the country&rsquo;s macro regime."},
@@ -371,7 +371,7 @@
     eyb3:"Para o seu site · grátis",s3:"Use nosso mini-radar onde quiser",s3s:"Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.",
     eyb4:"Princípios",
     disc:"Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.",
-    ftnav:'<a href="/metodologia">Metodologia</a> · <a href="/free">Tier grátis</a> · <a href="/sobre">Sobre</a> · <a href="/lentes/patrimonial">Patrimonial</a> · <a href="/lentes/eleitoral">Eleitoral</a> · <a href="/lentes/macro">Macro</a> · <a href="/lentes/institucional">Institucional</a> · <a href="/lentes/imobiliaria">Imobiliária</a> · <a href="/lentes/vertice">Vértice</a>',
+    ftnav:'<a href="/diario">Arquivo diário</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/metodologia/">Metodologia</a> · <a href="/lentes/">Lentes</a> · <a href="/free/">Tier grátis</a> · <a href="/sobre">Sobre</a> · <a href="/ativos">Ativos</a> · <a href="/lentes/patrimonial/">Patrimonial</a> · <a href="/lentes/eleitoral/">Eleitoral</a> · <a href="/lentes/macro/">Macro</a> · <a href="/lentes/institucional/">Institucional</a> · <a href="/lentes/imobiliaria/">Imobiliária</a> · <a href="/lentes/vertice/">Vértice</a> · <a href="/conceitos/regime-brasil/">Regime Brasil</a> · <a href="/conceitos/regime-global/">Regime Global</a> · <a href="/conceitos/intermercado-br/">Intermercado BR</a> · <a href="/conceitos/erp-br/">ERP_BR</a> · <a href="/conceitos/cone-de-regressao-logaritmica/">Cone de regressão</a> · <a href="/conceitos/indice-anima/">Índice Ânima</a> · <a href="/conceitos/risk-on-risk-off/">Risk-on/off</a> · <a href="/conceitos/analogos-historicos/">Análogos históricos</a> · <a href="/conceitos/vertice/">Vértice (conceito)</a>',
     lenses:[{n:"Patrimonial",d:"Sucessão, ITCMD, holdings e estruturas — a pressão sobre o patrimônio."},
       {n:"Eleitoral",d:"TSE, elegibilidade, financiamento e enforcement digital."},
       {n:"Macro / Juros",d:"Juros, inflação, fiscal e dívida — o regime macro do país."},
@@ -400,7 +400,7 @@
   document.getElementById("wl-email").placeholder=C.wlph;
   var expTag=LANG==="en"?"experiment":"experimento";
   var LSLUG=["patrimonial","eleitoral","macro","institucional","imobiliaria","vertice"];  // de-orphan: cada card linka pra sua página de lente (mesma ordem PT/EN)
-  set("lenses",C.lenses.map(function(l,i){return '<a class="ln'+(l.v?' vx':'')+'" href="/lentes/'+LSLUG[i]+'"><div class="nm">'+(l.v?'<span style="color:var(--gold)">✦</span> ':'')+l.n+(l.v?'<span class="tag">'+expTag+'</span>':'')+'</div><p>'+l.d+'</p>'+(l.m?'<span class="micro">'+l.m+'</span>':'')+'</a>'}).join(""));
+  set("lenses",C.lenses.map(function(l,i){return '<a class="ln'+(l.v?' vx':'')+'" href="/lentes/'+LSLUG[i]+'/"><div class="nm">'+(l.v?'<span style="color:var(--gold)">✦</span> ':'')+l.n+(l.v?'<span class="tag">'+expTag+'</span>':'')+'</div><p>'+l.d+'</p>'+(l.m?'<span class="micro">'+l.m+'</span>':'')+'</a>'}).join(""));
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
   set("scale",C.scale.map(function(s){return '<div class="st"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join(""));
   set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));
@@ -454,7 +454,7 @@
   async function refresh(){
     var sess=(await sb.auth.getSession()).data.session;
     var pw=document.getElementById("portal-wrap");
-    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; return; }
+    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; try{localStorage.removeItem("rp_premium")}catch(x){} return; }
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     if(pw)pw.style.display="inline";
     try{ var r=await fetch(SBU+"/functions/v1/radar-api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
@@ -465,7 +465,7 @@
             w.innerHTML=(EN?"Welcome back, Founding Member #":"Bem-vindo de volta, Membro Fundador #")+(d.rank||"")+" · "+(EN?"your live Radar":"seu Radar ao vivo")+" ↓";
             he.parentNode.insertBefore(rd, he); he.parentNode.insertBefore(w, rd); }
         }catch(e){} }
-      else{ window.RP_PREMIUM=false; if(seal)seal.style.display="none"; }
+      else{ window.RP_PREMIUM=false; if(seal)seal.style.display="none"; try{localStorage.removeItem("rp_premium")}catch(x){} }
     }catch(e){}
   }
   if(loginEl)loginEl.addEventListener("click",async function(e){ e.preventDefault();

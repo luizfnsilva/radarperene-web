@@ -1,42 +1,87 @@
 #!/usr/bin/env node
-// Gerador das páginas de conteúdo (Sprint B.2) — parseia SITE_COPY_BURST_1.md (fonte verbatim, já com
-// correção "50 anos→desde 2000") e emite páginas estáticas bilíngues reusando o chrome do index.html.
+// Gerador das páginas de conteúdo — parseia SITE_COPY_BURST_1.md + SITE_COPY_BURST_2_CONCEITOS.md
+// (fontes verbatim do ghostwriter) e emite páginas estáticas bilíngues reusando o chrome do index.html.
 // Doutrina: 1 rota por página (slug PT), conteúdo pt+en embutido, língua escolhida por hostname (.com→en, .com.br→pt).
-// Links internos normalizados pro slug PT; links de pillars/conceitos inexistentes viram texto neutro (não 404).
+// SEO: páginas-diretório (metodologia/, free/, lentes/*/, conceitos/*/) são servidas pelo Cloudflare COM trailing slash
+//      (a forma sem barra 307-redireciona) → canonical/hreflang/sitemap/links internos TODOS com barra final,
+//      senão o canonical aponta pro redirect e a página se deindexa (Ahrefs #1/#2). /sobre e /about são arquivos → sem barra.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const ROOT = dirname(new URL(import.meta.url).pathname);
-const COPY = readFileSync(join(ROOT, "..", "RADAR-REGULATORIO", "SITE_COPY_BURST_1.md"), "utf8");
+const RR = join(ROOT, "..", "RADAR-REGULATORIO");
+const COPY1 = readFileSync(join(RR, "SITE_COPY_BURST_1.md"), "utf8");
+const COPY2 = existsSync(join(RR, "SITE_COPY_BURST_2_CONCEITOS.md"))
+  ? readFileSync(join(RR, "SITE_COPY_BURST_2_CONCEITOS.md"), "utf8")
+  : readFileSync(join(RR, "_review_screenshots", "SITE_COPY_BURST_2_CONCEITOS.md"), "utf8");
 const INDEX = readFileSync(join(ROOT, "index.html"), "utf8");
 
-// --- chrome compartilhado: extrai o <style>…</style> + fontes + theme-script do index, p/ casar 100% ---
+// chrome compartilhado: o <link rel=preconnect…> até </head> do index, p/ casar fontes/tema/estilo 100%
 const headStyle = INDEX.slice(INDEX.indexOf("<link rel=\"preconnect\""), INDEX.indexOf("</head>"));
 
-// NOTA: /sobre NÃO é gerado aqui — já existe sobre.html + about.html hand-built servindo /sobre e /about.
-// A copy ghostwriter do /sobre está em SITE_COPY_BURST_1.md §2.1/2.2; p/ trocar, apague sobre.html+about.html
-// e adicione { slug:"sobre", sec:["2.1","2.2"], type:"manifesto" } abaixo.
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGES: cada entrada referencia a fonte (1=Burst1, 2=Burst2) e as chaves [pt,en].
+// type só afeta o breadcrumb. metodologia agora vem do Burst2 §2 (versão pondered, sem pesos expostos).
+// ─────────────────────────────────────────────────────────────────────────────
 const PAGES = [
-  { slug: "metodologia",          sec: ["5.1", "5.2"], type: "metodo" },
-  { slug: "free",                 sec: ["4.1", "4.2"], type: "free" },
-  { slug: "lentes/patrimonial",   sec: ["3.1", "3.2"], type: "lente" },
-  { slug: "lentes/eleitoral",     sec: ["3.3", "3.4"], type: "lente" },
-  { slug: "lentes/macro",         sec: ["3.5", "3.6"], type: "lente" },
-  { slug: "lentes/institucional", sec: ["3.7", "3.8"], type: "lente" },
-  { slug: "lentes/imobiliaria",   sec: ["3.9", "3.10"], type: "lente" },
-  { slug: "lentes/vertice",       sec: ["3.11", "3.12"], type: "lente" },
+  // ── Burst 2 (conceitual) ──
+  { slug: "como-ler-o-radar",      src: 2, sec: ["1.1", "1.2"], type: "guia" },
+  { slug: "metodologia",           src: 2, sec: ["2.1", "2.2"], type: "metodo" },
+  { slug: "lentes",                src: 2, sec: ["3.1", "3.2"], type: "lentes" },
+  { slug: "conceitos/regime-brasil",                  src: 2, sec: ["4.1:pt", "4.1:en"], type: "conceito" },
+  { slug: "conceitos/regime-global",                  src: 2, sec: ["4.2:pt", "4.2:en"], type: "conceito" },
+  { slug: "conceitos/intermercado-br",                src: 2, sec: ["4.3:pt", "4.3:en"], type: "conceito" },
+  { slug: "conceitos/erp-br",                         src: 2, sec: ["4.4:pt", "4.4:en"], type: "conceito" },
+  { slug: "conceitos/cone-de-regressao-logaritmica",  src: 2, sec: ["4.5:pt", "4.5:en"], type: "conceito" },
+  { slug: "conceitos/indice-anima",                   src: 2, sec: ["4.6:pt", "4.6:en"], type: "conceito" },
+  { slug: "conceitos/risk-on-risk-off",               src: 2, sec: ["4.7:pt", "4.7:en"], type: "conceito" },
+  { slug: "conceitos/analogos-historicos",            src: 2, sec: ["4.8:pt", "4.8:en"], type: "conceito" },
+  { slug: "conceitos/vertice",                        src: 2, sec: ["4.9:pt", "4.9:en"], type: "conceito" },
+  // ── Burst 1 (lentes individuais + free) ──
+  { slug: "free",                 src: 1, sec: ["4.1", "4.2"], type: "free" },
+  { slug: "lentes/patrimonial",   src: 1, sec: ["3.1", "3.2"], type: "lente" },
+  { slug: "lentes/eleitoral",     src: 1, sec: ["3.3", "3.4"], type: "lente" },
+  { slug: "lentes/macro",         src: 1, sec: ["3.5", "3.6"], type: "lente" },
+  { slug: "lentes/institucional", src: 1, sec: ["3.7", "3.8"], type: "lente" },
+  { slug: "lentes/imobiliaria",   src: 1, sec: ["3.9", "3.10"], type: "lente" },
+  { slug: "lentes/vertice",       src: 1, sec: ["3.11", "3.12"], type: "lente" },
 ];
 
-// --- parser: extrai cada bloco fenced indexado por "N.M" a partir dos headings "### N.M …" ---
+// ─── SEO_OVERRIDE: title ≤ 60c, description ≤ 158c. Ajusta SÓ os metas (knobs de SEO), preservando
+//     keywords; o H1 e o corpo continuam verbatim do ghostwriter. Só as páginas que estouravam o limite. ───
+const SEO_OVERRIDE = {
+  "como-ler-o-radar": { tPt: "Como ler o Radar Perene — seis passos para o regime do dia" },
+  "metodologia": { tPt: "Metodologia do Radar Perene — regime e percentil histórico", tEn: "Radar Perene methodology — regime & historical percentile" },
+  "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o Brasil em cinco dimensões regulatórias e de mercado. A Lente Vértice é o experimento cross-domínio; Intermercado é leitura paralela." },
+  "conceitos/regime-brasil": { tPt: "Regime Brasil — como o Radar lê o mercado brasileiro", tEn: "Brazil Regime — how the Radar reads Brazil's market", dEn: "Brazil Regime: the aggregate reading of the Brazilian market — defensive, neutral, or pro-risk. Categorical, with a 0–100 auxiliary scale." },
+  "conceitos/intermercado-br": { tPt: "Intermercado BR — razões patrimoniais como regime", dPt: "Intermercado BR: leitura cruzada de razões patrimoniais brasileiras (finanças, utilities, commodities, FIIs, café/ouro). Camada paralela às lentes.", dEn: "Intermarket BR: cross-reading of Brazilian wealth-sector ratios (finance, utilities, commodities, REITs, coffee/gold). A layer parallel to the lenses." },
+  "conceitos/cone-de-regressao-logaritmica": { tPt: "Cone de Regressão Logarítmica — assimetria de valuation", tEn: "Logarithmic Regression Cone — valuation asymmetry" },
+  "conceitos/indice-anima": { tPt: "Índice Ânima — leitura de humor do mercado brasileiro" },
+  "conceitos/risk-on-risk-off": { tPt: "Risk-on / Risk-off — inclinação do ambiente no Radar" },
+  "conceitos/vertice": { tPt: "Vértice — hipóteses cross-domínio e atualização bayesiana", tEn: "Vértice — cross-domain hypotheses & Bayesian updating", dEn: "Vértice is the Radar's methodological experiment — a Bayesian system formulating cross-domain hypotheses with evidence and continuous calibration." },
+  "lentes/patrimonial": { tPt: "Lente Patrimonial — regime tributário e sucessório do Brasil", tEn: "Wealth Lens — Brazil's estate tax, holding & offshore regime", dPt: "Trajetória regulatória do ITCMD, holding familiar, Lei 14.754, sucessão e proteção patrimonial — em código probabilístico, com convergência de fontes.", dEn: "Regulatory trajectory of ITCMD, family holdings, Law 14.754, succession, and asset protection — read in probabilistic code, with source convergence." },
+  "lentes/eleitoral": { tPt: "Lente Eleitoral — calendário regulatório-eleitoral do Brasil" },
+  "lentes/macro": { dPt: "Política monetária, câmbio, mercado de capitais, regulação bancária, crédito e fiscal — em código probabilístico, cruzados com o Intermercado BR.", dEn: "Monetary policy, FX, capital markets, banking regulation, credit, and fiscal — read in probabilistic code and crossed with Brazil's intermarket." },
+  "lentes/institucional": { tPt: "Lente Institucional — compliance, LGPD e jurisprudência", tEn: "Institutional Lens — compliance, LGPD & case law in Brazil" },
+  "lentes/imobiliaria": { tPt: "Lente Imobiliária — regulação, FIIs, crédito e SINAPI", tEn: "Real Estate Lens — Brazil's property regulation & REITs" },
+  "lentes/vertice": { tPt: "Lente Vértice — hipóteses cross-domínio e bayesianismo", tEn: "Lente Vértice — cross-domain hypotheses & Bayesianism" },
+};
+
+// ─── parser: extrai cada bloco fenced. Chaveia por "N.M" e, quando há sublíngua (#### pt-BR / heading com pt-BR|EN), também "N.M:pt"/"N.M:en". ───
 function parseBlocks(md) {
   const out = {};
   const lines = md.split("\n");
-  let key = null, inFence = false, buf = [];
+  let key = null, lang = null, inFence = false, buf = [];
   for (const ln of lines) {
-    const h = ln.match(/^###\s+(\d+\.\d+)\s/);
-    if (h) { key = h[1]; continue; }
+    if (!inFence) {
+      if (/^##\s/.test(ln)) { key = null; lang = null; continue; }  // cabeçalho nível-2 (## N.) reseta o contexto → fences soltos (§5 microcópia, §6) NÃO poluem a última página
+      const h3 = ln.match(/^###\s+(\d+\.\d+)\b/);
+      if (h3) { key = h3[1]; lang = /\bpt-?br\b/i.test(ln) ? "pt" : (/\bEN\b/.test(ln) ? "en" : null); continue; }
+      const h4 = ln.match(/^####\s+(pt-?br|en)\b/i);
+      if (h4) { lang = /pt/i.test(h4[1]) ? "pt" : "en"; continue; }
+    }
     if (ln.trim().startsWith("```")) {
-      if (inFence) { if (key) out[key] = buf.join("\n"); buf = []; inFence = false; key = null; }
+      if (inFence) { if (key) { const v = buf.join("\n"); out[key] = v; if (lang) out[key + ":" + lang] = v; } buf = []; inFence = false; }
       else if (key) { inFence = true; buf = []; }
       continue;
     }
@@ -44,78 +89,145 @@ function parseBlocks(md) {
   }
   return out;
 }
-const BLOCKS = parseBlocks(COPY);
+const BLOCKS = { 1: parseBlocks(COPY1), 2: parseBlocks(COPY2) };
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-// normaliza links MD: rotas existentes viram <a>; pillars/conceitos inexistentes viram texto neutro
-const EXISTING = ["/", "/sobre", "/metodologia", "/free", "/lentes/"];
-function mdInline(s, lang) {
-  return esc(s).replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => {
-    // normaliza EN→PT slug
-    url = url.replace("/about", "/sobre").replace("/methodology", "/metodologia").replace("/lenses/", "/lentes/").replace(/#integrity/, "#integridade");
-    const ok = EXISTING.some((p) => url === p || url.startsWith(p) && !url.includes("/conceitos") && !url.includes("/concepts"));
-    if (url.includes("/conceitos") || url.includes("/concepts")) return txt; // pillar ainda não existe → texto puro
-    return ok ? `<a href="${url}">${txt}</a>` : txt;
-  });
+
+// normaliza um path interno: EN→PT slug + trailing slash p/ rotas-diretório (evita link→redirect). /sobre,/about,/ativo,#âncoras intactos.
+const SLUG_MAP = [
+  ["/how-to-read-the-radar", "/como-ler-o-radar"],
+  ["/methodology", "/metodologia"],
+  ["/concepts/regime-brazil", "/conceitos/regime-brasil"],
+  ["/concepts/intermarket-br", "/conceitos/intermercado-br"],
+  ["/concepts/logarithmic-regression-cone", "/conceitos/cone-de-regressao-logaritmica"],
+  ["/concepts/anima-index", "/conceitos/indice-anima"],
+  ["/concepts/historical-analogs", "/conceitos/analogos-historicos"],
+  ["/concepts/", "/conceitos/"],
+  ["/lenses/wealth", "/lentes/patrimonial"],
+  ["/lenses/electoral", "/lentes/eleitoral"],
+  ["/lenses/institutional", "/lentes/institucional"],
+  ["/lenses/real-estate", "/lentes/imobiliaria"],
+  ["/lenses/", "/lentes/"],
+  ["/lenses", "/lentes"],
+  ["/about", "/sobre"],
+  ["#integrity", "#integridade"],
+];
+function normPath(url) {
+  for (const [en, pt] of SLUG_MAP) url = url.split(en).join(pt);
+  // trailing slash p/ rotas-diretório internas (não p/ arquivos /sobre /about, /ativo, âncoras, externos)
+  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo")) {
+    if (!url.endsWith("/")) url += "/";
+  }
+  return url;
+}
+// inline markdown: [txt](url) + **bold** + *itálico* (após esc; os marcadores sobrevivem ao esc)
+function mdInline(s) {
+  return esc(s)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => `<a href="${normPath(url.trim())}">${txt}</a>`)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
 }
 
-// converte um bloco fenced (com marcadores <!-- … -->) em {title,desc,h1,bodyHtml,disclaimer,anchorIds}
-function renderBlock(raw, lang, type) {
+// ─── renderBlock: bloco fenced (com marcadores <!-- … -->) → {title,desc,h1,bodyHtml,disclaimer}.
+//     Suporta tabelas markdown, blockquotes, listas ordenadas/não, H2/H3, e parágrafos de prosa. ───
+function renderBlock(raw) {
   const lines = raw.split("\n");
   let title = "", desc = "", h1 = "", disclaimer = "";
   const body = [];
-  let i = 0;
-  const nextContent = () => { while (i < lines.length && (lines[i].trim() === "" || lines[i].trim().startsWith("<!--"))) i++; return i < lines.length ? lines[i++] : ""; };
+  let i = 0, para = [];
+  const flush = () => { if (para.length) { body.push(`<p>${para.map(mdInline).join(" ")}</p>`); para = []; } };
+  const peekContent = () => { let j = i; while (j < lines.length && (lines[j].trim() === "" || /^<!--/.test(lines[j].trim()))) j++; return j; };
+
   for (i = 0; i < lines.length;) {
     const ln = lines[i];
     const t = ln.trim();
+
+    // marcadores de comentário
     const cm = t.match(/^<!--\s*(.*?)\s*-->$/);
     if (cm) {
-      const tag = cm[1].toLowerCase();
-      i++;
-      if (tag.startsWith("meta title")) title = nextContent().trim();
-      else if (tag.startsWith("meta desc")) desc = nextContent().trim();
-      else if (tag === "h1") h1 = nextContent().trim();
-      else if (tag.startsWith("h2")) {
-        const idm = cm[1].match(/id="([^"]+)"/);
-        const htxt = nextContent().trim();
-        body.push(`<h2 class="sec"${idm ? ` id="${idm[1]}"` : ""}>${esc(htxt)}</h2>`);
-      } else if (tag.startsWith("disclaimer")) { const d = []; while (i < lines.length && lines[i].trim() && !lines[i].trim().startsWith("<!--")) d.push(lines[i++].trim()); disclaimer = d.join(" "); }
-      else if (tag.startsWith("cta")) { const c = nextContent().trim(); if (c) body.push(`<p class="ctarow"><a class="btn" href="/#fundadores">${esc(c)}</a></p>`); }
-      else if (tag.startsWith("microcopy")) { const mc = nextContent().trim(); if (mc) body.push(`<p class="methodnote">${esc(mc)}</p>`); }
-      else if (tag.includes("link")) { const lk = nextContent().trim(); if (lk) body.push(`<p class="rel">${mdInline(lk, lang)}</p>`); }
-      // demais comentários (sub-hero etc) → ignora o rótulo, conteúdo seguinte cai como prosa
+      const tag = cm[1].toLowerCase(); i++;
+      const grab = () => { const j = peekContent(); i = j; return j < lines.length ? lines[i++].trim() : ""; };
+      if (tag.startsWith("meta title")) { flush(); title = grab(); }
+      else if (tag.startsWith("meta desc")) { flush(); desc = grab(); }
+      else if (tag === "h1") { flush(); h1 = grab(); }
+      else if (tag.startsWith("h2")) { flush(); const idm = cm[1].match(/id="([^"]+)"/); body.push(`<h2 class="sec"${idm ? ` id="${idm[1]}"` : ""}>${esc(grab())}</h2>`); }
+      else if (tag.startsWith("h3")) { flush(); body.push(`<h3 class="sub">${esc(grab())}</h3>`); }
+      else if (tag.startsWith("disclaimer")) { flush(); const d = []; const j = peekContent(); i = j; while (i < lines.length && lines[i].trim() && !/^<!--/.test(lines[i].trim())) d.push(lines[i++].trim()); disclaimer = d.join(" "); }
+      else if (tag.startsWith("cta")) { flush(); const c = grab(); if (c) body.push(/\[[^\]]+\]\(/.test(c) ? `<p class="ctarow rel">${mdInline(c)}</p>` : `<p class="ctarow"><a class="btn" href="/#fundadores">${esc(c)}</a></p>`); }
+      else if (tag.includes("microcopy") || tag.includes("link")) { flush(); const lk = grab(); if (lk) body.push(`<p class="rel">${mdInline(lk)}</p>`); }
+      else if (tag.includes("fechamento") || tag.includes("closing") || tag.includes("canôn") || tag.includes("canon")) { flush(); const c = grab(); if (c) body.push(`<p class="closing">${mdInline(c)}</p>`); }
+      // demais comentários: ignora o rótulo
       continue;
     }
+
+    // tabela markdown: linhas consecutivas começando com "|"
+    if (t.startsWith("|")) {
+      flush();
+      const rows = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")) { rows.push(lines[i].trim()); i++; }
+      const cells = (r) => r.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const isSep = (r) => /^\|?[\s:|-]+\|?$/.test(r) && r.includes("-");
+      let html = '<table class="tb"><thead><tr>';
+      const head = cells(rows[0]);
+      html += head.map((c) => `<th>${mdInline(c)}</th>`).join("") + "</tr></thead><tbody>";
+      for (let r = 1; r < rows.length; r++) { if (isSep(rows[r])) continue; html += "<tr>" + cells(rows[r]).map((c) => `<td>${mdInline(c)}</td>`).join("") + "</tr>"; }
+      html += "</tbody></table>";
+      body.push(html);
+      continue;
+    }
+
+    // blockquote: linha(s) começando com ">"
+    if (t.startsWith(">")) {
+      flush();
+      const q = [];
+      while (i < lines.length && lines[i].trim().startsWith(">")) { q.push(lines[i].trim().replace(/^>\s?/, "")); i++; }
+      body.push(`<blockquote class="ex">${q.filter(Boolean).map(mdInline).join("<br>")}</blockquote>`);
+      continue;
+    }
+
+    // lista ordenada
+    if (/^\d+\.\s/.test(t)) {
+      flush();
+      const items = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) { items.push(lines[i].trim().replace(/^\d+\.\s/, "")); i++; }
+      body.push("<ol>" + items.map((x) => `<li>${mdInline(x)}</li>`).join("") + "</ol>");
+      continue;
+    }
+
+    // lista não-ordenada ("- " ou "• ")
+    if (/^[-•]\s/.test(t)) {
+      flush();
+      const items = [];
+      while (i < lines.length && /^[-•]\s/.test(lines[i].trim())) { items.push(lines[i].trim().replace(/^[-•]\s/, "")); i++; }
+      body.push("<ul>" + items.map((x) => `<li>${mdInline(x)}</li>`).join("") + "</ul>");
+      continue;
+    }
+
     i++;
-    if (t === "") { body.push(""); continue; }
+    if (t === "") { flush(); continue; }
     // linha de estado-ao-vivo do engine: [Label: {x}] · …
-    if (/^\[.+\]/.test(t) && t.includes("{")) {
-      const labels = t.replace(/\{[^}]*\}/g, "—");
-      body.push(`<p class="livestate">${lang === "pt" ? "Ao vivo no app (fundadores)" : "Live in the app (founders)"}: ${esc(labels)}</p>`);
-      continue;
-    }
-    if (/^GET\s+https?:\/\//.test(t) || t.startsWith("<iframe")) { body.push(`<pre class="api"><code>${esc(t)}</code></pre>`); continue; }
-    if (t.startsWith("•")) { body.push(`<p class="bullet">${mdInline(t, lang)}</p>`); continue; }
-    body.push(`<p>${mdInline(t, lang)}</p>`);
-  }
-  // colapsa parágrafos: junta linhas consecutivas não-vazias que não são tags de bloco em um <p>
-  const html = [];
-  let para = [];
-  const flush = () => { if (para.length) { html.push(`<p>${para.join(" ")}</p>`); para = []; } };
-  for (const b of body) {
-    if (b === "") { flush(); continue; }
-    if (b.startsWith("<p>") && b.endsWith("</p>") && !b.includes('class=')) { para.push(b.slice(3, -4)); continue; }
-    flush(); html.push(b);
+    if (/^\[.+\]/.test(t) && t.includes("{")) { flush(); body.push(`<p class="livestate">${esc(t.replace(/\{[^}]*\}/g, "—"))}</p>`); continue; }
+    if (/^GET\s+https?:\/\//.test(t) || t.startsWith("<iframe")) { flush(); body.push(`<pre class="api"><code>${esc(t)}</code></pre>`); continue; }
+    para.push(t);
   }
   flush();
-  return { title, desc, h1, bodyHtml: html.join("\n"), disclaimer };
+  return { title, desc, h1, bodyHtml: body.join("\n"), disclaimer };
 }
 
-function page(slug, sec, type) {
-  const pt = renderBlock(BLOCKS[sec[0]] || "", "pt", type);
-  const en = renderBlock(BLOCKS[sec[1]] || "", "en", type);
-  const ptUrl = "/" + slug;
+function crumbLabel(slug, L) {
+  if (slug.startsWith("lentes/")) return (L ? "lens " : "lente ") + slug.split("/")[1];
+  if (slug.startsWith("conceitos/")) return (L ? "concept" : "conceito");
+  return slug;
+}
+
+const out = [];
+function page(p) {
+  const B = BLOCKS[p.src];
+  const pt = renderBlock(B[p.sec[0]] || "");
+  const en = renderBlock(B[p.sec[1]] || "");
+  const sov = SEO_OVERRIDE[p.slug] || {};     // metas encurtados p/ limite SEO (corpo segue verbatim)
+  const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = sov.dPt || pt.desc, dEn = sov.dEn || en.desc;
+  const path = "/" + p.slug + "/";            // rota-diretório → SEMPRE trailing slash (canonical real servido pelo CF)
   const disc = pt.disclaimer || "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.";
   const discEn = en.disclaimer || "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice.";
   const html = `<!doctype html>
@@ -123,28 +235,33 @@ function page(slug, sec, type) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-pt="${esc(pt.title)}" data-en="${esc(en.title)}">${esc(pt.title)}</title>
-<meta name="description" id="m-desc" content="${esc(pt.desc)}">
+<title data-pt="${esc(tPt)}" data-en="${esc(tEn)}">${esc(tPt)}</title>
+<meta name="description" id="m-desc" content="${esc(dPt)}">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="article">
-<meta property="og:title" id="og-t" content="${esc(pt.title)}">
-<meta property="og:description" id="og-d" content="${esc(pt.desc)}">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br${ptUrl}">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${ptUrl}">
-<link rel="alternate" hreflang="en" href="https://radarperene.com${ptUrl}">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com${ptUrl}">
+<meta property="og:title" id="og-t" content="${esc(tPt)}">
+<meta property="og:description" id="og-d" content="${esc(dPt)}">
+<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br${path}">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}">
+<link rel="alternate" hreflang="en" href="https://radarperene.com${path}">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com${path}">
 ${headStyle}
 <style>
   .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
   .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}
-  .pg h2.sec{margin-top:30px}
+  .pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}
+  .pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}
   .pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}
-  .pg .rel{font-size:13px;color:var(--dim)}
+  .pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}
   .pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}
-  .pg .methodnote{font-size:12.5px;color:var(--dim);font-style:italic;border-left:2px solid var(--gold);padding-left:11px}
   .pg .ctarow{margin:22px 0 6px}
-  .pg .bullet{margin:0 0 4px;font-size:14.5px}
-  .pg ol{color:var(--txt2);font-size:15px;padding-left:22px}.pg ol li{margin:5px 0}
+  .pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}
+  .pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}
+  .pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
+  .pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}
+  .pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}
+  .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
+  .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
   .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
   [data-lang]{display:none}
 </style>
@@ -159,7 +276,7 @@ ${headStyle}
 </div>
 <div class="wrap">
   <article class="pg">
-    <p class="crumb"><a href="/">Radar Perene</a> / <span data-lang="pt">${esc(slug.replace("lentes/", "lente "))}</span><span data-lang="en">${esc(slug.replace("lentes/", "lens "))}</span></p>
+    <p class="crumb"><a href="/">Radar Perene</a> / <span data-lang="pt">${esc(crumbLabel(p.slug, false))}</span><span data-lang="en">${esc(crumbLabel(p.slug, true))}</span></p>
     <div data-lang="pt">
       <h1>${esc(pt.h1)}</h1>
       ${pt.bodyHtml}
@@ -181,40 +298,55 @@ ${headStyle}
   document.documentElement.lang=en?"en":"pt-BR";
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  ["m-desc","og-t","og-d"].forEach(function(id){var e=document.getElementById(id);});
-  var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),T2=document.querySelector("title");
-  if(en){if(d)d.content="${esc(en.desc)}";if(ot)ot.content="${esc(en.title)}";if(od)od.content="${esc(en.desc)}";}
-  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname.replace(/\\/$/,"")||location.origin+location.pathname;
+  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
+    if(d)d.content="${esc(dEn)}";if(ot)ot.content="${esc(tEn)}";if(od)od.content="${esc(dEn)}";}
+  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>
 </body>
 </html>`;
-  const dir = join(ROOT, slug);
+  const dir = join(ROOT, p.slug);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), html);
-  return { slug, ptTitle: pt.title, enTitle: en.title, h1: pt.h1, paras: (pt.bodyHtml.match(/<p>/g) || []).length };
+  out.push({ slug: p.slug, title: tPt, enTitle: tEn, h1: pt.h1, desc: dPt, descEn: dEn, paras: (pt.bodyHtml.match(/<p>/g) || []).length, tables: (pt.bodyHtml.match(/<table/g) || []).length });
 }
 
-const results = PAGES.map((p) => page(p.slug, p.sec, p.type));
+for (const p of PAGES) page(p);
 
-// --- sitemap.xml: home + 9 páginas em AMBOS domínios (mesma rota, língua por hostname) + hreflang ---
-const LASTMOD = "2026-06-03";
+// ─── sitemap.xml: home + /sobre + /about + todas as PAGES, em AMBOS domínios, com hreflang. TUDO com trailing slash p/ diretórios. ───
+const LASTMOD = "2026-06-04";
 const su = (loc, alt, freq, pri) => `<url><loc>${loc}</loc>${alt}<lastmod>${LASTMOD}</lastmod><changefreq>${freq}</changefreq><priority>${pri}</priority></url>`;
-const aboutAlt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/sobre"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/about"/>`;
+const aboutAlt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/sobre"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/about"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com/about"/>`;
 const rows = [
-  su("https://radarperene.com/", `<xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/"/><xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/"/>`, "daily", "1.0"),
-  su("https://radarperene.com.br/", `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/"/>`, "daily", "1.0"),
-  // /sobre + /about hand-built (não gerados aqui)
+  su("https://radarperene.com/", `<xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/"/><xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com/"/>`, "daily", "1.0"),
+  su("https://radarperene.com.br/", `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com/"/>`, "daily", "1.0"),
   su("https://radarperene.com.br/sobre", aboutAlt, "monthly", "0.8"),
   su("https://radarperene.com/about", aboutAlt, "monthly", "0.8"),
 ];
+// /ativos — hub de ativos (worker-served, 1 rota/2 domínios). De-orfaniza as /ativo; em sitemap separado p/ as folhas (/sitemap-ativos.xml).
+const ativosAlt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/ativos"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/ativos"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com/ativos"/>`;
+rows.push(su("https://radarperene.com/ativos", ativosAlt, "daily", "0.6"));
+rows.push(su("https://radarperene.com.br/ativos", ativosAlt, "daily", "0.6"));
 for (const p of PAGES) {
-  const path = "/" + p.slug;
-  const altEn = `<xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com${path}"/><xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}"/>`;
-  rows.push(su(`https://radarperene.com${path}`, altEn, "monthly", "0.8"));
-  rows.push(su(`https://radarperene.com.br${path}`, altEn, "monthly", "0.8"));
+  const path = "/" + p.slug + "/";
+  const pri = p.type === "metodo" || p.type === "lentes" || p.type === "guia" ? "0.8" : (p.type === "conceito" ? "0.7" : "0.7");
+  const alt = `<xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com${path}"/><xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com${path}"/>`;
+  rows.push(su(`https://radarperene.com${path}`, alt, "monthly", pri));
+  rows.push(su(`https://radarperene.com.br${path}`, alt, "monthly", pri));
 }
 writeFileSync(join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${rows.join("\n")}\n</urlset>\n`);
+
+// ─── relatório + validação de limites SEO (title ≤ 60 ideal/≤65 ok · description ≤ 160) ───
 console.log("✓ sitemap.xml:", rows.length, "URLs");
-console.log("Blocos parseados:", Object.keys(BLOCKS).length);
-for (const r of results) console.log(`  ✓ /${r.slug.padEnd(22)} pt:"${(r.h1 || "??").slice(0, 30)}" ${r.paras}p ${r.ptTitle ? "" : "⚠ SEM TITLE"}${r.enTitle ? "" : " ⚠ SEM EN"}`);
+console.log("✓ blocos: Burst1", Object.keys(BLOCKS[1]).length, "· Burst2", Object.keys(BLOCKS[2]).length);
+let warn = 0;
+for (const r of out) {
+  const tl = r.title.length, dl = r.desc.length, el = r.enTitle.length, edl = r.descEn.length;
+  const w = [];
+  if (!r.title) w.push("SEM TITLE pt"); if (!r.enTitle) w.push("SEM TITLE en");
+  if (tl > 65) w.push(`title pt ${tl}c`); if (el > 65) w.push(`title en ${el}c`);
+  if (dl > 160) w.push(`desc pt ${dl}c`); if (edl > 160) w.push(`desc en ${edl}c`);
+  if (w.length) warn++;
+  console.log(`  ${w.length ? "⚠" : "✓"} /${r.slug.padEnd(40)} ${r.paras}p ${r.tables}tb · t${tl}/${el} d${dl}/${edl}${w.length ? "  ← " + w.join(", ") : ""}`);
+}
+console.log(warn ? `\n⚠ ${warn} página(s) acima dos limites — revisar` : "\n✓ todos os títulos/descrições dentro dos limites");

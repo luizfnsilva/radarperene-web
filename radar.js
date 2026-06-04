@@ -498,6 +498,9 @@
       if (!ov.ma200) sv.ma200 = null;
       if (!ov.ma50) sv.ma50 = null;
       if (!ov.bands) sv.bands = null;
+      // plugins (Bollinger etc.) ligados → computa e injeta p/ o upPrice desenhar como séries de linha (paridade com o SVG)
+      sv._plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); })
+        .map(function (l) { return { id: l.id, data: l.compute(s.hist) }; });
       if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
       _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid });
       return _upInst;
@@ -527,12 +530,10 @@
       }
       curHist = i0 ? s.hist.slice(i0) : s.hist; winStart = i0;
       rbtn.style.display = "none";
-      if (useUp) {  // uPlot: período = setScale("x") no range de datas; MAX = re-render (range completo). uPlot NÃO aceita setScale(x,null) → crash.
-        var fresh = (!_upInst || !_upInst.root || !_upInst.root.isConnected);
-        if (fresh) drawUp(chartEl);  // (re)cria — auto-range já inclui hist+futuro
-        if (_upInst && m) { var mn = tsAt(i0), mx = tsAt(s.hist.length - 1);  // janela: zoom, com folga à direita p/ o cone
+      if (useUp) {  // uPlot: SEMPRE re-desenha honrando o estado atual dos overlays (ov) — senão toggle de overlay em período finito (6M/1A/3A) era ignorado (só setScale). Depois aplica a janela.
+        drawUp(chartEl);  // (re)cria com os overlays atuais — auto-range já inclui hist+futuro
+        if (_upInst && m) { var mn = tsAt(i0), mx = tsAt(s.hist.length - 1);  // janela: zoom, com folga à direita p/ o cone (uPlot NÃO aceita setScale(x,null) → crash; por isso só quando m≠0)
           if (mn != null && mx != null) _upInst.setScale("x", { min: mn, max: mx + (mx - mn) * 0.18 }); }
-        else if (_upInst && !m && !fresh) drawUp(chartEl);  // voltou pro MAX após zoom → re-render pro range completo
         return;
       }
       paint(curHist, true);

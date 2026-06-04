@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-pt="Lente Eleitoral — leitura do calendário regulatório-eleitoral brasileiro" data-en="Electoral Lens — Brazil's electoral-regulatory cycle read as data">Lente Eleitoral — leitura do calendário regulatório-eleitoral brasileiro</title>
+<title data-pt="Lente Eleitoral — calendário regulatório-eleitoral do Brasil" data-en="Electoral Lens — Brazil's electoral-regulatory cycle read as data">Lente Eleitoral — calendário regulatório-eleitoral do Brasil</title>
 <meta name="description" id="m-desc" content="Trajetória de candidaturas, financiamento, prestação de contas, propaganda e julgamento eleitoral, em janelas curtas e convergência de fontes do TSE e STF.">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="article">
-<meta property="og:title" id="og-t" content="Lente Eleitoral — leitura do calendário regulatório-eleitoral brasileiro">
+<meta property="og:title" id="og-t" content="Lente Eleitoral — calendário regulatório-eleitoral do Brasil">
 <meta property="og:description" id="og-d" content="Trajetória de candidaturas, financiamento, prestação de contas, propaganda e julgamento eleitoral, em janelas curtas e convergência de fontes do TSE e STF.">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/lentes/eleitoral">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/lentes/eleitoral">
-<link rel="alternate" hreflang="en" href="https://radarperene.com/lentes/eleitoral">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com/lentes/eleitoral">
+<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/lentes/eleitoral/">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/lentes/eleitoral/">
+<link rel="alternate" hreflang="en" href="https://radarperene.com/lentes/eleitoral/">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com/lentes/eleitoral/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -122,14 +122,19 @@
 <style>
   .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
   .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}
-  .pg h2.sec{margin-top:30px}
+  .pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}
+  .pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}
   .pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}
-  .pg .rel{font-size:13px;color:var(--dim)}
+  .pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}
   .pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}
-  .pg .methodnote{font-size:12.5px;color:var(--dim);font-style:italic;border-left:2px solid var(--gold);padding-left:11px}
   .pg .ctarow{margin:22px 0 6px}
-  .pg .bullet{margin:0 0 4px;font-size:14.5px}
-  .pg ol{color:var(--txt2);font-size:15px;padding-left:22px}.pg ol li{margin:5px 0}
+  .pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}
+  .pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}
+  .pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
+  .pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}
+  .pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}
+  .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
+  .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
   .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
   [data-lang]{display:none}
 </style>
@@ -149,24 +154,24 @@
       <h1>Lente Eleitoral</h1>
       <p>A Lente Eleitoral lê o ciclo regulatório das disputas — candidaturas, financiamento, prestação de contas, propaganda, julgamento. Janelas mais curtas que as demais lentes; convergência rápida; ciclos amarrados ao calendário oficial. O motor lê o TSE, o STF, atos do Congresso e a movimentação dos partidos, e devolve a trajetória dentro do tempo eleitoral, não fora dele.</p>
 <h2 class="sec">Estado atual da lente</h2>
-<p class="livestate">Ao vivo no app (fundadores): [Stress regulatório: —] · [Convergência: — fontes nas últimas —] · [Janela: —] · [Confiança: —]</p>
+<p class="livestate">[Stress regulatório: —] · [Convergência: — fontes nas últimas —] · [Janela: —] · [Confiança: —]</p>
 <h2 class="sec">O que esta lente cobre</h2>
 <p>Cinco recortes: candidaturas e inelegibilidades, financiamento de campanha, prestação de contas, propaganda eleitoral, julgamentos do TSE/STF. As janelas, em vetores eleitorais, são curtas — semanas, não trimestres — porque o calendário pressiona; o motor calibra sua leitura ao ciclo de 2026 e revisa em cada janela.</p>
 <h2 class="sec">Como o Perene lê esta lente</h2>
 <p>O scoring eleitoral prioriza janelas curtas e fontes oficiais. O TSE e o STF têm peso máximo; veículos de imprensa entram como sinal de eco, não como fonte primária. A confiança contextual é gateada pelo histórico real (gate R1) — em períodos de baixa densidade, a tela mostra &quot;em calibração&quot;.</p>
-<p class="rel">Conceitos: Janela temporal · Convergência de fontes</p>
+<p class="rel">Conceitos: <a href="/conceitos/janela-temporal/">Janela temporal</a> · <a href="/conceitos/convergencia/">Convergência de fontes</a></p>
 <p class="ctarow"><a class="btn" href="/#fundadores">Acessar a Lente Eleitoral completa · R$ 149/mês</a></p>
     </div>
     <div data-lang="en">
       <h1>Electoral Lens</h1>
       <p>The Electoral Lens reads the regulatory cycle of Brazilian elections — candidacies, campaign finance, accounting, advertising, rulings. Shorter windows than the other lenses; faster convergence; cycles bound to the official calendar. The engine reads the TSE, the STF, acts of Congress, and party-level movement, and returns the trajectory within electoral time, not outside it.</p>
 <h2 class="sec">Lens — current state</h2>
-<p class="livestate">Live in the app (founders): [Regulatory stress: —] · [Convergence: — sources in the last —] · [Window: —] · [Confidence: —]</p>
+<p class="livestate">[Regulatory stress: —] · [Convergence: — sources in the last —] · [Window: —] · [Confidence: —]</p>
 <h2 class="sec">What this lens covers</h2>
 <p>Five slices: candidacies and ineligibilities, campaign finance, accounting, electoral advertising, TSE/STF rulings. Windows in electoral vectors are short — weeks, not quarters — because the calendar presses; the engine calibrates its reading to the 2026 cycle and revises with each window.</p>
 <h2 class="sec">How Perene reads this lens</h2>
 <p>Electoral scoring favors short windows and official sources. TSE and STF carry maximum weight; press carries echo signal, not primary status. Contextual confidence is gated by real history (R1 gate) — in periods of low density, the screen shows &quot;in calibration.&quot;</p>
-<p class="rel">Concepts: Context window · Source convergence</p>
+<p class="rel">Concepts: <a href="/conceitos/context-window/">Context window</a> · <a href="/conceitos/convergence/">Source convergence</a></p>
 <p class="ctarow"><a class="btn" href="/#fundadores">Unlock the Electoral Lens · US$ 149/mo</a></p>
     </div>
   </article>
@@ -182,10 +187,9 @@
   document.documentElement.lang=en?"en":"pt-BR";
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  ["m-desc","og-t","og-d"].forEach(function(id){var e=document.getElementById(id);});
-  var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),T2=document.querySelector("title");
-  if(en){if(d)d.content="Trajectory of candidacies, campaign finance, accounting, advertising, and electoral rulings, in short windows with source convergence from TSE and STF.";if(ot)ot.content="Electoral Lens — Brazil's electoral-regulatory cycle read as data";if(od)od.content="Trajectory of candidacies, campaign finance, accounting, advertising, and electoral rulings, in short windows with source convergence from TSE and STF.";}
-  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname.replace(/\/$/,"")||location.origin+location.pathname;
+  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
+    if(d)d.content="Trajectory of candidacies, campaign finance, accounting, advertising, and electoral rulings, in short windows with source convergence from TSE and STF.";if(ot)ot.content="Electoral Lens — Brazil's electoral-regulatory cycle read as data";if(od)od.content="Trajectory of candidacies, campaign finance, accounting, advertising, and electoral rulings, in short windows with source convergence from TSE and STF.";}
+  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>
 </body>

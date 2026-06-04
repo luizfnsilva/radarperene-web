@@ -41,3 +41,5 @@ Sitemap: https://radarperene.com/sitemap-ativos.xml
 Sitemap: https://radarperene.com.br/sitemap-ativos.xml
 Sitemap: https://radarperene.com/sitemap-indicadores.xml
 Sitemap: https://radarperene.com.br/sitemap-indicadores.xml
+Sitemap: https://radarperene.com/sitemap-snapshots.xml
+Sitemap: https://radarperene.com.br/sitemap-snapshots.xml

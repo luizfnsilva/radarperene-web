@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-pt="Metodologia do Radar Perene — como o motor lê o Brasil regulatório" data-en="Radar Perene methodology — how the engine reads regulated Brazil">Metodologia do Radar Perene — como o motor lê o Brasil regulatório</title>
-<meta name="description" id="m-desc" content="O método por trás das cinco lentes e da Lente Vértice. Coleta, classificação, scoring, convergência, gate temporal, confiança contextual e Doutrina de Intermercado BR.">
+<title data-pt="Metodologia do Radar Perene — regime e percentil histórico" data-en="Radar Perene methodology — regime &amp; historical percentile">Metodologia do Radar Perene — regime e percentil histórico</title>
+<meta name="description" id="m-desc" content="O método de leitura de regimes do Radar Perene: o que medimos, como interpretamos percentis, quais limitações declaramos. Sem previsão, sem parecer.">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="article">
-<meta property="og:title" id="og-t" content="Metodologia do Radar Perene — como o motor lê o Brasil regulatório">
-<meta property="og:description" id="og-d" content="O método por trás das cinco lentes e da Lente Vértice. Coleta, classificação, scoring, convergência, gate temporal, confiança contextual e Doutrina de Intermercado BR.">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/metodologia">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/metodologia">
-<link rel="alternate" hreflang="en" href="https://radarperene.com/metodologia">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com/metodologia">
+<meta property="og:title" id="og-t" content="Metodologia do Radar Perene — regime e percentil histórico">
+<meta property="og:description" id="og-d" content="O método de leitura de regimes do Radar Perene: o que medimos, como interpretamos percentis, quais limitações declaramos. Sem previsão, sem parecer.">
+<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/metodologia/">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/metodologia/">
+<link rel="alternate" hreflang="en" href="https://radarperene.com/metodologia/">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com/metodologia/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -122,14 +122,19 @@
 <style>
   .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
   .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}
-  .pg h2.sec{margin-top:30px}
+  .pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}
+  .pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}
   .pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}
-  .pg .rel{font-size:13px;color:var(--dim)}
+  .pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}
   .pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}
-  .pg .methodnote{font-size:12.5px;color:var(--dim);font-style:italic;border-left:2px solid var(--gold);padding-left:11px}
   .pg .ctarow{margin:22px 0 6px}
-  .pg .bullet{margin:0 0 4px;font-size:14.5px}
-  .pg ol{color:var(--txt2);font-size:15px;padding-left:22px}.pg ol li{margin:5px 0}
+  .pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}
+  .pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}
+  .pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
+  .pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}
+  .pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}
+  .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
+  .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
   .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
   [data-lang]{display:none}
 </style>
@@ -146,68 +151,66 @@
   <article class="pg">
     <p class="crumb"><a href="/">Radar Perene</a> / <span data-lang="pt">metodologia</span><span data-lang="en">metodologia</span></p>
     <div data-lang="pt">
-      <h1>Como o cérebro funciona</h1>
-      <p>Esta página declara o método. Tudo o que aparece em qualquer lente do Radar Perene sai daqui. O texto é longo de propósito — porque o leitor sofisticado precisa enxergar a engrenagem antes de confiar nela.</p>
-<h2 class="sec">1. Coleta — fontes primárias antes de tudo</h2>
-<p>O cérebro coleta de fontes oficiais (STF, STJ, TSE, RFB, BCB, CVM, DOU, órgãos de controle, BCB SGS, ANBIMA, Tesouro Transparente) por RSS e API quando existe, e por coleta tipada quando não. Imprensa e agregadores entram com confiança menor — não como ruído a descartar, mas como confirmação a pesar. Toda fonte tem dois eixos: tipo do veículo (tribunal, órgão, autorregulador, imprensa, agregador) e tipo do documento (lei, ato, decisão, jurisprudência, notícia). O confiança_fonte é a multiplicação dos dois.</p>
-<p>Coleta de séries quantitativas roda em dry-run obrigatório antes de gravar — porque rótulo de série do SGS engana, e o Perene não finge dado. Cada série tem origem, unidade e escala validadas na própria API antes de aparecer em qualquer cálculo.</p>
-<h2 class="sec">2. Classificação — vetor + urgência + janela</h2>
-<p>Cada item é classificado em um vetor (V1–V5 Patrimonial, E1–E5 Eleitoral, M1–M6 Macro, I1–I6 Institucional, R1–R7 Imobiliário). A classificação combina keyword matching auditável com camada LLM controlada. A urgência é mais importante que o vetor — um item no vetor errado mas com urgência correta tem valor operacional; um item perfeitamente classificado com urgência errada tem valor zero.</p>
-<h2 class="sec">3. Scoring — fórmula declarada</h2>
-<p>score_base = urgencia × peso_vetor × confiança_fonte × relevância_p7 × temporal_weight</p>
-<p>O temporal_weight aplica decaimento exponencial calibrado por vetor. O score original é imutável. O score ajustado adiciona, **aditivamente e com teto**, bonificações por convergência (até +0.6) e por mudança de regime (até +0.4). Cap absoluto: +1.0. Nenhum item passa de 5.0 — porque score multiplicado quebra a escala e fabrica falsos URGENTE.</p>
-<h2 class="sec">4. Convergência — quando múltiplas fontes confirmam</h2>
-<p>O cérebro mede convergência por vetor em uma janela móvel (30 dias para vetores patrimoniais e institucionais, 14 dias para eleitorais e macro). Quando três ou mais fontes independentes de alta confiança confirmam o mesmo vetor, o sistema reconhece **regime shift em formação** — o sinal vale mais que a soma das partes.</p>
-<h2 class="sec">5. Gate temporal — sem cálculo sobre data sintética</h2>
-<p>O cérebro nunca apresenta tendência, regime, convergência ou forecasting calculados sobre `data_publicacao = data_coleta` (que indica data sintética de backfill). Esse é o gate R1 — invariante absoluto. Itens com data sintética aparecem no corpus como referência histórica, mas não entram em séries temporais. Quando a densidade real é insuficiente, a tela mostra &quot;em calibração&quot; e diz por quê.</p>
-<h2 class="sec">6. Confiança contextual — output categórico, nunca número</h2>
-<p>A confiança é a média ponderada de três dimensões: densidade (volume recente), convergência (fontes independentes) e historicidade (corpus total versus mínimo estatístico). O output é categórico: baixa, moderada, moderada-alta, alta. Nunca um número. O teto é honesto — corpus pequeno nunca exibe &quot;alta&quot;. Quando o cálculo daria &quot;alta&quot; mas o histórico não sustenta, o sistema mostra o cálculo + a calibração e segura na faixa anterior.</p>
-<h2 class="sec">7. Doutrina Perene de Intermercado BR — o terceiro eixo</h2>
-<p>Além de regime regulatório e risco global, o cérebro lê o intermercado brasileiro por sete razões patrimoniais ponderadas por market cap: Finanças/IBOV (22%) · Utilities/IBOV (18%) · Commodities/IBOV (16%) · IFIX/IBOV (14%) · Cíclico/Não-Cíclico (10%) · Café/Ouro (10%) · VALE/Ouro (10%). O score composto Risk-BR vai de 0 a 100 com bucketização editorial. Divergências entre os três eixos (regime regulatório × risco global × intermercado BR) são output editorial nobre — não erro.</p>
-<h2 class="sec">8. Forecasting contextual — trajetória, não ponto</h2>
-<p>O motor de trajetória combina OLS (mínimos quadrados), EWMA (média móvel exponencial) e detecção de mudança de regime. Output: trajetória (em formação, estável, acelerando, desacelerando), janela temporal (3, 6, 12 ou 24 meses), cenários (base, intensificação, propagação, reversão) e confiança. Quando o histórico real é menor que quatro meses, o motor não promove forecasting — mostra &quot;em calibração&quot;.</p>
-<h2 class="sec">9. Lente Vértice — motor separado, regras mais duras</h2>
-<p>A Lente Vértice é um produto premium isolado com motor próprio (`experimental.*`), cadência de quinze minutos no engine quantitativo e disparo cirúrgico de LLM apenas em gatilhos relevantes. Sob doze regras imutáveis: toda hipótese nasce de dado estruturado; toda hipótese tem evidências e contradições; toda hipótese declara o que a fortalece e o que a enfraquece; toda hipótese gera snapshot para avaliação futura; nenhum output experimental altera o núcleo sem validação humana.</p>
-<h2 class="sec" id="integridade">10. Princípios imutáveis de integridade</h2>
-<p>O Perene não finge confiança. O Perene não finge data. O Perene não finge fonte. O Perene não finge previsão. Tendência, regime, convergência e forecasting nunca são calculados sobre data sintética. Sem histórico suficiente, a interface mostra estado de calibração. O score original é imutável; o ajustado é auditável. Fonte primária recebe tratamento diferenciado de imprensa, agregador e notícia. O produto descreve — nunca prescreve.</p>
-<h2 class="sec">FAQ</h2>
-<p>P: O Perene usa IA? R: Há uma camada técnica de linguagem (LLM) que organiza, classifica e narra os outputs do motor determinístico. A camada de inferência probabilística não é mística — é matemática declarada. A linguagem técnica para &quot;IA invisível&quot; descreve uma decisão de design (não vender &quot;IA&quot; como argumento), não opacidade de tratamento de dados.</p>
-<p>P: Por que vocês não dão recomendação de investimento? R: Porque consultoria jurídica, contábil e de investimento é privativa de profissional habilitado (OAB, CFC, CVM). Descrever regime regulatório e cruzamento de mercado é diferente de aconselhar a operar. O Perene faz a primeira; nunca a segunda.</p>
-<p>P: O que significa &quot;em calibração&quot;? R: Significa que o histórico real-dated do vetor ou da série é insuficiente para sustentar a métrica solicitada (tendência, regime, convergência). O sistema prefere admitir calibração a fabricar um número.</p>
-<p>P: Como o cone de quantis funciona? R: O cone agrega cenários por percentil sobre uma janela temporal, mostrando a faixa provável sob as condições atuais, com a banda explícita. É contexto probabilístico, não previsão pontual. A microcópia obrigatória ao lado de qualquer cone diz: &quot;projeção sob condições atuais — não é previsão de mercado&quot;.</p>
-<p>P: Posso usar a leitura do dia no meu site? R: Sim. O endpoint JSON é público e o widget é embedável, gratuitos. Cite a fonte (radarperene.com.br) e a leitura atualiza sozinha.</p>
+      <h1>Metodologia</h1>
+      <p>Esta página é a âncora conceitual do site. Ela explica <strong>como o Radar lê</strong> o mercado brasileiro — não cada peça interna do motor (isso é o produto), mas o método pelo qual o motor opera e os princípios pelos quais ele se recusa a operar.</p>
+<h2 class="sec">O que é leitura de regime</h2>
+<p>Regime é o estado predominante do mercado em uma janela definida. O Radar opera sob a premissa de que <strong>indicadores isolados informam, mas é o regime que organiza</strong>. Um juro real elevado, sozinho, é um número. Um juro real elevado em percentil histórico no topo da faixa, dentro de um regime fiscal em deterioração, com intermercado defensivo e sentimento esticado — é uma leitura.</p>
+<p>A leitura de regime é categórica (defensivo, neutro, pró-risco), com escala auxiliar de 0–100 para distinguir intensidade. Ela não substitui a análise; ela <strong>enquadra</strong> a análise.</p>
+<h2 class="sec">Por que usamos percentis históricos</h2>
+<p>Um valor absoluto raramente diz muita coisa por si só. O que importa é onde aquele valor está em relação à sua própria distribuição histórica. Um ERP_BR de 5,5% é alto ou baixo? Depende de onde 5,5% cai no histórico do próprio ERP_BR brasileiro.</p>
+<p>Por isso, toda métrica relevante do Radar carrega percentil histórico declarado: <em>atualmente em percentil 85 — acima da média histórica</em>. Percentil traduz número absoluto em posição relativa, e posição relativa é o que sustenta a leitura de regime.</p>
+<p>A história usada é o regime monetário moderno do Brasil (de 2000 em diante). Antes do Real, a inflação distorce a estatística — usar a cauda hiperinflacionária empilhada com 2024 destrói o sinal. O Radar respeita essa fronteira.</p>
+<h2 class="sec">Por que indicadores isolados são insuficientes</h2>
+<p>Há três razões.</p>
+<p>Primeira: indicadores se contradizem. Juro real alto sinaliza atratividade; câmbio fraco sinaliza fragilidade; preços de commodity altos sinalizam ciclo. Sem um agregador, o leitor escolhe inconscientemente o que confirma sua tese — viés de confirmação maquiado de análise.</p>
+<p>Segunda: indicadores têm histórias diferentes. Selic em 14% em 2002 é diferente de Selic em 14% em 2024. O percentil contextualiza; o número absoluto não.</p>
+<p>Terceira: indicadores se influenciam. Câmbio e juro real se cruzam, fluxo estrangeiro e small caps se cruzam, prêmio de termo e fiscal se cruzam. Ler um isolado é desconsiderar a rede em que ele opera. O Radar lê em rede.</p>
+<h2 class="sec">Como combinamos as dimensões</h2>
+<p>O Radar lê três eixos ortogonais ao mesmo tempo:</p>
+<ul><li><strong>Regime regulatório brasileiro</strong> — o que está sendo escrito no STF, STJ, TSE, BCB, CVM, RFB, DOU, agências.</li><li><strong>Risco global</strong> — o ambiente externo (volatilidade, dólar, juros longos americanos, ouro, pares de câmbio defensivos).</li><li><strong>Intermercado brasileiro</strong> — razões patrimoniais BR-native (finanças, utilities, commodities, FIIs, cíclicos vs. defensivos, café/ouro, VALE/ouro) lidas em escala comparável.</li></ul>
+<p>Cada eixo gera uma leitura própria. <strong>Convergências entre eixos confirmam; divergências organizam a nuance.</strong> A frase-tese do produto vem desse cruzamento: o capital tende a se posicionar antes da manchete — significa, em termos operacionais, que o intermercado se move antes do regulatório, e o Radar lê os dois lados.</p>
+<p>A forma exata como os três eixos se combinam — pesos, gates, normalizações, cestas, filtros — é a engrenagem proprietária. Ela é declarada na arquitetura técnica para auditoria; não é exposta na superfície. A razão é simples: a engrenagem é o produto.</p>
+<h2 class="sec">Por que o Radar não é previsão</h2>
+<p>Previsão atribui certeza a um ponto futuro. <em>O Ibovespa fechará em 145 mil pontos no fim do ano.</em> Não é o que o Radar faz, e não é o que o leitor sofisticado precisa.</p>
+<p>O Radar opera em <strong>cenário condicional</strong>, não em previsão pontual. <em>Sob as condições atuais, em janelas históricas semelhantes, o índice se moveu entre X e Y em N dos M casos observados, em janela de K dias.</em> É uma frase mais longa porque carrega mais honestidade — e é a única que sobrevive ao escrutínio quando o cenário não se materializa.</p>
+<p>Cenário condicional é probabilístico, é falsificável, é auditável. Previsão pontual é literatura.</p>
+<h2 class="sec">Limitações do método</h2>
+<p>O método tem limites declarados. O leitor sofisticado lê essa seção antes de qualquer outra.</p>
+<ul><li><strong>Janela de regime moderno</strong>: a estatística de regime do Brasil começa em 2000. Antes do Real, a inflação distorce; o Radar não atravessa essa fronteira na normalização. Crises pré-2000 entram como referência qualitativa, não como ponto na distribuição.</li><li><strong>Calibração visível</strong>: quando o histórico real para uma métrica é insuficiente, a tela mostra &quot;em calibração&quot; e diz por quê. O Radar prefere admitir calibração a fabricar um número.</li><li><strong>Não substitui profissional</strong>: não emite parecer jurídico, contábil ou de investimento. Não recomenda comprar, vender, contratar ou estruturar. Isso é princípio técnico, não cautela comercial.</li><li><strong>Cobertura jurisprudencial</strong>: o motor cobre jurisprudência limpa a partir do RSS contínuo (atos pós-cobertura inicial). Retroativos profundos têm cobertura desigual — declarado explicitamente.</li><li><strong>Forecast contextual, não pontual</strong>: a janela é mostrada, os cenários são mostrados, mas o Radar nunca crava ponto.</li></ul>
+<h2 class="sec" id="integridade">Princípios imutáveis de integridade</h2>
+<ol><li>O Radar não finge confiança.</li><li>O Radar não finge data.</li><li>O Radar não finge fonte.</li><li>O Radar não finge previsão.</li><li>Tendência, regime, convergência e forecasting nunca são calculados sobre data sintética.</li><li>Sem histórico suficiente, a interface mostra estado de calibração.</li><li>Fonte primária recebe tratamento diferenciado de imprensa, agregador e notícia.</li><li>O produto descreve — nunca prescreve.</li></ol>
+<p class="closing">O Radar não transforma incerteza em certeza. Transforma ruído em contexto.</p>
     </div>
     <div data-lang="en">
-      <h1>How the engine works</h1>
-      <p>This page declares the method. Everything that appears on any Radar Perene lens originates here. The text is long on purpose — the sophisticated reader needs to see the gears before trusting them.</p>
-<h2 class="sec">1. Collection — primary sources before all else</h2>
-<p>The engine collects from official sources (STF, STJ, TSE, Federal Revenue, Central Bank, CVM, the Official Gazette, control bodies, BCB SGS series, ANBIMA, Treasury Direct) via RSS and API where available, and via typed scraping where not. Press and aggregators enter with lower confidence — not as noise to discard, but as confirmation to weigh. Every source has two axes: outlet type (court, agency, self-regulator, press, aggregator) and document type (law, act, ruling, case law, news). source_confidence is the product of both.</p>
-<p>Quantitative series collection runs a mandatory dry-run before write — because SGS series labels mislead, and Perene does not fake data. Every series has origin, unit, and scale validated against the API itself before reaching any calculation.</p>
-<h2 class="sec">2. Classification — vector + urgency + window</h2>
-<p>Each item is classified into a vector (V1–V5 Wealth, E1–E5 Electoral, M1–M6 Macro, I1–I6 Institutional, R1–R7 Real Estate). Classification combines auditable keyword matching with a controlled LLM layer. Urgency outweighs vector — an item in the wrong vector with the right urgency has operational value; a perfectly classified item with the wrong urgency has zero value.</p>
-<h2 class="sec">3. Scoring — declared formula</h2>
-<p>base_score = urgency × vector_weight × source_confidence × p7_relevance × temporal_weight</p>
-<p>temporal_weight applies exponential decay calibrated by vector. The original score is immutable. The adjusted score adds, **additively and capped**, bonuses for convergence (up to +0.6) and regime change (up to +0.4). Absolute cap: +1.0. No item passes 5.0 — multiplicative boosts break the scale and fabricate false URGENT items.</p>
-<h2 class="sec">4. Convergence — when multiple sources confirm</h2>
-<p>The engine measures convergence per vector across a rolling window (30 days for wealth and institutional vectors, 14 days for electoral and macro). When three or more independent high-confidence sources confirm the same vector, the system recognizes **regime shift forming** — the signal is worth more than the sum of its parts.</p>
-<h2 class="sec">5. Temporal gate — no computation on synthetic dates</h2>
-<p>The engine never displays trajectory, regime, convergence, or forecasting computed on `publication_date = collection_date` (which marks synthetic backfill dates). That is the R1 gate — an absolute invariant. Items with synthetic dates appear in the corpus as historical reference but never enter time series. When real density is insufficient, the screen shows &quot;in calibration&quot; and says why.</p>
-<h2 class="sec">6. Contextual confidence — categorical output, never a number</h2>
-<p>Confidence is the weighted average of three dimensions: density (recent volume), convergence (independent sources), and historicity (total corpus versus statistical minimum). The output is categorical: low, moderate, moderate-high, high. Never a number. The ceiling is honest — a small corpus never displays &quot;high.&quot; When the calculation would yield &quot;high&quot; but history does not sustain it, the system shows the calculation plus the calibration and holds at the prior band.</p>
-<h2 class="sec">7. Perene Intermarket Doctrine — the third axis</h2>
-<p>Beyond regulatory regime and global risk, the engine reads Brazilian intermarket via seven wealth-sector ratios weighted by market cap: Finance/IBOV (22%) · Utilities/IBOV (18%) · Commodities/IBOV (16%) · REITs/IBOV (14%) · Cyclical/Non-Cyclical (10%) · Coffee/Gold (10%) · VALE/Gold (10%). The composite Risk-BR score runs 0–100 with editorial bucketing. Divergences between the three axes (regulatory regime × global risk × Brazilian intermarket) are editorially noble — not error.</p>
-<h2 class="sec">8. Contextual forecasting — trajectory, not point</h2>
-<p>The trajectory engine combines OLS, EWMA, and regime-change detection. Output: trajectory (forming, stable, accelerating, decelerating), context window (3, 6, 12, or 24 months), scenarios (base, intensification, propagation, reversal), and confidence. When real history is below four months, the engine does not promote forecasting — it shows &quot;in calibration.&quot;</p>
-<h2 class="sec">9. Lente Vértice — separate engine, harder rules</h2>
-<p>Lente Vértice is a premium product isolated with its own engine (`experimental.*`), fifteen-minute cadence on the quantitative side and surgical LLM dispatch only on relevant triggers. Under twelve immutable rules: every hypothesis is born from structured data; every hypothesis carries evidence and contradictions; every hypothesis declares what strengthens and what weakens it; every hypothesis generates a snapshot for future evaluation; no experimental output alters the core without human validation.</p>
-<h2 class="sec" id="integrity">10. Immutable principles of integrity</h2>
-<p>Perene does not fake confidence. Perene does not fake dates. Perene does not fake sources. Perene does not fake forecasts. Trajectory, regime, convergence, and forecasting are never computed on synthetic dates. Without enough history, the interface shows calibration state. The original score is immutable; the adjusted score is auditable. Primary sources are treated differently from press, aggregators, and news. The product describes — it never prescribes.</p>
-<h2 class="sec">FAQ</h2>
-<p>Q: Does Perene use AI? A: There is a technical language layer (LLM) that organizes, classifies, and narrates the outputs of the deterministic engine. The probabilistic-inference layer is not mystical — it is declared mathematics. The technical phrase &quot;invisible AI&quot; describes a design decision (not selling &quot;AI&quot; as a sales argument), not opacity in data handling.</p>
-<p>Q: Why no investment recommendations? A: Because legal, accounting, and investment advice is the regulated activity of licensed professionals. Describing a regulatory regime and a market crossing is different from advising a trade. Perene does the first; never the second.</p>
-<p>Q: What does &quot;in calibration&quot; mean? A: It means the real-dated history of the vector or series is insufficient to sustain the requested metric (trajectory, regime, convergence). The system prefers to admit calibration over fabricating a number.</p>
-<p>Q: How does the quantile cone work? A: The cone aggregates scenarios by percentile across a context window, showing the probable range under current conditions with the band explicit. It is probabilistic context, not point forecast. Mandatory microcopy beside any cone reads: &quot;projection under current conditions — not a market forecast.&quot;</p>
-<p>Q: Can I use today's reading on my site? A: Yes. The JSON endpoint is public and the widget is embeddable, both free. Cite the source (radarperene.com) and the reading refreshes on its own.</p>
+      <h1>Methodology</h1>
+      <p>This page is the conceptual anchor of the site. It explains <strong>how the Radar reads</strong> the Brazilian market — not each internal gear of the engine (that is the product), but the method by which the engine operates and the principles by which it refuses to operate.</p>
+<h2 class="sec">What regime reading means</h2>
+<p>A regime is the prevailing state of the market over a defined window. The Radar operates on the premise that <strong>isolated indicators inform, but the regime organizes</strong>. A high real rate, on its own, is a number. A high real rate at the top of its own historical percentile, within a deteriorating fiscal regime, with defensive intermarket and stretched sentiment — is a reading.</p>
+<p>The regime reading is categorical (defensive, neutral, pro-risk), with a 0–100 auxiliary scale for intensity. It does not replace analysis; it <strong>frames</strong> analysis.</p>
+<h2 class="sec">Why we use historical percentile</h2>
+<p>An absolute value rarely says much on its own. What matters is where that value sits within its own historical distribution. Is ERP_BR at 5.5% high or low? It depends on where 5.5% falls in the historical distribution of Brazil's own ERP_BR.</p>
+<p>For that reason, every relevant Radar metric carries a declared historical percentile: <em>currently at the 85th percentile — above historical average</em>. The percentile translates absolute number into relative position, and relative position is what sustains regime reading.</p>
+<p>The history used is Brazil's modern monetary regime (2000 onward). Before the Real, inflation distorts the statistics — stacking the hyperinflation tail against 2024 destroys the signal. The Radar respects that boundary.</p>
+<h2 class="sec">Why isolated indicators are insufficient</h2>
+<p>Three reasons.</p>
+<p>First: indicators contradict each other. High real rates signal attractiveness; weak FX signals fragility; high commodity prices signal cycle. Without aggregation, the reader unconsciously picks what confirms the prior — confirmation bias dressed as analysis.</p>
+<p>Second: indicators have different histories. Selic at 14% in 2002 is not Selic at 14% in 2024. Percentile contextualizes; the absolute number does not.</p>
+<p>Third: indicators influence each other. FX and real rates cross. Foreign flow and small caps cross. Term premium and fiscal cross. Reading one in isolation discards the network in which it operates. The Radar reads networked.</p>
+<h2 class="sec">How we combine the dimensions</h2>
+<p>The Radar reads three orthogonal axes simultaneously:</p>
+<ul><li><strong>Brazilian regulatory regime</strong> — what is being written at the STF, STJ, TSE, Central Bank, CVM, Federal Revenue, the Official Gazette, the agencies.</li><li><strong>Global risk</strong> — the external environment (volatility, dollar, US long rates, gold, defensive FX pairs).</li><li><strong>Brazilian intermarket</strong> — BR-native wealth-sector ratios (finance, utilities, commodities, REITs, cyclical vs. defensive, coffee/gold, VALE/gold) read on a comparable scale.</li></ul>
+<p>Each axis generates its own reading. <strong>Convergences across axes confirm; divergences organize nuance.</strong> The product's thesis sentence comes from that crossing: capital tends to position before the headline — operationally, this means intermarket moves before regulatory, and the Radar reads both sides.</p>
+<p>The exact way the three axes combine — weights, gates, normalizations, baskets, filters — is the proprietary gearing. It is declared inside the technical architecture for audit; it is not exposed on the surface. The reason is simple: the gearing is the product.</p>
+<h2 class="sec">Why the Radar is not a forecast</h2>
+<p>A forecast assigns certainty to a future point. <em>The Ibovespa will close at 145,000 by year-end.</em> That is not what the Radar does, and it is not what the sophisticated reader needs.</p>
+<p>The Radar operates in <strong>conditional scenario</strong>, not point forecast. <em>Under current conditions, in historically similar windows, the index moved between X and Y in N of M observed cases, over a K-day window.</em> It is a longer sentence because it carries more honesty — and it is the only one that survives scrutiny when the scenario does not materialize.</p>
+<p>A conditional scenario is probabilistic, falsifiable, auditable. A point forecast is literature.</p>
+<h2 class="sec">Limits of the method</h2>
+<p>The method has declared limits. The sophisticated reader reads this section before any other.</p>
+<ul><li><strong>Modern regime window</strong>: regime statistics for Brazil start in 2000. Before the Real, inflation distorts; the Radar does not cross that boundary in normalization. Pre-2000 crises enter as qualitative reference, not as distribution points.</li><li><strong>Visible calibration</strong>: when real history for a metric is insufficient, the screen shows &quot;in calibration&quot; and says why. The Radar prefers to admit calibration over fabricating a number.</li><li><strong>Does not replace a professional</strong>: it does not issue legal, accounting, or investment advice. It does not recommend buying, selling, hiring, or restructuring. That is technical principle, not commercial caution.</li><li><strong>Case-law coverage</strong>: the engine covers clean case law from continuous RSS onward (acts after initial coverage). Deep retroactive coverage is uneven — declared explicitly.</li><li><strong>Contextual forecasting, not point</strong>: the window is shown, the scenarios are shown, but the Radar never nails a point.</li></ul>
+<h2 class="sec" id="integrity">Immutable principles of integrity</h2>
+<ol><li>The Radar does not fake confidence.</li><li>The Radar does not fake dates.</li><li>The Radar does not fake sources.</li><li>The Radar does not fake forecasts.</li><li>Trajectory, regime, convergence, and forecasting are never computed on synthetic dates.</li><li>Without enough history, the interface shows calibration state.</li><li>Primary sources are treated differently from press, aggregators, and news.</li><li>The product describes — it never prescribes.</li></ol>
+<p class="closing">The Radar does not turn uncertainty into certainty. It turns noise into context.</p>
     </div>
   </article>
 </div>
@@ -222,10 +225,9 @@
   document.documentElement.lang=en?"en":"pt-BR";
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  ["m-desc","og-t","og-d"].forEach(function(id){var e=document.getElementById(id);});
-  var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),T2=document.querySelector("title");
-  if(en){if(d)d.content="The method behind the five lenses and Lente Vértice. Collection, classification, scoring, convergence, temporal gate, contextual confidence, and the Intermarket Doctrine.";if(ot)ot.content="Radar Perene methodology — how the engine reads regulated Brazil";if(od)od.content="The method behind the five lenses and Lente Vértice. Collection, classification, scoring, convergence, temporal gate, contextual confidence, and the Intermarket Doctrine.";}
-  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname.replace(/\/$/,"")||location.origin+location.pathname;
+  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
+    if(d)d.content="The method behind Radar Perene's regime reading: what we measure, how we read percentiles, which limits we declare. No forecast, no advice.";if(ot)ot.content="Radar Perene methodology — regime &amp; historical percentile";if(od)od.content="The method behind Radar Perene's regime reading: what we measure, how we read percentiles, which limits we declare. No forecast, no advice.";}
+  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>
 </body>

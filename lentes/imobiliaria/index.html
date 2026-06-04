@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-pt="Lente Imobiliária — regulação imobiliária, FIIs, crédito e SINAPI no Brasil" data-en="Real Estate Lens — Brazilian real estate regulation, REITs, and credit">Lente Imobiliária — regulação imobiliária, FIIs, crédito e SINAPI no Brasil</title>
+<title data-pt="Lente Imobiliária — regulação, FIIs, crédito e SINAPI" data-en="Real Estate Lens — Brazil's property regulation &amp; REITs">Lente Imobiliária — regulação, FIIs, crédito e SINAPI</title>
 <meta name="description" id="m-desc" content="Trajetória regulatória de imóveis, FIIs, crédito imobiliário, índices SINAPI/FipeZap e ratio IFIX/IBOV. Leitura intermercado com a cesta IMOB do Brasil.">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="article">
-<meta property="og:title" id="og-t" content="Lente Imobiliária — regulação imobiliária, FIIs, crédito e SINAPI no Brasil">
+<meta property="og:title" id="og-t" content="Lente Imobiliária — regulação, FIIs, crédito e SINAPI">
 <meta property="og:description" id="og-d" content="Trajetória regulatória de imóveis, FIIs, crédito imobiliário, índices SINAPI/FipeZap e ratio IFIX/IBOV. Leitura intermercado com a cesta IMOB do Brasil.">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/lentes/imobiliaria">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/lentes/imobiliaria">
-<link rel="alternate" hreflang="en" href="https://radarperene.com/lentes/imobiliaria">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com/lentes/imobiliaria">
+<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br/lentes/imobiliaria/">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/lentes/imobiliaria/">
+<link rel="alternate" hreflang="en" href="https://radarperene.com/lentes/imobiliaria/">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com/lentes/imobiliaria/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -122,14 +122,19 @@
 <style>
   .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
   .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}
-  .pg h2.sec{margin-top:30px}
+  .pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}
+  .pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}
   .pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}
-  .pg .rel{font-size:13px;color:var(--dim)}
+  .pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}
   .pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}
-  .pg .methodnote{font-size:12.5px;color:var(--dim);font-style:italic;border-left:2px solid var(--gold);padding-left:11px}
   .pg .ctarow{margin:22px 0 6px}
-  .pg .bullet{margin:0 0 4px;font-size:14.5px}
-  .pg ol{color:var(--txt2);font-size:15px;padding-left:22px}.pg ol li{margin:5px 0}
+  .pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}
+  .pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}
+  .pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
+  .pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}
+  .pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}
+  .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
+  .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
   .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
   [data-lang]{display:none}
 </style>
@@ -149,24 +154,24 @@
       <h1>Lente Imobiliária</h1>
       <p>A Lente Imobiliária lê o eixo do imóvel brasileiro — regulação setorial, crédito, FIIs, índices, valuation. Cruza com a cesta IMOB do intermercado (18 constituintes) e com o ratio IFIX/IBOV. Sinais de crédito imobiliário, SINAPI e FipeZap entram como séries primárias quando há dado real-dated.</p>
 <h2 class="sec">Estado atual da lente</h2>
-<p class="livestate">Ao vivo no app (fundadores): [Stress regulatório: —] · [Razão IFIX/IBOV: —] · [Convergência: — fontes] · [Janela: —] · [Confiança: —]</p>
+<p class="livestate">[Stress regulatório: —] · [Razão IFIX/IBOV: —] · [Convergência: — fontes] · [Janela: —] · [Confiança: —]</p>
 <h2 class="sec">O que esta lente cobre</h2>
 <p>Sete recortes: regulação setorial, crédito imobiliário, mercado de FIIs, índices e valuation (FipeZap, SINAPI), legislação urbana, ITBI/ITCI municipal, e cruzamento intermercado IMOB. A lente lê tanto o terreno regulatório quanto o sinal de mercado — o IFIX e a cesta IMOB ajudam a calibrar onde o capital está se posicionando antes do regulatório se mover.</p>
 <h2 class="sec">Como o Perene lê esta lente</h2>
 <p>A leitura imobiliária mistura regulatório com mercado mais intensamente que as outras lentes — porque o ciclo imobiliário é precificado por capital quase antes de virar política pública. O motor reconhece dois biases declarados na cesta IMOB (look-ahead de pesos e sobrevivência de constituintes) e mantém o sinal direcional preservado.</p>
-<p class="rel">Conceitos: Doutrina Perene de Intermercado BR · Convergência de fontes</p>
+<p class="rel">Conceitos: <a href="/conceitos/doutrina-intermercado/">Doutrina Perene de Intermercado BR</a> · <a href="/conceitos/convergencia/">Convergência de fontes</a></p>
 <p class="ctarow"><a class="btn" href="/#fundadores">Acessar a Lente Imobiliária · R$ 149/mês</a></p>
     </div>
     <div data-lang="en">
       <h1>Real Estate Lens</h1>
       <p>The Real Estate Lens reads Brazil's property axis — sectoral regulation, credit, REITs, indices, valuation. It cross-checks with the IMOB intermarket basket (18 constituents) and the IFIX/IBOV ratio. Mortgage credit signals, SINAPI, and FipeZap enter as primary series when real-dated data exists.</p>
 <h2 class="sec">Lens — current state</h2>
-<p class="livestate">Live in the app (founders): [Regulatory stress: —] · [IFIX/IBOV ratio: —] · [Convergence: — sources] · [Window: —] · [Confidence: —]</p>
+<p class="livestate">[Regulatory stress: —] · [IFIX/IBOV ratio: —] · [Convergence: — sources] · [Window: —] · [Confidence: —]</p>
 <h2 class="sec">What this lens covers</h2>
 <p>Seven slices: sectoral regulation, mortgage credit, the REIT market, indices and valuation (FipeZap, SINAPI), urban legislation, municipal property tax, and IMOB intermarket cross-checking. The lens reads both the regulatory terrain and the market signal — IFIX and the IMOB basket help calibrate where capital is positioning before regulation moves.</p>
 <h2 class="sec">How Perene reads this lens</h2>
 <p>Real estate reading mixes regulatory and market signals more intensely than the other lenses — the property cycle is priced by capital almost before it becomes public policy. The engine declares two biases in the IMOB basket (look-ahead weighting and survivor bias) and preserves directional signal accordingly.</p>
-<p class="rel">Concepts: Perene Intermarket Doctrine · Source convergence</p>
+<p class="rel">Concepts: <a href="/conceitos/intermarket-doctrine/">Perene Intermarket Doctrine</a> · <a href="/conceitos/convergence/">Source convergence</a></p>
 <p class="ctarow"><a class="btn" href="/#fundadores">Unlock the Real Estate Lens · US$ 149/mo</a></p>
     </div>
   </article>
@@ -182,10 +187,9 @@
   document.documentElement.lang=en?"en":"pt-BR";
   document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  ["m-desc","og-t","og-d"].forEach(function(id){var e=document.getElementById(id);});
-  var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),T2=document.querySelector("title");
-  if(en){if(d)d.content="Regulatory trajectory of real estate, REITs, mortgage credit, SINAPI/FipeZap indices, and IFIX/IBOV ratio. Intermarket reading with Brazil's IMOB basket.";if(ot)ot.content="Real Estate Lens — Brazilian real estate regulation, REITs, and credit";if(od)od.content="Regulatory trajectory of real estate, REITs, mortgage credit, SINAPI/FipeZap indices, and IFIX/IBOV ratio. Intermarket reading with Brazil's IMOB basket.";}
-  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname.replace(/\/$/,"")||location.origin+location.pathname;
+  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d");
+    if(d)d.content="Regulatory trajectory of real estate, REITs, mortgage credit, SINAPI/FipeZap indices, and IFIX/IBOV ratio. Intermarket reading with Brazil's IMOB basket.";if(ot)ot.content="Real Estate Lens — Brazil's property regulation &amp; REITs";if(od)od.content="Regulatory trajectory of real estate, REITs, mortgage credit, SINAPI/FipeZap indices, and IFIX/IBOV ratio. Intermarket reading with Brazil's IMOB basket.";}
+  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
   var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
 })();</script>
 </body>
