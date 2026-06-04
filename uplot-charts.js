@@ -300,7 +300,7 @@
       ctx.restore();
     }
 
-    var cursor = { points: { show: true }, focus: { prox: 24 } };
+    var cursor = { points: { show: true } };  // SEM focus: focus.prox destaca a linha da legenda, mas legend.show=false → addClass em elemento inexistente → crash na construção
     if (opt.sync) cursor.sync = { key: opt.sync }; // uPlot: cursor.sync.key compartilha crosshair entre charts
 
     var opts = {
