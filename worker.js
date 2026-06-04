@@ -137,9 +137,8 @@ function _renderDiarioDia(snap, date, origin, lang) {
     "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
     "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     verHtml +
-    (narr.resumo ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
+    (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +  // resumo só na reconstrução (é uma nota explicativa). No congelado, a lista linkada abaixo É a leitura — não repetir a mesma info com link e sem link (texto_html removido: duplicava resumo + cada indicador)
     "<ul>" + indHtml + "</ul>" +
-    (narr.texto_html ? "<div>" + narr.texto_html + "</div>" : "") +
     "<p class=\"foot\"><a href=\"/diario\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a></p>" +
     "<p class=\"nf\">" + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</p>" +
     "</body></html>";
