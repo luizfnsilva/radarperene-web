@@ -322,6 +322,49 @@
     return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0], mn: mn, mx: mx };
   }
 
+  // ── PAINEL DE TAXA-BASE (device estilo SentimenTrader): "em casos análogos, subiu em X% das vezes, mediana +Y% em 3/6/12m" ──
+  // P7: distribuição empírica de casos passados, NUNCA previsão/sinal de trade. Degrada se s.base_rate ausente/incompleto.
+  function baseRatePanel(br, L) {
+    if (!br || !br.h) return "";
+    var HS = [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]];
+    var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
+    var col = function (x) { return x == null ? "var(--_dim)" : x >= 0 ? "var(--_warm)" : "var(--_cool)"; };
+    var rows = "", bars = "";
+    for (var i = 0; i < HS.length; i++) {
+      var hk = HS[i][0], d = br.h[hk]; if (!d) continue;
+      var thin = (d.n == null || d.n < 8);  // GATE de amostra: < 8 casos = "amostra limitada", não destaca o hit
+      var hit = (d.hit == null || !isFinite(d.hit)) ? null : Math.round(d.hit);
+      var med = d.mediana, p25 = d.p25, p75 = d.p75;
+      // linha forte: hit% destacado · mediana com sinal · faixa p25…p75 · n casos
+      var hitTxt = (hit == null) ? "—" : (L ? "rose in " : "subiu em ") + '<b class="num" style="font-family:var(--_mono);color:' + (thin ? "var(--_dim)" : col(med)) + '">' + hit + '%</b>' + (L ? " of cases" : " dos casos");
+      var rng = (p25 != null && p75 != null) ? ' · <span class="num" style="font-family:var(--_mono);color:var(--_dim)">' + sgn(p25) + '…' + sgn(p75) + '</span>' : "";
+      var nTxt = (d.n != null) ? ' · <span style="color:var(--_dim)">' + d.n + (L ? " analogous cases" : " casos análogos") + '</span>' : "";
+      // comparação condicional vs incondicional (o valor real do device): só fonte=knn, se base[hX] existe
+      var vsBase = "";
+      if (br.fonte === "knn" && br.base && br.base[hk] != null && isFinite(br.base[hk])) {
+        vsBase = ' · <span style="color:var(--_dim)">' + (L ? "vs base " : "vs base ") + Math.round(br.base[hk]) + '%</span>';
+      }
+      var lim = thin ? ' <span style="color:var(--_dim)">(' + (L ? "limited sample" : "amostra limitada") + ')</span>' : "";
+      rows += '<div class="rp-ml" style="margin-top:4px"><b style="color:var(--_dim);font-family:var(--_mono)">' + hk + '</b> · ' + hitTxt +
+        ' · ' + (L ? "median " : "mediana ") + '<b style="color:' + (thin ? "var(--_dim)" : col(med)) + '">' + sgn(med) + '</b>' + rng + nTxt + vsBase + lim + '</div>';
+      // mini-histograma: barra horizontal de hit% (escala 0-100), reusando o padrão .bar/i
+      var w = (hit == null) ? 0 : Math.max(0, Math.min(100, hit));
+      var bc = thin ? "var(--_dim)" : (med != null && med < 0 ? "var(--_cool)" : "var(--_warm)");
+      bars += '<div style="display:flex;align-items:center;gap:7px;margin-top:5px"><span class="num" style="font-family:var(--_mono);font-size:9.5px;color:var(--_dim);width:22px;flex:none">' + hk + '</span>' +
+        '<div class="bar" style="flex:1;margin-top:0"><i style="width:' + w + '%;background:' + bc + '"></i></div>' +
+        '<span class="num" style="font-family:var(--_mono);font-size:9.5px;color:var(--_dim);width:26px;flex:none;text-align:right">' + (hit == null ? "—" : hit + "%") + '</span></div>';
+    }
+    if (!rows) return "";
+    var src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
+    var out = '<div class="rp-ml" style="margin-top:11px"><b>' + (L ? "BASE RATE · ANALOGOUS CASES" : "TAXA-BASE · CASOS ANÁLOGOS") + '</b>' +
+      (br.alvo ? ' · <span style="color:var(--_dim)">' + esc(br.alvo) + '</span>' : '') +
+      ' <span style="color:var(--_dim);opacity:.7">(' + src + ')</span></div>';
+    out += rows;
+    out += '<div style="margin-top:7px">' + bars + '</div>';
+    out += '<div class="rp-ml" style="opacity:.6;margin-top:6px">' + (L ? "empirical distribution of past analogous cases — not a forecast" : "distribuição de casos análogos passados — não é previsão") + '</div>';
+    return out;
+  }
+
   function openBig(s, title, meta, lang, fund, preCmp) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
     // O gráfico grande é a MAIOR isca → free SEMPRE abre (sem gate de abertura). O upsell vem das FEATURES gated
@@ -368,6 +411,7 @@
       else if (dmid != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "median " : "mediana ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go — not a forecast" : "pra onde costumou ir — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 full cone (p10–p90) + overlaid analogs in Founder" : "🔒 cone completo (p10–p90) + análogos sobrepostos no Founder") + '</span></div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
+    if (s.base_rate && s.base_rate.h) h += baseRatePanel(s.base_rate, L);  // taxa-base (casos análogos, estilo SentimenTrader) — logo após o cone/projeção
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       h += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : (L ? "Fair value (FASTgraphs) " : "Valor-justo (FASTgraphs) ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
     if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '<b>R$ ' + esc(s.dcf.iv) + '</b> · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (L ? "model from cash flow (growth " : "modelo do fluxo de caixa (cresc. ") + esc(s.dcf.g) + '% · ' + (L ? "discount " : "desconto ") + esc(s.dcf.r) + '%) — ' + (L ? "assumptions shown, not a forecast" : "premissas à mostra, não previsão") + '</div>';
