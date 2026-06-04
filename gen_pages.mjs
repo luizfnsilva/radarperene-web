@@ -10,10 +10,15 @@ import { dirname, join } from "node:path";
 
 const ROOT = dirname(new URL(import.meta.url).pathname);
 const RR = join(ROOT, "..", "RADAR-REGULATORIO");
-const COPY1 = readFileSync(join(RR, "SITE_COPY_BURST_1.md"), "utf8");
-const COPY2 = existsSync(join(RR, "SITE_COPY_BURST_2_CONCEITOS.md"))
-  ? readFileSync(join(RR, "SITE_COPY_BURST_2_CONCEITOS.md"), "utf8")
-  : readFileSync(join(RR, "_review_screenshots", "SITE_COPY_BURST_2_CONCEITOS.md"), "utf8");
+const burst = (name) => {  // procura na raiz do RR, depois em _review_screenshots; ausente → "" (gerador pula as páginas dessa fonte, preservando o HTML existente)
+  for (const p of [join(RR, name), join(RR, "_review_screenshots", name)]) if (existsSync(p)) return readFileSync(p, "utf8");
+  console.log(`  ⚠ fonte ausente: ${name} — páginas dessa fonte serão PULADAS (HTML preservado)`);
+  return "";
+};
+const COPY1 = burst("SITE_COPY_BURST_1.md");
+const COPY2 = burst("SITE_COPY_BURST_2_CONCEITOS.md");
+const COPY3 = burst("SITE_COPY_BURST_3_COMPLEMENTOS.md");   // home "linguagem"/"últimas leituras", /conceitos umbrella, diário, founder
+const COPY4 = burst("SITE_COPY_BURST_4_METODOLOGIA.md");    // /metodologia v3 — "mãe das citações" (substitui Burst1§5/Burst2§2)
 const INDEX = readFileSync(join(ROOT, "index.html"), "utf8");
 
 // chrome compartilhado: o <link rel=preconnect…> até </head> do index, p/ casar fontes/tema/estilo 100%
@@ -24,10 +29,13 @@ const headStyle = INDEX.slice(INDEX.indexOf("<link rel=\"preconnect\""), INDEX.i
 // type só afeta o breadcrumb. metodologia agora vem do Burst2 §2 (versão pondered, sem pesos expostos).
 // ─────────────────────────────────────────────────────────────────────────────
 const PAGES = [
+  // ── Burst 4: metodologia v3 (mãe das citações) ──
+  { slug: "metodologia",           src: 4, sec: ["m_pt", "m_en"], type: "metodo" },
   // ── Burst 2 (conceitual) ──
   { slug: "como-ler-o-radar",      src: 2, sec: ["1.1", "1.2"], type: "guia" },
-  { slug: "metodologia",           src: 2, sec: ["2.1", "2.2"], type: "metodo" },
   { slug: "lentes",                src: 2, sec: ["3.1", "3.2"], type: "lentes" },
+  // ── Burst 3: umbrella de conceitos ──
+  { slug: "conceitos",             src: 3, sec: ["1.3", "1.4"], type: "umbrella-conceitos" },
   { slug: "conceitos/regime-brasil",                  src: 2, sec: ["4.1:pt", "4.1:en"], type: "conceito" },
   { slug: "conceitos/regime-global",                  src: 2, sec: ["4.2:pt", "4.2:en"], type: "conceito" },
   { slug: "conceitos/intermercado-br",                src: 2, sec: ["4.3:pt", "4.3:en"], type: "conceito" },
@@ -51,7 +59,8 @@ const PAGES = [
 //     keywords; o H1 e o corpo continuam verbatim do ghostwriter. Só as páginas que estouravam o limite. ───
 const SEO_OVERRIDE = {
   "como-ler-o-radar": { tPt: "Como ler o Radar Perene — seis passos para o regime do dia" },
-  "metodologia": { tPt: "Metodologia do Radar Perene — regime e percentil histórico", tEn: "Radar Perene methodology — regime & historical percentile" },
+  "metodologia": { tPt: "Metodologia do Radar Perene — regime e percentil histórico", tEn: "Radar Perene methodology — regime & historical percentile", dPt: "Como o Radar Perene lê o mercado brasileiro: regime, intermercado, valuation, sentimento, análogos. Método declarado e auditável — sem previsão, sem parecer." },
+  "conceitos": { tPt: "A linguagem do Radar — todos os conceitos do Radar Perene", tEn: "The Radar's language — every Radar Perene concept" },
   "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o Brasil em cinco dimensões regulatórias e de mercado. A Lente Vértice é o experimento cross-domínio; Intermercado é leitura paralela." },
   "conceitos/regime-brasil": { tPt: "Regime Brasil — como o Radar lê o mercado brasileiro", tEn: "Brazil Regime — how the Radar reads Brazil's market", dEn: "Brazil Regime: the aggregate reading of the Brazilian market — defensive, neutral, or pro-risk. Categorical, with a 0–100 auxiliary scale." },
   "conceitos/intermercado-br": { tPt: "Intermercado BR — razões patrimoniais como regime", dPt: "Intermercado BR: leitura cruzada de razões patrimoniais brasileiras (finanças, utilities, commodities, FIIs, café/ouro). Camada paralela às lentes.", dEn: "Intermarket BR: cross-reading of Brazilian wealth-sector ratios (finance, utilities, commodities, REITs, coffee/gold). A layer parallel to the lenses." },
@@ -89,7 +98,17 @@ function parseBlocks(md) {
   }
   return out;
 }
-const BLOCKS = { 1: parseBlocks(COPY1), 2: parseBlocks(COPY2) };
+// Burst 4 (metodologia v3) usa "## 1. pt-BR" / "## 2. EN" (nível-2) + 1 fence cada → extrai os fences em ordem
+function fencedBlocks(md) {
+  const out = []; let inF = false, buf = [];
+  for (const ln of md.split("\n")) {
+    if (ln.trim().startsWith("```")) { if (inF) { out.push(buf.join("\n")); buf = []; inF = false; } else { inF = true; buf = []; } continue; }
+    if (inF) buf.push(ln);
+  }
+  return out;
+}
+const MET4 = fencedBlocks(COPY4);  // [0]=pt, [1]=en
+const BLOCKS = { 1: parseBlocks(COPY1), 2: parseBlocks(COPY2), 3: parseBlocks(COPY3), 4: { "m_pt": MET4[0] || "", "m_en": MET4[1] || "" } };
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -220,14 +239,54 @@ function crumbLabel(slug, L) {
   return slug;
 }
 
+// ─── JSON-LD por tipo de página (briefing §3) — Organization (todas) + BreadcrumbList (profundidade≥2) + específico do tipo ───
+const ORG_BR = "https://radarperene.com.br";
+const SITE_LASTMOD = "2026-06-04";
+const orgSchema = () => ({ "@context": "https://schema.org", "@type": "Organization", "name": "Radar Perene", "url": ORG_BR, "logo": ORG_BR + "/logo.svg", "sameAs": ["https://radarperene.com", "https://brazilcomplexity.com", "https://aformadopatrimonio.com.br"], "description": "Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto." });
+const DTS = { "@type": "DefinedTermSet", "name": "A linguagem do Radar Perene", "url": ORG_BR + "/conceitos/" };
+function breadcrumbSchema(slug, h1) {
+  const segs = slug.split("/"); const items = [{ "@type": "ListItem", position: 1, name: "Início", item: ORG_BR + "/" }]; let acc = "";
+  segs.forEach((s, i) => { acc += "/" + s; items.push({ "@type": "ListItem", position: i + 2, name: i === segs.length - 1 ? h1 : (s.charAt(0).toUpperCase() + s.slice(1)), item: ORG_BR + acc + "/" }); });
+  return { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": items };
+}
+function faqSchema(raw) {  // extrai pares **P: …?** / R: … (metodologia §12) → FAQPage citável
+  const lines = raw.split("\n"); const out = []; let q = null;
+  for (const ln of lines) {
+    const t = ln.trim();
+    const qm = t.match(/^\*\*P:\s*(.+?)\*\*$/) || t.match(/^\*\*Q:\s*(.+?)\*\*$/);
+    if (qm) { q = qm[1]; continue; }
+    const am = t.match(/^R:\s*(.+)/) || t.match(/^A:\s*(.+)/);
+    if (am && q) { out.push({ q, a: am[1].replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") }); q = null; }
+  }
+  return out.length ? { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": out.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) } : null;
+}
+function buildSchemas(p, ptRaw, pt, path, tPt, dPt) {
+  const url = ORG_BR + path; const s = [orgSchema()];
+  if (p.slug.includes("/")) s.push(breadcrumbSchema(p.slug, pt.h1));
+  const article = (t) => ({ "@context": "https://schema.org", "@type": t, "headline": tPt, "description": dPt, "url": url, "inLanguage": "pt-BR", "datePublished": "2026-06-04", "dateModified": SITE_LASTMOD, "author": { "@type": "Organization", "name": "Radar Perene" }, "publisher": { "@type": "Organization", "name": "Radar Perene", "url": ORG_BR } });
+  if (p.type === "metodo") { s.push(article("TechArticle")); const f = faqSchema(ptRaw); if (f) s.push(f); s.push({ "@context": "https://schema.org", ...DTS }); }
+  else if (p.type === "conceito") { s.push({ "@context": "https://schema.org", "@type": "DefinedTerm", "name": pt.h1, "description": dPt, "inDefinedTermSet": DTS, "url": url }); s.push(article("Article")); }
+  else if (p.type === "umbrella-conceitos") { s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" }); s.push({ "@context": "https://schema.org", ...DTS }); }
+  else if (p.type === "lentes") s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" });
+  else if (p.type === "lente") s.push({ "@context": "https://schema.org", "@type": "Service", "name": pt.h1, "description": dPt, "url": url, "provider": { "@type": "Organization", "name": "Radar Perene" }, "areaServed": "BR", "serviceType": "Regulatory & market intelligence" });
+  else if (p.type === "guia") s.push({ "@context": "https://schema.org", "@type": "HowTo", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" });
+  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": pt.h1, "description": dPt, "url": url, "documentation": ORG_BR + "/free/", "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  return s.map((x) => `<script type="application/ld+json">${JSON.stringify(x).replace(/</g, "\\u003c")}</script>`).join("\n");
+}
+
 const out = [];
 function page(p) {
-  const B = BLOCKS[p.src];
+  const B = BLOCKS[p.src] || {};
   const pt = renderBlock(B[p.sec[0]] || "");
   const en = renderBlock(B[p.sec[1]] || "");
+  if (!pt.h1 && !pt.title) {  // fonte ausente (ex.: Burst removido da pasta) → NÃO regenera; preserva o HTML já no disco
+    console.log(`  ⤼ /${p.slug.padEnd(40)} PULADO (fonte ${p.src}:${p.sec[0]} ausente — HTML existente preservado)`);
+    return;
+  }
   const sov = SEO_OVERRIDE[p.slug] || {};     // metas encurtados p/ limite SEO (corpo segue verbatim)
   const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = sov.dPt || pt.desc, dEn = sov.dEn || en.desc;
   const path = "/" + p.slug + "/";            // rota-diretório → SEMPRE trailing slash (canonical real servido pelo CF)
+  const ld = buildSchemas(p, B[p.sec[0]] || "", pt, path, tPt, dPt);  // JSON-LD por tipo (Organization+BreadcrumbList+específico)
   const disc = pt.disclaimer || "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.";
   const discEn = en.disclaimer || "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice.";
   const html = `<!doctype html>
@@ -245,6 +304,7 @@ function page(p) {
 <link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}">
 <link rel="alternate" hreflang="en" href="https://radarperene.com${path}">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com${path}">
+${ld}
 ${headStyle}
 <style>
   .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
