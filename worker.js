@@ -28,12 +28,22 @@ function _fetchIndicadores(lang) {
     { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
 }
 // Página HTML pura, crawlável, autossuficiente — números em texto indexável + JSON-LD (Observation+Dataset).
+function _fmtVal(v, u) {  // valor+unidade legível: "percentil 2", "+13%", "-1.47 pp", "38.1/100", "172.285 pontos"
+  if (v === null || v === undefined || v === "") return "—";
+  u = u || "";
+  if (/percentil|pctl/i.test(u)) return "percentil " + Math.round(v);
+  if (u === "%") return (v > 0 ? "+" : "") + v + "%";
+  if (/^pp$/i.test(u)) return (v > 0 ? "+" : "") + v + " pp";
+  if (u === "/100") return v + "/100";
+  if (/ponto|pts/i.test(u)) return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " " + u;  // milhar manual (Intl no Worker é limitado)
+  return v + (u ? " " + u : "");
+}
 function _renderIndicador(ind, dataRef, origin, lang, slug) {
   const en = lang === "en";
   const nome = _esc(ind.nome);
-  const unidade = _esc(ind.unidade || "");
-  const valorStr = _esc(ind.valor) + unidade;
-  const temPerc = ind.percentil !== null && ind.percentil !== undefined && ind.percentil !== "";
+  const valorStr = _esc(_fmtVal(ind.valor, ind.unidade));
+  const isPerc = /percentil|pctl/i.test(ind.unidade || "");  // unidade já é percentil → não repete "Percentil histórico"
+  const temPerc = !isPerc && ind.percentil !== null && ind.percentil !== undefined && ind.percentil !== "";
   const canon = origin + "/indicador/" + encodeURIComponent(slug);
   const desc = _esc((ind.descricao || ind.leitura || nome)).slice(0, 155);
   const title = nome + " — Radar Perene" + (en ? " · data reading" : " · leitura descritiva");
