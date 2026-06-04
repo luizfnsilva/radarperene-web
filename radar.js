@@ -292,25 +292,56 @@
     var tail = cone ? (pro ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (' · <span class="pj">⤳ ' + esc(fmtNum(cone.mid[cone.mid.length - 1])) + '</span>')) : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
     return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + tail + '</span>';
   }
-  // scatter de quadrantes (Lead-Lag): cada ponto = um mês; X=score do regime, Y=retorno do IBOV em 6m; vertical = hoje
+  // scatter (Lead-Lag): cada ponto = um mês; X=score do regime, Y=retorno do IBOV em 6m. Didático: faixa "hoje" (cur±8)
+  // destacada, pontos análogos em foco (resto esmaecido), mediana dos análogos e marcador de hoje. P7.
   function scatterChart(sc) {
     if (!sc || !sc.points || sc.points.length < 10) return "";
     var pts = sc.points, ys = pts.map(function (p) { return p.y; });
     var ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys), yr = (ymax - ymin) || 1;
     var W = 280, H = 150, pL = 4, pR = 4, pT = 6, pB = 6, pw = W - pL - pR, ph = H - pT - pB;
+    var cx = sc.cur_x, band = 8;
     function X(v) { return pL + (Math.max(0, Math.min(100, v)) / 100) * pw; }
     function Y(v) { return pT + (1 - (v - ymin) / yr) * ph; }
     var o = '<svg class="bc big" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
-    // zonas: ganhos (acima de 0) warm sutil · perdas (abaixo) cool sutil
     if (ymin < 0 && ymax > 0) { var y0 = Y(0);
       o += '<rect x="' + pL + '" y="' + pT + '" width="' + pw.toFixed(1) + '" height="' + Math.max(0, y0 - pT).toFixed(1) + '" fill="var(--_warm)" opacity="0.045"/>';
       o += '<rect x="' + pL + '" y="' + y0.toFixed(1) + '" width="' + pw.toFixed(1) + '" height="' + Math.max(0, (H - pB) - y0).toFixed(1) + '" fill="var(--_cool)" opacity="0.045"/>'; }
+    // ★ faixa "regime de hoje" (cur±8): onde moram os análogos — o foco da leitura
+    if (cx != null) o += '<rect x="' + X(cx - band).toFixed(1) + '" y="' + pT + '" width="' + (X(cx + band) - X(cx - band)).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_accent)" opacity="0.08"/>';
     for (var sgg = 1; sgg < 4; sgg++) { var sgy = (pT + (sgg / 4) * ph).toFixed(1); o += '<line x1="' + pL + '" y1="' + sgy + '" x2="' + (W - pR) + '" y2="' + sgy + '" stroke="var(--_line)" stroke-width="0.3" opacity="0.4"/>'; }
-    o += '<line x1="' + X(50).toFixed(1) + '" y1="' + pT + '" x2="' + X(50).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_line)" stroke-width="0.5"/>';
     if (ymin < 0 && ymax > 0) o += '<line x1="' + pL + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.6"/>';
-    o += pts.map(function (p) { return '<rect x="' + (X(p.x) - 1).toFixed(1) + '" y="' + (Y(p.y) - 1).toFixed(1) + '" width="2" height="2" fill="var(--_' + (p.y >= 0 ? "warm" : "cool") + ')" opacity="0.5"/>'; }).join("");
-    o += '<line x1="' + X(sc.cur_x).toFixed(1) + '" y1="' + pT + '" x2="' + X(sc.cur_x).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_accent)" stroke-width="1.2" stroke-dasharray="3 2"/>';
+    // pontos: análogos (dentro da faixa) em foco; resto esmaecido — o olho vai pro cluster que importa
+    o += pts.map(function (p) { var near = cx != null && Math.abs(p.x - cx) <= band;
+      return '<circle cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="' + (near ? 1.7 : 1.1) + '" fill="var(--_' + (p.y >= 0 ? "warm" : "cool") + ')" opacity="' + (near ? 0.9 : 0.22) + '"/>'; }).join("");
+    // mediana dos análogos (faixa) + marcador "hoje"
+    if (cx != null && sc.med_at_cur != null) {
+      o += '<line x1="' + X(cx - band).toFixed(1) + '" y1="' + Y(sc.med_at_cur).toFixed(1) + '" x2="' + X(cx + band).toFixed(1) + '" y2="' + Y(sc.med_at_cur).toFixed(1) + '" stroke="var(--_accent)" stroke-width="1.1" stroke-dasharray="4 2"/>';
+      o += '<circle cx="' + X(cx).toFixed(1) + '" cy="' + Y(sc.med_at_cur).toFixed(1) + '" r="3.2" fill="var(--_accent)"/>';
+    }
+    if (cx != null) o += '<line x1="' + X(cx).toFixed(1) + '" y1="' + pT + '" x2="' + X(cx).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_accent)" stroke-width="1" stroke-dasharray="2 2" opacity="0.7"/>';
     return o + '</svg>';
+  }
+  // distribuição dos desfechos análogos (histograma do IBOV +6m perto do regime de hoje) — "a maioria caiu entre X e Y"
+  function distChart(sc) {
+    if (!sc || !sc.points || sc.cur_x == null) return null;
+    var near = sc.points.filter(function (p) { return Math.abs(p.x - sc.cur_x) <= 8; }).map(function (p) { return p.y; }).sort(function (a, b) { return a - b; });
+    if (near.length < 8) return null;
+    var lo = near[0], hi = near[near.length - 1], rng = (hi - lo) || 1;
+    var q = function (f) { return near[Math.min(near.length - 1, Math.floor(f * near.length))]; };
+    var p25 = q(0.25), p50 = near[Math.floor(near.length / 2)], p75 = q(0.75);
+    var NB = 9, bins = new Array(NB).fill(0);
+    near.forEach(function (y) { bins[Math.min(NB - 1, Math.floor((y - lo) / rng * NB))]++; });
+    var bmax = Math.max.apply(null, bins) || 1;
+    var W = 280, H = 150, pL = 4, pR = 4, pT = 8, pB = 8, pw = W - pL - pR, ph = H - pT - pB;
+    var Xb = function (v) { return pL + ((v - lo) / rng) * pw; };
+    var o = '<svg class="bc big" viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" aria-hidden="true">';
+    o += '<rect x="' + Xb(p25).toFixed(1) + '" y="' + pT + '" width="' + Math.max(0, Xb(p75) - Xb(p25)).toFixed(1) + '" height="' + ph.toFixed(1) + '" fill="var(--_accent)" opacity="0.08"/>';
+    var bw = pw / NB;
+    for (var i = 0; i < NB; i++) { var bh = (bins[i] / bmax) * ph, bx = pL + i * bw, mid = lo + (i + 0.5) / NB * rng;
+      o += '<rect x="' + (bx + 0.6).toFixed(1) + '" y="' + (pT + ph - bh).toFixed(1) + '" width="' + (bw - 1.2).toFixed(1) + '" height="' + bh.toFixed(1) + '" fill="var(--_' + (mid >= 0 ? "warm" : "cool") + ')" opacity="0.6"/>'; }
+    if (lo < 0 && hi > 0) o += '<line x1="' + Xb(0).toFixed(1) + '" y1="' + pT + '" x2="' + Xb(0).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_line)" stroke-width="0.6"/>';
+    o += '<line x1="' + Xb(p50).toFixed(1) + '" y1="' + (pT - 3) + '" x2="' + Xb(p50).toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_accent)" stroke-width="1.3"/>';
+    return { svg: o + '</svg>', p25: Math.round(p25 * 10) / 10, p50: Math.round(p50 * 10) / 10, p75: Math.round(p75 * 10) / 10, n: near.length };
   }
   // Risk-on/off (SentimenTrader, P7: SEM buy signal): oscilador 0-100 com threshold 50, zonas de extremo e MARCAÇÃO de alerta nos extremos passados
   function riskPane(rk, opt) {
@@ -614,6 +645,27 @@
       };
       if (cmp.length >= 2) applyMode(); else renderStudio();  // pré-carga (intermercado) abre já em modo compare
     }
+    else if (preCmp && preCmp.length >= 2) {  // FREE + comparar (intermercado): overlay LEAD-LAG read-only (3 séries rebaseadas, diagnóstico citável); cruzar/manipular = Founder
+      compareActive = true;
+      var perRowF = mw.querySelector(".rp-per"); if (perRowF) perRowF.style.display = "none";  // os períodos eram do ativo único
+      var tgfF = mw.querySelector(".rp-tgf"); if (tgfF) tgfF.style.display = "none";            // idem os 2 toggles do ativo único
+      var legF = document.createElement("div"); legF.style.marginTop = "4px"; chartEl.parentNode.insertBefore(legF, chartEl.nextSibling);
+      var gotF = [], pendF = preCmp.length;
+      preCmp.forEach(function (c, i) {
+        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(c.cod) + "&classe=" + encodeURIComponent(c.cls), FOPT)
+          .then(function (r) { return r.json(); }).then(function (d) {
+            gotF[i] = (d && d.hist) ? { nome: c.nome, hist: d.hist, datas: d.datas } : null;
+            if (--pendF === 0) {
+              var cc = compareChart(gotF.filter(Boolean), lang, { big: true });
+              if (!cc) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.7;padding:18px 0;text-align:center">' + (L ? "no time overlap between these series" : "sem sobreposição temporal entre essas séries") + '</div>'; return; }
+              chartEl.innerHTML = cc.svg;
+              yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");
+              chartEl.appendChild(yax);
+              legF.innerHTML = '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs && cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c; }).join(" · ") : '') + '</div><div class="rp-ml" style="margin-top:4px"><span style="color:var(--_accent)">🔒</span> ' + (L ? "cross any series & drag-zoom in Founder" : "cruzar qualquer série & zoom no Founder") + '</div>';
+            }
+          }).catch(function () { });
+      });
+    }
     if (!useUp) chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto) — em uPlot o cursor é nativo, não bindamos o manual (risco #2)
       if (brushing || compareActive) return;  // durante o arraste/modo compare, o crosshair de ticker único não vale
       var rect = chartEl.getBoundingClientRect(), fx = (e.clientX - rect.left) / rect.width;
@@ -744,7 +796,7 @@
       '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
       rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "Indicators ⇒ BR intermarket" : "Indicadores ⇒ intermercado BR") + '</h4><div class="g3">' +
-      rr.intermercado_br.map(function (x) { var hasTk = x.tickers && x.tickers.length, xp = x.fonte || hasTk || (x.leadlag && x.leadlag.txt); return '<div class="t ' + esc(x.tom) + '"' + (xp ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (xp ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.spark2 && x.spark2.a ? '<div class="legend" style="margin-top:5px"><span style="color:var(--_accent)">▬</span> ' + esc(x.spark2.an) + ' <span style="color:var(--_cool)">▬</span> ' + esc(x.spark2.bn) + (x.spark2.c ? ' <span style="color:var(--_warm)">▦</span> ' + esc(x.spark2.cn) : '') + (x.spark2.ar ? '<span style="opacity:.6;display:block;margin-top:1px">' + (L ? "left axis " : "eixo esq ") + esc(fmtNum(x.spark2.ar[0])) + '–' + esc(fmtNum(x.spark2.ar[1])) + ' · ' + (L ? "right axis " : "eixo dir ") + esc(fmtNum(x.spark2.br[0])) + '–' + esc(fmtNum(x.spark2.br[1])) + '</span>' : '') + '</div>' + dualSpark(x.spark2.a, x.spark2.b, x.spark2.c) : '') + (xp ? '<div class="more">' + (x.fonte ? '<div class="mi">' + (L ? "What it is — " : "O que é — ") + esc(x.fonte) + '</div>' : '') + (x.leadlag && x.leadlag.txt ? '<div class="mi"><b>Lead-lag</b> — ' + esc(x.leadlag.txt) + '</div>' : '') + (hasTk ? '<div class="mi" style="margin-bottom:3px">' + (L ? "components (click):" : "componentes (clique):") + '</div><div class="tk">' + x.tickers.map(function (tk) { return '<span class="i" data-cod="' + esc(String(tk.ticker).toLowerCase()) + '" data-cls="' + esc(tk.cls || "equity_br") + '"><span class="sy">' + esc(tk.ticker) + '</span>' + (tk.dy != null ? '<span class="mt">DY ' + esc(tk.dy) + '%</span>' : '') + '</span>'; }).join("") + '</div>' : '') + (x.cod ? '<button class="rp-imxp" data-cod="' + esc(x.cod) + '" data-nome="' + esc(x.numn || x.nome) + '" data-denn="' + esc(x.denn || "IBOV") + '">⤢ ' + (L ? "compare big (composite × IBOV)" : "comparar grande (composto × IBOV)") + '</button>' : '') + '</div>' : '') + '</div>'; }).join("") + '</div>'; }
+      rr.intermercado_br.map(function (x) { var hasTk = x.tickers && x.tickers.length, xp = x.fonte || hasTk || (x.leadlag && x.leadlag.txt); return '<div class="t ' + esc(x.tom) + '"' + (xp ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (xp ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.spark2 && x.spark2.a ? '<div class="legend" style="margin-top:5px"><span style="color:var(--_accent)">▬</span> ' + esc(x.spark2.an) + ' <span style="color:var(--_cool)">▬</span> ' + esc(x.spark2.bn) + (x.spark2.c ? ' <span style="color:var(--_warm)">▦</span> ' + esc(x.spark2.cn) : '') + (x.spark2.ar ? '<span style="opacity:.6;display:block;margin-top:1px">' + (L ? "left axis " : "eixo esq ") + esc(fmtNum(x.spark2.ar[0])) + '–' + esc(fmtNum(x.spark2.ar[1])) + ' · ' + (L ? "right axis " : "eixo dir ") + esc(fmtNum(x.spark2.br[0])) + '–' + esc(fmtNum(x.spark2.br[1])) + '</span>' : '') + '</div>' + dualSpark(x.spark2.a, x.spark2.b, x.spark2.c) : '') + (xp ? '<div class="more">' + (x.fonte ? '<div class="mi">' + (L ? "What it is — " : "O que é — ") + esc(x.fonte) + '</div>' : '') + (x.leadlag && x.leadlag.txt ? '<div class="mi"><b>Lead-lag</b> — ' + esc(x.leadlag.txt) + '</div>' : '') + (hasTk ? '<div class="mi" style="margin-bottom:3px">' + (L ? "components (click):" : "componentes (clique):") + '</div><div class="tk">' + x.tickers.map(function (tk) { return '<span class="i" data-cod="' + esc(String(tk.ticker).toLowerCase()) + '" data-cls="' + esc(tk.cls || "equity_br") + '"><span class="sy">' + esc(tk.ticker) + '</span>' + (tk.dy != null ? '<span class="mt">DY ' + esc(tk.dy) + '%</span>' : '') + '</span>'; }).join("") + '</div>' : '') + (x.cod ? '<button class="rp-imxp" data-cod="' + esc(x.cod) + '" data-nome="' + esc(x.numn || x.nome) + '" data-denn="' + esc(x.denn || "IBOV") + '">⤢ ' + (L ? "compare (lead-lag overlay)" : "comparar (overlay lead-lag)") + '</button>' : '') + '</div>' : '') + '</div>'; }).join("") + '</div>'; }
     // ações: tira diversa 1-por-setor (com relação risk-on/off). Tesouro (M) e FIIs (R) agora vivem DENTRO das lentes (amostra).
     if (show("acoes") && rr.tickers_acoes && rr.tickers_acoes.length) { h += '<h4>' + (L ? "BR stocks · one per sector" : "Ações BR · 1 por setor") + '</h4><div class="legend">' + (L ? "a diverse cut across sectors — click any for the chart; each lens above opens its own curated 5" : "uma tira diversa por setor — clique pra ver o gráfico; cada lente acima abre os 5 dela") + '</div><div class="tk">' +
       rr.tickers_acoes.map(function (t) { var rel = (t.razao_nome ? "∈ " + t.razao_nome + (t.razao_leitura ? " · " + t.razao_leitura : "") : "") + (t.risk ? ((t.razao_nome ? " · " : "") + t.risk) : ""); var fund = (t.pl != null ? "P/L " + t.pl : "") + (t.dy != null ? ((t.pl != null ? " · " : "") + "DY " + t.dy + "%") : "") + (t.roe != null ? " · ROE " + t.roe + "%" : ""); return '<span class="i" data-cod="' + esc(String(t.ticker).toLowerCase()) + '" data-cls="equity_br"' + (rel ? ' data-rel="' + esc(rel) + '"' : '') + (fund ? ' data-fund="' + esc(fund) + '"' : '') + '><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w range" : "% da faixa 52s") + '</span>' : '') + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
@@ -771,8 +823,11 @@
         (rr.teses_total > 1 ? '<div class="legend">+ ' + (rr.teses_total - 1) + (L ? " other active theses in the app" : " outras teses ativas no app") + '</div>' : '');
     }
     if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br; h += '<h4>' + (L ? "BR analog · past → future" : "Análogo BR · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(ab.pergunta) + '</div>' + (ab.datas_analogas && ab.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') + '<div class="stat"><div><div class="v">' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median (IBOV)" : "mediana (IBOV)") + '</div></div><div><div class="v">' + esc(ab.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(ab.n_analogos) + '</div></div></div>' + (ab.n_analogos && ab.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>'; }
-    if (rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter;
-      h += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "where we are today" : "onde estamos hoje") + ' · <span style="color:var(--_warm)">▪</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">▪</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' + scatterChart(sct) + (sct.leitura ? '<div class="legend" style="margin-top:4px">' + esc(sct.leitura) + '</div>' : ''); }
+    if (rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);
+      h += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "today's regime band" : "faixa do regime de hoje") + ' · <span style="color:var(--_warm)">●</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">●</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:230px">' + scatterChart(sct) + '<div class="legend" style="margin-top:3px">' + (L ? "the cloud · today highlighted" : "a nuvem · hoje em destaque") + '</div></div>' +
+        (dist ? '<div style="flex:1;min-width:230px">' + dist.svg + '<div class="legend" style="margin-top:3px">' + (L ? "outcome distribution · most between " : "distribuição dos desfechos · maioria entre ") + (dist.p25 >= 0 ? "+" : "") + dist.p25 + '% ' + (L ? "and " : "e ") + (dist.p75 >= 0 ? "+" : "") + dist.p75 + '% (' + (L ? "median " : "mediana ") + (dist.p50 >= 0 ? "+" : "") + dist.p50 + '%, n=' + dist.n + ')</div></div>' : '') +
+        '</div>' + (sct.leitura ? '<div class="legend" style="margin-top:4px">' + esc(sct.leitura) + '</div>' : ''); }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
@@ -861,7 +916,10 @@
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
           ev.stopPropagation();
           var icod = imxp.getAttribute("data-cod"), inome = imxp.getAttribute("data-nome") || "Composto", idenn = imxp.getAttribute("data-denn") || "IBOV";
-          var pre = [{ cod: icod, cls: "intermercado", nome: inome }, { cod: "ibov", cls: "pulso", nome: "IBOV" }];  // default = composto × IBOV (risk-on/off clássico); × ouro e a razão ficam no picker do Estúdio
+          // lead-lag: numerador + denominador (quando ≠ IBOV, ex. cíclicas×defensivas) + IBOV → as 3 séries do mini-gráfico do card sobrepostas
+          var pre = [{ cod: icod, cls: "intermercado", nome: inome }];
+          if (idenn && idenn.toUpperCase() !== "IBOV") pre.push({ cod: icod, cls: "intermercado_den", nome: idenn });
+          pre.push({ cod: "ibov", cls: "pulso", nome: "IBOV" });
           fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(icod) + "&classe=intermercado", FOPT)
             .then(function (r) { return r.json(); }).then(function (s0) { if (s0 && s0.hist && s0.hist.length) openBig(s0, inome, "", lang, null, pre); }).catch(function () { });
           return;
