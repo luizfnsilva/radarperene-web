@@ -41,6 +41,31 @@ function _fmtVal(v, u) {  // valor+unidade legível: "percentil 2", "+13%", "-1.
   if (/ponto|pts/i.test(u)) return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " " + u;  // milhar manual (Intl no Worker é limitado)
   return v + (u ? " " + u : "");
 }
+// ── chrome compartilhado das páginas worker-rendered → casa com a identidade do site (Fraunces/Inter, paleta creme/dourado, tema claro/escuro) ──
+function _chromeCss(extra) {
+  return '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">' +
+    '<style>:root{--bg:#faf9f6;--surface:#fff;--surface2:#f3f1ec;--line:#e6e3dc;--txt:#1a1a2e;--txt2:#3a3a45;--dim:#6e6e78;--gold:#a8651a;--serif:\'Fraunces\',Georgia,serif;--sans:\'Inter\',system-ui,sans-serif;--mono:\'JetBrains Mono\',ui-monospace,monospace;--max:760px}' +
+    ':root[data-theme="dark"]{--bg:#0e1217;--surface:#161b22;--surface2:#1c222b;--line:#28303a;--txt:#eceef1;--txt2:#c2c8d0;--dim:#8a929e;--gold:#d9a441}' +
+    '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}' +
+    '.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 22px;max-width:var(--max);margin:0 auto}' +
+    '.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt)}.brand .nm{font-family:var(--serif);font-size:17px;font-weight:600}.brand .nm b{color:var(--gold)}' +
+    '.tg{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:13px}' +
+    '.wrap{max-width:var(--max);margin:0 auto;padding:6px 22px 30px}' +
+    'h1{font-family:var(--serif);font-weight:500;font-size:clamp(23px,4vw,33px);line-height:1.16;letter-spacing:-.01em;margin:14px 0 4px}' +
+    'h2{font-family:var(--serif);font-weight:500;font-size:19px;margin:24px 0 6px}' +
+    'a{color:var(--gold)}p{color:var(--txt2)}ul{padding-left:1.1rem}li{margin:.35rem 0;color:var(--txt2)}' +
+    '.dt{color:var(--dim);font-size:.85rem;margin-bottom:1rem}.nf{color:var(--dim);font-size:.8rem;margin-top:.6rem}' +
+    'pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px;font-family:var(--mono);color:var(--txt2)}' +
+    'footer{max-width:var(--max);margin:0 auto;padding:20px 22px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}footer a{color:var(--gold)}' +
+    (extra || "") + '</style>';
+}
+function _header() {
+  return '<div class="top"><a class="brand" href="/"><svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true" style="color:var(--dim)"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><path d="M16 16 L16 2 A14 14 0 0 1 29 13 Z" fill="#b8801f" fill-opacity="0.2"/><line x1="16" y1="16" x2="16" y2="2" stroke="#b8801f" stroke-width="1.6"/><circle cx="16" cy="16" r="2" fill="#b8801f"/></svg><span class="nm">Radar <b>Perene</b></span></a><button class="tg" id="rp-tg" type="button" aria-label="tema">☾</button></div>';
+}
+function _themeScript() {
+  return '<script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var b=document.getElementById("rp-tg");if(b)b.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>';
+}
 function _renderIndicador(ind, dataRef, origin, lang, slug) {
   const en = lang === "en";
   const nome = _esc(ind.nome);
@@ -81,10 +106,10 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
     "<meta property=\"og:title\" content=\"" + _esc(title) + "\">" +
     "<meta property=\"og:description\" content=\"" + desc + "\">" +
     "<meta property=\"og:url\" content=\"" + canon + "\">" +
-    "<meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\">" +
+    "<meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ldStr + "</script>" +
-    "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:46rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:1.6}h1{font-size:1.65rem;margin:0 0 1rem}b{color:#0b3d91}p{margin:.5rem 0}a{color:#0b3d91}.upd{color:#666;font-size:.85rem;margin-top:1.5rem}</style>" +
-    "</head><body>" +
+    _chromeCss("h1{font-size:clamp(24px,4vw,32px)}b{color:var(--gold)}p{margin:.5rem 0}.upd{color:var(--dim);font-size:.85rem;margin-top:1.4rem}") +
+    "</head><body>" + _header() + "<div class=\"wrap\">" +
     "<h1>" + nome + "</h1>" +
     "<p>" + L.cur + " <b>" + valorStr + "</b></p>" +
     (temPerc ? "<p>" + L.perc + " <b>" + _esc(ind.percentil) + "</b></p>" : "") +
@@ -92,8 +117,7 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
     (ind.leitura ? "<p>" + _esc(ind.leitura) + "</p>" : "") +
     (ind.descricao ? "<p>" + _esc(ind.descricao) + "</p>" : "") +
     "<p class=\"upd\">" + L.upd + " " + _esc(dataRef || "") + "</p>" +
-    "<p><a href=\"/\">" + L.back + "</a></p>" +
-    "</body></html>";
+    "</div><footer><a href=\"/\">" + L.back + "</a></footer>" + _themeScript() + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
@@ -132,20 +156,19 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario/" + date + "\">" +
-    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\">" +
+    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
-    "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:46rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:1.6}h1{font-size:1.5rem;margin:0 0 .3rem}.dt{color:#666;font-size:.85rem;margin-bottom:1.2rem}a{color:#0b3d91}ul{padding-left:1.1rem}li{margin:.4rem 0}.ver{background:#fff;border:1px solid #e6e3dc;border-left:3px solid #b8801f;border-radius:0 8px 8px 0;padding:.8rem 1rem;margin:1rem 0}.ver ul{margin:.4rem 0 0}.foot{margin-top:2rem;font-size:.85rem;color:#666}.nf{color:#999;font-size:.8rem;margin-top:.6rem}</style>" +
-    "</head><body>" +
+    _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}") +
+    "</head><body>" + _header() + "<div class=\"wrap\">" +
     "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
     "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     verHtml +
-    (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +  // resumo só na reconstrução (é uma nota explicativa). No congelado, a lista linkada abaixo É a leitura — não repetir a mesma info com link e sem link (texto_html removido: duplicava resumo + cada indicador)
+    (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
     "<ul>" + indHtml + "</ul>" +
-    "<p style=\"font-size:13px;color:#555;margin-top:18px\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a></p>" +
-    ((nav.prev || nav.next) ? "<p style=\"font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px\">" + (nav.prev ? "<a href=\"/diario/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"/diario/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
-    "<p class=\"foot\"><a href=\"/diario\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a></p>" +
-    "<p class=\"nf\">" + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</p>" +
-    "</body></html>";
+    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a></p>" +
+    ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"/diario/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"/diario/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
+    "</div><footer><a href=\"/diario\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
+    _themeScript() + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 function _renderDiarioIndex(data, origin, lang) {
@@ -165,10 +188,13 @@ function _renderDiarioIndex(data, origin, lang) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario\">" +
+    "<meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
-    "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:46rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:1.7}h1{font-size:1.6rem}a{color:#0b3d91}ul{padding-left:1.1rem}li{margin:.3rem 0}p.lead{color:#444}</style>" +
-    "</head><body><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><ul>" + rows + "</ul>" +
-    "<p style=\"margin-top:1.5rem\"><a href=\"/\">" + (en ? "Full radar →" : "Radar completo →") + "</a></p></body></html>";
+    _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}") +
+    "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
+    "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí.") + "</p>" +
+    "<ul class=\"dlist\">" + rows + "</ul>" +
+    "</div><footer><a href=\"/\">" + (en ? "← Full radar" : "← Radar completo") + "</a></footer>" + _themeScript() + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
@@ -266,10 +292,11 @@ export default {
           "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/ativos\">" +
+          "<meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
           "<script type=\"application/ld+json\">" + ld + "</script>" +
-          "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:52rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:2}h1{font-size:1.6rem;line-height:1.3}a{color:#0b3d91;text-decoration:none;white-space:nowrap}p.lead{color:#444;line-height:1.6}</style>" +
-          "</head><body><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p>" + links + "</p>" +
-          "<p style=\"margin-top:2rem\"><a href=\"/\">" + (en ? "Full radar &rarr;" : "Radar completo &rarr;") + "</a></p></body></html>";
+          _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}") +
+          "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p class=\"alist\">" + links + "</p></div>" +
+          "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" + _themeScript() + "</body></html>";
         return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=21600" } });
       } catch (e) { return env.ASSETS.fetch(request); }
     }
