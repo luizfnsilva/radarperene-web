@@ -365,9 +365,9 @@
 
   // ── PAINEL DE TAXA-BASE (device estilo SentimenTrader): "em casos análogos, subiu em X% das vezes, mediana +Y% em 3/6/12m" ──
   // P7: distribuição empírica de casos passados, NUNCA previsão/sinal de trade. Degrada se s.base_rate ausente/incompleto.
-  function baseRatePanel(br, L) {
+  function baseRatePanel(br, L, pro) {
     if (!br || !br.h) return "";
-    var HS = [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]];
+    var HS = pro ? [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]] : [["3m", "3m"]];  // free: só o 3m (diagnóstico); 6m/12m = investigação (Founder)
     var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
     var col = function (x) { return x == null ? "var(--_dim)" : x >= 0 ? "var(--_warm)" : "var(--_cool)"; };
     var rows = "", bars = "";
@@ -402,6 +402,7 @@
       ' <span style="color:var(--_dim);opacity:.7">(' + src + ')</span></div>';
     out += rows;
     out += '<div style="margin-top:7px">' + bars + '</div>';
+    if (!pro) out += '<div class="rp-ml" style="margin-top:5px;opacity:.92"><span style="color:var(--_accent)">🔒</span> ' + (L ? "6-month & 12-month horizons in Founder" : "prazos de 6 e 12 meses no Founder") + '</div>';  // free = só 3m; demais prazos = investigação paga
     out += '<div class="rp-ml" style="opacity:.6;margin-top:6px">' + (L ? "empirical distribution of past analogous cases — not a forecast" : "distribuição de casos análogos passados — não é previsão") + '</div>';
     return out;
   }
@@ -453,7 +454,7 @@
       else if (dmid != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "median " : "mediana ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go — not a forecast" : "pra onde costumou ir — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 full cone (p10–p90) + overlaid analogs in Founder" : "🔒 cone completo (p10–p90) + análogos sobrepostos no Founder") + '</span></div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) h += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
-    if (s.base_rate && s.base_rate.h) h += baseRatePanel(s.base_rate, L);  // taxa-base (casos análogos, estilo SentimenTrader) — logo após o cone/projeção
+    if (s.base_rate && s.base_rate.h) h += baseRatePanel(s.base_rate, L, gpaid);  // taxa-base (casos análogos) — free: só 3m; 6m/12m no Founder (gpaid)
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       h += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : (L ? "Fair value (FASTgraphs) " : "Valor-justo (FASTgraphs) ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
     if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '<b>R$ ' + esc(s.dcf.iv) + '</b> · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (L ? "model from cash flow (growth " : "modelo do fluxo de caixa (cresc. ") + esc(s.dcf.g) + '% · ' + (L ? "discount " : "desconto ") + esc(s.dcf.r) + '%) — ' + (L ? "assumptions shown, not a forecast" : "premissas à mostra, não previsão") + '</div>';
