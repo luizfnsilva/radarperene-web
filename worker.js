@@ -17,6 +17,72 @@ const EN_FAQ = JSON.stringify({
 
 const NARR_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
 const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/narrative";
+const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
+
+// escape p/ texto em HTML (defensivo: catálogo é a única fonte, mas nunca confiamos cego)
+function _esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function _fetchIndicadores(lang) {
+  return fetch(IND_API + "?lang=" + (lang === "en" ? "en" : "pt"),
+    { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
+}
+// Página HTML pura, crawlável, autossuficiente — números em texto indexável + JSON-LD (Observation+Dataset).
+function _renderIndicador(ind, dataRef, origin, lang, slug) {
+  const en = lang === "en";
+  const nome = _esc(ind.nome);
+  const unidade = _esc(ind.unidade || "");
+  const valorStr = _esc(ind.valor) + unidade;
+  const temPerc = ind.percentil !== null && ind.percentil !== undefined && ind.percentil !== "";
+  const canon = origin + "/indicador/" + encodeURIComponent(slug);
+  const desc = _esc((ind.descricao || ind.leitura || nome)).slice(0, 155);
+  const title = nome + " — Radar Perene" + (en ? " · data reading" : " · leitura descritiva");
+  const L = en
+    ? { cur: "Current reading:", perc: "Historical percentile:", cls: "Classification:", upd: "Last updated:", back: "See the full radar →" }
+    : { cur: "Leitura atual:", perc: "Percentil histórico:", cls: "Classificação:", upd: "Última atualização:", back: "Ver o radar completo →" };
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": ind.nome,
+    "description": ind.descricao || ind.leitura || ind.nome,
+    "url": canon,
+    "inLanguage": en ? "en" : "pt-BR",
+    "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" },
+    "isAccessibleForFree": true,
+    "datePublished": dataRef || undefined,
+    "variableMeasured": {
+      "@type": "PropertyValue",
+      "name": ind.nome,
+      "value": ind.valor,
+      "unitText": ind.unidade || undefined,
+      "description": ind.leitura || ind.descricao || undefined
+    }
+  };
+  const ldStr = JSON.stringify(ld).replace(/</g, "\\u003c");
+  const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head>" +
+    "<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
+    "<title>" + _esc(title) + "</title>" +
+    "<meta name=\"description\" content=\"" + desc + "\">" +
+    "<link rel=\"canonical\" href=\"" + canon + "\">" +
+    "<meta property=\"og:type\" content=\"website\">" +
+    "<meta property=\"og:title\" content=\"" + _esc(title) + "\">" +
+    "<meta property=\"og:description\" content=\"" + desc + "\">" +
+    "<meta property=\"og:url\" content=\"" + canon + "\">" +
+    "<meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\">" +
+    "<script type=\"application/ld+json\">" + ldStr + "</script>" +
+    "<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:46rem;margin:0 auto;padding:2.5rem 1.25rem;color:#1a1a2e;background:#fafafc;line-height:1.6}h1{font-size:1.65rem;margin:0 0 1rem}b{color:#0b3d91}p{margin:.5rem 0}a{color:#0b3d91}.upd{color:#666;font-size:.85rem;margin-top:1.5rem}</style>" +
+    "</head><body>" +
+    "<h1>" + nome + "</h1>" +
+    "<p>" + L.cur + " <b>" + valorStr + "</b></p>" +
+    (temPerc ? "<p>" + L.perc + " <b>" + _esc(ind.percentil) + "</b></p>" : "") +
+    (ind.classificacao ? "<p>" + L.cls + " " + _esc(ind.classificacao) + "</p>" : "") +
+    (ind.leitura ? "<p>" + _esc(ind.leitura) + "</p>" : "") +
+    (ind.descricao ? "<p>" + _esc(ind.descricao) + "</p>" : "") +
+    "<p class=\"upd\">" + L.upd + " " + _esc(dataRef || "") + "</p>" +
+    "<p><a href=\"/\">" + L.back + "</a></p>" +
+    "</body></html>";
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+}
 
 export default {
   async fetch(request, env) {
@@ -30,6 +96,33 @@ export default {
         const urls = (tj.ativos || []).map(function (t) { return "<url><loc>" + _url.origin + "/ativo/" + t + "</loc><changefreq>daily</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=21600" } });
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
+    }
+    // ── /sitemap-indicadores.xml — sitemap programático de /indicador (DATA-DRIVEN): lista REAL via /v1/indicadores ──
+    if (_url.pathname === "/sitemap-indicadores.xml") {
+      try {
+        const ir = await _fetchIndicadores(_isEN ? "en" : "pt");
+        const ij = ir.ok ? await ir.json() : { indicadores: [] };
+        const urls = (ij.indicadores || []).filter(function (i) { return i && i.slug; }).map(function (i) { return "<url><loc>" + _url.origin + "/indicador/" + encodeURIComponent(i.slug) + "</loc><changefreq>daily</changefreq></url>"; }).join("");
+        return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+      } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
+    }
+    // ── /indicador/{slug} — UMA rota dinâmica p/ QUALQUER indicador (B2 SEO): HTML puro do catálogo único. Indicador novo no catálogo aparece sozinho, sem mexer no worker. ──
+    const _im = _url.pathname.match(/^\/indicador\/([a-z0-9-]+)\/?$/);
+    if (_im) {
+      const slug = _im[1];
+      const lang = _isEN ? "en" : "pt";
+      try {
+        const ir = await _fetchIndicadores(lang);
+        if (ir.ok) {
+          const ij = await ir.json();
+          const ind = (ij.indicadores || []).find(function (i) { return i && i.slug === slug; });
+          if (ind) return _renderIndicador(ind, ij.data_referencia, _url.origin, lang, slug);
+        }
+        // slug fora do catálogo (ou API indisponível) → 404 limpo
+        return new Response(lang === "en" ? "Indicator not found." : "Indicador não encontrado.", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
+      } catch (e) {
+        return new Response("Not found.", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
+      }
     }
     // ── /ativo/{ticker} — página por ativo (SEO programático B.1): reusa a home shell + widget em modo ativo + narrativa per-ativo ──
     const _am = _url.pathname.match(/^\/ativo\/([a-z0-9]{2,8})\/?$/i);
