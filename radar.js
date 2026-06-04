@@ -11,6 +11,8 @@
  *  Dado: API pública (CORS aberto). P7: descritivo, nunca recomenda. Atualiza ao carregar a página.
  */
 (function () {
+  // endereço absoluto do próprio radar.js — currentScript é válido AGORA (defer, exec síncrona), vira null no callback do boot.
+  var RP_SRC = (document.currentScript && document.currentScript.src) || "";
   var API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
   // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
   // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
@@ -40,8 +42,7 @@
   function ensureUplot(cb) {
     if (RP_ENGINE !== "uplot") return cb();                  // flag off → caminho legado, zero download
     if (window.RPUplot && window.RPUplot.ready()) return cb();
-    var sc = document.currentScript;
-    var base = ((sc && sc.src) || "radar.js").replace(/radar\.js(\?.*)?$/, "");
+    var base = (RP_SRC || "radar.js").replace(/radar\.js(\?.*)?$/, "");  // src absoluto (capturado no topo) → vendor carrega de radarperene.com/vendor/ em qq página/embed, não relativo a /ativo/…
     function load(tag, attr, url, onload) { var e = document.createElement(tag); e[attr] = url; if (tag === "link") e.rel = "stylesheet"; e.onload = onload; e.onerror = onload; (document.head || document.body).appendChild(e); }
     load("link", "href", base + "vendor/uplot/uPlot.min.css");
     load("script", "src", base + "vendor/uplot/uPlot.iife.min.js", function () {
