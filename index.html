@@ -425,7 +425,7 @@
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   var rn=document.getElementById("radar-perene");
   if(rn){ rn.setAttribute("data-lang",LANG);
-    var rs=document.createElement("script"); rs.src="radar.js"; rs.defer=true; document.body.appendChild(rs); }
+    var rs=document.createElement("script"); rs.src="/radar.js"; rs.defer=true; document.body.appendChild(rs); }  // absoluto: em /ativo/{ticker} o relativo "radar.js" virava /ativo/radar.js → 404 → widget não carregava
 
   // waitlist
   document.getElementById("wl").addEventListener("submit",function(ev){
