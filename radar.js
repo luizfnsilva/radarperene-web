@@ -535,6 +535,7 @@
       paint(curHist, true);
     }
     if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
+    document.body.appendChild(mw);  // ★ modal no DOM ANTES do setChart — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
     setChart(0);
     if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
@@ -675,7 +676,7 @@
         setChart(parseFloat(btn.getAttribute("data-m")));
       });
     })(perBtns[pi]); }
-    document.addEventListener("keydown", onkey); document.body.appendChild(mw);
+    document.addEventListener("keydown", onkey);  // (appendChild(mw) já feito antes do setChart, p/ o uPlot montar com o modal no DOM)
   }
 
   function render(node, d, lang, sections, chrome, skin) {
