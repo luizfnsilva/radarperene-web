@@ -125,7 +125,11 @@
   footer .disc{max-width:70ch;margin:0 auto 10px}
   /* lentes (o que é o app) */
   .lenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px}
-  .ln{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .ln{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;text-decoration:none;color:inherit;display:block;transition:border-color .15s}
+  .ln:hover{border-color:var(--gold)}
+  footer .ftnav{margin:0 0 14px;font-size:12.5px;line-height:2.1;color:var(--dim)}
+  footer .ftnav a{color:var(--dim);text-decoration:none}
+  footer .ftnav a:hover{color:var(--gold)}
   .ln .nm{font-family:var(--serif);font-weight:600;font-size:16px;margin:0 0 5px;display:flex;align-items:center;gap:7px}
   .ln p{color:var(--dim);font-size:13.5px;margin:0}
   .ln.vx{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface))}
@@ -256,6 +260,7 @@
 </div>
 
 <footer>
+  <nav class="ftnav" id="ftnav"></nav>
   <div class="disc" id="disc">Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.</div>
   <div>Radar Perene · <a href="mailto:hello@brazilcomplexity.com" id="mail">hello@brazilcomplexity.com</a><span id="portal-wrap" style="display:none"> · <a href="https://billing.stripe.com/p/login/14A14mbaWcwH2Dp58bb3q00" target="_blank" rel="noopener" id="portal">Gerenciar assinatura</a></span> · radarperene.com</div>
 </footer>
@@ -335,6 +340,7 @@
     eyb3:"For your site · free",s3:"Use our mini-radar anywhere",s3s:"A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4:"Principles",
     disc:"Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
+    ftnav:'<a href="/metodologia">Methodology</a> · <a href="/free">Free</a> · <a href="/about">About</a> · <a href="/lentes/patrimonial">Wealth</a> · <a href="/lentes/eleitoral">Electoral</a> · <a href="/lentes/macro">Macro</a> · <a href="/lentes/institucional">Institutional</a> · <a href="/lentes/imobiliaria">Real estate</a> · <a href="/lentes/vertice">Vértice</a>',
     lenses:[{n:"Wealth",d:"Succession, estate tax, holdings and structures — pressure on wealth."},
       {n:"Electoral",d:"Electoral courts, eligibility, campaign finance and digital enforcement."},
       {n:"Macro / Rates",d:"Rates, inflation, fiscal and debt — the country&rsquo;s macro regime."},
@@ -365,6 +371,7 @@
     eyb3:"Para o seu site · grátis",s3:"Use nosso mini-radar onde quiser",s3s:"Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.",
     eyb4:"Princípios",
     disc:"Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.",
+    ftnav:'<a href="/metodologia">Metodologia</a> · <a href="/free">Tier grátis</a> · <a href="/sobre">Sobre</a> · <a href="/lentes/patrimonial">Patrimonial</a> · <a href="/lentes/eleitoral">Eleitoral</a> · <a href="/lentes/macro">Macro</a> · <a href="/lentes/institucional">Institucional</a> · <a href="/lentes/imobiliaria">Imobiliária</a> · <a href="/lentes/vertice">Vértice</a>',
     lenses:[{n:"Patrimonial",d:"Sucessão, ITCMD, holdings e estruturas — a pressão sobre o patrimônio."},
       {n:"Eleitoral",d:"TSE, elegibilidade, financiamento e enforcement digital."},
       {n:"Macro / Juros",d:"Juros, inflação, fiscal e dívida — o regime macro do país."},
@@ -389,10 +396,11 @@
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
   set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
-  set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);
+  set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);set("ftnav",C.ftnav);
   document.getElementById("wl-email").placeholder=C.wlph;
   var expTag=LANG==="en"?"experiment":"experimento";
-  set("lenses",C.lenses.map(function(l){return '<div class="ln'+(l.v?' vx':'')+'"><div class="nm">'+(l.v?'<span style="color:var(--gold)">✦</span> ':'')+l.n+(l.v?'<span class="tag">'+expTag+'</span>':'')+'</div><p>'+l.d+'</p>'+(l.m?'<span class="micro">'+l.m+'</span>':'')+'</div>'}).join(""));
+  var LSLUG=["patrimonial","eleitoral","macro","institucional","imobiliaria","vertice"];  // de-orphan: cada card linka pra sua página de lente (mesma ordem PT/EN)
+  set("lenses",C.lenses.map(function(l,i){return '<a class="ln'+(l.v?' vx':'')+'" href="/lentes/'+LSLUG[i]+'"><div class="nm">'+(l.v?'<span style="color:var(--gold)">✦</span> ':'')+l.n+(l.v?'<span class="tag">'+expTag+'</span>':'')+'</div><p>'+l.d+'</p>'+(l.m?'<span class="micro">'+l.m+'</span>':'')+'</a>'}).join(""));
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
   set("scale",C.scale.map(function(s){return '<div class="st"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join(""));
   set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));
