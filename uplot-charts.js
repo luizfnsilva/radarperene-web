@@ -300,7 +300,7 @@
       ctx.restore();
     }
 
-    var cursor = { points: { show: true } };  // SEM focus: focus.prox destaca a linha da legenda, mas legend.show=false → addClass em elemento inexistente → crash na construção
+    var cursor = { points: { show: false } };  // points/focus OFF: o uPlot addClass-a o "cursor point" por série ao desenhar; com séries esparsas (cone só-futuro) dava addClass(undefined) → crash. Crosshair (default) mantido.
     if (opt.sync) cursor.sync = { key: opt.sync }; // uPlot: cursor.sync.key compartilha crosshair entre charts
 
     var opts = {
