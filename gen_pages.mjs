@@ -179,7 +179,7 @@ ${headStyle}
 // língua por hostname (.com→en, .com.br→pt) — bots que rodam JS recebem 1 língua; hreflang cobre o resto
 (function(){var host=location.hostname.toLowerCase();var en=/radarperene\\.com$/.test(host)&&!/\\.com\\.br$/.test(host);var L=en?"en":"pt";
   document.documentElement.lang=en?"en":"pt-BR";
-  document.querySelectorAll("[data-lang]").forEach(function(n){n.style.display=(n.getAttribute("data-lang")===L)?"":"none";});
+  document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
   var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
   ["m-desc","og-t","og-d"].forEach(function(id){var e=document.getElementById(id);});
   var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),T2=document.querySelector("title");
