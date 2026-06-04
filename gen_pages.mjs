@@ -13,8 +13,10 @@ const INDEX = readFileSync(join(ROOT, "index.html"), "utf8");
 // --- chrome compartilhado: extrai o <style>…</style> + fontes + theme-script do index, p/ casar 100% ---
 const headStyle = INDEX.slice(INDEX.indexOf("<link rel=\"preconnect\""), INDEX.indexOf("</head>"));
 
+// NOTA: /sobre NÃO é gerado aqui — já existe sobre.html + about.html hand-built servindo /sobre e /about.
+// A copy ghostwriter do /sobre está em SITE_COPY_BURST_1.md §2.1/2.2; p/ trocar, apague sobre.html+about.html
+// e adicione { slug:"sobre", sec:["2.1","2.2"], type:"manifesto" } abaixo.
 const PAGES = [
-  { slug: "sobre",                sec: ["2.1", "2.2"], type: "manifesto" },
   { slug: "metodologia",          sec: ["5.1", "5.2"], type: "metodo" },
   { slug: "free",                 sec: ["4.1", "4.2"], type: "free" },
   { slug: "lentes/patrimonial",   sec: ["3.1", "3.2"], type: "lente" },
@@ -198,9 +200,13 @@ const results = PAGES.map((p) => page(p.slug, p.sec, p.type));
 // --- sitemap.xml: home + 9 páginas em AMBOS domínios (mesma rota, língua por hostname) + hreflang ---
 const LASTMOD = "2026-06-03";
 const su = (loc, alt, freq, pri) => `<url><loc>${loc}</loc>${alt}<lastmod>${LASTMOD}</lastmod><changefreq>${freq}</changefreq><priority>${pri}</priority></url>`;
+const aboutAlt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/sobre"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/about"/>`;
 const rows = [
   su("https://radarperene.com/", `<xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/"/><xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/"/>`, "daily", "1.0"),
   su("https://radarperene.com.br/", `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com/"/>`, "daily", "1.0"),
+  // /sobre + /about hand-built (não gerados aqui)
+  su("https://radarperene.com.br/sobre", aboutAlt, "monthly", "0.8"),
+  su("https://radarperene.com/about", aboutAlt, "monthly", "0.8"),
 ];
 for (const p of PAGES) {
   const path = "/" + p.slug;
