@@ -71,6 +71,27 @@
   .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
   .brand .nm b{color:var(--gold)}
   .lang{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:4px}.lang a{text-decoration:none;padding:0 4px}.lang a.on{color:var(--gold);font-weight:600}
+  /* menu superior de conteúdo educacional (estilo SentimenTrader/Lead-Lag): links + dropdowns leves */
+  .topnav{display:flex;align-items:center;gap:18px;font-size:13px;flex-wrap:wrap}
+  .topnav>a,.topnav .dd>a{text-decoration:none;color:var(--txt2);white-space:nowrap;padding:4px 0;border-bottom:1.5px solid transparent;transition:color .15s,border-color .15s}
+  .topnav>a:hover,.topnav .dd>a:hover{color:var(--gold);border-color:var(--gold)}
+  .topnav .dd{position:relative}
+  .topnav .ddm{position:absolute;top:100%;left:0;z-index:120;min-width:230px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.18);padding:7px;display:none;flex-direction:column;margin-top:6px}
+  .topnav .dd:hover .ddm,.topnav .dd:focus-within .ddm{display:flex}
+  .topnav .ddm a{text-decoration:none;color:var(--txt2);font-size:12.5px;padding:7px 10px;border-radius:7px;white-space:nowrap}
+  .topnav .ddm a:hover{background:var(--surface2);color:var(--gold)}
+  .topnav .ddm a b{display:block;font-size:11px;color:var(--dim);font-weight:400;margin-top:1px}
+  @media(max-width:820px){.topnav{display:none}}
+  /* grid "A linguagem do Radar" (9 conceitos) */
+  .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .cgrid a{display:block;text-decoration:none;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;transition:border-color .15s,transform .15s}
+  .cgrid a:hover{border-color:var(--gold);transform:translateY(-1px)}
+  .cgrid a .cn{font-family:var(--serif);font-size:15px;color:var(--txt);font-weight:600}
+  .cgrid a .cd{font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.45}
+  @media(max-width:760px){.cgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:480px){.cgrid{grid-template-columns:1fr}}
+  #rp-ultimas .ult{display:block;text-decoration:none;color:var(--txt2);font-size:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+  #rp-ultimas .ult:hover{color:var(--gold)} #rp-ultimas .ult b{color:var(--txt);font-variant-numeric:tabular-nums;margin-right:8px}
   .tg{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;padding:2px 8px;cursor:pointer;font-size:12px;line-height:1.3;font-family:var(--sans);margin-left:6px}
   .tg:hover{color:var(--gold);border-color:var(--gold)}
   /* hero */
@@ -163,6 +184,7 @@
     <span class="nm">Radar <b>Perene</b></span>
     <span id="me-seal" style="display:none;margin-left:10px;font-size:11px;background:#b8801f;color:#0a0c0f;padding:2px 9px;border-radius:20px;font-weight:700;vertical-align:middle"></span>
   </div>
+  <nav class="topnav" id="topnav" aria-label="conteúdo"></nav>
   <div class="lang"><a href="/sobre" id="l-sobre">O que é</a> · <a href="#" id="me-login">Entrar</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a><button id="theme-tg" class="tg" type="button" aria-label="alternar tema">☾</button></div>
 </div>
 
@@ -189,6 +211,14 @@
     <h2 class="sec" id="s2">Cinco lentes do Brasil — e um experimento</h2>
     <p class="secsub" id="s2s">Não é newsletter. É um instrumento que lê o regime de cada domínio regulatório do país, em camadas. Veja a estrutura; a leitura de hoje, ao vivo, vem logo abaixo.</p>
     <div class="lenses" id="lenses"></div>
+  </section>
+
+  <section id="linguagem">
+    <div class="eyebrow" id="eyb-lng">A linguagem do Radar</div>
+    <h2 class="sec" id="s-lng">Os conceitos que sustentam a leitura</h2>
+    <p class="secsub" id="s-lng-s">Regime, lentes, intermercado, percentil, análogo, hipótese. Quem entende essa linguagem lê o produto — cada termo tem uma página dedicada.</p>
+    <div class="cgrid" id="conceitos-grid"></div>
+    <p class="micro" style="margin-top:12px"><a href="/conceitos/" id="lng-cta" style="color:var(--gold)">Ver toda a linguagem do Radar →</a></p>
   </section>
 
   <section id="depth">
@@ -236,6 +266,14 @@
       </form>
       <div class="wl-msg" id="wl-msg"></div>
     </div>
+  </section>
+
+  <section id="ultimas">
+    <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
+    <h2 class="sec" id="s-ult">O regime do dia — arquivado e auditável</h2>
+    <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — o histórico completo cruza passado e futuro.</p>
+    <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
+    <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diário completo →</a></p>
   </section>
 
   <section class="api">
@@ -401,6 +439,18 @@
   var expTag=LANG==="en"?"experiment":"experimento";
   var LSLUG=["patrimonial","eleitoral","macro","institucional","imobiliaria","vertice"];  // de-orphan: cada card linka pra sua página de lente (mesma ordem PT/EN)
   set("lenses",C.lenses.map(function(l,i){return '<a class="ln'+(l.v?' vx':'')+'" href="/lentes/'+LSLUG[i]+'/"><div class="nm">'+(l.v?'<span style="color:var(--gold)">✦</span> ':'')+l.n+(l.v?'<span class="tag">'+expTag+'</span>':'')+'</div><p>'+l.d+'</p>'+(l.m?'<span class="micro">'+l.m+'</span>':'')+'</a>'}).join(""));
+  // ── menu superior de conteúdo educacional (Conceitos ▾ / Lentes ▾ + flat links) ──
+  var _en=LANG==="en";
+  var NAV=_en?{met:"Methodology",con:"Concepts",len:"Lenses",dia:"Daily",howto:"How to read",free:"Free",ac:"All concepts →",al:"All lenses →"}:{met:"Metodologia",con:"Conceitos",len:"Lentes",dia:"Diário",howto:"Como ler",free:"Tier grátis",ac:"Todos os conceitos →",al:"Todas as lentes →"};
+  var CN=_en?[["regime-brasil","Brazil Regime"],["regime-global","Global Regime"],["intermercado-br","Intermarket BR"],["erp-br","ERP_BR"],["cone-de-regressao-logaritmica","Logarithmic Cone"],["indice-anima","Ânima Index"],["risk-on-risk-off","Risk-on / Risk-off"],["analogos-historicos","Historical Analogs"],["vertice","Vértice"]]:[["regime-brasil","Regime Brasil"],["regime-global","Regime Global"],["intermercado-br","Intermercado BR"],["erp-br","ERP_BR"],["cone-de-regressao-logaritmica","Cone Logarítmico"],["indice-anima","Índice Ânima"],["risk-on-risk-off","Risk-on / Risk-off"],["analogos-historicos","Análogos Históricos"],["vertice","Vértice"]];
+  var conDD=CN.map(function(c){return '<a href="/conceitos/'+c[0]+'/">'+c[1]+'</a>'}).join("")+'<a href="/conceitos/" style="color:var(--gold)">'+NAV.ac+'</a>';
+  var lenDD=C.lenses.map(function(l,i){return '<a href="/lentes/'+LSLUG[i]+'/">'+l.n+'</a>'}).join("")+'<a href="/lentes/" style="color:var(--gold)">'+NAV.al+'</a>';
+  set("topnav",'<a href="/metodologia/">'+NAV.met+'</a><span class="dd"><a href="/conceitos/" tabindex="0">'+NAV.con+' ▾</a><div class="ddm">'+conDD+'</div></span><span class="dd"><a href="/lentes/" tabindex="0">'+NAV.len+' ▾</a><div class="ddm">'+lenDD+'</div></span><a href="/diario">'+NAV.dia+'</a><a href="/como-ler-o-radar/">'+NAV.howto+'</a><a href="/free/">'+NAV.free+'</a>');
+  // ── grid "A linguagem do Radar" (9 conceitos, descoberta na home) ──
+  var CD=_en?["Brazil's prevailing market state","the external environment pressing on Brazil","cross-reading of Brazilian wealth-sector ratios","Brazilian equity risk premium in historical percentile","frames price against the long-term trajectory","proprietary reading of Brazilian market mood","environment tilt between risk and protection","past windows with a similar profile","cross-domain hypotheses under Bayesian discipline"]:["o estado predominante do mercado brasileiro","o ambiente externo que pressiona o Brasil","leitura cruzada de razões patrimoniais brasileiras","prêmio de risco brasileiro em percentil histórico","enquadra preço contra a trajetória de longo prazo","adaptação proprietária do humor do mercado BR","inclinação do ambiente entre risco e proteção","janelas do passado com perfil semelhante","hipóteses cross-domínio sob disciplina bayesiana"];
+  set("conceitos-grid",CN.map(function(c,i){return '<a href="/conceitos/'+c[0]+'/"><span class="cn">'+c[1]+'</span><span class="cd">'+CD[i]+'</span></a>'}).join(""));
+  if(_en){set("eyb-lng","The Radar's language");set("s-lng","The concepts behind the reading");set("s-lng-s","Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.");set("lng-cta","See the full Radar language →");
+    set("eyb-ult","Latest readings");set("s-ult","The day's regime — archived and auditable");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.");set("ult-cta","See the full Diary →");}
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
   set("scale",C.scale.map(function(s){return '<div class="st"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join(""));
   set("princ",C.princ.map(function(p){return '<div><b>'+p[0]+'.</b> '+p[1]+'</div>'}).join(""));

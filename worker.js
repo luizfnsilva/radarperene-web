@@ -101,7 +101,8 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
 function _diarioFetch(url) {
   return fetch(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
 }
-function _renderDiarioDia(snap, date, origin, lang) {
+function _renderDiarioDia(snap, date, origin, lang, nav) {
+  nav = nav || {};
   const en = lang === "en";
   const inds = snap.indicadores || [];
   const narr = snap.narrativa || {};
@@ -140,6 +141,8 @@ function _renderDiarioDia(snap, date, origin, lang) {
     verHtml +
     (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +  // resumo só na reconstrução (é uma nota explicativa). No congelado, a lista linkada abaixo É a leitura — não repetir a mesma info com link e sem link (texto_html removido: duplicava resumo + cada indicador)
     "<ul>" + indHtml + "</ul>" +
+    "<p style=\"font-size:13px;color:#555;margin-top:18px\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a></p>" +
+    ((nav.prev || nav.next) ? "<p style=\"font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px\">" + (nav.prev ? "<a href=\"/diario/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"/diario/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
     "<p class=\"foot\"><a href=\"/diario\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a></p>" +
     "<p class=\"nf\">" + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</p>" +
     "</body></html>";
@@ -240,7 +243,9 @@ export default {
       try {
         const r = await _diarioFetch(SNAP_API + "?date=" + _dm[1] + "&lang=" + (_isEN ? "en" : "pt"));
         if (!r.ok) return new Response((_isEN ? "No reading for " : "Sem leitura para ") + _dm[1], { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
-        return _renderDiarioDia(await r.json(), _dm[1], _url.origin, _isEN ? "en" : "pt");
+        const nav = {};  // navegação cronológica (lista desc: idx-1 = mais recente = seguinte; idx+1 = anterior)
+        try { const sl = await _diarioFetch(SNAPS_API); if (sl.ok) { const ds = ((await sl.json()).itens || []).map(function (x) { return x.data; }); const ix = ds.indexOf(_dm[1]); if (ix >= 0) { nav.next = ix > 0 ? ds[ix - 1] : null; nav.prev = ix < ds.length - 1 ? ds[ix + 1] : null; } } } catch (e) { /* opcional */ }
+        return _renderDiarioDia(await r.json(), _dm[1], _url.origin, _isEN ? "en" : "pt", nav);
       } catch (e) { return env.ASSETS.fetch(request); }
     }
     // ── /ativos — hub crawlável que DE-ORFANIZA as páginas /ativo (Ahrefs #3): links reais via /v1/tickers. 1 rota, língua por hostname. ──
@@ -317,6 +322,13 @@ export default {
         if (nr.ok) narr = await nr.json();
       } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
 
+      // Últimas leituras (3 diários mais recentes) → injeta no #rp-ultimas (crawler-first, links pro arquivo)
+      let ultimas = null;
+      try {
+        const ur = await fetch(SNAPS_API + "?lang=" + (isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } });
+        if (ur.ok) { const uj = await ur.json(); ultimas = (uj.itens || []).slice(0, 3); }
+      } catch (e) { /* opcional */ }
+
       let rw = new HTMLRewriter();
       if (isEN) {
         rw = rw
@@ -337,6 +349,13 @@ export default {
           const ld = JSON.stringify(narr.jsonld).replace(/</g, "\u003c"); // seguro dentro de <script>
           rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } });
         }
+      }
+      if (ultimas && ultimas.length) {
+        const uh = ultimas.map(function (s) {
+          const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
+          return '<a class="ult" href="/diario/' + s.data + '"><b>' + s.data + '</b>' + _esc(rg) + (s.global ? " · " + (isEN ? "global " : "global ") + _esc(s.global) : "") + " →</a>";
+        }).join("");
+        rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }
       return rw.transform(res);
     } catch (e) {
