@@ -86,8 +86,8 @@
   .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
   .cgrid a{display:block;text-decoration:none;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;transition:border-color .15s,transform .15s}
   .cgrid a:hover{border-color:var(--gold);transform:translateY(-1px)}
-  .cgrid a .cn{font-family:var(--serif);font-size:15px;color:var(--txt);font-weight:600}
-  .cgrid a .cd{font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.45}
+  .cgrid a .cn{display:block;font-family:var(--serif);font-size:15px;color:var(--txt);font-weight:600;line-height:1.25}
+  .cgrid a .cd{display:block;font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.45}
   @media(max-width:760px){.cgrid{grid-template-columns:1fr 1fr}}
   @media(max-width:480px){.cgrid{grid-template-columns:1fr}}
   #rp-ultimas .ult{display:block;text-decoration:none;color:var(--txt2);font-size:14px;padding:9px 0;border-bottom:1px solid var(--line)}
@@ -526,8 +526,13 @@
     m.style.cssText="position:absolute;top:46px;right:14px;z-index:10000;background:#13171c;border:1px solid #222a31;border-radius:10px;padding:7px;box-shadow:0 12px 40px rgba(0,0,0,.55);min-width:190px";
     function opt(label,fn){var b=document.createElement("button");b.textContent=label;b.style.cssText="display:block;width:100%;text-align:left;background:transparent;border:0;color:#e8ebee;padding:9px 11px;border-radius:7px;cursor:pointer;font:13px 'Inter',system-ui,sans-serif";b.onmouseover=function(){b.style.background="#1c222b"};b.onmouseout=function(){b.style.background="transparent"};b.onclick=fn;m.appendChild(b);}
     var prov=function(p){return function(){sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.href}})}};
-    opt(EN?"Continue with Google":"Entrar com Google",prov("google"));
-    opt(EN?"Continue with Apple":"Entrar com Apple",prov("apple"));
+    // Google/Apple = só ícone (sem texto), lado a lado em botões claros
+    var GSVG='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.5 29.3 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 18.9 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.5 29.3 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 43.5c5.2 0 9.8-2 13.3-5.2l-6.2-5.2C29.1 34.7 26.7 35.5 24 35.5c-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.6 39 16.2 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.4l6.2 5.2C40.9 36.8 43.5 31 43.5 24c0-1.3-.1-2.3-.4-3.5z"/></svg>';
+    var ASVG='<svg width="19" height="19" viewBox="0 0 24 24" fill="#000" aria-hidden="true"><path d="M16.4 12.8c0-2.1 1.7-3.1 1.8-3.2-1-1.4-2.5-1.6-3-1.6-1.3-.1-2.5.8-3.1.8-.6 0-1.7-.8-2.7-.8-1.4 0-2.7.8-3.4 2.1-1.5 2.5-.4 6.3 1 8.3.7 1 1.5 2.1 2.5 2 1-.04 1.4-.65 2.6-.65s1.5.65 2.6.63c1.1-.02 1.8-1 2.4-2 .8-1.1 1.1-2.2 1.1-2.3-.02-.01-2.1-.8-2.1-3.1zM14.4 6.3c.5-.65.9-1.55.8-2.45-.8.03-1.7.53-2.3 1.18-.5.55-.95 1.47-.83 2.33.9.07 1.8-.45 2.33-1.06z"/></svg>';
+    function ico(svg,fn,lbl){var b=document.createElement("button");b.innerHTML=svg;b.title=lbl;b.setAttribute("aria-label",lbl);b.style.cssText="flex:1;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #2a323c;border-radius:8px;padding:11px;cursor:pointer";b.onmouseover=function(){b.style.background="#eef0f2"};b.onmouseout=function(){b.style.background="#fff"};b.onclick=fn;return b;}
+    var oauthRow=document.createElement("div");oauthRow.style.cssText="display:flex;gap:7px;margin-bottom:6px";
+    oauthRow.appendChild(ico(GSVG,prov("google"),"Google"));oauthRow.appendChild(ico(ASVG,prov("apple"),"Apple"));
+    m.appendChild(oauthRow);
     opt(EN?"Email magic link":"Link por e-mail",async function(){m.remove();var em=(prompt(EN?"Your email:":"Seu e-mail:")||"").trim().toLowerCase();if(!em)return;if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){alert(EN?"Invalid email format — check for spaces/typos.":"Formato de e-mail inválido — confira espaços/erros de digitação.");return;}var res=await sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+"/",shouldCreateUser:true}});alert(res.error?("Erro: "+res.error.message):(EN?"Check your email for the link (and spam).":"Verifique seu e-mail — enviamos o link (veja o spam também)."))});
     document.body.appendChild(m);
     setTimeout(function(){document.addEventListener("click",function h(ev){if(!m.contains(ev.target)&&ev.target!==loginEl){m.remove();document.removeEventListener("click",h)}})},50);
