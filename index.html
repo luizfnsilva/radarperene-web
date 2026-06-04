@@ -426,6 +426,8 @@
   var rn=document.getElementById("radar-perene");
   if(rn){ rn.setAttribute("data-lang",LANG);
     var rs=document.createElement("script"); rs.src="/radar.js"; rs.defer=true; document.body.appendChild(rs); }  // absoluto: em /ativo/{ticker} o relativo "radar.js" virava /ativo/radar.js → 404 → widget não carregava
+  // em sub-páginas (/ativo/{ticker}) a seção #radar vira o widget DO TICKER → os CTAs "radar ao vivo" devem ir pro radar COMPLETO (home), não rolar pro ticker
+  if(location.pathname!=="/"&&location.pathname!=="/index.html"){document.querySelectorAll('a[href="#radar"]').forEach(function(a){a.setAttribute("href","/#radar");});}
 
   // waitlist
   document.getElementById("wl").addEventListener("submit",function(ev){
