@@ -15,6 +15,9 @@ const EN_FAQ = JSON.stringify({
   ]
 });
 
+const NARR_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
+const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/narrative";
+
 export default {
   async fetch(request, env) {
     const res = await env.ASSETS.fetch(request); // serve o asset estático
@@ -24,21 +27,40 @@ export default {
       const isEN = /radarperene\.com$/i.test(host) && !/\.com\.br$/i.test(host); // só .com (não .com.br)
       const isRoot = url.pathname === "/" || url.pathname === "/index.html";
       const ct = res.headers.get("content-type") || "";
-      if (!isEN || !isRoot || !ct.includes("text/html")) return res; // tudo o mais: intacto
-      return new HTMLRewriter()
-        .on("html", { element(e) { e.setAttribute("lang", "en"); } })
-        .on("title", { element(e) { e.setInnerContent(EN_TITLE); } })
-        .on('meta[name="description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
-        .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
-        .on('meta[name="twitter:description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
-        .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
-        .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
-        .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
-        .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
-        .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } })
-        .transform(res);
+      if (!isRoot || !ct.includes("text/html")) return res; // só a home HTML é transformada
+
+      // AI-readability (Sprint A): busca a leitura do dia em prosa (cacheada 1h, DEFENSIVA) p/ injetar como texto + JSON-LD
+      let narr = null;
+      try {
+        const nr = await fetch(NARR_API + "?lang=" + (isEN ? "en" : "pt"),
+          { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
+        if (nr.ok) narr = await nr.json();
+      } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
+
+      let rw = new HTMLRewriter();
+      if (isEN) {
+        rw = rw
+          .on("html", { element(e) { e.setAttribute("lang", "en"); } })
+          .on("title", { element(e) { e.setInnerContent(EN_TITLE); } })
+          .on('meta[name="description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
+          .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
+          .on('meta[name="twitter:description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
+          .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
+          .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
+          .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
+          .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
+          .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } });
+      }
+      if (narr && narr.texto_html) {
+        rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
+        if (narr.jsonld) {
+          const ld = JSON.stringify(narr.jsonld).replace(/</g, "\u003c"); // seguro dentro de <script>
+          rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } });
+        }
+      }
+      return rw.transform(res);
     } catch (e) {
-      return res; // nunca quebra: na dúvida, serve o original (PT)
+      return res; // nunca quebra: na dúvida, serve o original
     }
   }
 };

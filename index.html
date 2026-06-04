@@ -92,6 +92,9 @@
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
   h2.sec{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,32px);margin:0 0 8px}
   .secsub{color:var(--dim);max-width:64ch;margin:0 0 22px;font-size:15px}
+  .rp-narr{max-width:74ch;margin:18px auto 0;font-size:13.5px;line-height:1.65;color:var(--dim)}
+  .rp-narr:empty{display:none}
+  .rp-narr p{margin:0 0 7px}.rp-narr p:first-child{color:var(--txt2);font-weight:500}
   /* live radar mount */
   /* value cards */
   .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -208,6 +211,8 @@
     <h2 class="sec" id="s1">A leitura de hoje</h2>
     <p class="secsub" id="s1s">Uma amostra do motor sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.</p>
     <div id="radar-perene" data-chrome="off" style="--rp-max:100%"></div>
+    <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). Mesma leitura honesta, em prosa. -->
+    <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
   </section>
 
   <section id="fundadores">
