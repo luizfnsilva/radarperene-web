@@ -11,6 +11,8 @@
  *  Dado: API pública (CORS aberto). P7: descritivo, nunca recomenda. Atualiza ao carregar a página.
  */
 (function () {
+  // endereço absoluto do próprio radar.js — currentScript é válido AGORA (defer, exec síncrona), vira null no callback do boot.
+  var RP_SRC = (document.currentScript && document.currentScript.src) || "";
   var API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
   // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
   // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
@@ -18,6 +20,45 @@
   var FOPT = { headers: { apikey: ANON, Authorization: "Bearer " + ANON } };
   var RP_CAT = [];  // catálogo de séries cruzáveis (estúdio) — montado no render a partir do digest, cresce sozinho com novos tickers
   var STYLE_ID = "rp-radar-style";
+
+  // ── Sprint 1: engine de gráfico atrás de flag. Default = SVG legado (zero mudança). ─────────────
+  //    Liga com ?engine=uplot OU localStorage rp-engine="uplot". O embed de terceiros NUNCA liga
+  //    (sem query/sem localStorage → "svg"), então percorre o caminho SVG byte-idêntico de hoje e
+  //    sequer baixa vendor/uplot. Toda a lógica nova abaixo vive atrás de uplotOn()/RP_ENGINE.
+  var RP_ENGINE = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get("engine");
+      if (q === "uplot" || q === "svg") { localStorage.setItem("rp-engine", q); return q; }
+      return localStorage.getItem("rp-engine") || "svg";
+    } catch (e) { return "svg"; }
+  })();
+  // quais gráficos já migraram p/ uPlot (os demais seguem SVG mesmo com a flag on). Sprint 1 = só o herói.
+  var RP_UP = { price: true, osc: false, scatter: false, dual: false };
+  // true só quando a flag pede E a engine carregou (RPUplot.ready()). Senão → SVG (degrada gracioso).
+  function uplotOn() { return RP_ENGINE === "uplot" && window.RPUplot && window.RPUplot.ready(); }
+
+  // Carrega vendor/uplot + uplot-charts SÓ se a flag pedir; resolve quando a engine estiver pronta.
+  // Flag off → nunca baixa nada (cb imediato). onerror→cb mantém o widget vivo em SVG se o asset falhar.
+  function ensureUplot(cb) {
+    if (RP_ENGINE !== "uplot") return cb();                  // flag off → caminho legado, zero download
+    if (window.RPUplot && window.RPUplot.ready()) return cb();
+    var base = (RP_SRC || "radar.js").replace(/radar\.js(\?.*)?$/, "");  // src absoluto (capturado no topo) → vendor carrega de radarperene.com/vendor/ em qq página/embed, não relativo a /ativo/…
+    function load(tag, attr, url, onload) { var e = document.createElement(tag); e[attr] = url; if (tag === "link") e.rel = "stylesheet"; e.onload = onload; e.onerror = onload; (document.head || document.body).appendChild(e); }
+    load("link", "href", base + "vendor/uplot/uPlot.min.css");
+    load("script", "src", base + "vendor/uplot/uPlot.iife.min.js", function () {
+      load("script", "src", base + "uplot-charts.js", function () { cb(); });   // engine só depois do vendor
+    });
+  }
+
+  // Registro dos uPlots montados (p/ re-tema): cada item re-desenha a si mesmo. flushUp() popula.
+  var _upMounted = [];
+  function rpRedrawUplots() {  // canvas não herda var CSS ao vivo → re-instancia no toque de tema
+    for (var i = _upMounted.length - 1; i >= 0; i--) {
+      var m = _upMounted[i];
+      if (!m.el || !m.el.isConnected) { _upMounted.splice(i, 1); continue; }  // desmontado (modal fechado) → descarta
+      try { m.draw(m.el); } catch (e) {}
+    }
+  }
 
   // ── REGISTRO DE CAMADAS (Strategy/Factory) — fonte única dos overlays do gráfico ──────────────
   // Cada camada se descreve: id, rótulo, default, disponibilidade. 'core' = desenhada pelo bigChart
@@ -399,7 +440,8 @@
       if (st.sharpe != null) h += '<div class="rp-ml"><b style="color:var(--_' + (st.sharpe >= 0 ? "warm" : "cool") + ')">Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
     h += '<div class="rp-per">' + [["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) { return '<button data-m="' + p[0] + '"' + (p[0] === "0" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
-    h += '<div class="rp-chart">' + bigChart(s, { big: true }) + '</div>';
+    var useUp = uplotOn() && RP_UP.price;  // herói em uPlot? (flag on + engine pronta + price migrado)
+    h += '<div class="rp-chart">' + (useUp ? '' : bigChart(s, { big: true })) + '</div>';  // uPlot desenha no div vazio depois do innerHTML
     if (!gpaid) {  // FREE: 2 overlays (1 projeção = cone/mediana + 1 indicador) — "gostinho"; manipular/comparar/cone-completo ficam no Founder
       var freeIds = ["cone"]; if (s.fair) freeIds.push("fair"); else if (s.ma200 && s.ma200.length) freeIds.push("ma200");
       var fLbl = { cone: (L ? "Projection (median)" : "Projeção (mediana)"), fair: (L ? "Fair value" : "Valor-justo"), ma200: "MM200" };
@@ -444,7 +486,28 @@
       return [[5, mx], [27.5, mn + 0.75 * rg], [50, mn + 0.5 * rg], [72.5, mn + 0.25 * rg], [95, mn]].map(function (p) {  // 5 níveis alinhados às gridlines (eixo mais legível p/ análise precisa)
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
     }
+    // ── uPlot (Sprint 1, herói): clona s refletindo os toggles free e (re)instancia upPrice no chartEl. ──
+    //    Mantido num builder p/ o re-tema (MutationObserver) re-desenhar com a paleta nova.
+    var _upInst = null;  // instância uPlot viva (ou null em modo SVG)
+    function drawUp(el) {  // el = chartEl; lê o estado de overlays `ov` (free liga/desliga cone/fair/ma200)
+      var sv = {};
+      for (var kk in s) if (Object.prototype.hasOwnProperty.call(s, kk)) sv[kk] = s[kk];
+      if (ov.cone === false) { sv.cone = null; sv.shadow = null; }   // toggle "Projeção" off → sem cone/sombra
+      if (!ov.fair) sv.fair = null;                                   // toggle "Valor-justo" off
+      if (!ov.ma200) sv.ma200 = null;
+      if (!ov.ma50) sv.ma50 = null;
+      if (!ov.bands) sv.bands = null;
+      if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
+      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid });
+      return _upInst;
+    }
+    function tsAt(idx) {  // timestamp (epoch-s) da data no índice idx de s.hist; fallback null
+      if (!s.datas || s.datas.length !== s.hist.length) return null;
+      var t = Date.parse(String(s.datas[idx]).length <= 10 ? s.datas[idx] + "T00:00:00Z" : s.datas[idx]);
+      return isFinite(t) ? t / 1000 : null;
+    }
     function paint(histArr, wf) { wf = wf !== false;  // wf=mostra futuro (cone/proj); zoom num período passado desliga
+      if (useUp) { drawUp(chartEl); return; }  // uPlot: redesenha (cone/fair/ma seguem os toggles); zoom/eixo são nativos
       var ws = winStart, we = winStart + histArr.length;  // janela ABSOLUTA em s.hist → fatia TUDO igual (sombra/MM/valor-justo), inclusive zoom não-tail
       var shSl = (ov.cone !== false && s.shadow && s.shadow.lo) ? { lo: s.shadow.lo.slice(ws, we), hi: s.shadow.hi.slice(ws, we) } : null;
       var ma2Sl = (ov.ma200 && s.ma200) ? s.ma200.slice(ws, we) : null, ma5Sl = (ov.ma50 && s.ma50) ? s.ma50.slice(ws, we) : null;
@@ -462,8 +525,16 @@
         if (i0 > s.datas.length - 6) i0 = Math.max(0, s.datas.length - 8);  // mínimo de pontos
       }
       curHist = i0 ? s.hist.slice(i0) : s.hist; winStart = i0;
-      rbtn.style.display = "none"; paint(curHist, true);
+      rbtn.style.display = "none";
+      if (useUp) {  // uPlot: o eixo-X já mostra TUDO; período = setScale("x") no range de datas (sem re-fatiar/repintar SVG)
+        if (!_upInst || !_upInst.root || !_upInst.root.isConnected) drawUp(chartEl);  // re-instancia se o canvas saiu do DOM (ex.: voltou do Estúdio A×B)
+        if (_upInst) { var mn = tsAt(i0), mx = tsAt(s.hist.length - 1);
+          if (mn != null && mx != null) _upInst.setScale("x", m ? { min: mn, max: mx + (mx - mn) * 0.18 } : null); }  // MAX (m=0) → autoscale; janela → deixa folga p/ o cone futuro à direita
+        return;
+      }
+      paint(curHist, true);
     }
+    if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
     setChart(0);
     if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
@@ -538,7 +609,7 @@
       };
       if (cmp.length >= 2) applyMode(); else renderStudio();  // pré-carga (intermercado) abre já em modo compare
     }
-    chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto)
+    if (!useUp) chartEl.addEventListener("mousemove", function (e) {  // crosshair sincronizado (guia + valor no ponto) — em uPlot o cursor é nativo, não bindamos o manual (risco #2)
       if (brushing || compareActive) return;  // durante o arraste/modo compare, o crosshair de ticker único não vale
       var rect = chartEl.getBoundingClientRect(), fx = (e.clientX - rect.left) / rect.width;
       if (fx < 0 || fx > 1 || !curHist || curHist.length < 2) { xh.style.display = "none"; xt.style.display = "none"; return; }
@@ -546,9 +617,10 @@
       xh.style.display = "block"; xh.style.left = (fx * 100) + "%";
       xt.style.display = "block"; xt.style.left = (fx * 100) + "%"; xt.textContent = fmtNum(val);
     });
-    chartEl.addEventListener("mouseleave", function () { xh.style.display = "none"; xt.style.display = "none"; });
+    if (!useUp) chartEl.addEventListener("mouseleave", function () { xh.style.display = "none"; xt.style.display = "none"; });
     // ★ MANIPULAÇÃO (só assinante): arrastar no gráfico dá zoom num período livre. Visitante free nunca recebe estes handlers.
-    if (gpaid) {
+    //    Em uPlot o drag-zoom é nativo → NÃO bindamos o brush manual (colide com o cursor/zoom do uPlot, risco #2).
+    if (gpaid && !useUp) {
       chartEl.style.cursor = "crosshair";
       chartEl.parentNode.insertBefore(rbtn, chartEl.nextSibling);
       var hint = document.createElement("div"); hint.className = "rp-ml"; hint.style.opacity = ".6"; hint.style.marginTop = "3px";
@@ -591,7 +663,15 @@
     for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
       btn.addEventListener("click", function (e) { e.stopPropagation();
         for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
-        if (btn.getAttribute("data-max")) { chartEl.innerHTML = '<div class="rp-gate"><div class="rp-blur">' + chartEl.innerHTML + '</div>' + lockHTML + '</div>'; return; }  // item 6: gráfico real BORRADO atrás + lock ancorado por cima (tease PLG, não tela vazia)
+        if (btn.getAttribute("data-max")) {  // item 6: gráfico real BORRADO atrás + lock ancorado por cima (tease PLG, não tela vazia)
+          if (useUp) {  // canvas perde o bitmap se serializado via innerHTML → move os nós p/ dentro do blur sem re-serializar
+            var gate = document.createElement("div"); gate.className = "rp-gate";
+            var blur = document.createElement("div"); blur.className = "rp-blur";
+            while (chartEl.firstChild) blur.appendChild(chartEl.firstChild);
+            gate.appendChild(blur); gate.insertAdjacentHTML("beforeend", lockHTML); chartEl.appendChild(gate);
+          } else { chartEl.innerHTML = '<div class="rp-gate"><div class="rp-blur">' + chartEl.innerHTML + '</div>' + lockHTML + '</div>'; }
+          return;
+        }
         setChart(parseFloat(btn.getAttribute("data-m")));
       });
     })(perBtns[pi]); }
@@ -745,10 +825,22 @@
       }).catch(function () { node.innerHTML = '<div class="' + cls + '"><div class="sub">—</div></div>'; });
   }
 
+  // Re-desenha os uPlots montados quando o tema troca claro/escuro (canvas é bitmap, não herda var CSS).
+  // MutationObserver no <html> data-theme → zero edição de index.html. Só age com a flag on.
+  function rpWatchTheme() {
+    if (typeof MutationObserver !== "function") return;
+    var mo = new MutationObserver(function () { if (uplotOn()) rpRedrawUplots(); });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+
   function boot() {
     injectStyle();
+    rpWatchTheme();
     var nodes = document.querySelectorAll("#radar-perene,[data-radar-perene]");
     if (!nodes.length) return;
+    ensureUplot(function () { bootNodes(nodes); });
+  }
+  function bootNodes(nodes) {
     nodes.forEach(function (node) {
       var lang = node.getAttribute("data-lang") === "en" ? "en" : "pt";
       var chrome = node.getAttribute("data-chrome") !== "off";  // "off" = sem marca/teaser-link/rodapé (uso na própria página)
