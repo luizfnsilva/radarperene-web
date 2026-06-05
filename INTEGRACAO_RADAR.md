@@ -7,6 +7,12 @@ grátis, e **P7** (descritivo, educacional, **nunca recomendação**).
 > **Já no ar:** o widget e os scripts são servidos por **`radarperene.com`**. A API de dados (JSON) fica em
 > `https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api`.
 
+> **Atalho — Leitura do dia (JSON canônico, citável):** `GET https://radarperene.com.br/api/leitura-do-dia.json`
+> retorna a leitura agregada do dia (regime BR + score, regime global, lente em destaque, análogo, componentes
+> visíveis, divergências, link da metodologia, disclaimer). CORS aberto, cache 4h, sem cadastro. Schema campo a
+> campo, exemplos curl e os três tamanhos de widget em **`https://radarperene.com.br/api/docs`**.
+> Histórico verificável (uma página por dia, desde 2000) em **`https://radarperene.com.br/diario`**.
+
 ---
 
 ## Forma 1 — `radar.js` (recomendada: 1 linha, SUA identidade, qualquer site)
