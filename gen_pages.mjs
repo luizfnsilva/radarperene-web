@@ -148,6 +148,8 @@ const SLUG_MAP = [
   ["/concepts/logarithmic-regression-cone", "/conceitos/cone-de-regressao-logaritmica"],
   ["/concepts/anima-index", "/conceitos/indice-anima"],
   ["/concepts/historical-analogs", "/conceitos/analogos-historicos"],
+  ["/conceitos/intermarket-doctrine", "/conceitos/intermercado-br"], ["/concepts/intermarket-doctrine", "/conceitos/intermercado-br"],
+  ["/conceitos/market-regime", "/conceitos/regime-brasil"], ["/concepts/market-regime", "/conceitos/regime-brasil"],
   ["/concepts/", "/conceitos/"],
   ["/lenses/wealth", "/lentes/patrimonial"],
   ["/lenses/electoral", "/lentes/eleitoral"],
@@ -170,10 +172,18 @@ function normPath(url) {
   }
   return url;
 }
+// paths internos válidos (após normPath) → links p/ inexistentes viram TEXTO (mata 404 de conceito/lente citados na copy)
+const VALID_PATHS = new Set(["/", "/sobre", "/about", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", ...PAGES.map((p) => "/" + p.slug + "/")]);
+const OK_PREFIX = ["/ativo/", "/indicador/", "/diario/"];  // rotas dinâmicas do worker (não enumeráveis) — permite por prefixo
+function validInternal(p) {
+  if (!p.startsWith("/") || p.includes("#") || /\.[a-z0-9]+$/i.test(p)) return true;  // âncora/arquivo/externo → não mexe
+  if (VALID_PATHS.has(p)) return true;
+  return OK_PREFIX.some((pre) => p.startsWith(pre) && p.length > pre.length);
+}
 // inline markdown: [txt](url) + **bold** + *itálico* (após esc; os marcadores sobrevivem ao esc)
 function mdInline(s) {
   return esc(s)
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => `<a href="${normPath(url.trim())}">${txt}</a>`)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => { const p = normPath(url.trim()); return validInternal(p) ? `<a href="${p}">${txt}</a>` : txt; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
 }
@@ -352,7 +362,8 @@ function page(p) {
     pt.bodyHtml += relatedHtml(bare, false); en.bodyHtml += relatedHtml(bare, true);
   }
   const sov = SEO_OVERRIDE[p.slug] || {};     // metas encurtados p/ limite SEO (corpo segue verbatim)
-  const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = sov.dPt || pt.desc, dEn = sov.dEn || en.desc;
+  const clampD = (s, n) => { s = String(s || ""); return s.length <= n ? s : s.slice(0, n).replace(/\s+\S*$/, "").replace(/[\s,.;:—–-]+$/, ""); };
+  const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = clampD(sov.dPt || pt.desc, 150), dEn = clampD(sov.dEn || en.desc, 150);  // ≤150 (Ahrefs meta-desc)
   const path = "/" + p.slug + "/";            // rota-diretório → SEMPRE trailing slash (canonical real servido pelo CF)
   const ld = buildSchemas(p, B[p.sec[0]] || "", pt, path, tPt, dPt);  // JSON-LD por tipo (Organization+BreadcrumbList+específico)
   const disc = pt.disclaimer || "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.";
@@ -399,6 +410,7 @@ ${headStyle}
   .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
   .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
   .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
+  footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold)}
   [data-lang]{display:none}
 </style>
 </head>
@@ -424,6 +436,8 @@ ${headStyle}
   </article>
 </div>
 <footer>
+  <nav class="ftnav" data-lang="pt"><a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Tier grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a></nav>
+  <nav class="ftnav" data-lang="en"><a href="/metodologia/">Methodology</a> · <a href="/como-ler-o-radar/">How to read</a> · <a href="/conceitos/">Concepts</a> · <a href="/lentes/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/about">About</a> · <a href="/termos/">Terms</a> · <a href="/privacidade/">Privacy</a></nav>
   <p class="disc" data-lang="pt">${esc(disc)}</p>
   <p class="disc" data-lang="en">${esc(discEn)}</p>
   <p>© Radar Perene · <a href="/" style="color:var(--gold)">radarperene.com</a></p>

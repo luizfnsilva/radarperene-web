@@ -26,6 +26,8 @@ const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api
 function _esc(s) {
   return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+// meta description ≤ n (corta em palavra inteira) — evita "meta description too long" do Ahrefs
+function _clampDesc(s, n) { s = String(s == null ? "" : s); if (s.length <= n) return s; return s.slice(0, n).replace(/\s+\S*$/, "").replace(/[\s,.;:—–-]+$/, ""); }
 function _fetchIndicadores(lang) {
   return fetch(IND_API + "?lang=" + (lang === "en" ? "en" : "pt"),
     { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
@@ -73,7 +75,7 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
   const isPerc = /percentil|pctl/i.test(ind.unidade || "");  // unidade já é percentil → não repete "Percentil histórico"
   const temPerc = !isPerc && ind.percentil !== null && ind.percentil !== undefined && ind.percentil !== "";
   const canon = origin + "/indicador/" + encodeURIComponent(slug);
-  const desc = _esc((ind.descricao || ind.leitura || nome)).slice(0, 155);
+  const desc = _esc(_clampDesc(ind.descricao || ind.leitura || nome, 148));
   const title = nome + " — Radar Perene" + (en ? " · data reading" : " · leitura descritiva");
   const L = en
     ? { cur: "Current reading:", perc: "Historical percentile:", cls: "Classification:", upd: "Last updated:", back: "See the full radar →" }
@@ -134,7 +136,8 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const canon = origin + "/diario/" + date;
   const regime = inds.find(function (i) { return i.slug === "regime-br"; });
   const title = "Radar Perene — " + date + (en ? " · Brazil market regime" : " · regime do mercado BR");
-  const desc = _esc(String(narr.resumo || (regime ? regime.leitura : "") || date)).slice(0, 155);
+  const _rl = regime ? (regime.classificacao || regime.leitura || "") : "", _rs = (regime && regime.valor != null) ? regime.valor + "/100" : "";
+  const desc = _esc((en ? "Brazilian market regime on " + date + (_rl ? ": " + _rl + (_rs ? " (" + _rs + ")" : "") : "") + ". Archived daily reading by Radar Perene." : "Regime do mercado brasileiro em " + date + (_rl ? ": " + _rl + (_rs ? " (" + _rs + ")" : "") : "") + ". Leitura diária arquivada do Radar Perene.")).slice(0, 150);
   let verHtml = "";
   if (ver && ver.horizontes && ver.horizontes.length) {
     const lines = ver.horizontes.map(function (h) {
@@ -145,9 +148,12 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     });
     verHtml = "<div class=\"ver\"><b>" + (en ? "Verification — outcome vs. the reading" : "Verificação — desfecho vs. a leitura") + "</b><ul>" + lines.map(function (l) { return "<li>" + _esc(l) + "</li>"; }).join("") + "</ul></div>";
   }
+  const IND_OK = { "regime-br": 1, "erp-br": 1, "valuation-br": 1, "ciclicas-defensivas": 1, "ibovespa": 1, "analogo-br": 1 };  // slugs com página /indicador real
+  const CONC_MAP = { "regime-global": "regime-global", "intermercado-br": "intermercado-br" };  // reconstruídos → página de conceito (não /indicador, que 404ava)
   const indHtml = inds.map(function (i) {
     const v = i.valor != null ? " <b>" + _esc(_fmtVal(i.valor, i.unidade)) + "</b>" : "";
-    return "<li><a href=\"/indicador/" + _esc(i.slug) + "\">" + _esc(i.nome) + "</a>" + v + (i.leitura ? " — " + _esc(i.leitura) : "") + "</li>";
+    const nm = IND_OK[i.slug] ? "<a href=\"/indicador/" + _esc(i.slug) + "\">" + _esc(i.nome) + "</a>" : (CONC_MAP[i.slug] ? "<a href=\"/conceitos/" + CONC_MAP[i.slug] + "/\">" + _esc(i.nome) + "</a>" : _esc(i.nome));
+    return "<li>" + nm + v + (i.leitura ? " — " + _esc(i.leitura) : "") + "</li>";
   }).join("");
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
@@ -156,7 +162,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario/" + date + "\">" +
-    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}") +
     "</head><body>" + _header() + "<div class=\"wrap\">" +
@@ -188,7 +194,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario\">" +
-    "<meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}") +
     "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
@@ -292,7 +298,7 @@ export default {
           "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/ativos\">" +
-          "<meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+          "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
           "<script type=\"application/ld+json\">" + ld + "</script>" +
           _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}") +
           "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p class=\"alist\">" + links + "</p></div>" +
@@ -312,12 +318,13 @@ export default {
         let narr = null;
         try { const nr = await fetch(NARR_API + "?codigo=" + tk + "&classe=" + cls + "&lang=" + lang, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (nr.ok) narr = await nr.json(); } catch (e) {}
         const titulo = tk + (lang === "en" ? " — Radar Perene · descriptive reading" : " — Radar Perene · leitura descritiva");
-        const desc = (narr && narr.resumo) ? narr.resumo.slice(0, 155) : tk;
+        const desc = (narr && narr.resumo) ? _clampDesc(narr.resumo, 148) : tk;
         let rw = new HTMLRewriter()
           .on("title", { element(e) { e.setInnerContent(titulo); } })
           .on('meta[name="description"]', { element(e) { e.setAttribute("content", desc); } })
           .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", titulo); } })
           .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", desc); } })
+          .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", _url.origin + "/ativo/" + tk.toLowerCase()); } })
           .on("link#rp-canonical", { element(e) { e.setAttribute("href", _url.origin + "/ativo/" + tk.toLowerCase()); } })
           // hreflang self-referente (Ahrefs #4/5): senão herda os do index apontando p/ a home "/"
           .on('link[rel="alternate"][hreflang="pt-br"]', { element(e) { e.setAttribute("href", "https://radarperene.com.br/ativo/" + tk.toLowerCase()); } })
