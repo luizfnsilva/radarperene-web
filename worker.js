@@ -87,6 +87,16 @@ const EN_BODY = (function () {
   };
 })();
 
+// JSON-LD @graph (Organization/WebSite/Dataset/Service) em EN p/ o .com (o JS NÃO traduz este graph).
+const EN_GRAPH = JSON.stringify({
+  "@context": "https://schema.org", "@graph": [
+    { "@type": "Organization", "@id": "https://radarperene.com/#org", "name": "Radar Perene", "alternateName": "Método Perene", "url": "https://radarperene.com", "email": "hello@brazilcomplexity.com", "logo": "https://radarperene.com/og.png", "image": "https://radarperene.com/og.png", "description": "Brazil regime-intelligence instrument — descriptive, in-house, public-source. It reads the macro, rates, intermarket, regulatory and judicial environment and shows what is happening today, from basic to advanced. Not investment advice.", "knowsLanguage": ["en", "pt-BR"], "areaServed": { "@type": "Country", "name": "Brazil" }, "sameAs": ["https://radarperene.com.br"] },
+    { "@type": "WebSite", "@id": "https://radarperene.com/#website", "url": "https://radarperene.com", "name": "Radar Perene", "publisher": { "@id": "https://radarperene.com/#org" }, "inLanguage": ["en", "pt-BR"], "potentialAction": { "@type": "SearchAction", "target": { "@type": "EntryPoint", "urlTemplate": "https://radarperene.com/?q={search_term_string}" }, "query-input": "required name=search_term_string" } },
+    { "@type": "Dataset", "@id": "https://radarperene.com/#dataset", "name": "Radar Perene — Brazil market regime, macro and intermarket", "description": "Descriptive series and scores of the market regime, rates/Selic, country risk, intermarket, FX, REITs (IFIX), Treasury, crypto and the equity risk premium (earnings yield vs real rate), plus regulatory/judicial activity. Public data since 2000, continuously updated. Descriptive, never a recommendation or price forecast.", "url": "https://radarperene.com/", "creator": { "@id": "https://radarperene.com/#org" }, "isAccessibleForFree": true, "license": "https://radarperene.com/", "inLanguage": ["en", "pt-BR"], "spatialCoverage": { "@type": "Place", "name": "Brazil" }, "temporalCoverage": "2000-01-01/..", "keywords": ["market regime", "country risk", "Brazil macro", "interest rates", "Selic", "intermarket", "FX", "equity risk premium", "fair value", "IFIX", "REITs", "IBOV", "Brazilian Treasury", "Brazil valuation"], "variableMeasured": ["regime_br_score", "risk_global_score", "equity risk premium", "fair value", "intermarket"], "distribution": { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://radarperene.com/INTEGRACAO_RADAR.md" } },
+    { "@type": "Service", "@id": "https://radarperene.com/#service", "name": "Radar Perene Founder", "serviceType": "Descriptive market and regulatory intelligence", "provider": { "@id": "https://radarperene.com/#org" }, "areaServed": { "@type": "Country", "name": "Brazil" }, "description": "Full plan: long history, workable charts (free-range zoom, compare A×B, overlays and indicators), p10–p90 scenario cone, fair value and regime-turn alerts. Founder pricing for the first 100. Descriptive, never a recommendation." }
+  ]
+});
+
 const NARR_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
 const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/narrative";
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
@@ -447,7 +457,8 @@ export default {
           .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
           .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
           .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
-          .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } });
+          .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } })
+          .on("#rp-graph-ld", { element(e) { e.setInnerContent(EN_GRAPH, { html: true }); } });
         // SSR-EN do BODY: traduz/preenche cada nó estático PT com o EN do catálogo (idêntico ao que o JS faz em-browser)
         for (const _id in EN_BODY) {
           const _html = EN_BODY[_id];
