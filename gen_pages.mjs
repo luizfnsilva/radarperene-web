@@ -180,10 +180,34 @@ function validInternal(p) {
   if (VALID_PATHS.has(p)) return true;
   return OK_PREFIX.some((pre) => p.startsWith(pre) && p.length > pre.length);
 }
+// ── EN: slugs em inglês p/ o .com (PAGE_MAP). Arquivo PT usa slugs PT; arquivo EN usa slugs EN. ──
+const EN_SLUG = {
+  "metodologia": "methodology", "como-ler-o-radar": "how-to-read-the-radar", "lentes": "lenses", "conceitos": "concepts",
+  "conceitos/regime-brasil": "concepts/regime-brazil", "conceitos/regime-global": "concepts/regime-global", "conceitos/intermercado-br": "concepts/intermarket-br",
+  "conceitos/erp-br": "concepts/erp-br", "conceitos/cone-de-regressao-logaritmica": "concepts/logarithmic-regression-cone", "conceitos/indice-anima": "concepts/anima-index",
+  "conceitos/risk-on-risk-off": "concepts/risk-on-risk-off", "conceitos/analogos-historicos": "concepts/historical-analogs", "conceitos/vertice": "concepts/vertice",
+  "free": "free", "lentes/patrimonial": "lenses/wealth", "lentes/eleitoral": "lenses/electoral", "lentes/macro": "lenses/macro", "lentes/institucional": "lenses/institutional",
+  "lentes/imobiliaria": "lenses/real-estate", "lentes/vertice": "lenses/vertice", "termos": "terms", "privacidade": "privacy", "api/docs": "api/docs", "founder": "founder",
+};
+const enSlug = (s) => EN_SLUG[s] || s;
+const SLUG_MAP_EN = [["/api/todays-reading.json", "/api/leitura-do-dia.json"], ["/diary", "/diario"]];  // arquivo EN: rotas-worker PT-only; o resto mantém o slug EN da copy
+function normPathEN(url) {
+  for (const [a, b] of SLUG_MAP_EN) url = url.split(a).join(b);
+  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo") && !/\.[a-z0-9]+$/i.test(url)) { if (!url.endsWith("/")) url += "/"; }
+  return url;
+}
+const VALID_PATHS_EN = new Set(["/", "/about", "/sobre", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", ...PAGES.map((p) => "/" + enSlug(p.slug) + "/")]);
+function validInternalEN(p) {
+  if (!p.startsWith("/") || p.includes("#") || /\.[a-z0-9]+$/i.test(p)) return true;
+  if (VALID_PATHS_EN.has(p)) return true;
+  return OK_PREFIX.some((pre) => p.startsWith(pre) && p.length > pre.length);
+}
+let CUR_LANG = "pt";  // page() seta antes de cada renderBlock → mdInline escolhe a normalização (PT mapeia EN→PT; EN mantém EN)
 // inline markdown: [txt](url) + **bold** + *itálico* (após esc; os marcadores sobrevivem ao esc)
 function mdInline(s) {
+  const np = CUR_LANG === "en" ? normPathEN : normPath, vi = CUR_LANG === "en" ? validInternalEN : validInternal;
   return esc(s)
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => { const p = normPath(url.trim()); return validInternal(p) ? `<a href="${p}">${txt}</a>` : txt; })
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => { const p = np(url.trim()); return vi(p) ? `<a href="${p}">${txt}</a>` : txt; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
 }
@@ -289,14 +313,12 @@ function crumbLabel(slug, L) {
   return slug;
 }
 
-// ─── JSON-LD por tipo de página (briefing §3) — Organization (todas) + BreadcrumbList (profundidade≥2) + específico do tipo ───
+// ─── JSON-LD por tipo de página (briefing §3) — Organization (todas) + BreadcrumbList (profundidade≥2) + específico do tipo. Lang-aware: PT→.com.br, EN→.com. ───
 const ORG_BR = "https://radarperene.com.br";
 const SITE_LASTMOD = "2026-06-04";
-const orgSchema = () => ({ "@context": "https://schema.org", "@type": "Organization", "name": "Radar Perene", "url": ORG_BR, "logo": ORG_BR + "/logo.svg", "sameAs": ["https://radarperene.com", "https://brazilcomplexity.com", "https://aformadopatrimonio.com.br"], "description": "Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto." });
-const DTS = { "@type": "DefinedTermSet", "name": "A linguagem do Radar Perene", "url": ORG_BR + "/conceitos/" };
-function breadcrumbSchema(slug, h1) {
-  const segs = slug.split("/"); const items = [{ "@type": "ListItem", position: 1, name: "Início", item: ORG_BR + "/" }]; let acc = "";
-  segs.forEach((s, i) => { acc += "/" + s; items.push({ "@type": "ListItem", position: i + 2, name: i === segs.length - 1 ? h1 : (s.charAt(0).toUpperCase() + s.slice(1)), item: ORG_BR + acc + "/" }); });
+function breadcrumbSchema(slug, h1, org) {
+  const segs = slug.split("/"); const items = [{ "@type": "ListItem", position: 1, name: "Início", item: org + "/" }]; let acc = "";
+  segs.forEach((s, i) => { acc += "/" + s; items.push({ "@type": "ListItem", position: i + 2, name: i === segs.length - 1 ? h1 : (s.charAt(0).toUpperCase() + s.slice(1)), item: org + acc + "/" }); });
   return { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": items };
 }
 function faqSchema(raw) {  // extrai pares **P: …?** / R: … (metodologia §12) → FAQPage citável
@@ -310,19 +332,22 @@ function faqSchema(raw) {  // extrai pares **P: …?** / R: … (metodologia §1
   }
   return out.length ? { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": out.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) } : null;
 }
-function buildSchemas(p, ptRaw, pt, path, tPt, dPt) {
-  const url = ORG_BR + path; const s = [orgSchema()];
-  if (p.slug.includes("/")) s.push(breadcrumbSchema(p.slug, pt.h1));
-  const article = (t) => ({ "@context": "https://schema.org", "@type": t, "headline": tPt, "description": dPt, "url": url, "inLanguage": "pt-BR", "datePublished": "2026-06-04", "dateModified": SITE_LASTMOD, "author": { "@type": "Organization", "name": "Radar Perene" }, "publisher": { "@type": "Organization", "name": "Radar Perene", "url": ORG_BR } });
-  if (p.type === "metodo") { s.push(article("TechArticle")); const f = faqSchema(ptRaw); if (f) s.push(f); s.push({ "@context": "https://schema.org", ...DTS }); }
-  else if (p.type === "conceito") { s.push({ "@context": "https://schema.org", "@type": "DefinedTerm", "name": pt.h1, "description": dPt, "inDefinedTermSet": DTS, "url": url }); s.push(article("Article")); }
-  else if (p.type === "umbrella-conceitos") { s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" }); s.push({ "@context": "https://schema.org", ...DTS }); }
-  else if (p.type === "lentes") s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" });
-  else if (p.type === "lente") s.push({ "@context": "https://schema.org", "@type": "Service", "name": pt.h1, "description": dPt, "url": url, "provider": { "@type": "Organization", "name": "Radar Perene" }, "areaServed": "BR", "serviceType": "Regulatory & market intelligence" });
-  else if (p.type === "guia") s.push({ "@context": "https://schema.org", "@type": "HowTo", "name": pt.h1, "description": dPt, "url": url, "inLanguage": "pt-BR" });
-  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": pt.h1, "description": dPt, "url": url, "documentation": ORG_BR + "/api/docs/", "provider": { "@type": "Organization", "name": "Radar Perene" } });
-  else if (p.type === "apidocs") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": pt.h1, "description": dPt, "url": url, "documentation": url, "provider": { "@type": "Organization", "name": "Radar Perene" } });
-  else if (p.type === "founder") s.push({ "@context": "https://schema.org", "@type": "Product", "name": "Radar Perene — Founder Access", "description": dPt, "url": url, "brand": { "@type": "Brand", "name": "Radar Perene" }, "offers": { "@type": "Offer", "price": "149", "priceCurrency": "BRL", "availability": "https://schema.org/LimitedAvailability", "url": url } });
+function buildSchemas(p, raw, block, lg, title, desc) {
+  const en = lg === "en", org = en ? "https://radarperene.com" : ORG_BR, slug = en ? enSlug(p.slug) : p.slug;
+  const url = org + "/" + slug + "/", inLang = en ? "en" : "pt-BR";
+  const dts = { "@type": "DefinedTermSet", "name": en ? "The Radar Perene language" : "A linguagem do Radar Perene", "url": org + (en ? "/concepts/" : "/conceitos/") };
+  const s = [{ "@context": "https://schema.org", "@type": "Organization", "name": "Radar Perene", "url": org, "logo": org + "/og.png", "sameAs": ["https://radarperene.com", "https://radarperene.com.br", "https://brazilcomplexity.com", "https://aformadopatrimonio.com.br"].filter((u) => u !== org), "description": en ? "Brazilian regulatory intelligence read as data — regime, intermarket and context." : "Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto." }];
+  if (p.slug.includes("/")) s.push(breadcrumbSchema(slug, block.h1, org));
+  const article = (t) => ({ "@context": "https://schema.org", "@type": t, "headline": title, "description": desc, "url": url, "inLanguage": inLang, "datePublished": "2026-06-04", "dateModified": SITE_LASTMOD, "author": { "@type": "Organization", "name": "Radar Perene" }, "publisher": { "@type": "Organization", "name": "Radar Perene", "url": org } });
+  if (p.type === "metodo") { s.push(article("TechArticle")); const f = faqSchema(raw); if (f) s.push(f); s.push({ "@context": "https://schema.org", ...dts }); }
+  else if (p.type === "conceito") { s.push({ "@context": "https://schema.org", "@type": "DefinedTerm", "name": block.h1, "description": desc, "inDefinedTermSet": dts, "url": url }); s.push(article("Article")); }
+  else if (p.type === "umbrella-conceitos") { s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": block.h1, "description": desc, "url": url, "inLanguage": inLang }); s.push({ "@context": "https://schema.org", ...dts }); }
+  else if (p.type === "lentes") s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": block.h1, "description": desc, "url": url, "inLanguage": inLang });
+  else if (p.type === "lente") s.push({ "@context": "https://schema.org", "@type": "Service", "name": block.h1, "description": desc, "url": url, "provider": { "@type": "Organization", "name": "Radar Perene" }, "areaServed": "BR", "serviceType": "Regulatory & market intelligence" });
+  else if (p.type === "guia") s.push({ "@context": "https://schema.org", "@type": "HowTo", "name": block.h1, "description": desc, "url": url, "inLanguage": inLang });
+  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": org + (en ? "/api/docs/" : "/api/docs/"), "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  else if (p.type === "apidocs") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": url, "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  else if (p.type === "founder") s.push({ "@context": "https://schema.org", "@type": "Product", "name": "Radar Perene — Founder Access", "description": desc, "url": url, "brand": { "@type": "Brand", "name": "Radar Perene" }, "offers": { "@type": "Offer", "price": "149", "priceCurrency": en ? "USD" : "BRL", "availability": "https://schema.org/LimitedAvailability", "url": url } });
   return s.map((x) => `<script type="application/ld+json">${JSON.stringify(x).replace(/</g, "\\u003c")}</script>`).join("\n");
 }
 
@@ -341,124 +366,101 @@ const CONCEPT_GRAPH = {
   "risk-on-risk-off": ["indice-anima", "regime-global", "regime-brasil"], "analogos-historicos": ["regime-brasil", "vertice"],
   "vertice": ["analogos-historicos", "intermercado-br", "regime-global"],
 };
-function relatedHtml(bareSlug, L) {
+function relatedHtml(bareSlug, L) {  // L=true → EN (slugs EN); false → PT
   const rel = (CONCEPT_GRAPH[bareSlug] || []).filter((r) => CONCEPT_NAMES[r]);
-  const links = rel.map((r) => `<a href="/conceitos/${r}/">${esc(CONCEPT_NAMES[r][L ? "en" : "pt"])}</a>`).join(" · ");
-  const method = `<a href="/metodologia/">${L ? "see the full method" : "ver no método completo"}</a>`;
+  const cu = (r) => L ? "/" + enSlug("conceitos/" + r) + "/" : "/conceitos/" + r + "/";
+  const links = rel.map((r) => `<a href="${cu(r)}">${esc(CONCEPT_NAMES[r][L ? "en" : "pt"])}</a>`).join(" · ");
+  const method = `<a href="${L ? "/methodology/" : "/metodologia/"}">${L ? "see the full method" : "ver no método completo"}</a>`;
   return `<p class="rel" style="margin-top:26px">${L ? "Related concepts" : "Conceitos relacionados"}: ${links} · ${method}</p>`;
 }
 
 const out = [];
-function page(p) {
-  const B = BLOCKS[p.src] || {};
-  const pt = renderBlock(B[p.sec[0]] || "");
-  const en = renderBlock(B[p.sec[1]] || "");
-  if (!pt.h1 && !pt.title) {  // fonte ausente (ex.: Burst removido da pasta) → NÃO regenera; preserva o HTML já no disco
-    console.log(`  ⤼ /${p.slug.padEnd(40)} PULADO (fonte ${p.src}:${p.sec[0]} ausente — HTML existente preservado)`);
-    return;
-  }
-  if (p.type === "conceito") {  // RelatedConcepts no rodapé de cada conceito (hub-spoke + ponte p/ metodologia)
-    const bare = p.slug.split("/")[1];
-    pt.bodyHtml += relatedHtml(bare, false); en.bodyHtml += relatedHtml(bare, true);
-  }
-  const sov = SEO_OVERRIDE[p.slug] || {};     // metas encurtados p/ limite SEO (corpo segue verbatim)
-  const clampD = (s, n) => { s = String(s || ""); return s.length <= n ? s : s.slice(0, n).replace(/\s+\S*$/, "").replace(/[\s,.;:—–-]+$/, ""); };
-  const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = clampD(sov.dPt || pt.desc, 150), dEn = clampD(sov.dEn || en.desc, 150);  // ≤150 (Ahrefs meta-desc)
-  const path = "/" + p.slug + "/";            // rota-diretório → SEMPRE trailing slash (canonical real servido pelo CF)
-  const ld = buildSchemas(p, B[p.sec[0]] || "", pt, path, tPt, dPt);  // JSON-LD por tipo (Organization+BreadcrumbList+específico)
-  const disc = pt.disclaimer || "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.";
-  const discEn = en.disclaimer || "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice.";
+// footers estáticos crawláveis por idioma (slugs PT no .com.br, EN no .com)
+const FOOT_PT = '<a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Tier grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a>';
+const FOOT_EN = '<a href="/methodology/">Methodology</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/concepts/">Concepts</a> · <a href="/lenses/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>';
+const PG_CSS = '<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold)}</style>';
+const BRAND_SVG = '<svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true" style="color:var(--dim)"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><path d="M16 16 L16 2 A14 14 0 0 1 29 13 Z" fill="#b8801f" fill-opacity="0.2"/><line x1="16" y1="16" x2="16" y2="2" stroke="#b8801f" stroke-width="1.6"/><circle cx="16" cy="16" r="2" fill="#b8801f"/></svg>';
+const THEME_JS = '<script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>';
+
+// renderFile: gera UM arquivo mono-língua (PT→/{slug}/ em .com.br · EN→/{enSlug}/ em .com), canonical próprio + hreflang cruzado
+function renderFile(p, lg, block, raw, title, desc) {
+  const en = lg === "en";
+  const ptPath = "/" + p.slug + "/", enPath = "/" + enSlug(p.slug) + "/";
+  const slug = en ? enSlug(p.slug) : p.slug, path = en ? enPath : ptPath;
+  const origin = en ? "https://radarperene.com" : "https://radarperene.com.br", canon = origin + path;
+  const ld = buildSchemas(p, raw, block, lg, title, desc);
+  const disc = block.disclaimer || (en ? "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice." : "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.");
   const html = `<!doctype html>
-<html lang="pt-BR">
+<html lang="${en ? "en" : "pt-BR"}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-pt="${esc(tPt)}" data-en="${esc(tEn)}">${esc(tPt)}</title>
-<meta name="description" id="m-desc" content="${esc(dPt)}">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Radar Perene">
-<meta property="og:locale" content="pt_BR">
-<meta property="og:url" content="https://radarperene.com.br${path}">
+<meta property="og:locale" content="${en ? "en_US" : "pt_BR"}">
+<meta property="og:url" content="${canon}">
 <meta property="og:image" content="https://radarperene.com.br/og.png">
-<meta property="og:title" id="og-t" content="${esc(tPt)}">
-<meta property="og:description" id="og-d" content="${esc(dPt)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://radarperene.com.br/og.png">
-<meta name="twitter:title" id="tw-t" content="${esc(tPt)}">
-<meta name="twitter:description" id="tw-d" content="${esc(dPt)}">
-<link rel="canonical" id="rp-canonical" href="https://radarperene.com.br${path}">
-<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}">
-<link rel="alternate" hreflang="en" href="https://radarperene.com${path}">
-<link rel="alternate" hreflang="x-default" href="https://radarperene.com${path}">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(desc)}">
+<link rel="canonical" href="${canon}">
+<link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${ptPath}">
+<link rel="alternate" hreflang="en" href="https://radarperene.com${enPath}">
+<link rel="alternate" hreflang="x-default" href="https://radarperene.com.br${ptPath}">
 ${ld}
 ${headStyle}
-<style>
-  .pg{max-width:760px;margin:0 auto;padding:8px 0 20px}
-  .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}
-  .pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}
-  .pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}
-  .pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}
-  .pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}
-  .pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}
-  .pg .ctarow{margin:22px 0 6px}
-  .pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}
-  .pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}
-  .pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}
-  .pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}
-  .pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}
-  .pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}
-  .pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}
-  .crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}
-  footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold)}
-  [data-lang]{display:none}
-</style>
+${PG_CSS}
 </head>
 <body>
 <div class="top">
-  <a class="brand" href="/" style="text-decoration:none">
-    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true" style="color:var(--dim)"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><path d="M16 16 L16 2 A14 14 0 0 1 29 13 Z" fill="#b8801f" fill-opacity="0.2"/><line x1="16" y1="16" x2="16" y2="2" stroke="#b8801f" stroke-width="1.6"/><circle cx="16" cy="16" r="2" fill="#b8801f"/></svg>
-    <span class="nm">Radar <b>Perene</b></span>
-  </a>
-  <div class="lang"><a href="/" data-pt="" data-en="">← <span data-lang="pt">início</span><span data-lang="en">home</span></a><button id="theme-tg" class="tg" type="button" aria-label="tema">☾</button></div>
+  <a class="brand" href="/" style="text-decoration:none">${BRAND_SVG}<span class="nm">Radar <b>Perene</b></span></a>
+  <div class="lang"><a href="/">← ${en ? "home" : "início"}</a> <button id="theme-tg" class="tg" type="button" aria-label="theme">☾</button></div>
 </div>
 <div class="wrap">
   <article class="pg">
-    <p class="crumb"><a href="/">Radar Perene</a> / <span data-lang="pt">${esc(crumbLabel(p.slug, false))}</span><span data-lang="en">${esc(crumbLabel(p.slug, true))}</span></p>
-    <div data-lang="pt">
-      <h1>${esc(pt.h1)}</h1>
-      ${pt.bodyHtml}
-    </div>
-    <div data-lang="en">
-      <h1>${esc(en.h1)}</h1>
-      ${en.bodyHtml}
-    </div>
+    <p class="crumb"><a href="/">Radar Perene</a> / ${esc(crumbLabel(p.slug, en))}</p>
+    <h1>${esc(block.h1)}</h1>
+    ${block.bodyHtml}
   </article>
 </div>
 <footer>
-  <nav class="ftnav" data-lang="pt"><a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Tier grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a></nav>
-  <nav class="ftnav" data-lang="en"><a href="/metodologia/">Methodology</a> · <a href="/como-ler-o-radar/">How to read</a> · <a href="/conceitos/">Concepts</a> · <a href="/lentes/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/about">About</a> · <a href="/termos/">Terms</a> · <a href="/privacidade/">Privacy</a></nav>
-  <p class="disc" data-lang="pt">${esc(disc)}</p>
-  <p class="disc" data-lang="en">${esc(discEn)}</p>
-  <p>© Radar Perene · <a href="/" style="color:var(--gold)">radarperene.com</a></p>
+  <nav class="ftnav">${en ? FOOT_EN : FOOT_PT}</nav>
+  <p class="disc">${esc(disc)}</p>
+  <p>© Radar Perene · <a href="/" style="color:var(--gold)">${en ? "radarperene.com" : "radarperene.com.br"}</a></p>
 </footer>
-<script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();
-// língua por hostname (.com→en, .com.br→pt) — bots que rodam JS recebem 1 língua; hreflang cobre o resto
-(function(){var host=location.hostname.toLowerCase();var en=/radarperene\\.com$/.test(host)&&!/\\.com\\.br$/.test(host);var L=en?"en":"pt";
-  document.documentElement.lang=en?"en":"pt-BR";
-  document.querySelectorAll("[data-lang]").forEach(function(n){if(n.getAttribute("data-lang")===L)n.removeAttribute("data-lang");else n.style.display="none";});
-  var T=document.querySelector("title");if(T&&T.getAttribute("data-"+L))document.title=T.getAttribute("data-"+L);
-  if(en){var d=document.getElementById("m-desc"),ot=document.getElementById("og-t"),od=document.getElementById("og-d"),tt=document.getElementById("tw-t"),td=document.getElementById("tw-d"),ou=document.querySelector('meta[property=\\"og:url\\"]'),ol=document.querySelector('meta[property=\\"og:locale\\"]');
-    if(d)d.content="${esc(dEn)}";if(ot)ot.content="${esc(tEn)}";if(od)od.content="${esc(dEn)}";if(tt)tt.content="${esc(tEn)}";if(td)td.content="${esc(dEn)}";if(ou)ou.content=location.origin+location.pathname;if(ol)ol.content="en_US";}
-  var c=document.getElementById("rp-canonical");if(c)c.href=location.origin+location.pathname;  // self-referente NA forma servida (com trailing slash) — NÃO tira a barra (senão aponta pro 307)
-  var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rp-theme",cur);}catch(e){}};
-})();</script>
+${THEME_JS}
 </body>
 </html>`;
-  const dir = join(ROOT, p.slug);
+  const dir = join(ROOT, slug);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), html);
-  out.push({ slug: p.slug, title: tPt, enTitle: tEn, h1: pt.h1, desc: dPt, descEn: dEn, paras: (pt.bodyHtml.match(/<p>/g) || []).length, tables: (pt.bodyHtml.match(/<table/g) || []).length });
+}
+
+function page(p) {
+  const B = BLOCKS[p.src] || {};
+  CUR_LANG = "pt"; const pt = renderBlock(B[p.sec[0]] || "");
+  CUR_LANG = "en"; const en = renderBlock(B[p.sec[1]] || "");
+  CUR_LANG = "pt";
+  if (!pt.h1 && !pt.title) {  // fonte ausente (Burst removido) → NÃO regenera; preserva o HTML no disco
+    console.log(`  ⤼ /${p.slug.padEnd(40)} PULADO (fonte ${p.src}:${p.sec[0]} ausente — HTML existente preservado)`);
+    return;
+  }
+  if (p.type === "conceito") {  // RelatedConcepts no rodapé (hub-spoke + ponte p/ metodologia) — slugs por idioma
+    const bare = p.slug.split("/")[1];
+    pt.bodyHtml += relatedHtml(bare, false); en.bodyHtml += relatedHtml(bare, true);
+  }
+  const sov = SEO_OVERRIDE[p.slug] || {};
+  const clampD = (s, n) => { s = String(s || ""); return s.length <= n ? s : s.slice(0, n).replace(/\s+\S*$/, "").replace(/[\s,.;:—–-]+$/, ""); };
+  const tPt = sov.tPt || pt.title, tEn = sov.tEn || en.title, dPt = clampD(sov.dPt || pt.desc, 150), dEn = clampD(sov.dEn || en.desc, 150);
+  renderFile(p, "pt", pt, B[p.sec[0]] || "", tPt, dPt);   // PT em /{slug}/ (.com.br)
+  renderFile(p, "en", en, B[p.sec[1]] || "", tEn, dEn);   // EN em /{enSlug}/ (.com)
+  out.push({ slug: p.slug, enSlug: enSlug(p.slug), title: tPt, enTitle: tEn, h1: pt.h1, desc: dPt, descEn: dEn, paras: (pt.bodyHtml.match(/<p>/g) || []).length, tables: (pt.bodyHtml.match(/<table/g) || []).length });
 }
 
 for (const p of PAGES) page(p);
@@ -478,11 +480,12 @@ const ativosAlt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://ra
 rows.push(su("https://radarperene.com/ativos", ativosAlt, "daily", "0.6"));
 rows.push(su("https://radarperene.com.br/ativos", ativosAlt, "daily", "0.6"));
 for (const p of PAGES) {
-  const path = "/" + p.slug + "/";
+  const ptPath = "/" + p.slug + "/", enPath = "/" + enSlug(p.slug) + "/";
   const pri = p.type === "metodo" || p.type === "lentes" || p.type === "guia" ? "0.8" : (p.type === "conceito" ? "0.7" : "0.7");
-  const alt = `<xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com${path}"/><xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${path}"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com${path}"/>`;
-  rows.push(su(`https://radarperene.com${path}`, alt, "monthly", pri));
-  rows.push(su(`https://radarperene.com.br${path}`, alt, "monthly", pri));
+  // PT canônico em .com.br/{ptSlug}, EN em .com/{enSlug}; hreflang cruzado, x-default = PT (mercado primário)
+  const alt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${ptPath}"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com${enPath}"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com.br${ptPath}"/>`;
+  rows.push(su(`https://radarperene.com.br${ptPath}`, alt, "monthly", pri));
+  rows.push(su(`https://radarperene.com${enPath}`, alt, "monthly", pri));
 }
 writeFileSync(join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${rows.join("\n")}\n</urlset>\n`);
 
