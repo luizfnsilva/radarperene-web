@@ -15,6 +15,78 @@ const EN_FAQ = JSON.stringify({
   ]
 });
 
+// ── SSR-EN do BODY da home (.com) p/ crawler SEM JS ────────────────────────────────
+// O index.html é PT estático; o JS (catálogo C, branch EN) reescreve em-browser. O crawler
+// sem-JS via PT. Aqui replicamos a MESMA branch EN p/ injetar via HTMLRewriter no .com.
+// FONTE DA VERDADE: index.html linhas ~367-467 (branch EN do catálogo C + builders).
+// Se aquele catálogo mudar, ESTE bloco precisa acompanhar (sem framework SSR no projeto).
+const EN_BODY = (function () {
+  const C = {
+    h1: 'Brazil&rsquo;s regime, read as <span class="g">data</span> — not opinion.',
+    lead: "Five Lenses on Brazil&rsquo;s regime — wealth, electoral, macro, institutional and real-estate — plus the cross-asset Vértice Experiment. You choose the depth of the read. Live, below.",
+    cta1: "Join the 100 founders", cta2: "See the live radar", micro: "Educational content, public sources. Descriptive — never a recommendation.",
+    eyb7: "Who it&rsquo;s for", s7: "Investors, analysts, managers — and serious newcomers.", s7s: "For anyone who wants to read Brazil&rsquo;s market regime without noise or guesswork, at the depth they choose — from a one-line read to the data behind it.",
+    eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure; today&rsquo;s live reading is right below.",
+    eyb5: "Depth", s5: "You choose the depth", s5s: "Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
+    eyb6: "What&rsquo;s underneath",
+    eyb1: "Live · today", s1: "Today&rsquo;s reading", s1s: "A sample of the engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
+    fbadge: "Launch · seats limited to the first 100 founders", fh: "The 100 founders unlock all five Lenses — and the Vértice Experiment", fp: "For US$149/mo — locked while your subscription stays active — you unlock all five Lenses and the Vértice Experiment, plus the decision depth: the full quantile cone, a chart you can work, the future projected. In the future the Lenses will be sold à la carte (Vértice alone will be US$290); together they add up to more than US$490/month. Pay upfront, 7-day full automatic refund (via Stripe), cancel in one click.",
+    wlbtn: "Get my invite",
+    eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
+    eyb4: "Principles",
+    disc: "Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
+    ftnav: '<a href="/diario">Daily archive</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/lenses/">Lenses</a> · <a href="/concepts/">Concepts</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lenses/wealth/">Wealth</a> · <a href="/lenses/electoral/">Electoral</a> · <a href="/lenses/macro/">Macro</a> · <a href="/lenses/institutional/">Institutional</a> · <a href="/lenses/real-estate/">Real estate</a> · <a href="/lenses/vertice/">Vértice</a> · <a href="/concepts/regime-brazil/">Brazil Regime</a> · <a href="/concepts/regime-global/">Global Regime</a> · <a href="/concepts/intermarket-br/">Intermarket BR</a> · <a href="/concepts/erp-br/">ERP_BR</a> · <a href="/concepts/logarithmic-regression-cone/">Regression Cone</a> · <a href="/concepts/anima-index/">Ânima</a> · <a href="/concepts/risk-on-risk-off/">Risk-on/off</a> · <a href="/concepts/historical-analogs/">Historical analogs</a> · <a href="/concepts/vertice/">Vértice (concept)</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>',
+    lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings and structures — pressure on wealth." },
+      { n: "Electoral", d: "Electoral courts, eligibility, campaign finance and digital enforcement." },
+      { n: "Macro / Rates", d: "Rates, inflation, fiscal and debt — the country&rsquo;s macro regime." },
+      { n: "Institutional", d: "Laws, taxes and rulings in the making that touch wealth and succession." },
+      { n: "Real estate", d: "REITs, real-estate credit, registries and sector regulation." },
+      { n: "Vértice", d: "The experiment: cross-asset thermometers, breadth and historical analogs.", v: 1, m: "Contextual hypothesis, not a forecast." }],
+    ladder: [{ t: "Briefing", d: "the essentials in 5 seconds" }, { t: "Lens", d: "stress by domain" }, { t: "Scenarios", d: "trajectories and windows" }, { t: "War Room", d: "proof and propagation" }, { t: "Modeling", d: "cross everything · 50+ yrs · k-NN" }],
+    scale: [["26", "years of BR market data"], ["70", "stocks in deep series"], ["8", "Risk-BR sub-scores"], ["187", "months in the analog study"], ["FDR", "statistically-significant correlations"]],
+    princ: [["Descriptive", "We read and contextualize the regime — we never recommend or predict a price."],
+      ["Public sources", "Built on public data. Low-noise, auditable, transparent."],
+      ["Contradiction on show", "Every reading carries its own counter-evidence. No false certainty."]],
+    eyb8: "Free × Founder", s8: "What you unlock as a Founder", s8s: "For US$149/mo — locked while your subscription stays active — you unlock today&rsquo;s decision depth (the full quantile cone, working the chart, projecting the future) and secure all 6 Lenses, including the Vértice Experiment, as they ship. The free tier stays the daily showroom; items marked &ldquo;coming&rdquo; arrive as the product grows.",
+    eyb9: "FAQ", s9: "How it works",
+    tiers: [["Today&rsquo;s reading — regime, the 5 Lenses, intermarket and breadth", "✓", "✓"], ["Embeddable mini-radar (public API)", "✓", "✓"], ["The future projection — the median (where it tended to go)", "✓", "✓"], ["Full quantile cone (p10–p90) + overlaid analogs", "—", "✓ now"], ["Work the chart — free-range zoom, compare A×B, overlays", "—", "✓ now"], ["Price locked while your subscription stays active · a seat among the 100", "—", "✓ now"], ["All 6 Lenses — including the Vértice Experiment", "—", "guaranteed"], ["Long history + anomalies + regime-turn alerts", "—", "coming"], ["3 L3 reads — economist, lawyer, accountant", "—", "coming"]],
+    faq: [["How does Radar Perene compute Brazil&rsquo;s macro regime?", "A monthly cross-market sensor outputs a Risk-BR score (0–100) from 8 domestic sub-scores (liquidity, defensive rotation, credit stress and more), calibrated on central-bank expectations (Focus since 2001) and real-rate curves (long NTN-B since 2006), isolating statistically-significant anomalies in 36-month windows."], ["What is the Founder price and what changes later?", "US$ 149/month (or US$ 1,490/year · 2 months free), locked for your subscription while it stays active — and it includes all five Lenses and the Vértice Experiment. In the future the Lenses will be sold à la carte (Vértice alone will be US$290); together they exceed US$490/month. Founder secures them all for US$ 149. You join the preliminary product now and get full access when it is ready — the same product, not a separate premium."], ["How do payment and the 7-day window work?", "Payment is taken at signup (R$ on the .com.br domain, US$ on .com), processed by Stripe. You have a 7-day full, automatic refund window — a legal right, no friction. After 7 days the normal recurrence (monthly or annual) continues. Everything is managed by you in the Stripe Customer Portal — there is no human support desk."], ["How do support, cancellation and data deletion work?", "ALL subscription management — cancellation, refunds, card changes and invoices — is 100% self-service via the Stripe Customer Portal, anytime, in one click. There is no human support desk: you handle everything yourself, in the portal. Account and data deletion is also one click in your profile — we store nothing beyond your Google/Apple login and email."], ["Is this investment advice?", "No. Under our P7 protocol the system is strictly descriptive — it reads regimes and anomalies from public sources and never recommends, predicts a price, or gives financial advice."]]
+  };
+  const LSLUG = ["patrimonial", "eleitoral", "macro", "institucional", "imobiliaria", "vertice"];
+  const ELEN = { patrimonial: "wealth", eleitoral: "electoral", institucional: "institutional", imobiliaria: "real-estate" };
+  const ECON = { "regime-brasil": "regime-brazil", "intermercado-br": "intermarket-br", "cone-de-regressao-logaritmica": "logarithmic-regression-cone", "indice-anima": "anima-index", "analogos-historicos": "historical-analogs" };
+  const U_MET = "/methodology/", U_CON = "/concepts/", U_LEN = "/lenses/", U_HOW = "/how-to-read-the-radar/";
+  const LP = (s) => U_LEN + (ELEN[s] || s) + "/";
+  const CP = (s) => U_CON + (ECON[s] || s) + "/";
+  const expTag = "experiment";
+  const NAV = { met: "Methodology", con: "Concepts", len: "Lenses", dia: "Daily", howto: "How to read", free: "Free", ac: "All concepts →", al: "All lenses →" };
+  const CN = [["regime-brasil", "Brazil Regime"], ["regime-global", "Global Regime"], ["intermercado-br", "Intermarket BR"], ["erp-br", "ERP_BR"], ["cone-de-regressao-logaritmica", "Logarithmic Cone"], ["indice-anima", "Ânima Index"], ["risk-on-risk-off", "Risk-on / Risk-off"], ["analogos-historicos", "Historical Analogs"], ["vertice", "Vértice"]];
+  const CD = ["Brazil's prevailing market state", "the external environment pressing on Brazil", "cross-reading of Brazilian wealth-sector ratios", "Brazilian equity risk premium in historical percentile", "frames price against the long-term trajectory", "proprietary reading of Brazilian market mood", "environment tilt between risk and protection", "past windows with a similar profile", "cross-domain hypotheses under Bayesian discipline"];
+  const lenses = C.lenses.map((l, i) => '<a class="ln' + (l.v ? ' vx' : '') + '" href="' + LP(LSLUG[i]) + '"><div class="nm">' + (l.v ? '<span style="color:var(--gold)">✦</span> ' : '') + l.n + (l.v ? '<span class="tag">' + expTag + '</span>' : '') + '</div><p>' + l.d + '</p>' + (l.m ? '<span class="micro">' + l.m + '</span>' : '') + '</a>').join("");
+  const conDD = CN.map((c) => '<a href="' + CP(c[0]) + '">' + c[1] + '</a>').join("") + '<a href="' + U_CON + '" style="color:var(--gold)">' + NAV.ac + '</a>';
+  const lenDD = C.lenses.map((l, i) => '<a href="' + LP(LSLUG[i]) + '">' + l.n + '</a>').join("") + '<a href="' + U_LEN + '" style="color:var(--gold)">' + NAV.al + '</a>';
+  const topnav = '<a href="' + U_MET + '">' + NAV.met + '</a><span class="dd"><a href="' + U_CON + '" tabindex="0">' + NAV.con + ' ▾</a><div class="ddm">' + conDD + '</div></span><span class="dd"><a href="' + U_LEN + '" tabindex="0">' + NAV.len + ' ▾</a><div class="ddm">' + lenDD + '</div></span><a href="/diario">' + NAV.dia + '</a><a href="' + U_HOW + '">' + NAV.howto + '</a><a href="/free/">' + NAV.free + '</a>';
+  const cgrid = CN.map((c, i) => '<a href="' + CP(c[0]) + '"><span class="cn">' + c[1] + '</span><span class="cd">' + CD[i] + '</span></a>').join("");
+  const ladder = C.ladder.map((s, i) => '<div class="st"><div class="no">' + (i + 1) + '</div><div class="ti">' + s.t + '</div><div class="de">' + s.d + '</div></div>').join("");
+  const scale = C.scale.map((s) => '<div class="st"><b>' + s[0] + '</b><span>' + s[1] + '</span></div>').join("");
+  const princ = C.princ.map((p) => '<div><b>' + p[0] + '.</b> ' + p[1] + '</div>').join("");
+  const tiers = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:9px 6px;border-bottom:1px solid #222a31;color:#8b97a3;font-weight:600"></th><th style="padding:9px 6px;border-bottom:1px solid #222a31;color:#8b97a3;font-weight:600;width:25%">Free</th><th style="padding:9px 6px;border-bottom:1px solid #222a31;color:#c9a227;font-weight:700;width:25%">Founder</th></tr></thead><tbody>' + C.tiers.map((r) => '<tr><td style="text-align:left;padding:9px 6px;border-bottom:1px solid #222a31">' + r[0] + '</td><td style="text-align:center;padding:9px 6px;border-bottom:1px solid #222a31;color:#8b97a3">' + r[1] + '</td><td style="text-align:center;padding:9px 6px;border-bottom:1px solid #222a31">' + r[2] + '</td></tr>').join("") + '</tbody></table>';
+  const faqbox = C.faq.map((f) => '<div style="border-top:1px solid #222a31;padding:13px 0"><b style="display:block;margin-bottom:5px">' + f[0] + '</b><p style="margin:0;color:#8b97a3;font-size:14px;line-height:1.6">' + f[1] + '</p></div>').join("");
+  return {
+    "h1": C.h1, "lead": C.lead, "cta1": C.cta1, "cta2": C.cta2, "micro1": C.micro,
+    "eyb7": C.eyb7, "s7": C.s7, "s7s": C.s7s, "eyb2": C.eyb2, "s2": C.s2, "s2s": C.s2s,
+    "eyb-lng": "The Radar's language", "s-lng": "The concepts behind the reading", "s-lng-s": "Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.", "lng-cta": "See the full Radar language →",
+    "eyb5": C.eyb5, "s5": C.s5, "s5s": C.s5s, "eyb6": C.eyb6,
+    "eyb8": C.eyb8, "s8": C.s8, "s8s": C.s8s,
+    "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
+    "fbadge": C.fbadge, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn,
+    "eyb-ult": "Latest readings", "s-ult": "The day's regime — archived and auditable", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.", "ult-cta": "See the full Diary →",
+    "eyb3": C.eyb3, "s3": C.s3, "s3s": C.s3s, "eyb4": C.eyb4, "disc": C.disc,
+    "eyb9": C.eyb9, "s9": C.s9, "qtag-txt": "CURRENT SIGNAL · REGIME BR",
+    "lenses": lenses, "topnav": topnav, "conceitos-grid": cgrid, "ladder": ladder, "scale": scale, "princ": princ, "tiers": tiers, "faqbox": faqbox, "ftnav": C.ftnav
+  };
+})();
+
 const NARR_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
 const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/narrative";
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
@@ -376,6 +448,15 @@ export default {
           .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
           .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
           .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } });
+        // SSR-EN do BODY: traduz/preenche cada nó estático PT com o EN do catálogo (idêntico ao que o JS faz em-browser)
+        for (const _id in EN_BODY) {
+          const _html = EN_BODY[_id];
+          rw = rw.on("#" + _id, { element(e) { e.setInnerContent(_html, { html: true }); } });
+        }
+        // hrefs estáticos PT que o JS troca em-browser → corrige p/ crawler EN
+        rw = rw
+          .on("#lng-cta", { element(e) { e.setAttribute("href", "/concepts/"); } })
+          .on("#l-sobre", { element(e) { e.setAttribute("href", "/about"); } });
       }
       if (narr && narr.texto_html) {
         rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
