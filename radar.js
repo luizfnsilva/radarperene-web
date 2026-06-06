@@ -453,9 +453,9 @@
     var L = lang === "en", v = null;
     if (rk && rk.serie) for (var i = rk.serie.length - 1; i >= 0; i--) if (rk.serie[i] != null) { v = rk.serie[i]; break; }
     var pos = v == null ? "—" : v >= 70 ? (L ? "elevated" : "elevado") : v <= 30 ? (L ? "low" : "baixo") : Math.abs(v - 50) <= 8 ? (L ? "near neutral" : "próximo de neutro") : v > 50 ? (L ? "above neutral" : "acima do neutro") : (L ? "below neutral" : "abaixo do neutro");
-    if (kind === "anima") return (L ? "BR market mood: " : "Humor do mercado BR: ") + pos + (L ? " · extremes = greed/fear" : " · extremos = ganância/medo");
-    // risk-on/off: MESMO rótulo do pré-ampliado (consistência pedida) — "Risk-on/off", não "Regime BR" solto
-    return (L ? "Risk-on/off · BR regime: " : "Risk-on/off · regime BR: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
+    if (kind === "anima") return (L ? "Ânima Index · BR market mood: " : "Índice Ânima · humor do mercado BR: ") + pos + (L ? " · extremes = greed/fear" : " · extremos = ganância/medo");
+    // ★ Índice de Risco Perene = nosso risk-on/off de sentimento (índice proprietário, empilhado em todo ticker junto à Ânima)
+    return (L ? "Perene Risk Index · risk-on/off: " : "Índice de Risco Perene · risk-on/off: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
   }
   // barra de overlays (P2): Preço · MM200 · Mediana análoga (free) + P25–P75 · P10–P90 · Bollinger · Valor-justo (Founder, com 🔒). Clique → openBig.
   function overlayBar(s, lang, pro) {
@@ -1139,7 +1139,7 @@
               inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" + (s.fair ? " · gold = fair value" : "") : "preço · histórico → hoje → projeção (tracejada)" + (s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj, cone: s.cone }, { fair: s.fair && s.fair.serie, futFair: s.fair && s.fair.serie_fut });  // bug 5: passa a SÉRIE do fair (era o objeto → nunca desenhava) + cone → inline consistente com o modal (registro)
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
-              if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (lang === "en" ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados)") + '</span>' + riskPane(s.risco);
+              if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (lang === "en" ? "Perene Risk Index · risk-on/off (ticks = past extremes)" : "Índice de Risco Perene · risk-on/off (traços = extremos passados)") + '</span>' + riskPane(s.risco);
               inner += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);  // domínio (FnG/TVL/volume) → texto; stack completo no "ampliar"
             }
             var canBig = s && s.hist && s.hist.length > 1;
