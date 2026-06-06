@@ -380,7 +380,7 @@
   // monta UM oscilador empilhado (idempotente: upOscillator faz clear(el); re-monta no toggle de horizonte sem duplicar no re-tema).
   function mountOsc(el, obj, s, syncKey, big, hideX) {
     if (!el || !obj || !obj.serie || obj.serie.length < 2) return;
-    var o = { big: big, sync: syncKey, datas: s.datas, axisW: 52, nav: true, hideX: hideX };
+    var o = { big: big, sync: syncKey, datas: s.datas, axisW: 52, nav: true, hideX: hideX, height: (big ? 112 : 48) };  // alto e legível (empilhamento SentimenTrader)
     for (var i = _upMounted.length - 1; i >= 0; i--) if (_upMounted[i].el === el) _upMounted.splice(i, 1);  // descarta entrada antiga desse el (o re-tema redesenha só o atual)
     if (window.RPUplot.upOscillator(el, obj, o)) _upMounted.push({ el: el, draw: function (e) { window.RPUplot.upOscillator(e, obj, o); } });
   }
@@ -724,8 +724,10 @@
     }
     if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
     document.body.appendChild(mw);  // ★ modal no DOM ANTES do setChart — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
+    // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group propaga a janela do último a setá-la → o preço (setChart) impõe
+    // a janela a Ânima/risk (senão o autoscale dos osciladores na montagem sobrescreveria o período do preço).
+    if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync/janela do preço + seletor de horizonte
     setChart(0);
-    if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync do preço + seletor de horizonte
     if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
         el.addEventListener("click", function () { var k = el.getAttribute("data-fk"); ov[k] = !ov[k]; el.textContent = (ov[k] ? "● " : "○ ") + el.getAttribute("data-lbl"); paint(curHist, true); });
@@ -1054,6 +1056,10 @@
         node.innerHTML = h;
         if (useUp) {
           var SYNC = "rpativo" + (++_syncSeq);
+          // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group de janela propaga a janela do último a setá-la →
+          // o preço impõe a janela ~3a a Ânima/risk (senão o autoscale dos osciladores sobrescreveria o período do preço).
+          mountStackOsc(node.querySelector(".rp-anima"), node.querySelector(".rp-risk"), s, SYNC, lang, true, aObj);
+          wireAnima(node, s, lang, gpaid, SYNC, true);  // seletor de horizonte (estrutural↔curto🔒) re-monta no mesmo grupo de sync/janela
           var pEl = node.querySelector(".rp-ativo-price");
           if (pEl) {
             var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52 };
@@ -1066,12 +1072,13 @@
                 var i0 = 0; while (i0 < s.datas.length && s.datas[i0] < cs) i0++;
                 var toTs = function (d) { var t = Date.parse(String(d).length <= 10 ? d + "T00:00:00Z" : d); return isFinite(t) ? t / 1000 : null; };
                 var mn = toTs(s.datas[i0]), xarr = up.data && up.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;
-                if (mn != null && maxFull != null && maxFull > mn) up.setScale("x", { min: mn, max: maxFull });  // inclui o futuro do cone; propaga aos osciladores sincronizados
+                if (mn != null && maxFull != null && maxFull > mn) {  // inclui o futuro do cone; propaga a janela aos osciladores via link-group
+                  var _applyWin = function () { try { up.setScale("x", { min: mn, max: maxFull }); } catch (e) {} };
+                  _applyWin(); if (typeof requestAnimationFrame === "function") requestAnimationFrame(_applyWin);  // re-aplica APÓS o init deferido (rAF) do uPlot dos osciladores — senão o autoscale deles sobrescreve a janela ~3a
+                }
               }
             }
           }
-          mountStackOsc(node.querySelector(".rp-anima"), node.querySelector(".rp-risk"), s, SYNC, lang, true, aObj);
-          wireAnima(node, s, lang, gpaid, SYNC, true);  // seletor de horizonte (estrutural↔curto🔒) re-monta no mesmo grupo de sync
         }
         var zb = node.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function () { openBig(s, nm, "", lang, null); });
         node.querySelectorAll(".rp-ob").forEach(function (el) { el.addEventListener("click", function () { openBig(s, nm, "", lang, null); }); });  // overlay (free ou 🔒) → estúdio (manipulação = Founder)

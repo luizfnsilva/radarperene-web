@@ -151,11 +151,33 @@
     return fit;
   }
 
+  // ── LINK GROUP de JANELA-X (empilhamento SentimenTrader): cursor.sync do uPlot só sincroniza o CROSSHAIR,
+  //    NÃO o zoom/período. Sem isto, o preço ia p/ 6M mas Ânima/risk ficavam na história inteira (achatados/desalinhados).
+  //    Aqui: gráficos com a MESMA chave (opt.sync) compartilham min/max do eixo-X — qualquer setScale (período, wheel,
+  //    pan) propaga aos irmãos. Guard _linkBusy evita laço. O ÚLTIMO a setar a janela vence (orquestrado no radar.js:
+  //    osciladores montam ANTES, o preço por último impõe a janela correta). ──
+  var _links = {};
+  function linkRegister(u, key) { if (!key) return u; (_links[key] = _links[key] || []).push(u); u._linkKey = key; return u; }
+  function linkScaleHook(key) {
+    return function (u, scaleKey) {
+      if (scaleKey !== "x" || !key || u._linkBusy) return;
+      var grp = _links[key]; if (!grp) return;
+      var mn = u.scales.x.min, mx = u.scales.x.max; if (mn == null || mx == null) return;
+      for (var i = 0; i < grp.length; i++) { var o = grp[i];
+        if (o === u || !o.scales || !o.scales.x) continue;
+        if (o.scales.x.min !== mn || o.scales.x.max !== mx) { o._linkBusy = true; try { o.setScale("x", { min: mn, max: mx }); } catch (e) {} o._linkBusy = false; }
+      }
+    };
+  }
   // Limpa um container antes de (re)desenhar — idempotente p/ re-render.
   // destrói a instância uPlot anterior (se houver): u.destroy() DESREGISTRA do grupo de cursor.sync e do ResizeObserver →
   // sem isso, toggle de horizonte / re-tema deixariam fantasmas no sync desenhando em canvas solto. Guardamos em el._rpU.
   function clear(el) {
-    if (el && el._rpU) { try { el._rpU.destroy(); } catch (e) {} el._rpU = null; }
+    if (el && el._rpU) {
+      var u = el._rpU;
+      if (u._linkKey && _links[u._linkKey]) { var g = _links[u._linkKey], ix = g.indexOf(u); if (ix >= 0) g.splice(ix, 1); }
+      try { u.destroy(); } catch (e) {} el._rpU = null;
+    }
     while (el && el.firstChild) el.removeChild(el.firstChild);
   }
   function keep(el, u) { try { el._rpU = u; } catch (e) {} return u; }  // registra a instância viva p/ o próximo clear destruir
@@ -380,12 +402,14 @@
       plugins: [navPlugin({ onReset: opt.onReset })], // wheel-zoom + drag-pan (sensação TradingView)
       hooks: {
         drawClear: [drawBackground],                 // fundo (banding/regime) antes das séries
-        draw: [drawTodayLine]                         // âncora "hoje" por cima
+        draw: [drawTodayLine],                        // âncora "hoje" por cima
+        setScale: [linkScaleHook(opt.sync)]           // janela-x propaga aos painéis empilhados (período/wheel/pan)
       }
     };
 
     var u = new window.uPlot(opts, data, el);
     makeResponsive(u, el);
+    linkRegister(u, opt.sync);
     return keep(el, u);
   }
 
@@ -470,10 +494,12 @@
       plugins: opt.nav ? [navPlugin({ onReset: opt.onReset })] : [],
       hooks: {
         drawClear: [drawZones],
-        draw: [drawLines]
+        draw: [drawLines],
+        setScale: [linkScaleHook(opt.sync)]           // janela-x propaga aos painéis empilhados (preço↔Ânima↔risk)
       }
     }, data, el);
     makeResponsive(u, el);
+    linkRegister(u, opt.sync);
     return keep(el, u);
   }
 
