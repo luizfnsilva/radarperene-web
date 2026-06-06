@@ -152,7 +152,51 @@
   }
 
   // Limpa um container antes de (re)desenhar — idempotente p/ re-render.
-  function clear(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
+  // destrói a instância uPlot anterior (se houver): u.destroy() DESREGISTRA do grupo de cursor.sync e do ResizeObserver →
+  // sem isso, toggle de horizonte / re-tema deixariam fantasmas no sync desenhando em canvas solto. Guardamos em el._rpU.
+  function clear(el) {
+    if (el && el._rpU) { try { el._rpU.destroy(); } catch (e) {} el._rpU = null; }
+    while (el && el.firstChild) el.removeChild(el.firstChild);
+  }
+  function keep(el, u) { try { el._rpU = u; } catch (e) {} return u; }  // registra a instância viva p/ o próximo clear destruir
+
+  // =========================================================================
+  // navPlugin — a "sensação TradingView": WHEEL = zoom-x em torno do cursor,
+  // DRAG = pan-x (arrasta o tempo), DBLCLICK = reset. Com cursor.sync.scales=["x"]
+  // o zoom/pan se propaga aos painéis empilhados (preço↔Ânima↔risk) na mesma janela.
+  // Listeners de move/up são presos a `document` SÓ durante o arraste (auto-cleanup,
+  // sem vazar ao fechar o modal). Cuida só do eixo-X (preço/osc mantêm seu Y).
+  // =========================================================================
+  function navPlugin(opt) {
+    opt = opt || {};
+    return { hooks: { ready: [function (u) {
+      var over = u.over;
+      over.style.cursor = "grab";
+      // WHEEL → zoom-x ancorado na posição do cursor (in = aproxima; out = afasta)
+      over.addEventListener("wheel", function (e) {
+        e.preventDefault();
+        var rect = over.getBoundingClientRect(), w = rect.width || 1;
+        var leftPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / w));
+        var xMin = u.scales.x.min, xMax = u.scales.x.max, rng = xMax - xMin;
+        if (!isFinite(rng) || rng <= 0) return;
+        var z = e.deltaY < 0 ? 0.82 : 1.22;                 // scroll p/ cima = zoom-in
+        var nRng = rng * z, anchor = xMin + leftPct * rng;
+        u.setScale("x", { min: anchor - leftPct * nRng, max: anchor + (1 - leftPct) * nRng });
+      }, { passive: false });
+      // DRAG → pan-x; listeners no document só enquanto arrasta (auto-cleanup)
+      over.addEventListener("mousedown", function (e) {
+        if (e.button !== 0) return;
+        var sx = e.clientX, m0 = u.scales.x.min, M0 = u.scales.x.max, w = over.getBoundingClientRect().width || 1;
+        if (!isFinite(M0 - m0)) return;
+        over.style.cursor = "grabbing";
+        function mv(ev) { var dx = (ev.clientX - sx) / w * (M0 - m0); u.setScale("x", { min: m0 - dx, max: M0 - dx }); }
+        function up() { over.style.cursor = "grab"; document.removeEventListener("mousemove", mv); document.removeEventListener("mouseup", up); }
+        document.addEventListener("mousemove", mv); document.addEventListener("mouseup", up);
+      });
+      // DBLCLICK → reset à janela cheia (callback de quem montou; senão auto-range)
+      over.addEventListener("dblclick", function () { if (opt.onReset) opt.onReset(u); else u.setScale("x", { min: u.data[0][0], max: u.data[0][u.data[0].length - 1] }); });
+    }] } };
+  }
 
   // =========================================================================
   // 1) upPrice — preço por DATAS REAIS + cone de quantis + MMs + fair + shadow
@@ -292,26 +336,33 @@
           ctx.fillRect(px0, top, Math.max(0, px1 - px0), h);
         }
       }
-      // região futura (sutil warm) — atrás do cone, só sinaliza "daqui pra frente"
-      if (futN > 0 && !cone) { // quando há cone, as bandas já marcam; só pinta no fallback proj
+      // região futura (sutil warm) — "daqui pra frente é OUTRA COISA": leque de desfechos análogos, não preço observado. Sempre (com ou sem cone) p/ bater o olho.
+      if (futN > 0) {
         var pxToday = u.valToPos(todayTs, "x", true);
-        ctx.fillStyle = withAlpha(T.warm, 0.05);
+        ctx.fillStyle = withAlpha(T.warm, 0.045);
         ctx.fillRect(pxToday, top, Math.max(0, u.bbox.left + u.bbox.width - pxToday), h);
       }
     }
     function drawTodayLine(u) {
-      // linha vertical "hoje" — desenhada DEPOIS das séries (hook draw final).
+      // âncora "hoje" — a referência ABSOLUTA do gráfico: tudo (cone/leque) nasce dela. Desenhada DEPOIS das séries.
       var ctx = u.ctx, top = u.bbox.top, h = u.bbox.height;
       var px = u.valToPos(todayTs, "x", true);
       ctx.save();
-      ctx.strokeStyle = withAlpha(T.dim, 0.85);
-      ctx.lineWidth = 1; ctx.setLineDash([1, 2]);
+      ctx.strokeStyle = withAlpha(T.accent, 0.9);
+      ctx.lineWidth = 1.3; ctx.setLineDash([]);
       ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, top + h); ctx.stroke();
+      if (opt.todayLabel !== false) { // etiqueta discreta "hoje/now" no topo da âncora
+        var lab = opt.lang === "en" ? "now" : "hoje";
+        ctx.font = "9px ui-monospace, monospace"; ctx.textBaseline = "top";
+        var tw = ctx.measureText(lab).width + 6;
+        ctx.fillStyle = withAlpha(T.accent, 0.92); ctx.fillRect(px + 1, top + 1, tw, 12);
+        ctx.fillStyle = T.card; ctx.fillText(lab, px + 4, top + 3);
+      }
       ctx.restore();
     }
 
-    var cursor = { points: { show: false } };  // points/focus OFF: o uPlot addClass-a o "cursor point" por série ao desenhar; com séries esparsas (cone só-futuro) dava addClass(undefined) → crash. Crosshair (default) mantido.
-    if (opt.sync) cursor.sync = { key: opt.sync }; // uPlot: cursor.sync.key compartilha crosshair entre charts
+    var cursor = { points: { show: false }, drag: { x: false, y: false } };  // brush nativo OFF → navPlugin cuida de zoom(wheel)/pan(drag), sensação TradingView. points OFF evita addClass(undefined) com séries esparsas (cone só-futuro).
+    if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] }; // uPlot: compartilha crosshair E janela-x (zoom/pan) entre os painéis empilhados — Y de cada um independente
 
     var opts = {
       width: el.clientWidth || 280,
@@ -321,20 +372,21 @@
       legend: { show: true },                        // readout AO VIVO: data na posição da cruz + valor de cada série ali
       scales: { x: { time: true } },                 // eixo-X temporal de verdade
       axes: [
-        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.6), width: 0.5 }, ticks: { stroke: withAlpha(T.line, 0.6) }, font: "10px ui-monospace, monospace" },
-        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.5), width: 0.5 }, ticks: { stroke: withAlpha(T.line, 0.5) }, font: "10px ui-monospace, monospace", size: 44 }
+        { show: !opt.hideX, stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.6), width: 0.5 }, ticks: { stroke: withAlpha(T.line, 0.6) }, font: "10px ui-monospace, monospace" },
+        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.5), width: 0.5 }, ticks: { stroke: withAlpha(T.line, 0.5) }, font: "10px ui-monospace, monospace", size: opt.axisW || 44 } // size = calha-Y fixa: empilhado, todos os painéis usam o MESMO → o crosshair alinha na vertical
       ],
       series: series,
       bands: bands,                                  // uPlot: preenche entre pares de séries
+      plugins: [navPlugin({ onReset: opt.onReset })], // wheel-zoom + drag-pan (sensação TradingView)
       hooks: {
         drawClear: [drawBackground],                 // fundo (banding/regime) antes das séries
-        draw: [drawTodayLine]                         // linha "hoje" por cima
+        draw: [drawTodayLine]                         // âncora "hoje" por cima
       }
     };
 
     var u = new window.uPlot(opts, data, el);
     makeResponsive(u, el);
-    return u;
+    return keep(el, u);
   }
 
   // =========================================================================
@@ -398,8 +450,8 @@
       }
     }
 
-    var cursor = { points: { show: true } };
-    if (opt.sync) cursor.sync = { key: opt.sync };
+    var cursor = { points: { show: false }, drag: { x: false, y: false } };      // points OFF (mesma higiene do upPrice) + brush OFF (nav via navPlugin): a Ânima/risk têm nulls no início (forward-fill) → série esparsa → cursor.points nativo quebra (addClass undefined / 'contains'); crosshair + sync seguem pela linha vertical
+    if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] };           // empilhado: compartilha crosshair E janela-x com o preço (Y 0–100 próprio)
 
     var u = new window.uPlot({
       width: el.clientWidth || 280,
@@ -408,20 +460,21 @@
       legend: { show: false },
       scales: { x: { time: !!(opt.datas) }, y: { range: [0, 100] } }, // oscilador travado 0–100
       axes: [
-        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.5), width: 0.5 }, font: "10px ui-monospace, monospace" },
-        { stroke: T.dim, grid: { show: false }, font: "10px ui-monospace, monospace", size: 30, values: function (u, sp) { return sp.map(function (v) { return v; }); } }
+        { show: !opt.hideX, stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.5), width: 0.5 }, font: "10px ui-monospace, monospace" }, // empilhado: eixo-X (datas) só no painel de baixo
+        { stroke: T.dim, grid: { show: false }, font: "10px ui-monospace, monospace", size: opt.axisW || 30, values: function (u, sp) { return sp.map(function (v) { return v; }); } }
       ],
       series: [
         {},
         { label: "osc", stroke: T.accent, width: 1.3, points: { show: false } }
       ],
+      plugins: opt.nav ? [navPlugin({ onReset: opt.onReset })] : [],
       hooks: {
         drawClear: [drawZones],
         draw: [drawLines]
       }
     }, data, el);
     makeResponsive(u, el);
-    return u;
+    return keep(el, u);
   }
 
   // =========================================================================
@@ -519,7 +572,7 @@
       }
     }, data, el);
     makeResponsive(u, el);
-    return u;
+    return keep(el, u);
   }
 
   // =========================================================================
@@ -569,7 +622,7 @@
       series: series
     }, data, el);
     makeResponsive(u, el);
-    return u;
+    return keep(el, u);
   }
 
   // -------------------------------------------------------------------------

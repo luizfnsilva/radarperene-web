@@ -29,11 +29,14 @@
     try {
       var q = new URLSearchParams(location.search).get("engine");
       if (q === "uplot" || q === "svg") { localStorage.setItem("rp-engine", q); return q; }
-      return localStorage.getItem("rp-engine") || "svg";
+      // NOSSAS páginas (home + /ativo) definem window.RP_ENGINE_DEFAULT="uplot" antes do radar.js → engine rica.
+      // O embed de TERCEIROS não define nada (nem query, nem global) → "svg" byte-idêntico, backlink/SEO intactos.
+      return localStorage.getItem("rp-engine") || (typeof window !== "undefined" && window.RP_ENGINE_DEFAULT === "uplot" ? "uplot" : "svg");
     } catch (e) { return "svg"; }
   })();
-  // quais gráficos já migraram p/ uPlot (os demais seguem SVG mesmo com a flag on). Sprint 1 = só o herói.
-  var RP_UP = { price: true, osc: false, scatter: false, dual: false };
+  // quais gráficos já migraram p/ uPlot (os demais seguem SVG mesmo com a flag on). Herói + osciladores empilhados (Ânima/risk).
+  var RP_UP = { price: true, osc: true, scatter: false, dual: false };
+  var _syncSeq = 0;  // contador de chaves de sync (1 grupo de crosshair/janela por gráfico empilhado)
   // true só quando a flag pede E a engine carregou (RPUplot.ready()). Senão → SVG (degrada gracioso).
   function uplotOn() { return RP_ENGINE === "uplot" && window.RPUplot && window.RPUplot.ready(); }
 
@@ -157,6 +160,11 @@
       ".rp .tk .i[data-cod]{cursor:pointer}.rp .tk .i[data-cod]:hover{border-color:var(--_accent)}" +
       ".rp [data-exp]{cursor:pointer}.rp .more{display:none;margin-top:6px;border-top:1px solid var(--_line);padding-top:5px}.rp .open .more{display:block}.rp .more .mi{font-size:10px;color:var(--_dim);padding:2px 0}" +
       ".rp .rp-zoom{margin-top:6px;border:1px solid var(--_line);background:var(--_card2);color:var(--_accent);border-radius:7px;font-size:10px;padding:3px 9px;cursor:pointer;font-family:var(--rp-font,'Inter',system-ui,sans-serif)}.rp .rp-zoom:hover{border-color:var(--_accent)}" +
+      // seletor de horizonte do Ânima: estrutural (252d, free) ↔ curto (63d, Founder 🔒) — vive no painel empilhado e re-monta o oscilador
+      ".rp .rp-asel{font-family:var(--_mono);font-size:9.5px;border-radius:6px;padding:2px 9px;cursor:pointer;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim)}" +
+      ".rp .rp-asel.on{background:var(--_accent);border-color:var(--_accent);color:var(--_card)}" +
+      ".rp .rp-asel.lock{background:transparent;border:1px dashed var(--_line);color:var(--_dim);opacity:.85}.rp .rp-asel.lock:hover{border-color:var(--_accent);opacity:1}" +
+      ".rp .rp-asel-up a{color:var(--_accent);text-decoration:none;font-weight:700}" +
       ".rp-mw{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,10,14,.55)}" +
       ".rp-mc{position:relative;max-width:560px!important;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px!important;box-shadow:0 18px 60px rgba(0,0,0,.4);cursor:default}" +
       ".rp-mc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-mc .rp-x:hover{color:var(--_accent)}" +
@@ -355,9 +363,133 @@
     o += '<line x1="' + pL + '" y1="' + Y(rk.hi).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(rk.hi).toFixed(1) + '" stroke="var(--_hot)" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>';
     o += '<line x1="' + pL + '" y1="' + Y(rk.lo).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(rk.lo).toFixed(1) + '" stroke="var(--_cool)" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>';
     o += '<line x1="' + pL + '" y1="' + Y(rk.thr).toFixed(1) + '" x2="' + (W - pR) + '" y2="' + Y(rk.thr).toFixed(1) + '" stroke="var(--_line)" stroke-width="0.5"/>';
-    o += '<polyline points="' + s.map(function (v, i) { return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.3 : 1.4) + '"/>';
+    var rpts = []; for (var ri = 0; ri < s.length; ri++) { if (s[ri] == null || !isFinite(s[ri])) continue; rpts.push(X(ri).toFixed(1) + "," + Y(s[ri]).toFixed(1)); }  // pula nulos (Ânima vazio antes da série começar) — sem ponto fantasma no rodapé
+    o += '<polyline points="' + rpts.join(" ") + '" fill="none" stroke="var(--_accent)" stroke-width="' + (big ? 1.3 : 1.4) + '"/>';
     if (rk.marks) for (var mi = 0; mi < rk.marks.length; mi++) { var mk = rk.marks[mi], mx = X(mk.i); o += '<line x1="' + mx.toFixed(1) + '" y1="' + (H - pB - 3) + '" x2="' + mx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_' + (mk.tom || 'neu') + ')" stroke-width="1.4"/>'; }  // marca de alerta (extremo), sem direção de trade
     return o + '</svg>';
+  }
+
+  // ── COMPONENTE UNIVERSAL DE ATIVO (uPlot): pilha SentimenTrader = preço · Ânima · Risk-on/off, sincronizados (crosshair + janela). ──
+  // Monta os 2 osciladores GLOBAIS (Ânima=humor, Risk=regime) sob o preço, no MESMO grupo de sync → passar o cursor no preço acende o
+  // sentimento daquele dia nos outros dois. axisW fixo casa as calhas-Y → o crosshair alinha na vertical. hideX: datas só no painel de baixo.
+  function mountStackOsc(animaEl, riskEl, s, syncKey, lang, big, animaObj) {
+    var hasRisk = !!(riskEl && s.risco && s.risco.serie && s.risco.serie.length > 1);
+    mountOsc(animaEl, animaObj || s.anima, s, syncKey, big, hasRisk);  // Ânima = painel do meio → esconde o eixo-X se há risco abaixo
+    if (hasRisk) mountOsc(riskEl, s.risco, s, syncKey, big, false);     // risco = painel de baixo → mostra as datas
+  }
+  // monta UM oscilador empilhado (idempotente: upOscillator faz clear(el); re-monta no toggle de horizonte sem duplicar no re-tema).
+  function mountOsc(el, obj, s, syncKey, big, hideX) {
+    if (!el || !obj || !obj.serie || obj.serie.length < 2) return;
+    var o = { big: big, sync: syncKey, datas: s.datas, axisW: 52, nav: true, hideX: hideX };
+    for (var i = _upMounted.length - 1; i >= 0; i--) if (_upMounted[i].el === el) _upMounted.splice(i, 1);  // descarta entrada antiga desse el (o re-tema redesenha só o atual)
+    if (window.RPUplot.upOscillator(el, obj, o)) _upMounted.push({ el: el, draw: function (e) { window.RPUplot.upOscillator(e, obj, o); } });
+  }
+  // ── SELETOR DE HORIZONTE DO ÂNIMA: estrutural (252d, free) ↔ curto (63d, Founder 🔒) ──────────────
+  // Resolve qual oscilador-de-humor o usuário pode ver agora. Free SEMPRE vê o estrutural (a leitura canônica);
+  // o curto (mais ruidoso, tático) é lente do Founder. Nunca vaza o curto gated p/ o free (obj = null se só houver curto).
+  function animaActive(s, mode, pro) {
+    var estr = (s.anima_estrut && s.anima_estrut.serie && s.anima_estrut.serie.length > 1) ? s.anima_estrut : null;
+    var curt = (s.anima && s.anima.serie && s.anima.serie.length > 1) ? s.anima : null;
+    var canCurto = pro && !!curt;                                   // curto exige Founder
+    var m = (mode === "curto" && canCurto) ? "curto" : "estr";      // free normaliza p/ estrutural
+    var obj = (m === "curto") ? curt : (estr || (pro ? curt : null));  // free sem estrutural → sem painel (não expõe o curto gated)
+    return { mode: m, obj: obj, estr: estr, curt: curt, canCurto: canCurto };
+  }
+  function checkoutURL(lang) { return window.RP_CHECKOUT || (lang === "en" ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"); }
+  // leitura TEXTUAL de um indicador de domínio (cripto: Fear&Greed/TVL; ações: volume). Substitui o gráfico cru — a pilha
+  // empilhada (preço·Ânima·risk) é o gráfico padrão de TODO ticker; o resto vira linha de texto (último valor + faixa).
+  function oscTextLine(arr, label, lang) {
+    if (!arr || !arr.length || !label) return "";
+    var last = null, mn = Infinity, mx = -Infinity, ok = false;
+    for (var i = 0; i < arr.length; i++) { var v = arr[i]; if (v == null || !isFinite(v)) continue; ok = true; last = v; if (v < mn) mn = v; if (v > mx) mx = v; }
+    if (!ok) return "";
+    var L = lang === "en";
+    return '<div class="rp-ml" style="margin-top:7px"><b>' + esc(label) + '</b> ' + esc(fmtNum(last)) + (mx > mn ? ' <span style="opacity:.6">· ' + (L ? "range " : "faixa ") + esc(fmtNum(mn)) + '–' + esc(fmtNum(mx)) + '</span>' : '') + '</div>';
+  }
+  // legenda do Ânima já com o horizonte ativo ("Humor do mercado BR: … · estrutural (252d)")
+  function animaCap(obj, lang, mode) {
+    var L = lang === "en";
+    return oscCaption(obj, lang, "anima") + (mode === "curto" ? (L ? " · short (63d)" : " · curto (63d)") : (L ? " · structural (252d)" : " · estrutural (252d)"));
+  }
+  // HTML do seletor (só aparece quando HÁ as duas séries — senão é painel único, sem botão). Devolve "" se não há escolha.
+  function animaSelHTML(aSel, lang) {
+    if (!aSel.estr || !aSel.curt) return "";
+    var L = lang === "en";
+    var btn = function (m, lab, on, lock) { return '<button type="button" class="rp-asel' + (on ? " on" : "") + (lock ? " lock" : "") + '" data-am="' + m + '" data-lbl="' + esc(lab) + '"' + (lock ? ' data-lock="1"' : '') + '>' + (lock ? "🔒 " : on ? "● " : "○ ") + esc(lab) + '</button>'; };
+    return '<div class="rp-asel-row" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:9px">'
+      + '<span class="rp-ml" style="opacity:.7;margin-right:1px">' + (L ? "Mood" : "Ânima") + '</span>'
+      + btn("estr", L ? "Structural" : "Estrutural", aSel.mode === "estr", false)
+      + btn("curto", L ? "Short" : "Curto", aSel.mode === "curto", !aSel.canCurto)
+      + (aSel.canCurto ? '' : '<span class="rp-asel-up rp-ml" style="display:none;flex-basis:100%;opacity:.92;margin-top:3px"><span style="color:var(--_accent)">🔒</span> ' + (L ? "Short-term mood (63d) is a Founder lens — " : "O humor curto (63d) é lente do Founder — ") + '<a href="' + checkoutURL(lang) + '" target="_blank" rel="noopener">' + (L ? "unlock →" : "destravar →") + '</a></span>')
+      + '</div>';
+  }
+  // Liga o seletor: troca o horizonte → re-monta o oscilador (mesmo grupo de sync do preço) + atualiza legenda/botões.
+  // Locked (free clicando "curto") → só revela a linha de upsell (não troca). scope = modal ou node /ativo.
+  function wireAnima(scope, s, lang, pro, syncKey, big) {
+    var sel = scope.querySelectorAll(".rp-asel[data-am]"); if (!sel.length) return;
+    var animaEl = scope.querySelector(".rp-anima"), capEl = scope.querySelector(".rp-anima-cap");
+    var hasRisk = !!(s.risco && s.risco.serie && s.risco.serie.length > 1);
+    var mode = "estr";
+    function refresh() {
+      var act = animaActive(s, mode, pro); mode = act.mode;       // normaliza (free nunca fica em curto)
+      mountOsc(animaEl, act.obj, s, syncKey, big, hasRisk);        // re-monta com o horizonte escolhido (re-entra no sync)
+      if (capEl) capEl.textContent = animaCap(act.obj, lang, mode);
+      sel.forEach(function (b) { var on = (b.getAttribute("data-am") === mode), lock = !!b.getAttribute("data-lock"); b.className = "rp-asel" + (on ? " on" : "") + (lock ? " lock" : ""); b.textContent = (lock ? "🔒 " : on ? "● " : "○ ") + b.getAttribute("data-lbl"); });
+    }
+    sel.forEach(function (b) { b.addEventListener("click", function () {
+      if (b.getAttribute("data-lock")) { var up = scope.querySelector(".rp-asel-up"); if (up) up.style.display = "block"; return; }  // free → upsell, sem trocar
+      mode = b.getAttribute("data-am"); refresh();
+    }); });
+  }
+  // gating do paywall na PRÓPRIA série: Free vê Preço + MM200 + Mediana análoga; Founder ganha valor-justo, sombra, MM50 (e p25–p90 dentro do upPrice).
+  function gateSerie(s, pro) {
+    if (pro) return s;
+    var c = {}; for (var k in s) if (Object.prototype.hasOwnProperty.call(s, k)) c[k] = s[k];
+    c.fair = null; c.dcf = null; c.ma50 = null; c.shadow = null;  // cone mantido: upPrice(pro=false) desenha SÓ a mediana análoga (p25/p75/p10/p90 ficam gated lá dentro)
+    return c;
+  }
+  // legenda de UMA frase (P4): "Regime BR: próximo de neutro · traços marcam extremos passados". Lê o último valor não-nulo.
+  function oscCaption(rk, lang, kind) {
+    var L = lang === "en", v = null;
+    if (rk && rk.serie) for (var i = rk.serie.length - 1; i >= 0; i--) if (rk.serie[i] != null) { v = rk.serie[i]; break; }
+    var pos = v == null ? "—" : v >= 70 ? (L ? "elevated" : "elevado") : v <= 30 ? (L ? "low" : "baixo") : Math.abs(v - 50) <= 8 ? (L ? "near neutral" : "próximo de neutro") : v > 50 ? (L ? "above neutral" : "acima do neutro") : (L ? "below neutral" : "abaixo do neutro");
+    if (kind === "anima") return (L ? "BR market mood: " : "Humor do mercado BR: ") + pos + (L ? " · extremes = greed/fear" : " · extremos = ganância/medo");
+    return (L ? "BR regime: " : "Regime BR: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
+  }
+  // barra de overlays (P2): Preço · MM200 · Mediana análoga (free) + P25–P75 · P10–P90 · Bollinger · Valor-justo (Founder, com 🔒). Clique → openBig.
+  function overlayBar(s, lang, pro) {
+    var L = lang === "en", chips = [{ on: true, lock: false, lbl: L ? "Price" : "Preço" }];
+    if (s.ma200 && s.ma200.length) chips.push({ on: true, lock: false, lbl: "MM200" });
+    if (s.cone) chips.push({ on: true, lock: false, lbl: L ? "Analog median" : "Mediana análoga" });
+    if (s.cone && (s.cone.lo || s.cone.lo2)) { chips.push({ on: pro, lock: !pro, lbl: "P25–P75" }); chips.push({ on: pro, lock: !pro, lbl: "P10–P90" }); }
+    chips.push({ on: false, lock: !pro, lbl: "Bollinger" });
+    if (s.fair) chips.push({ on: pro, lock: !pro, lbl: L ? "Fair value" : "Valor-justo" });
+    return '<div class="rp-obar" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px">' + chips.map(function (c) {
+      var st = c.lock ? "background:transparent;border:1px dashed var(--_line);color:var(--_dim);opacity:.85" : c.on ? "background:var(--_accent);border:1px solid var(--_accent);color:var(--_card)" : "background:var(--_card2);border:1px solid var(--_line);color:var(--_dim)";
+      return '<button class="rp-ob" type="button" style="font-family:var(--_mono);font-size:10px;border-radius:6px;padding:3px 9px;cursor:pointer;' + st + '">' + (c.lock ? "🔒 " : c.on ? "● " : "○ ") + esc(c.lbl) + '</button>';
+    }).join("") + '</div>';
+  }
+  // bloco-análogo NOBRE (P3): a taxa-base como resumo do ativo, não como gráfico solto. Free=3m; Founder=3/6/12m.
+  function analogBlock(s, nm, lang, pro) {
+    var br = s.base_rate; if (!br || !br.h) return "";
+    var L = lang === "en", HS = pro ? ["3m", "6m", "12m"] : ["3m"];
+    var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
+    var rows = HS.map(function (hk) {
+      var d = br.h[hk]; if (!d) return "";
+      var lab = hk === "3m" ? (L ? "3 months" : "3 meses") : hk === "6m" ? (L ? "6 months" : "6 meses") : (L ? "12 months" : "12 meses");
+      var thin = (d.n == null || d.n < 8);
+      return '<div style="margin-top:' + (hk === "3m" ? 0 : 9) + 'px"><div class="rp-ml" style="opacity:.7">' + esc(nm) + ' — ' + (L ? "similar regimes in " : "regimes semelhantes em ") + esc(lab) + '</div>'
+        + '<div style="font-family:var(--_mono);margin-top:2px;line-height:1.5">'
+        + (d.hit != null ? '<b style="color:var(--_' + (d.hit >= 50 ? "warm" : "cool") + ')">' + (L ? "Rose in " : "Subiu em ") + Math.round(d.hit) + '%</b>' + (L ? " of cases" : " dos casos") : '')
+        + (d.mediana != null ? ' · ' + (L ? "median " : "mediana ") + '<b>' + sgn(d.mediana) + '</b>' : '')
+        + (d.p25 != null && d.p75 != null ? ' · ' + (L ? "range " : "faixa ") + sgn(d.p25) + ' ' + (L ? "to" : "a") + ' ' + sgn(d.p75) : '')
+        + (d.n != null ? ' · <span style="opacity:.7">' + d.n.toLocaleString(L ? "en-US" : "pt-BR") + (L ? " analog cases" : " casos análogos") + (thin ? (L ? " (limited)" : " (limitada)") : "") + '</span>' : '')
+        + '</div></div>';
+    }).join("");
+    return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
+      + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "BASE RATE · ANALOG CASES" : "TAXA-BASE · CASOS ANÁLOGOS") + '</div>' + rows
+      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85"><span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in Founder" : "horizontes 6m e 12m no Founder") + '</div>' : '')
+      + '<div class="rp-ml" style="margin-top:5px;opacity:.6">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div></div>';
   }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   // ★ ESTÚDIO — cruzar até 3 séries (qualquer classe) rebaseadas a 100, alinhadas por grade MENSAL (lida com diário×mensal) + correlação
@@ -473,6 +605,8 @@
     h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
     h += '<div class="rp-per">' + [["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) { return '<button data-m="' + p[0] + '"' + (p[0] === "0" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
     var useUp = uplotOn() && RP_UP.price;  // herói em uPlot? (flag on + engine pronta + price migrado)
+    var hasStack = useUp && !!((s.anima && s.anima.serie && s.anima.serie.length > 1) || (s.risco && s.risco.serie && s.risco.serie.length > 1));  // tem oscilador empilhado? (preço esconde o eixo-X, datas vão p/ o painel de baixo)
+    var SYNC = "rpbig" + (++_syncSeq);  // grupo de sync (crosshair + janela-x) deste modal: preço ↔ Ânima ↔ risk
     h += '<div class="rp-chart">' + (useUp ? '' : bigChart(s, { big: true })) + '</div>';  // uPlot desenha no div vazio depois do innerHTML
     if (!gpaid) {  // FREE: 2 overlays (1 projeção = cone/mediana + 1 indicador) — "gostinho"; manipular/comparar/cone-completo ficam no Founder
       var freeIds = ["cone"]; if (s.fair) freeIds.push("fair"); else if (s.ma200 && s.ma200.length) freeIds.push("ma200");
@@ -489,9 +623,18 @@
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       h += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : (L ? "Fair value (FASTgraphs) " : "Valor-justo (FASTgraphs) ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
     if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '<b>R$ ' + esc(s.dcf.iv) + '</b> · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (L ? "model from cash flow (growth " : "modelo do fluxo de caixa (cresc. ") + esc(s.dcf.g) + '% · ' + (L ? "discount " : "desconto ") + esc(s.dcf.r) + '%) — ' + (L ? "assumptions shown, not a forecast" : "premissas à mostra, não previsão") + '</div>';
-    if (s.risco && s.risco.serie && s.risco.serie.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes, alert only)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados, só alerta)") + '</div>' + riskPane(s.risco, { big: true });
-    else if (s.hist2 && s.hist2.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist2_label || "") + '</div>' + bigChart({ hist: s.hist2 }, { big: true });
-    if (s.hist3 && s.hist3.length > 1) h += '<div class="rp-ml" style="margin-top:9px">' + esc(s.hist3_label || "") + '</div>' + bigChart({ hist: s.hist3 }, { big: true });
+    // ★ painéis empilhados (SentimenTrader): Ânima (humor) + Risk-on/off (regime), alinhados ao preço pela data — crosshair único atravessa os 3
+    var aSel = animaActive(s, "estr", gpaid), aObj = aSel.obj;  // ★ Ânima: free=estrutural (252d), curto (63d)=Founder — seletor de horizonte
+    var animaOk = !!aObj, riscoOk = s.risco && s.risco.serie && s.risco.serie.length > 1;
+    if (useUp) {  // uPlot: placeholders vazios; os osciladores sincronizados montam após o innerHTML (mountStackOsc + wireAnima)
+      if (animaOk) h += animaSelHTML(aSel, lang) + '<div class="rp-ml rp-anima-cap" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div><div class="rp-osc rp-anima"></div>';
+      if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div><div class="rp-osc rp-risk"></div>';
+    } else {  // SVG (embed/fallback): osciladores estáticos
+      if (animaOk) h += '<div class="rp-ml" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div>' + riskPane(aObj, { big: true });
+      if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div>' + riskPane(s.risco, { big: true });
+    }
+    // indicadores de domínio (cripto: Fear&Greed/TVL; ações: volume) → leitura TEXTUAL (a pilha empilhada é o gráfico padrão de todos)
+    h += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);
     if (meta && !(preCmp && preCmp.length >= 2)) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';  // no comparativo lead-lag a interpretação vira legenda do gráfico (não duplica aqui)
     h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
     var mw = document.createElement("div"); mw.className = "rp-mw"; mw.innerHTML = h;
@@ -533,7 +676,7 @@
       sv._plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); })
         .map(function (l) { return { id: l.id, data: l.compute(s.hist) }; });
       if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
-      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid });
+      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, onReset: function () { setChart(0); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · onReset: dblclick volta ao MAX
       return _upInst;
     }
     function tsAt(idx) {  // timestamp (epoch-s) da data no índice idx de s.hist; fallback null
@@ -563,8 +706,13 @@
       rbtn.style.display = "none";
       if (useUp) {  // uPlot: SEMPRE re-desenha honrando o estado atual dos overlays (ov) — senão toggle de overlay em período finito (6M/1A/3A) era ignorado (só setScale). Depois aplica a janela.
         drawUp(chartEl);  // (re)cria com os overlays atuais — auto-range já inclui hist+futuro
-        if (_upInst && m) { var mn = tsAt(i0), mx = tsAt(s.hist.length - 1);  // janela: zoom, com folga à direita p/ o cone (uPlot NÃO aceita setScale(x,null) → crash; por isso só quando m≠0)
-          if (mn != null && mx != null) _upInst.setScale("x", { min: mn, max: mx + (mx - mn) * 0.18 }); }
+        if (_upInst) {  // SEMPRE setScale (com números, nunca null) → a janela propaga aos painéis sincronizados (Ânima/risk) inclusive no MAX
+          var xarr = _upInst.data && _upInst.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;  // último ts do eixo — inclui o futuro do cone
+          var mn = m ? tsAt(i0) : ((xarr && xarr.length) ? xarr[0] : null);
+          var endTs = tsAt(s.hist.length - 1);
+          var mx = m ? (endTs != null && mn != null ? endTs + (endTs - mn) * 0.18 : maxFull) : maxFull;  // janela finita: folga à direita p/ o cone; MAX: até o fim do futuro
+          if (mn != null && mx != null && mx > mn) _upInst.setScale("x", { min: mn, max: mx });
+        }
         return;
       }
       paint(curHist, true);
@@ -572,6 +720,7 @@
     if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
     document.body.appendChild(mw);  // ★ modal no DOM ANTES do setChart — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
     setChart(0);
+    if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync do preço + seletor de horizonte
     if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
         el.addEventListener("click", function () { var k = el.getAttribute("data-fk"); ov[k] = !ov[k]; el.textContent = (ov[k] ? "● " : "○ ") + el.getAttribute("data-lbl"); paint(curHist, true); });
@@ -873,15 +1022,54 @@
       .then(function (r) { return r.json(); }).then(function (s) {
         var nm = (codigo || "").toUpperCase();
         if (!s || !s.hist || s.hist.length < 2) { node.innerHTML = '<div class="' + cls + '"><div class="sub">' + (L ? "no data for " : "sem dados para ") + esc(nm) + '</div></div>'; return; }
+        var gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}
+        var useUp = uplotOn() && RP_UP.price;
+        var aSel = animaActive(s, "estr", gpaid), aObj = aSel.obj;  // ★ Ânima: free=estrutural, curto=Founder (seletor)
+        var animaOk = !!aObj, riscoOk = s.risco && s.risco.serie && s.risco.serie.length > 1;
+        var hasStack = useUp && (animaOk || riscoOk);
         var h = '<div class="' + cls + '"><div class="hd"><h4 style="margin:0">' + esc(nm) + '</h4><span class="sub">' + (L ? "descriptive engine · today" : "motor descritivo · hoje") + '</span></div>';
-        h += '<div>' + bigChart(s, { big: true }) + '</div>';
-        if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii"; h += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : (L ? "Fair value " : "Valor-justo ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : '') + '</div>'; }
-        if (s.trend && s.trend.score != null) h += '<div class="rp-ml">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
+        // ★ COMPONENTE UNIVERSAL: preço → Ânima → Risk-on/off como UMA linha do tempo (âncora "hoje"), crosshair sincronizado entre os 3.
+        if (useUp) {
+          h += '<div class="rp-chart rp-ativo-price"></div>';
+          h += overlayBar(s, lang, gpaid);  // Preço · MM200 · Mediana análoga (free) + P25–P75 · P10–P90 · Bollinger · Valor-justo (Founder)
+          if (animaOk) h += animaSelHTML(aSel, lang) + '<div class="rp-ml rp-anima-cap" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div><div class="rp-osc rp-anima"></div>';
+          if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div><div class="rp-osc rp-risk"></div>';
+        } else {  // SVG (fallback)
+          h += '<div>' + bigChart(s, { big: true }) + '</div>';
+          if (animaOk) h += '<div class="rp-ml" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div>' + riskPane(aObj, { big: true });
+          if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div>' + riskPane(s.risco, { big: true });
+        }
+        h += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);  // domínio (cripto FnG/TVL · ações volume) → texto; pilha empilhada = padrão
+        if (gpaid && s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii"; h += '<div class="rp-ml" style="margin-top:8px">' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : (L ? "Fair value " : "Valor-justo ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : '') + '</div>'; }
+        if (s.trend && s.trend.score != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
+        h += analogBlock(s, nm, lang, gpaid);  // taxa-base nobre (P3)
         h += '<div class="rp-ml" style="margin-top:8px;opacity:.7">' + (L ? "descriptive, never a recommendation · distribution, not a forecast" : "descritivo, nunca recomendação · distribuição, não previsão") + '</div>';
         h += '<button class="rp-zoom" type="button" style="margin-top:9px">⤢ ' + (L ? "expand & manipulate" : "ampliar & manipular") + '</button>';
         h += '</div>';
         node.innerHTML = h;
+        if (useUp) {
+          var SYNC = "rpativo" + (++_syncSeq);
+          var pEl = node.querySelector(".rp-ativo-price");
+          if (pEl) {
+            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52 };
+            var up = window.RPUplot.upPrice(pEl, gateSerie(s, gpaid), pOpt);
+            if (up) {
+              _upMounted.push({ el: pEl, draw: function (el) { window.RPUplot.upPrice(el, gateSerie(s, gpaid), pOpt); } });  // re-tema
+              // abre ancorado no presente (~3 anos recentes); wheel/drag exploram o resto, MAX no "ampliar"
+              if (s.datas && s.datas.length === s.hist.length) {
+                var cut = new Date(s.datas[s.datas.length - 1]); cut.setFullYear(cut.getFullYear() - 3); var cs = cut.toISOString().slice(0, 10);
+                var i0 = 0; while (i0 < s.datas.length && s.datas[i0] < cs) i0++;
+                var toTs = function (d) { var t = Date.parse(String(d).length <= 10 ? d + "T00:00:00Z" : d); return isFinite(t) ? t / 1000 : null; };
+                var mn = toTs(s.datas[i0]), xarr = up.data && up.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;
+                if (mn != null && maxFull != null && maxFull > mn) up.setScale("x", { min: mn, max: maxFull });  // inclui o futuro do cone; propaga aos osciladores sincronizados
+              }
+            }
+          }
+          mountStackOsc(node.querySelector(".rp-anima"), node.querySelector(".rp-risk"), s, SYNC, lang, true, aObj);
+          wireAnima(node, s, lang, gpaid, SYNC, true);  // seletor de horizonte (estrutural↔curto🔒) re-monta no mesmo grupo de sync
+        }
         var zb = node.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function () { openBig(s, nm, "", lang, null); });
+        node.querySelectorAll(".rp-ob").forEach(function (el) { el.addEventListener("click", function () { openBig(s, nm, "", lang, null); }); });  // overlay (free ou 🔒) → estúdio (manipulação = Founder)
       }).catch(function () { node.innerHTML = '<div class="' + cls + '"><div class="sub">—</div></div>'; });
   }
 
@@ -940,8 +1128,7 @@
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
               if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (lang === "en" ? "Risk-on/off · BR regime (50 = neutral · ticks = past extremes)" : "Risk-on/off · regime BR (50 = neutro · traços = extremos passados)") + '</span>' + riskPane(s.risco);
-              else if (s.hist2 && s.hist2.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist2_label || "") + '</span>' + bigChart({ hist: s.hist2 });
-              if (s.hist3 && s.hist3.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + esc(s.hist3_label || "") + '</span>' + bigChart({ hist: s.hist3 });
+              inner += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);  // domínio (FnG/TVL/volume) → texto; stack completo no "ampliar"
             }
             var canBig = s && s.hist && s.hist.length > 1;
             if (canBig) inner += '<button class="rp-zoom" type="button">⤢ ' + (lang === "en" ? "expand chart" : "ampliar gráfico") + '</button>';
