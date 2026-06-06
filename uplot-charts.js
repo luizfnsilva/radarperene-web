@@ -382,6 +382,26 @@
       }
       ctx.restore();
     }
+    // ── marcadores de SINAL (pinos datados): buy signal do Índice de Risco Perene (range-rank <5%→>68.5%).
+    //    Triângulo ▲ no rodapé na data do trigger (P7: marca o evento histórico, não recomenda). opt.sinais = [{data,tipo}].
+    function drawSignals(u) {
+      if (!opt.sinais || !opt.sinais.length) return;
+      var ctx = u.ctx, top = u.bbox.top, h = u.bbox.height, yb = top + h;
+      var xmin = u.scales.x.min, xmax = u.scales.x.max;
+      ctx.save();
+      for (var i = 0; i < opt.sinais.length; i++) {
+        var sg = opt.sinais[i], ts = dateToTs(sg.data); if (ts == null || ts < xmin || ts > xmax) continue;
+        var px = u.valToPos(ts, "x", true);
+        var up = !/off|down|pessim/.test(String(sg.tipo || ""));        // buy/risk-on = ▲ verde-âmbar; risk-off = ▼
+        var col = up ? T.accent : T.hot;
+        ctx.strokeStyle = withAlpha(col, 0.45); ctx.lineWidth = 0.8; ctx.setLineDash([2, 3]);
+        ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, yb); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = col;                       // triângulo na base
+        var ty = up ? yb - 1 : top + 1, dir = up ? -1 : 1;
+        ctx.beginPath(); ctx.moveTo(px, ty); ctx.lineTo(px - 4, ty + dir * 6); ctx.lineTo(px + 4, ty + dir * 6); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
 
     var cursor = { points: { show: false }, drag: { x: false, y: false } };  // brush nativo OFF → navPlugin cuida de zoom(wheel)/pan(drag), sensação TradingView. points OFF evita addClass(undefined) com séries esparsas (cone só-futuro).
     if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] }; // uPlot: compartilha crosshair E janela-x (zoom/pan) entre os painéis empilhados — Y de cada um independente
@@ -402,7 +422,7 @@
       plugins: [navPlugin({ onReset: opt.onReset })], // wheel-zoom + drag-pan (sensação TradingView)
       hooks: {
         drawClear: [drawBackground],                 // fundo (banding/regime) antes das séries
-        draw: [drawTodayLine],                        // âncora "hoje" por cima
+        draw: [drawTodayLine, drawSignals],           // âncora "hoje" + pinos de sinal (buy signal Risco Perene)
         setScale: [linkScaleHook(opt.sync)]           // janela-x propaga aos painéis empilhados (período/wheel/pan)
       }
     };

@@ -681,7 +681,7 @@
       sv._plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); })
         .map(function (l) { return { id: l.id, data: l.compute(s.hist) }; });
       if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
-      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, onReset: function () { setChart(0); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · onReset: dblclick volta ao MAX
+      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, sinais: s.sinais, onReset: function () { setChart(0); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · sinais: pinos do buy signal · onReset: dblclick volta ao MAX
       return _upInst;
     }
     function tsAt(idx) {  // timestamp (epoch-s) da data no índice idx de s.hist; fallback null
@@ -1062,7 +1062,7 @@
           wireAnima(node, s, lang, gpaid, SYNC, true);  // seletor de horizonte (estrutural↔curto🔒) re-monta no mesmo grupo de sync/janela
           var pEl = node.querySelector(".rp-ativo-price");
           if (pEl) {
-            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52 };
+            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, sinais: s.sinais };  // pinos do buy signal (Índice de Risco Perene)
             var up = window.RPUplot.upPrice(pEl, gateSerie(s, gpaid), pOpt);
             if (up) {
               _upMounted.push({ el: pEl, draw: function (el) { window.RPUplot.upPrice(el, gateSerie(s, gpaid), pOpt); } });  // re-tema
