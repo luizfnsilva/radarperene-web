@@ -454,8 +454,8 @@
     if (rk && rk.serie) for (var i = rk.serie.length - 1; i >= 0; i--) if (rk.serie[i] != null) { v = rk.serie[i]; break; }
     var pos = v == null ? "—" : v >= 70 ? (L ? "elevated" : "elevado") : v <= 30 ? (L ? "low" : "baixo") : Math.abs(v - 50) <= 8 ? (L ? "near neutral" : "próximo de neutro") : v > 50 ? (L ? "above neutral" : "acima do neutro") : (L ? "below neutral" : "abaixo do neutro");
     if (kind === "anima") return (L ? "Ânima Index · BR market mood: " : "Índice Ânima · humor do mercado BR: ") + pos + (L ? " · extremes = greed/fear" : " · extremos = ganância/medo");
-    // ★ Índice de Risco Perene = nosso risk-on/off de sentimento (índice proprietário, empilhado em todo ticker junto à Ânima)
-    return (L ? "Perene Risk Index · risk-on/off: " : "Índice de Risco Perene · risk-on/off: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
+    // ★ Índice de Risco Perene = nome DIDÁTICO do apetite ao risco (o investidor BR não conhece "risk-on/off") — marca própria
+    return (L ? "Perene Risk Index · risk appetite: " : "Índice de Risco Perene · apetite ao risco: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
   }
   // barra de overlays (P2): Preço · MM200 · Mediana análoga (free) + P25–P75 · P10–P90 · Bollinger · Valor-justo (Founder, com 🔒). Clique → openBig.
   function overlayBar(s, lang, pro) {
