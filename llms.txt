@@ -13,7 +13,7 @@
 - Instrumentos: ERP_BR (prêmio de risco das ações vs juro real, em percentil histórico), Cone de Regressão Logarítmica (preço vs trajetória de longo prazo), Índice Ânima (humor do mercado BR, 0–100) e Índice de Risco Perene (apetite ao risco do ambiente BR, 0–100 por range-rank de 84 dias) — os dois índices proprietários empilhados sob o preço de cada ativo —, Sinais de virada datados (marcados em transições de regime, confrontados com o desfecho real), Análogos Históricos ("janelas como a de hoje → o que o IBOV fez em ~6 meses", como distribuição, com amostra e incerteza explícitas).
 - Percentil histórico como régua honesta; janela estatística do regime monetário moderno (a partir de 2000); "em calibração" quando o histórico é insuficiente.
 - Valuation descritivo: valor-justo (lucro × P/L normal), DCF, prêmio de risco. Mercado: macro, Selic, risco-Brasil, câmbio, IBOV, FIIs (IFIX), Tesouro, cripto — clicáveis, com gráfico, projeção e cone de cenários p10–p90.
-- Leitura DIÁRIA por ativo: cada ação, FII, índice ou cripto coberto abre em /ativo/{ticker} com a pilha diária preço · Índice Ânima · Índice de Risco Perene sincronizada, sinais de virada datados, cone e análogos.
+- Leitura DIÁRIA por ativo: cada ação, FII, índice ou cripto coberto abre em /ativo/{ticker} com a pilha diária preço · Índice Ânima · Índice de Risco Perene sincronizada, sinais de virada datados, cone e casos análogos (no tier grátis aparecem como existência + nº de casos; a DISTRIBUIÇÃO — probabilidade de alta, retorno mediano e faixa em 3/6/12 meses — é do plano Founder).
 
 ## Páginas principais (PT em .com.br · EN em .com)
 - Metodologia (referência canônica versionada — a "mãe das citações": instrumentos, princípios de integridade, fontes, como citar): https://radarperene.com.br/metodologia · https://radarperene.com/methodology
@@ -35,7 +35,7 @@
 
 ## Oferta
 - Leitura de hoje e diagnóstico: GRATUITOS. API pública e widget embedável (gratuitos, atribuição obrigatória — link estático = backlink real). Integração: https://radarperene.com/INTEGRACAO_RADAR.md
-- Plano Founder (100 primeiros): histórico longo, gráficos manipuláveis (zoom, comparar A×B, overlays), cone p10–p90 com análogos sobrepostos, valor-justo, alertas de virada de regime. As cinco lentes + o Experimento Vértice.
+- Plano Founder (100 primeiros): "o que historicamente aconteceu depois" — a DISTRIBUIÇÃO completa dos casos análogos por ativo (probabilidade de alta, retorno mediano e faixa em 3/6/12 meses); cone p10–p90 com análogos sobrepostos, histórico longo, gráficos manipuláveis (zoom, comparar A×B, overlays), valor-justo, alertas de virada de regime. As cinco lentes + o Experimento Vértice. (Resumo do tier: free = "entenda onde estamos"; Founder = "veja o que historicamente aconteceu depois".)
 
 ## Princípios
 Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Educacional/informativo. Linguagem honesta sobre incerteza (amostra, janela, confiança categórica). Sem cálculo sobre data sintética; calibração visível. Bilíngue PT/EN.
