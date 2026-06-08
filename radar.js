@@ -825,8 +825,13 @@
           var xarr = _upInst.data && _upInst.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;  // último ts do eixo — inclui o futuro do cone
           var mn = m ? tsAt(i0) : ((xarr && xarr.length) ? xarr[0] : null);
           var endTs = tsAt(s.hist.length - 1);
-          var futSpan = (maxFull != null && endTs != null) ? (maxFull - endTs) : 0;  // largura do cone/futuro
-          var mx = (maxFull != null ? maxFull : endTs) + futSpan * 0.08;  // SEMPRE até o fim do cone (+folga) — o leque é o diferencial, nunca cortar; o min (mn) define a janela de histórico
+          var futSpan = (maxFull != null && endTs != null) ? (maxFull - endTs) : 0;  // largura TOTAL do cone/futuro (fixo ~6M)
+          // ★ futuro PROPORCIONAL à janela visível: senão nas janelas CURTAS (3M) o cone de 6M ocupava ~60% da largura,
+          //   espremia o preço e deixava os osciladores com espaço morto. Mostra ~30% de futuro (≈42% do passado), capado
+          //   no fim do cone; janelas longas (3A/MAX) mostram o cone INTEIRO. O dado do cone segue completo — Founder navega até o fim.
+          var pastSpan = (endTs != null && mn != null) ? (endTs - mn) : futSpan;
+          var futShown = futSpan > 0 ? Math.min(futSpan, Math.max(pastSpan * 0.42, futSpan * 0.2)) : 0;
+          var mx = (endTs != null) ? (endTs + futShown + futShown * 0.06) : (maxFull != null ? maxFull : null);
           if (mn != null && mx != null && mx > mn) { _upInst.setScale("x", { min: mn, max: mx }); _navClamp = gpaid ? null : { min: mn, max: mx }; }  // FREE: trava a navegação nesta janela (zoom/pan dentro, sem escapar pro passado)
         }
         return;
