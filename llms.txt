@@ -36,6 +36,7 @@
 ## Oferta
 - Leitura de hoje e diagnóstico: GRATUITOS. API pública e widget embedável (gratuitos, atribuição obrigatória — link estático = backlink real). Integração: https://radarperene.com/INTEGRACAO_RADAR.md
 - Plano Founder (100 primeiros): "o que historicamente aconteceu depois" — a DISTRIBUIÇÃO completa dos casos análogos por ativo (probabilidade de alta, retorno mediano e faixa em 3/6/12 meses); cone p10–p90 com análogos sobrepostos, histórico longo, gráficos manipuláveis (zoom, comparar A×B, overlays), valor-justo, alertas de virada de regime. As cinco lentes + o Experimento Vértice. (Resumo do tier: free = "entenda onde estamos"; Founder = "veja o que historicamente aconteceu depois".)
+- TRANSPARÊNCIA (status do produto): o Radar está em fase de lançamento. Hoje cerca de 90% das funções planejadas e dos ativos cobertos AINDA NÃO estão disponíveis no plano Founder (R$ 149/mês) — entram gradualmente conforme o produto evolui, sem custo adicional, com o preço de fundador travado. O assinante paga para garantir tudo conforme chega, não por um produto completo hoje. Descritivo, nunca recomendação/previsão.
 
 ## Princípios
 Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Educacional/informativo. Linguagem honesta sobre incerteza (amostra, janela, confiança categórica). Sem cálculo sobre data sintética; calibração visível. Bilíngue PT/EN.
