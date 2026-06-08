@@ -81,7 +81,7 @@
     { id: "cone",  kind: "core", defaultOn: true,  available: function (s) { return !!(s.cone && s.cone.mid && s.cone.mid.length > 1); }, label: function (c) { return c.L ? "Cone + shadow" : "Cone + sombra"; } },
     { id: "ma200", kind: "core", defaultOn: false, available: function (s) { return s.ma200 && s.ma200.length; }, label: function (c) { return "MM" + c.ml + c.mu; } },
     { id: "ma50",  kind: "core", defaultOn: false, available: function (s) { return s.ma50 && s.ma50.length; }, label: function (c) { return "MM" + c.mc + c.mu; } },
-    { id: "fair",  kind: "core", defaultOn: true,  available: function (s) { return !!s.fair; }, label: function (c) { return c.L ? "Fair value" : "Valor-justo"; } },
+    { id: "fair",  kind: "core", defaultOn: false, available: function (s) { return !!s.fair; }, label: function (c) { return "Valuation (Lyn Alden)"; } },  // default OFF: o valor-justo costuma ficar longe do preço e esticaria o eixo, achatando o cone; entra por toggle (Founder)
     { id: "bands", kind: "core", defaultOn: false, available: function (s) { return s.bands && s.bands.length; }, label: function (c) { return c.L ? "Regime bands" : "Bandas regime"; } },
     // ── 1º PLUGIN drop-in (prova da arquitetura): Bollinger (20,2), computado do hist no cliente ──
     { id: "boll", kind: "plugin", defaultOn: false, available: function (s) { return s.hist && s.hist.length >= 20; }, label: function (c) { return "Bollinger (20,2)"; },
@@ -372,15 +372,15 @@
   // ── COMPONENTE UNIVERSAL DE ATIVO (uPlot): pilha SentimenTrader = preço · Ânima · Risk-on/off, sincronizados (crosshair + janela). ──
   // Monta os 2 osciladores GLOBAIS (Ânima=humor, Risk=regime) sob o preço, no MESMO grupo de sync → passar o cursor no preço acende o
   // sentimento daquele dia nos outros dois. axisW fixo casa as calhas-Y → o crosshair alinha na vertical. hideX: datas só no painel de baixo.
-  function mountStackOsc(animaEl, riskEl, s, syncKey, lang, big, animaObj) {
+  function mountStackOsc(animaEl, riskEl, s, syncKey, lang, big, animaObj, pro) {
     var hasRisk = !!(riskEl && s.risco && s.risco.serie && s.risco.serie.length > 1);
-    mountOsc(animaEl, animaObj || s.anima, s, syncKey, big, hasRisk);  // Ânima = painel do meio → esconde o eixo-X se há risco abaixo
-    if (hasRisk) mountOsc(riskEl, s.risco, s, syncKey, big, false);     // risco = painel de baixo → mostra as datas
+    mountOsc(animaEl, animaObj || s.anima, s, syncKey, big, hasRisk, "anima", pro);  // Ânima = painel do meio → esconde o eixo-X se há risco abaixo
+    if (hasRisk) mountOsc(riskEl, s.risco, s, syncKey, big, false, "risk", pro);     // risco = painel de baixo → mostra as datas
   }
   // monta UM oscilador empilhado (idempotente: upOscillator faz clear(el); re-monta no toggle de horizonte sem duplicar no re-tema).
-  function mountOsc(el, obj, s, syncKey, big, hideX) {
+  function mountOsc(el, obj, s, syncKey, big, hideX, role, pro) {
     if (!el || !obj || !obj.serie || obj.serie.length < 2) return;
-    var o = { big: big, sync: syncKey, datas: s.datas, axisW: 52, nav: true, hideX: hideX, height: (big ? 112 : 48) };  // alto e legível (empilhamento SentimenTrader)
+    var o = { big: big, sync: syncKey, datas: s.datas, axisW: 52, nav: !!pro, hideX: hideX, height: (big ? 112 : 48), sinais: s.sinais, role: role };  // nav só p/ Founder (free trava no período); role = anima/risk → tooltip consolidado do preço lê o valor de cada painel
     for (var i = _upMounted.length - 1; i >= 0; i--) if (_upMounted[i].el === el) _upMounted.splice(i, 1);  // descarta entrada antiga desse el (o re-tema redesenha só o atual)
     if (window.RPUplot.upOscillator(el, obj, o)) _upMounted.push({ el: el, draw: function (e) { window.RPUplot.upOscillator(e, obj, o); } });
   }
@@ -432,7 +432,7 @@
     var mode = "estr";
     function refresh() {
       var act = animaActive(s, mode, pro); mode = act.mode;       // normaliza (free nunca fica em curto)
-      mountOsc(animaEl, act.obj, s, syncKey, big, hasRisk);        // re-monta com o horizonte escolhido (re-entra no sync)
+      mountOsc(animaEl, act.obj, s, syncKey, big, hasRisk, "anima", pro);        // re-monta com o horizonte escolhido (re-entra no sync)
       if (capEl) capEl.textContent = animaCap(act.obj, lang, mode);
       sel.forEach(function (b) { var on = (b.getAttribute("data-am") === mode), lock = !!b.getAttribute("data-lock"); b.className = "rp-asel" + (on ? " on" : "") + (lock ? " lock" : ""); b.textContent = (lock ? "🔒 " : on ? "● " : "○ ") + b.getAttribute("data-lbl"); });
     }
@@ -457,6 +457,11 @@
     // ★ Índice de Risco Perene = nome DIDÁTICO do apetite ao risco (o investidor BR não conhece "risk-on/off") — marca própria
     return (L ? "Perene Risk Index · risk appetite: " : "Índice de Risco Perene · apetite ao risco: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
   }
+  // rótulo CURTO de estado (Camada 4 "Leitura rápida") a partir do último valor 0–100 de um índice (Ânima/Risco).
+  function rkPos(rk, L) {
+    var v = null; if (rk && rk.serie) for (var i = rk.serie.length - 1; i >= 0; i--) if (rk.serie[i] != null) { v = rk.serie[i]; break; }
+    return v == null ? "—" : v >= 70 ? (L ? "elevated" : "elevado") : v <= 30 ? (L ? "low" : "baixo") : Math.abs(v - 50) <= 8 ? (L ? "near neutral" : "próximo de neutro") : v > 50 ? (L ? "above neutral" : "acima do neutro") : (L ? "below neutral" : "abaixo do neutro");
+  }
   // barra de overlays (P2): Preço · MM200 · Mediana análoga (free) + P25–P75 · P10–P90 · Bollinger · Valor-justo (Founder, com 🔒). Clique → openBig.
   function overlayBar(s, lang, pro) {
     var L = lang === "en", chips = [{ on: true, lock: false, lbl: L ? "Price" : "Preço" }];
@@ -464,7 +469,7 @@
     if (s.cone) chips.push({ on: true, lock: false, lbl: L ? "Analog median" : "Mediana análoga" });
     if (s.cone && (s.cone.lo || s.cone.lo2)) { chips.push({ on: pro, lock: !pro, lbl: "P25–P75" }); chips.push({ on: pro, lock: !pro, lbl: "P10–P90" }); }
     chips.push({ on: false, lock: !pro, lbl: "Bollinger" });
-    if (s.fair) chips.push({ on: pro, lock: !pro, lbl: L ? "Fair value" : "Valor-justo" });
+    if (s.fair) chips.push({ on: pro, lock: !pro, lbl: "Valuation (Lyn Alden)" });
     return '<div class="rp-obar" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px">' + chips.map(function (c) {
       var st = c.lock ? "background:transparent;border:1px dashed var(--_line);color:var(--_dim);opacity:.85" : c.on ? "background:var(--_accent);border:1px solid var(--_accent);color:var(--_card)" : "background:var(--_card2);border:1px solid var(--_line);color:var(--_dim)";
       return '<button class="rp-ob" type="button" style="font-family:var(--_mono);font-size:10px;border-radius:6px;padding:3px 9px;cursor:pointer;' + st + '">' + (c.lock ? "🔒 " : c.on ? "● " : "○ ") + esc(c.lbl) + '</button>';
@@ -488,7 +493,7 @@
         + '</div></div>';
     }).join("");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
-      + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "BASE RATE · ANALOG CASES" : "TAXA-BASE · CASOS ANÁLOGOS") + '</div>' + rows
+      + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</div>' + rows
       + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85"><span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in Founder" : "horizontes 6m e 12m no Founder") + '</div>' : '')
       + '<div class="rp-ml" style="margin-top:5px;opacity:.6">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div></div>';
   }
@@ -561,7 +566,7 @@
     }
     if (!rows) return "";
     var src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
-    var out = '<div class="rp-ml" style="margin-top:11px"><b>' + (L ? "BASE RATE · ANALOGOUS CASES" : "TAXA-BASE · CASOS ANÁLOGOS") + '</b>' +
+    var out = '<div class="rp-ml" style="margin-top:11px"><b>' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</b>' +
       (br.alvo ? ' · <span style="color:var(--_dim)">' + esc(br.alvo) + '</span>' : '') +
       ' <span style="color:var(--_dim);opacity:.7">(' + src + ')</span></div>';
     out += rows;
@@ -590,14 +595,14 @@
     if (fund) h += '<div class="rp-ml" style="margin-top:2px"><b>' + (L ? "Fundamentals · " : "Fundamentos · ") + '</b>' + esc(fund) + '</div>';
     // ★ disposição estilo SentimenTrader: a PILHA (preço·Ânima·risk) vem no TOPO p/ comparação visual imediata (usuário básico);
     //   os blocos de texto/stat (tendência, retornos, projeção, taxa-base, valuation) acumulam em `depth` e entram ABAIXO da pilha.
-    var depth = "";
+    var depth = "", trendBlk = "";  // trendBlk = Tendência + vs IBOV → sobem p/ a "Leitura rápida" (Camada 4), acima das estatísticas detalhadas
     if (s.trend && s.trend.score != null) { var tr = s.trend, sc = tr.score, seg = "";
       var tlab = sc >= 8 ? (L ? "strong uptrend" : "tendência forte") : sc >= 6 ? (L ? "uptrend" : "tendência de alta") : sc >= 4 ? (L ? "neutral" : "neutra") : sc >= 2 ? (L ? "weak" : "tendência fraca") : (L ? "downtrend" : "tendência de baixa");
       for (var si = 0; si < 10; si++) seg += '<span style="display:inline-block;width:8%;height:7px;margin-right:1.5%;border-radius:2px;background:' + (si < sc ? 'var(--_' + (tr.tom || 'neu') + ')' : 'var(--_line)') + '"></span>';
-      depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Trend Score " : "Score de tendência ") + sc + '/10</b> · ' + esc(tlab) + ' <span style="opacity:.6">(' + (L ? "close vs 50/100/200-day MAs, hierarchy, momentum" : "fecho vs médias 50/100/200, hierarquia, momentum") + ')</span></div><div style="margin-top:4px">' + seg + '</div>'; }
+      trendBlk += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Trend " : "Tendência ") + sc + '/10</b> · ' + esc(tlab) + ' <span style="opacity:.6">(' + (L ? "close vs 50/100/200-day MAs, hierarchy, momentum" : "fecho vs médias 50/100/200, hierarquia, momentum") + ')</span></div><div style="margin-top:4px">' + seg + '</div>'; }
     if (s.trend_rel && s.trend_rel.score != null) { var trr = s.trend_rel.score;
       var trl = trr >= 8 ? (L ? "strongly outperforming the IBOV" : "forte vs IBOV") : trr >= 6 ? (L ? "outperforming the IBOV" : "acima do IBOV") : trr >= 4 ? (L ? "in line with the IBOV" : "em linha com o IBOV") : trr >= 2 ? (L ? "lagging the IBOV" : "abaixo do IBOV") : (L ? "strongly lagging the IBOV" : "fraco vs IBOV");
-      depth += '<div class="rp-ml"><b>' + (L ? "Relative trend vs IBOV " : "Tendência relativa vs IBOV ") + trr + '/10</b> · ' + esc(trl) + ' <span style="opacity:.6">(' + (L ? "the intermarket as a score" : "o intermercado com cara de score") + ')</span></div>'; }
+      trendBlk += '<div class="rp-ml"><b>' + (L ? "vs IBOV " : "vs IBOV ") + trr + '/10</b> · ' + esc(trl) + ' <span style="opacity:.6">(' + (L ? "the intermarket as a score" : "o intermercado com cara de score") + ')</span></div>'; }
     if (s.stats) { var st = s.stats;
       var labs = st.monthly ? [["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]] : [["d1", "1d"], ["w1", "1sem"], ["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]];
       var neutral = st.is_asset === false;  // P1: macro/fiscal — variação é fato, não bom/ruim; sem cor de valência
@@ -606,26 +611,31 @@
       if (st.pos52 != null) depth += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(st.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(st.hi52)) + '</div><div class="rp-52"><i style="left:' + st.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + st.pos52 + (L ? "% of range" : "% da faixa") + '</div>';
       depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + (st.dd_top != null ? ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b>' : '') + '</div>';
       if (st.sharpe != null) depth += '<div class="rp-ml"><b style="color:var(--_' + (st.sharpe >= 0 ? "warm" : "cool") + ')">Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }
-    h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of analogous outcomes (band p25–median–p75) under current conditions" : "preço · histórico → hoje → leque de desfechos análogos (faixa p25–mediana–p75) sob condições atuais") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
-    h += '<div class="rp-per">' + [["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) { return '<button data-m="' + p[0] + '"' + (p[0] === "0" ? ' class="on"' : '') + '>' + esc(p[1]) + '</button>'; }).join("") + (gpaid ? '' : '<button class="lock" data-max="1">' + (L ? "free range 🔒" : "período livre 🔒") + '</button>') + '</div>';
+    h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : "preço · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
+    // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis. Free: 3M/6M livres, 1A/3A/MAX no Founder (gate). Decisão do dono.
+    h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) {
+      var m = parseFloat(p[0]); var locked = !gpaid && (m === 0 || m > 3);  // free = só 3M (decisão do dono); 6M/1A/3A/MAX = Founder. 0 = MAX (o mais longo)
+      var cls = (p[0] === "3" ? "on" : "") + (locked ? " lock" : "");
+      return '<button data-m="' + p[0] + '"' + (locked ? ' data-max="1"' : '') + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + esc(p[1]) + (locked ? " 🔒" : "") + '</button>';
+    }).join("") + '</div>';
     var useUp = uplotOn() && RP_UP.price;  // herói em uPlot? (flag on + engine pronta + price migrado)
     var hasStack = useUp && !!((s.anima && s.anima.serie && s.anima.serie.length > 1) || (s.risco && s.risco.serie && s.risco.serie.length > 1));  // tem oscilador empilhado? (preço esconde o eixo-X, datas vão p/ o painel de baixo)
     var SYNC = "rpbig" + (++_syncSeq);  // grupo de sync (crosshair + janela-x) deste modal: preço ↔ Ânima ↔ risk
     h += '<div class="rp-chart">' + (useUp ? '' : bigChart(s, { big: true })) + '</div>';  // uPlot desenha no div vazio depois do innerHTML
     if (!gpaid) {  // FREE: 2 overlays (1 projeção = cone/mediana + 1 indicador) — "gostinho"; manipular/comparar/cone-completo ficam no Founder
       var freeIds = ["cone"]; if (s.ma200 && s.ma200.length) freeIds.push("ma200");  // valor-justo (linha) = Founder; free vê o prêmio/desconto em TEXTO (decisão do dono)
-      var fLbl = { cone: (L ? "Projection (median)" : "Projeção (mediana)"), fair: (L ? "Fair value" : "Valor-justo"), ma200: "MM200" };
+      var fLbl = { cone: (L ? "Projection (median)" : "Projeção (mediana)"), fair: "Valuation (Lyn Alden)", ma200: "MM200" };
       h += '<div class="rp-tgf" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">' + freeIds.map(function (id) { var don = ((RP_LAYERS.filter(function (l) { return l.id === id; })[0]) || {}).defaultOn; return '<button class="rp-tog" data-fk="' + id + '" data-lbl="' + esc(fLbl[id]) + '" style="font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:6px;padding:3px 9px;cursor:pointer">' + (don ? "● " : "○ ") + esc(fLbl[id]) + '</button>'; }).join("") + '<span class="rp-ml" style="opacity:.5">' + (L ? "· compare A×B & manipulate in Founder" : "· comparar A×B & manipular no Founder") + '</span></div>';
     }
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);
-        if (dlo != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (dlo2 != null ? 'p10–p90 ' + sgn(dlo2) + ' … ' + sgn(dhi2) : (L ? "band " : "faixa ") + sgn(dlo) + ' … ' + sgn(dhi)) + '</b> · ' + (dlo2 != null ? (L ? "core p25–p75 " : "núcleo p25–p75 ") + sgn(dlo) + '…' + sgn(dhi) + ' · ' : '') + (L ? "median " : "mediana ") + sgn(dmid) + ' · ' + (L ? "empirical distribution of past outcomes — not a forecast" : "distribuição empírica de desfechos passados — não é previsão") + '</div>'; }
-      else if (dmid != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "median " : "mediana ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go — not a forecast" : "pra onde costumou ir — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 full cone (p10–p90) + overlaid analogs in Founder" : "🔒 cone completo (p10–p90) + análogos sobrepostos no Founder") + '</span></div>'; }
+        if (dmid != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b>' + (dlo != null && dhi != null ? ' · ' + (L ? "50% of cases " : "50% dos casos ") + sgn(dlo) + ' … ' + sgn(dhi) : '') + (dlo2 != null && dhi2 != null ? ' · ' + (L ? "80% of cases " : "80% dos casos ") + sgn(dlo2) + ' … ' + sgn(dhi2) : '') + ' · ' + (L ? "in similar situations in the past — not a forecast" : "em situações parecidas no passado — não é previsão") + '</div>'; }
+      else if (dmid != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go in analogous cases — not a forecast" : "pra onde costumou ir em casos análogos — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 50% / 80% of cases in Founder" : "🔒 faixas dos 50% / 80% dos casos no Founder") + '</span></div>'; }
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
     if (s.base_rate && s.base_rate.h) depth += baseRatePanel(s.base_rate, L, gpaid);  // taxa-base (casos análogos) — free: só 3m; 6m/12m no Founder (gpaid)
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
-      depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : (L ? "Fair value (FASTgraphs) " : "Valor-justo (FASTgraphs) ")) + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
+      depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : "Valuation · Lyn Alden ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
     if (s.dcf && s.dcf.iv != null) depth += '<div class="rp-ml" style="margin-top:4px">' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '<b>R$ ' + esc(s.dcf.iv) + '</b> · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (L ? "model from cash flow (growth " : "modelo do fluxo de caixa (cresc. ") + esc(s.dcf.g) + '% · ' + (L ? "discount " : "desconto ") + esc(s.dcf.r) + '%) — ' + (L ? "assumptions shown, not a forecast" : "premissas à mostra, não previsão") + '</div>';
     // ★ painéis empilhados (SentimenTrader): Ânima (humor) + Risk-on/off (regime), alinhados ao preço pela data — crosshair único atravessa os 3
     var aSel = animaActive(s, "estr", gpaid), aObj = aSel.obj;  // ★ Ânima: free=estrutural (252d), curto (63d)=Founder — seletor de horizonte
@@ -639,7 +649,14 @@
     }
     // indicadores de domínio (cripto: Fear&Greed/TVL; ações: volume) → leitura TEXTUAL (a pilha empilhada é o gráfico padrão de todos)
     h += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);
-    h += depth;  // ★ stats/tendência/projeção/taxa-base/valuation ENTRAM AQUI — abaixo da pilha preço·Ânima·risk (gráficos no topo)
+    // ★ Camada 4 — "Leitura rápida": interpretação resumida (Regime · Humor · Tendência · vs IBOV) ANTES do muro de estatísticas. P7: só rótulos de estado, nunca recomendação.
+    if ((riscoOk || animaOk || trendBlk) && !(preCmp && preCmp.length >= 2)) {
+      var lr = '<div class="rp-ml" style="margin-top:11px;font-weight:700;letter-spacing:.03em">' + (L ? "QUICK READ" : "LEITURA RÁPIDA") + '</div>';
+      if (riscoOk) lr += '<div class="rp-ml" style="margin-top:3px">' + (L ? "Regime · " : "Regime · ") + '<b>' + esc(rkPos(s.risco, L)) + '</b> <span style="opacity:.6">(' + (L ? "risk appetite" : "apetite ao risco") + ')</span></div>';
+      if (animaOk) lr += '<div class="rp-ml">' + (L ? "Mood · " : "Humor · ") + '<b>' + esc(rkPos(aObj, L)) + '</b> <span style="opacity:.6">(' + (L ? "BR market" : "mercado BR") + ')</span></div>';
+      h += lr + trendBlk;  // trendBlk = Tendência X/10 + vs IBOV Y/10
+    }
+    h += depth;  // ★ estatísticas detalhadas (retornos/52s/vol/Sharpe/taxa-base/valuation) — abaixo da Leitura rápida e da pilha de gráficos
     if (meta && !(preCmp && preCmp.length >= 2)) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';  // no comparativo lead-lag a interpretação vira legenda do gráfico (não duplica aqui)
     h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
     var mw = document.createElement("div"); mw.className = "rp-mw"; mw.innerHTML = h;
@@ -670,6 +687,7 @@
     // ── uPlot (Sprint 1, herói): clona s refletindo os toggles free e (re)instancia upPrice no chartEl. ──
     //    Mantido num builder p/ o re-tema (MutationObserver) re-desenhar com a paleta nova.
     var _upInst = null;  // instância uPlot viva (ou null em modo SVG)
+    var _navClamp = null;  // FREE: janela navegável permitida {min,max} (período selecionado → fim do cone); Founder = null (sem limite). setado em setChart.
     function drawUp(el) {  // el = chartEl; lê o estado de overlays `ov` (free liga/desliga cone/fair/ma200)
       var sv = {};
       for (var kk in s) if (Object.prototype.hasOwnProperty.call(s, kk)) sv[kk] = s[kk];
@@ -682,7 +700,7 @@
       sv._plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); })
         .map(function (l) { return { id: l.id, data: l.compute(s.hist) }; });
       if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
-      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, sinais: s.sinais, onReset: function () { setChart(0); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · sinais: pinos do buy signal · onReset: dblclick volta ao MAX
+      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, height: 200, nav: true, clamp: function () { return _navClamp; }, sinais: s.sinais, onReset: function () { var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 3; setChart(isFinite(fr) ? fr : 3); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · sinais: pinos do buy signal · onReset: dblclick volta ao período ATIVO (default 3M)
       return _upInst;
     }
     function tsAt(idx) {  // timestamp (epoch-s) da data no índice idx de s.hist; fallback null
@@ -706,7 +724,7 @@
       if (m && s.datas && s.datas.length === s.hist.length) {
         var last = s.datas[s.datas.length - 1], cut = new Date(last); cut.setMonth(cut.getMonth() - m); var cs = cut.toISOString().slice(0, 10);
         while (i0 < s.datas.length && s.datas[i0] < cs) i0++;
-        if (i0 > s.datas.length - 6) i0 = Math.max(0, s.datas.length - 8);  // mínimo de pontos
+        if (i0 > s.datas.length - 3) i0 = Math.max(0, s.datas.length - 3);  // piso de 3 pontos: em série MENSAL, "3M" = 3 pontos; salvaguarda antiga (len-8) inflava o 3M p/ ~8 meses
       }
       curHist = i0 ? s.hist.slice(i0) : s.hist; winStart = i0;
       rbtn.style.display = "none";
@@ -716,8 +734,9 @@
           var xarr = _upInst.data && _upInst.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;  // último ts do eixo — inclui o futuro do cone
           var mn = m ? tsAt(i0) : ((xarr && xarr.length) ? xarr[0] : null);
           var endTs = tsAt(s.hist.length - 1);
-          var mx = m ? (endTs != null && mn != null ? endTs + (endTs - mn) * 0.18 : maxFull) : maxFull;  // janela finita: folga à direita p/ o cone; MAX: até o fim do futuro
-          if (mn != null && mx != null && mx > mn) _upInst.setScale("x", { min: mn, max: mx });
+          var futSpan = (maxFull != null && endTs != null) ? (maxFull - endTs) : 0;  // largura do cone/futuro
+          var mx = (maxFull != null ? maxFull : endTs) + futSpan * 0.08;  // SEMPRE até o fim do cone (+folga) — o leque é o diferencial, nunca cortar; o min (mn) define a janela de histórico
+          if (mn != null && mx != null && mx > mn) { _upInst.setScale("x", { min: mn, max: mx }); _navClamp = gpaid ? null : { min: mn, max: mx }; }  // FREE: trava a navegação nesta janela (zoom/pan dentro, sem escapar pro passado)
         }
         return;
       }
@@ -727,8 +746,9 @@
     document.body.appendChild(mw);  // ★ modal no DOM ANTES do setChart — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
     // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group propaga a janela do último a setá-la → o preço (setChart) impõe
     // a janela a Ânima/risk (senão o autoscale dos osciladores na montagem sobrescreveria o período do preço).
-    if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync/janela do preço + seletor de horizonte
-    setChart(0);
+    if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj, gpaid); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync/janela do preço + seletor de horizonte
+    setChart(3);  // abre em 3M (default legível); MAX/longos via botões (gated p/ free)
+    if (useUp && typeof requestAnimationFrame === "function") requestAnimationFrame(function () { setChart(3); });  // reaplica a janela após o layout/ResizeObserver dos osciladores assentar no mount (senão o auto-range deles re-propaga "tudo" e o 3M inicial era ignorado)
     if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
         el.addEventListener("click", function () { var k = el.getAttribute("data-fk"); ov[k] = !ov[k]; el.textContent = (ov[k] ? "● " : "○ ") + el.getAttribute("data-lbl"); paint(curHist, true); });
@@ -740,7 +760,9 @@
       var cmpCache = {}; cmpCache[s.classe + ":" + s.codigo] = s;
       var perRow = mw.querySelector(".rp-per");
       var studio = document.createElement("div"); studio.style.cssText = "margin:8px 0 4px";
-      chartEl.parentNode.insertBefore(studio, chartEl);
+      // controles avançados ABAIXO da pilha preço·Ânima·risk: o gráfico é o centro (hierarquia "ver→entender"), os botões não empurram o hero p/ baixo. Decisão do dono.
+      var stackTail = mw.querySelector(".rp-osc.rp-risk") || mw.querySelector(".rp-osc.rp-anima") || chartEl;
+      stackTail.parentNode.insertBefore(studio, stackTail.nextSibling);
       var legEl = document.createElement("div"); legEl.style.marginTop = "4px"; chartEl.parentNode.insertBefore(legEl, chartEl.nextSibling);
       var btnCss = "font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer";
       var fetchSerie = function (cod, cls, cb) {
@@ -876,8 +898,7 @@
     }
     for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
       btn.addEventListener("click", function (e) { e.stopPropagation();
-        for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
-        if (btn.getAttribute("data-max")) {  // item 6: gráfico real BORRADO atrás + lock ancorado por cima (tease PLG, não tela vazia)
+        if (btn.getAttribute("data-max")) {  // item 6: período TRAVADO (free) → gráfico real BORRADO + lock ancorado. NÃO marca este botão como ativo: senão dblclick(onReset)/sair-do-compare liam o botão travado e liberavam o período pago sem gate.
           if (useUp) {  // canvas perde o bitmap se serializado via innerHTML → move os nós p/ dentro do blur sem re-serializar
             var gate = document.createElement("div"); gate.className = "rp-gate";
             var blur = document.createElement("div"); blur.className = "rp-blur";
@@ -886,6 +907,7 @@
           } else { chartEl.innerHTML = '<div class="rp-gate"><div class="rp-blur">' + chartEl.innerHTML + '</div>' + lockHTML + '</div>'; }
           return;
         }
+        for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
         setChart(parseFloat(btn.getAttribute("data-m")));
       });
     })(perBtns[pi]); }
@@ -1051,7 +1073,7 @@
         // ★ VALUATION (Lyn Alden) — leitura TEXTUAL p/ FREE (prêmio/desconto vs valor-justo, citável p/ IA/SEO);
         //   a LINHA de valor-justo no gráfico + a investigação (DCF/cenários) ficam no Founder (🔒). Decisão do dono.
         if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
-          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : (L ? "Fair value " : "Valor-justo ")) + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72"><span style="color:var(--_accent)">🔒</span> ' + (L ? "fair-value line on chart in Founder" : "linha de valor-justo no gráfico no Founder") + '</span>') + '</div>'; }
+          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation · Lyn Alden ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72"><span style="color:var(--_accent)">🔒</span> ' + (L ? "Lyn Alden valuation line on chart in Founder" : "linha de Valuation (Lyn Alden) no gráfico no Founder") + '</span>') + '</div>'; }
         else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72"><span style="color:var(--_accent)">🔒</span> ' + (L ? "model & scenarios in Founder" : "modelo & cenários no Founder") + '</span>') + '</div>';
         if (s.trend && s.trend.score != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
         h += analogBlock(s, nm, lang, gpaid);  // taxa-base nobre (P3)
@@ -1063,21 +1085,23 @@
           var SYNC = "rpativo" + (++_syncSeq);
           // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group de janela propaga a janela do último a setá-la →
           // o preço impõe a janela ~3a a Ânima/risk (senão o autoscale dos osciladores sobrescreveria o período do preço).
-          mountStackOsc(node.querySelector(".rp-anima"), node.querySelector(".rp-risk"), s, SYNC, lang, true, aObj);
+          mountStackOsc(node.querySelector(".rp-anima"), node.querySelector(".rp-risk"), s, SYNC, lang, true, aObj, gpaid);
           wireAnima(node, s, lang, gpaid, SYNC, true);  // seletor de horizonte (estrutural↔curto🔒) re-monta no mesmo grupo de sync/janela
           var pEl = node.querySelector(".rp-ativo-price");
           if (pEl) {
-            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, sinais: s.sinais };  // pinos do buy signal (Índice de Risco Perene)
+            var _navClampA = null;  // FREE: janela navegável permitida (~3a → fim do cone); Founder = null
+            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, nav: true, clamp: function () { return _navClampA; }, sinais: s.sinais };  // free navega COM zoom mas clampado ao tempo permitido; Founder = livre. pinos do buy signal (Índice de Risco Perene)
             var up = window.RPUplot.upPrice(pEl, gateSerie(s, gpaid), pOpt);
             if (up) {
               _upMounted.push({ el: pEl, draw: function (el) { window.RPUplot.upPrice(el, gateSerie(s, gpaid), pOpt); } });  // re-tema
-              // abre ancorado no presente (~3 anos recentes); wheel/drag exploram o resto, MAX no "ampliar"
+              // abre ancorado no presente (~3 anos recentes); wheel/drag exploram dentro da janela (free clampado, Founder livre)
               if (s.datas && s.datas.length === s.hist.length) {
                 var cut = new Date(s.datas[s.datas.length - 1]); cut.setFullYear(cut.getFullYear() - 3); var cs = cut.toISOString().slice(0, 10);
                 var i0 = 0; while (i0 < s.datas.length && s.datas[i0] < cs) i0++;
                 var toTs = function (d) { var t = Date.parse(String(d).length <= 10 ? d + "T00:00:00Z" : d); return isFinite(t) ? t / 1000 : null; };
                 var mn = toTs(s.datas[i0]), xarr = up.data && up.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;
                 if (mn != null && maxFull != null && maxFull > mn) {  // inclui o futuro do cone; propaga a janela aos osciladores via link-group
+                  _navClampA = gpaid ? null : { min: mn, max: maxFull };  // free: trava a navegação na janela ~3a
                   var _applyWin = function () { try { up.setScale("x", { min: mn, max: maxFull }); } catch (e) {} };
                   _applyWin(); if (typeof requestAnimationFrame === "function") requestAnimationFrame(_applyWin);  // re-aplica APÓS o init deferido (rAF) do uPlot dos osciladores — senão o autoscale deles sobrescreve a janela ~3a
                 }

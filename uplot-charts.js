@@ -191,6 +191,16 @@
   // =========================================================================
   function navPlugin(opt) {
     opt = opt || {};
+    // clamp opcional (FREE): limita a janela navegável a [c.min, c.max] — zoom-IN e pan DENTRO liberados (sensação TradingView),
+    // mas não deixa abrir/escapar além do tempo permitido. opt.clamp() devolve {min,max} (ou null = sem limite, Founder).
+    function clampWin(mn, mx) {
+      var c = opt.clamp && opt.clamp(); if (!c || c.min == null || c.max == null) return { min: mn, max: mx };
+      var span = mx - mn, allow = c.max - c.min;
+      if (!(span < allow)) return { min: c.min, max: c.max };          // pediu janela >= a permitida → trava na janela cheia (sem zoom-out além)
+      if (mn < c.min) { mn = c.min; mx = c.min + span; }                // bateu na parede esquerda (passado) → desliza p/ dentro
+      if (mx > c.max) { mx = c.max; mn = c.max - span; }                // bateu na parede direita (futuro do cone)
+      return { min: mn, max: mx };
+    }
     return { hooks: { ready: [function (u) {
       var over = u.over;
       over.style.cursor = "grab";
@@ -203,7 +213,7 @@
         if (!isFinite(rng) || rng <= 0) return;
         var z = e.deltaY < 0 ? 0.82 : 1.22;                 // scroll p/ cima = zoom-in
         var nRng = rng * z, anchor = xMin + leftPct * rng;
-        u.setScale("x", { min: anchor - leftPct * nRng, max: anchor + (1 - leftPct) * nRng });
+        u.setScale("x", clampWin(anchor - leftPct * nRng, anchor + (1 - leftPct) * nRng));
       }, { passive: false });
       // DRAG → pan-x; listeners no document só enquanto arrasta (auto-cleanup)
       over.addEventListener("mousedown", function (e) {
@@ -211,7 +221,7 @@
         var sx = e.clientX, m0 = u.scales.x.min, M0 = u.scales.x.max, w = over.getBoundingClientRect().width || 1;
         if (!isFinite(M0 - m0)) return;
         over.style.cursor = "grabbing";
-        function mv(ev) { var dx = (ev.clientX - sx) / w * (M0 - m0); u.setScale("x", { min: m0 - dx, max: M0 - dx }); }
+        function mv(ev) { var dx = (ev.clientX - sx) / w * (M0 - m0); u.setScale("x", clampWin(m0 - dx, M0 - dx)); }
         function up() { over.style.cursor = "grab"; document.removeEventListener("mousemove", mv); document.removeEventListener("mouseup", up); }
         document.addEventListener("mousemove", mv); document.addEventListener("mouseup", up);
       });
@@ -284,6 +294,7 @@
     var data = [xs];
     var series = [{}]; // x
     var bands = [];    // uPlot: bands[] preenchem ENTRE pares de séries (hi acima de lo)
+    var coneFadeByHi = {}; // [iHi] → [alpha_hoje, alpha_horizonte]: fade temporal (incerteza cresce com o horizonte) aplicado no drawBackground
 
     function addSeries(arr, conf) { data.push(arr); series.push(conf); return series.length - 1; }
 
@@ -309,18 +320,20 @@
     // cone externo p10–p90 (banda clara) — desenhada primeiro pra ficar atrás.
     // uPlot: a banda entre series[hi] e series[lo] via opts.bands[{series:[hi,lo], fill}].
     if (coneHi2 && coneLo2) {
-      var iHi2 = addSeries(coneHi2, { label: "p90", stroke: withAlpha(T.warm, 0.4), width: 0.5, points: { show: false } });
-      var iLo2 = addSeries(coneLo2, { label: "p10", stroke: withAlpha(T.warm, 0.4), width: 0.5, points: { show: false } });
+      var iHi2 = addSeries(coneHi2, { label: "p90", stroke: withAlpha(T.warm, 0.28), width: 0.5, points: { show: false } });
+      var iLo2 = addSeries(coneLo2, { label: "p10", stroke: withAlpha(T.warm, 0.28), width: 0.5, points: { show: false } });
       bands.push({ series: [iHi2, iLo2], fill: withAlpha(T.warm, 0.07) });
+      coneFadeByHi[iHi2] = [0.13, 0.02];  // 80% dos casos: leque amplo, bem suave → some no horizonte
     }
     // cone interno p25–p75 (banda mais densa).
     if (coneHi && coneLo) {
-      var iHi = addSeries(coneHi, { label: "p75", stroke: withAlpha(T.warm, 0.55), width: 0.6, points: { show: false } });
-      var iLo = addSeries(coneLo, { label: "p25", stroke: withAlpha(T.warm, 0.55), width: 0.6, points: { show: false } });
+      var iHi = addSeries(coneHi, { label: "p75", stroke: withAlpha(T.warm, 0.42), width: 0.6, points: { show: false } });
+      var iLo = addSeries(coneLo, { label: "p25", stroke: withAlpha(T.warm, 0.42), width: 0.6, points: { show: false } });
       bands.push({ series: [iHi, iLo], fill: withAlpha(T.warm, 0.13) });
+      coneFadeByHi[iHi] = [0.22, 0.05];   // 50% dos casos: núcleo mais denso perto de hoje, desbotando no futuro
     }
-    // mediana (tracejada) — sempre, free vê só ela.
-    if (coneMid) addSeries(coneMid, { label: "mediana", stroke: T.warm, width: 1.4, dash: [4, 2], points: { show: false } });
+    // mediana — a TRAJETÓRIA típica (linha forte) destacada da DISTRIBUIÇÃO (bandas suaves). Sempre; free vê só ela.
+    if (coneMid) addSeries(coneMid, { label: "mediana", stroke: T.warm, width: 2.2, dash: [5, 3], points: { show: false } });
     else if (projSer) addSeries(projSer, { label: "projeção", stroke: T.warm, width: 1.4, dash: [4, 2], points: { show: false } });
 
     // shadow (passado): banda entre shadowHi e shadowLo.
@@ -364,6 +377,19 @@
         ctx.fillStyle = withAlpha(T.warm, 0.045);
         ctx.fillRect(pxToday, top, Math.max(0, u.bbox.left + u.bbox.width - pxToday), h);
       }
+      // fade temporal do cone: a banda nasce densa em "hoje" e desbota com o horizonte (incerteza cresce). Gradiente horizontal hoje→fim aplicado nas bandas do cone ANTES do uPlot desenhá-las.
+      if (u.bands && u.bands.length) {
+        var pxT0 = u.valToPos(todayTs, "x", true), pxR = u.bbox.left + u.bbox.width;
+        var pxT = Math.max(pxT0, u.bbox.left);  // se "hoje" saiu da tela à esquerda (zoom no futuro), ancora o gradiente no limite visível p/ o cone não ficar invisível (só a cauda desbotada)
+        if (pxR > pxT + 1) {
+          for (var bb = 0; bb < u.bands.length; bb++) {
+            var bn = u.bands[bb]; var fade = bn && bn.series ? coneFadeByHi[bn.series[0]] : null; if (!fade) continue;
+            try { var gr = ctx.createLinearGradient(pxT, 0, pxR, 0); gr.addColorStop(0, withAlpha(T.warm, fade[0])); gr.addColorStop(1, withAlpha(T.warm, fade[1]));
+              bn.fill = (function (g) { return function () { return g; }; })(gr);  // uPlot normaliza band.fill numa FUNÇÃO no init → precisa devolver função (não o gradiente direto), com binding por-iteração
+            } catch (e) {}
+          }
+        }
+      }
     }
     function drawTodayLine(u) {
       // âncora "hoje" — a referência ABSOLUTA do gráfico: tudo (cone/leque) nasce dela. Desenhada DEPOIS das séries.
@@ -373,6 +399,13 @@
       ctx.strokeStyle = withAlpha(T.accent, 0.9);
       ctx.lineWidth = 1.3; ctx.setLineDash([]);
       ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, top + h); ctx.stroke();
+      // ● âncora "hoje": ponto no ÚLTIMO preço observado — a fronteira de onde o leque nasce (continuidade observação→distribuição, não "dois gráficos colados").
+      var pcur = (price[bi] != null && isFinite(price[bi])) ? price[bi] : curPx;
+      if (pcur != null) {
+        var py = u.valToPos(pcur, "y", true);
+        ctx.beginPath(); ctx.fillStyle = T.accent; ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.fill();
+        ctx.lineWidth = 1.6; ctx.strokeStyle = withAlpha(T.card, 0.95); ctx.beginPath(); ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.stroke();  // anel p/ destacar do traçado
+      }
       if (opt.todayLabel !== false) { // etiqueta discreta "hoje/now" no topo da âncora
         var lab = opt.lang === "en" ? "now" : "hoje";
         ctx.font = "9px ui-monospace, monospace"; ctx.textBaseline = "top";
@@ -403,6 +436,54 @@
       ctx.restore();
     }
 
+    // ── tooltip consolidado (linguagem de analogia histórica; substitui a legenda nativa crua "Time/preço/p90/p10/...") ──
+    //    P7: descreve o passado ("em X% dos casos análogos o resultado ficou nesta faixa"), nunca prevê. Free vê só "Caso mediano"; Founder vê as faixas 50%/80%.
+    var Lt = opt.lang === "en";
+    var curPx = null; for (var ci = bi; ci >= 0; ci--) { if (price[ci] != null && isFinite(price[ci])) { curPx = price[ci]; break; } }  // último preço observado = âncora dos %
+    function fmtV(v) { if (v == null || !isFinite(v)) return "—"; var a = Math.abs(v); var loc = Lt ? "en-US" : "pt-BR"; if (a >= 1000) return Math.round(v).toLocaleString(loc); if (a >= 1) return (Math.round(v * 100) / 100).toLocaleString(loc); return (Math.round(v * 10000) / 10000).toLocaleString(loc); }
+    function pctOf(v) { return (v != null && isFinite(v) && curPx) ? ((v - curPx) / Math.abs(curPx) * 100) : null; }
+    function sgnp(p) { return (p == null) ? "—" : (p >= 0 ? "+" : "") + (Math.round(p * 10) / 10) + "%"; }
+    function fmtDate(ts) { var d = new Date(ts * 1000); var dd = ("0" + d.getDate()).slice(-2), mm = ("0" + (d.getMonth() + 1)).slice(-2), yy = d.getFullYear(); return Lt ? (mm + "/" + dd + "/" + yy) : (dd + "/" + mm + "/" + yy); }
+    var tip = document.createElement("div");
+    tip.className = "rpu-tip";
+    tip.style.cssText = "position:absolute;pointer-events:none;z-index:30;display:none;background:var(--_card2,#16181d);border:1px solid var(--_line,#2a2d34);border-radius:7px;padding:6px 9px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--_dim,#9aa0aa);white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.32)";
+    function tipRow(lbl, val, strong) { return '<div style="display:flex;justify-content:space-between;gap:16px"><span>' + lbl + '</span><span style="color:var(--_txt,#e8eaed)' + (strong ? ';font-weight:700' : '') + '">' + val + '</span></div>'; }
+    function updateTip(u) {
+      var idx = u.cursor.idx;
+      if (idx == null || !u.data[0]) { tip.style.display = "none"; return; }
+      var ts = u.data[0][idx];
+      var html = '<div style="color:var(--_txt,#e8eaed);font-weight:700;margin-bottom:3px">' + fmtDate(ts) + '</div>';
+      var pv = price[idx];
+      if (pv != null && isFinite(pv)) {                                   // região observada: preço + MM200 + valuation
+        html += tipRow(Lt ? "Price" : "Preço", fmtV(pv), true);
+        if (ma200 && ma200[idx] != null) html += tipRow("MM200", fmtV(ma200[idx]));
+        if (ma50 && ma50[idx] != null) html += tipRow("MM50", fmtV(ma50[idx]));
+        if (fair && fair[idx] != null) html += tipRow(Lt ? "Valuation" : "Valuation", fmtV(fair[idx]));
+      } else if (coneMid && coneMid[idx] != null) {                       // região de projeção: leque de desfechos de casos análogos
+        html += tipRow(Lt ? "Median case" : "Caso mediano", sgnp(pctOf(coneMid[idx])), true);
+        if (coneLo && coneHi && coneLo[idx] != null && coneHi[idx] != null) html += tipRow(Lt ? "50% of cases" : "50% dos casos", sgnp(pctOf(coneLo[idx])) + " → " + sgnp(pctOf(coneHi[idx])));
+        if (coneLo2 && coneHi2 && coneLo2[idx] != null && coneHi2[idx] != null) html += tipRow(Lt ? "80% of cases" : "80% dos casos", sgnp(pctOf(coneLo2[idx])) + " → " + sgnp(pctOf(coneHi2[idx])));
+      } else if (projSer && projSer[idx] != null) {
+        html += tipRow(Lt ? "Projection" : "Projeção", sgnp(pctOf(projSer[idx])), true);
+      } else { tip.style.display = "none"; return; }
+      // painéis sincronizados (Ânima/Risco) no MESMO timestamp → readout consolidado num só painel (estilo Bloomberg/Koyfin)
+      try {
+        var grp = _links[opt.sync];
+        if (grp && grp.length) for (var gi = 0; gi < grp.length; gi++) {
+          var u2 = grp[gi]; if (!u2 || u2 === u || !u2._rpRole) continue;
+          var i2 = u2.cursor && u2.cursor.idx; if (i2 == null || !u2.data || !u2.data[1]) continue;
+          var v2 = u2.data[1][i2]; if (v2 == null || !isFinite(v2)) continue;
+          var rlab = u2._rpRole === "anima" ? (Lt ? "Mood" : "Ânima") : u2._rpRole === "risk" ? (Lt ? "Risk" : "Risco") : u2._rpRole;
+          html += tipRow(rlab, Math.round(v2));
+        }
+      } catch (e) {}
+      tip.innerHTML = html; tip.style.display = "block";
+      var ow = u.over.clientWidth, oh = u.over.clientHeight, tw = tip.offsetWidth, th = tip.offsetHeight;
+      var lft = u.cursor.left + 14; if (lft + tw > ow) lft = u.cursor.left - tw - 14; if (lft < 0) lft = 2;
+      var tp = u.cursor.top + 12; if (tp + th > oh) tp = oh - th - 2; if (tp < 0) tp = 2;
+      tip.style.left = lft + "px"; tip.style.top = tp + "px";
+    }
+
     var cursor = { points: { show: false }, drag: { x: false, y: false } };  // brush nativo OFF → navPlugin cuida de zoom(wheel)/pan(drag), sensação TradingView. points OFF evita addClass(undefined) com séries esparsas (cone só-futuro).
     if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] }; // uPlot: compartilha crosshair E janela-x (zoom/pan) entre os painéis empilhados — Y de cada um independente
 
@@ -411,7 +492,7 @@
       height: opt.height || (opt.big === false ? 60 : 150),
       // tema/fonte do uPlot herdados do container
       cursor: cursor,
-      legend: { show: true },                        // readout AO VIVO: data na posição da cruz + valor de cada série ali
+      legend: { show: false },                       // legenda nativa OFF: o painel cru (Time/preço/p90/p10/p25/p75/sombra±) saía no espaço nobre abaixo do hero → substituído pelo tooltip consolidado em linguagem de analogia (updateTip)
       scales: { x: { time: true } },                 // eixo-X temporal de verdade
       axes: [
         { show: !opt.hideX, stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.6), width: 0.5 }, ticks: { stroke: withAlpha(T.line, 0.6) }, font: "10px ui-monospace, monospace" },
@@ -419,15 +500,17 @@
       ],
       series: series,
       bands: bands,                                  // uPlot: preenche entre pares de séries
-      plugins: [navPlugin({ onReset: opt.onReset })], // wheel-zoom + drag-pan (sensação TradingView)
+      plugins: (opt.nav === false ? [] : [navPlugin({ onReset: opt.onReset, clamp: opt.clamp })]), // wheel-zoom + drag-pan (sensação TradingView); opt.clamp (FREE) limita a navegação ao tempo permitido sem matar o zoom
       hooks: {
         drawClear: [drawBackground],                 // fundo (banding/regime) antes das séries
         draw: [drawTodayLine, drawSignals],           // âncora "hoje" + pinos de sinal (buy signal Risco Perene)
-        setScale: [linkScaleHook(opt.sync)]           // janela-x propaga aos painéis empilhados (período/wheel/pan)
+        setScale: [linkScaleHook(opt.sync)],          // janela-x propaga aos painéis empilhados (período/wheel/pan)
+        setCursor: [updateTip]                        // tooltip consolidado segue o crosshair (também dispara no sync vindo de Ânima/risk)
       }
     };
 
     var u = new window.uPlot(opts, data, el);
+    try { u.over.appendChild(tip); } catch (e) {}  // tooltip consolidado vive sobre a área de plot
     makeResponsive(u, el);
     linkRegister(u, opt.sync);
     return keep(el, u);
@@ -494,6 +577,26 @@
       }
     }
 
+    // sinais (buy/sell) — MESMOS pinos do preço, replicados aqui: são eventos TEMPORAIS, pertencem a todos os painéis empilhados (alinhados pela data).
+    function drawSignals(u) {
+      if (!opt.sinais || !opt.sinais.length) return;
+      var ctx = u.ctx, top = u.bbox.top, h = u.bbox.height, yb = top + h;
+      var xmin = u.scales.x.min, xmax = u.scales.x.max;
+      ctx.save();
+      for (var i = 0; i < opt.sinais.length; i++) {
+        var sg = opt.sinais[i], ts = dateToTs(sg.data); if (ts == null || ts < xmin || ts > xmax) continue;
+        var px = u.valToPos(ts, "x", true);
+        var up = !/off|down|pessim/.test(String(sg.tipo || ""));
+        var col = up ? T.accent : T.hot;
+        ctx.strokeStyle = withAlpha(col, 0.4); ctx.lineWidth = 0.8; ctx.setLineDash([2, 3]);
+        ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, yb); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = col;
+        var ty = up ? yb - 1 : top + 1, dir = up ? -1 : 1;
+        ctx.beginPath(); ctx.moveTo(px, ty); ctx.lineTo(px - 4, ty + dir * 5); ctx.lineTo(px + 4, ty + dir * 5); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+
     var cursor = { points: { show: false }, drag: { x: false, y: false } };      // points OFF (mesma higiene do upPrice) + brush OFF (nav via navPlugin): a Ânima/risk têm nulls no início (forward-fill) → série esparsa → cursor.points nativo quebra (addClass undefined / 'contains'); crosshair + sync seguem pela linha vertical
     if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] };           // empilhado: compartilha crosshair E janela-x com o preço (Y 0–100 próprio)
 
@@ -514,10 +617,11 @@
       plugins: opt.nav ? [navPlugin({ onReset: opt.onReset })] : [],
       hooks: {
         drawClear: [drawZones],
-        draw: [drawLines],
+        draw: [drawLines, drawSignals],               // zonas/threshold + pinos de sinal (mesmos eventos do preço)
         setScale: [linkScaleHook(opt.sync)]           // janela-x propaga aos painéis empilhados (preço↔Ânima↔risk)
       }
     }, data, el);
+    u._rpRole = opt.role || null;  // anima/risk → o tooltip consolidado do preço lê o valor deste painel no mesmo timestamp
     makeResponsive(u, el);
     linkRegister(u, opt.sync);
     return keep(el, u);
