@@ -327,9 +327,12 @@ export default {
     //    sitemap-snapshots.xml (data-driven), então o índice reflete as centenas de URLs sem regenerar nada. ──
     if (_url.pathname === "/sitemap.xml") {
       const o = _url.origin;
+      // lastmod no índice = sinal p/ o Google re-buscar os filhos. Os 3 dinâmicos (ativos/indicadores/snapshots) mudam ~diariamente;
+      // o de páginas tem lastmod por-URL próprio dentro do filho → hoje no índice é inócuo (não força re-crawl de página inalterada).
+      const lm = new Date().toISOString().slice(0, 10);
       const kids = ["/sitemap-pages.xml", "/sitemap-ativos.xml", "/sitemap-indicadores.xml", "/sitemap-snapshots.xml"];
       const body = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
-        kids.map(function (k) { return "<sitemap><loc>" + o + k + "</loc></sitemap>"; }).join("") + "</sitemapindex>";
+        kids.map(function (k) { return "<sitemap><loc>" + o + k + "</loc><lastmod>" + lm + "</lastmod></sitemap>"; }).join("") + "</sitemapindex>";
       return new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
     }
     // ── /sitemap-ativos.xml — sitemap programático dos /ativo (B.1): a lista REAL (~77), via /v1/tickers ──

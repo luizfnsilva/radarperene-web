@@ -37,6 +37,8 @@ Allow: /
 
 Sitemap: https://radarperene.com/sitemap.xml
 Sitemap: https://radarperene.com.br/sitemap.xml
+Sitemap: https://radarperene.com/sitemap-pages.xml
+Sitemap: https://radarperene.com.br/sitemap-pages.xml
 Sitemap: https://radarperene.com/sitemap-ativos.xml
 Sitemap: https://radarperene.com.br/sitemap-ativos.xml
 Sitemap: https://radarperene.com/sitemap-indicadores.xml
