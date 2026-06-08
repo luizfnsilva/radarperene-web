@@ -478,7 +478,9 @@
   // bloco-análogo NOBRE (P3): a taxa-base como resumo do ativo, não como gráfico solto. Free=3m; Founder=3/6/12m.
   function analogBlock(s, nm, lang, pro) {
     var br = s.base_rate; if (!br || !br.h) return "";
-    var L = lang === "en", HS = pro ? ["3m", "6m", "12m"] : ["3m"];
+    var L = lang === "en";
+    if (!pro) return analogFreeHTML(br, L);  // ★ free = só teaser (moat); Founder = distribuição completa
+    var HS = ["3m", "6m", "12m"];
     var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
     var rows = HS.map(function (hk) {
       var d = br.h[hk]; if (!d) return "";
@@ -496,6 +498,28 @@
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</div>' + rows
       + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85"><span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in Founder" : "horizontes 6m e 12m no Founder") + '</div>' : '')
       + '<div class="rp-ml" style="margin-top:5px;opacity:.6">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div></div>';
+  }
+  // ★ MOAT — bloco-análogo no FREE = só TEASER (existência + nº de casos + leitura qualitativa); a DISTRIBUIÇÃO (probabilidade
+  //   de alta · retorno mediano · faixa · 3/6/12m) é o que se vende no Founder. Doutrina (dono + CANONICO_TIER_FREE §moat):
+  //   "Free = onde estamos; Founder = o que aconteceu depois". Vende-se a CONCLUSÃO, não a planilha. Per-ativo NUNCA mostra o número
+  //   (o macro/diário mostra a mediana do IBOV como gancho — esse é o único análogo numérico livre, e é de propósito).
+  function analogFreeHTML(br, L) {
+    if (!br || !br.h) return "";
+    var hs = ["3m", "6m", "12m"], N = null;
+    for (var i = 0; i < hs.length; i++) { var d = br.h[hs[i]]; if (d && d.n != null && (N == null || d.n > N)) N = d.n; }
+    if (N == null) return "";  // sem casos → não mostra (degrada honesto)
+    var dBias = br.h["6m"] || br.h["3m"] || br.h["12m"], med = (dBias && dBias.mediana != null) ? dBias.mediana : null;
+    var bias = med == null ? null : (med > 2 ? (L ? "historically leaned up" : "viés histórico de alta") : med < -2 ? (L ? "historically leaned down" : "viés histórico de baixa") : (L ? "historically neutral" : "viés histórico neutro"));
+    var suf = (N >= 8), src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
+    var ck = checkoutURL(L ? "en" : "pt");
+    return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
+      + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + ' <span style="opacity:.55;font-weight:400">(' + src + ')</span></div>'
+      + '<div class="rp-ml" style="margin-top:5px;color:var(--_txt)"><b style="font-family:var(--_mono)">' + N.toLocaleString(L ? "en-US" : "pt-BR") + '</b> ' + (L ? "analogous cases found" : "casos análogos encontrados") + '</div>'
+      + '<div class="rp-ml" style="opacity:.85">' + (suf ? (L ? "✓ enough for analysis" : "✓ amostra suficiente para análise") : (L ? "· limited sample" : "· amostra limitada")) + (bias ? ' · ' + (L ? "reading: " : "leitura: ") + bias : '') + '</div>'
+      + '<div class="rp-ml" style="margin-top:8px;opacity:.95"><span style="color:var(--_accent)">🔒</span> ' + (L ? "probability of rising · median return · case range (50% / 80%) · 3 / 6 / 12 months" : "probabilidade de alta · retorno mediano · faixa dos casos (50% / 80%) · 3 / 6 / 12 meses") + '</div>'
+      + '<a href="' + ck + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--_accent);text-decoration:none">' + (L ? "What historically happened next? → Founder" : "O que historicamente aconteceu depois? → Founder") + '</a>'
+      + '<div class="rp-ml" style="opacity:.55;margin-top:6px">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div>'
+      + '</div>';
   }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   // ★ ESTÚDIO — cruzar até 3 séries (qualquer classe) rebaseadas a 100, alinhadas por grade MENSAL (lida com diário×mensal) + correlação
@@ -542,7 +566,8 @@
   // P7: distribuição empírica de casos passados, NUNCA previsão/sinal de trade. Degrada se s.base_rate ausente/incompleto.
   function baseRatePanel(br, L, pro) {
     if (!br || !br.h) return "";
-    var HS = pro ? [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]] : [["3m", "3m"]];  // free: só o 3m (diagnóstico); 6m/12m = investigação (Founder)
+    if (!pro) return analogFreeHTML(br, L);  // ★ free = só teaser (moat); Founder = distribuição completa (3/6/12m)
+    var HS = [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]];
     var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
     var col = function (x) { return x == null ? "var(--_dim)" : x >= 0 ? "var(--_warm)" : "var(--_cool)"; };
     var rows = "", bars = "";
@@ -638,9 +663,11 @@
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);
         if (dmid != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b>' + (dlo != null && dhi != null ? ' · ' + (L ? "50% of cases " : "50% dos casos ") + sgn(dlo) + ' … ' + sgn(dhi) : '') + (dlo2 != null && dhi2 != null ? ' · ' + (L ? "80% of cases " : "80% dos casos ") + sgn(dlo2) + ' … ' + sgn(dhi2) : '') + ' · ' + (L ? "in similar situations in the past — not a forecast" : "em situações parecidas no passado — não é previsão") + '</div>'; }
-      else if (dmid != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b> · ' + (L ? "where it tended to go in analogous cases — not a forecast" : "pra onde costumou ir em casos análogos — não é previsão") + ' · <span style="opacity:.72">' + (L ? "🔒 50% / 80% of cases in Founder" : "🔒 faixas dos 50% / 80% dos casos no Founder") + '</span></div>'; }
+      else if (dmid != null) depth += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in Founder" : "caso mediano & faixas 50% / 80% no Founder") + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
-      if (dpct != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'; }
+      if (dpct != null) depth += gpaid
+        ? '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'
+        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78"><span style="color:var(--_accent)">🔒</span> ' + (L ? "value in Founder" : "valor no Founder") + '</span></div>'; }
     if (s.base_rate && s.base_rate.h) depth += baseRatePanel(s.base_rate, L, gpaid);  // taxa-base (casos análogos) — free: só 3m; 6m/12m no Founder (gpaid)
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : "Valuation · Lyn Alden ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
