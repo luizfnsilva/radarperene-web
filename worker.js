@@ -322,6 +322,16 @@ export default {
   async fetch(request, env) {
     const _url = new URL(request.url);
     const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
+    // ── /sitemap.xml — ÍNDICE de sitemaps (origin-aware): amarra os 4 filhos do MESMO domínio (páginas estáticas +
+    //    ativos + indicadores + arquivo diário) num só ponto de submissão. Os diários crescem sozinhos via o filho
+    //    sitemap-snapshots.xml (data-driven), então o índice reflete as centenas de URLs sem regenerar nada. ──
+    if (_url.pathname === "/sitemap.xml") {
+      const o = _url.origin;
+      const kids = ["/sitemap-pages.xml", "/sitemap-ativos.xml", "/sitemap-indicadores.xml", "/sitemap-snapshots.xml"];
+      const body = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
+        kids.map(function (k) { return "<sitemap><loc>" + o + k + "</loc></sitemap>"; }).join("") + "</sitemapindex>";
+      return new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+    }
     // ── /sitemap-ativos.xml — sitemap programático dos /ativo (B.1): a lista REAL (~77), via /v1/tickers ──
     if (_url.pathname === "/sitemap-ativos.xml") {
       try {

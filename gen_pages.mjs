@@ -487,10 +487,14 @@ for (const p of PAGES) {
   rows.push(su(`https://radarperene.com.br${ptPath}`, alt, "monthly", pri));
   rows.push(su(`https://radarperene.com${enPath}`, alt, "monthly", pri));
 }
-writeFileSync(join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${rows.join("\n")}\n</urlset>\n`);
+const _pagesXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${rows.join("\n")}\n</urlset>\n`;
+// sitemap-pages.xml = filho do ÍNDICE /sitemap.xml (servido pelo worker, origin-aware, junto de ativos/indicadores/snapshots).
+// sitemap.xml estático = fallback (o worker o sobrepõe via run_worker_first). Mantém os 2 em sync.
+writeFileSync(join(ROOT, "sitemap-pages.xml"), _pagesXml);
+writeFileSync(join(ROOT, "sitemap.xml"), _pagesXml);
 
 // ─── relatório + validação de limites SEO (title ≤ 60 ideal/≤65 ok · description ≤ 160) ───
-console.log("✓ sitemap.xml:", rows.length, "URLs");
+console.log("✓ sitemap-pages.xml + sitemap.xml:", rows.length, "URLs (páginas); índice /sitemap.xml soma ativos+indicadores+snapshots no worker)");
 console.log("✓ blocos: Burst1", Object.keys(BLOCKS[1]).length, "· Burst2", Object.keys(BLOCKS[2]).length);
 let warn = 0;
 for (const r of out) {
