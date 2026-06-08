@@ -727,16 +727,21 @@
 
   // =========================================================================
   // 4) upDual — 2 séries normalizadas + razão tracejada, rebaseadas a 100.
-  //    a, b: séries; c (opcional): razão. Reproduz dualSpark.
+  //    a, b: as DUAS pontas; c (opcional): a razão (o sinal lead-lag). Estilo leadlagreport.
+  //    opt (opcional): { datas, sync, big, height, hideX, nav, clamp, onReset, axisW } — quando vem,
+  //    vira o PAINEL DE CIMA empilhado do big-chart (datas reais + sync de janela com os osciladores
+  //    Ânima/risk embaixo). Sem opt = mini-spark com X sintético (compat dualSpark).
   // =========================================================================
-  function upDual(el, a, b, c) {
+  function upDual(el, a, b, c, opt) {
     if (!ready()) { warnNoUplot(); return null; }
     if (!el || !a || !b || a.length < 2) return null;
+    opt = opt || {};
     var T = theme(el);
     clear(el);
 
     // rebaseia a 100 pelo primeiro ponto não-nulo (par curado já costuma vir [0,100],
-    // mas rebaseamos pra garantir comparabilidade visual quando vier cru).
+    // mas rebaseamos pra garantir comparabilidade visual quando vier cru — escalas diferentes
+    // entre as pontas, ex. setor ~3000 vs IBOV ~130k).
     function rebase(arr) {
       if (!arr) return null;
       var base0 = null;
@@ -746,9 +751,13 @@
     }
 
     var n = a.length;
-    var xs = new Array(n);
-    var base = Date.now() / 1000 - (n - 1) * 86400;
-    for (var i = 0; i < n; i++) xs[i] = base + i * 86400; // X sintético uniforme (sem datas no shape do par)
+    var xs = new Array(n), realX = !!(opt.datas && opt.datas.length === n);
+    if (realX) {
+      for (var i = 0; i < n; i++) { var ts = dateToTs(opt.datas[i]); xs[i] = (ts != null) ? ts : (Date.now() / 1000 - (n - i) * 86400); }
+    } else {
+      var base = Date.now() / 1000 - (n - 1) * 86400;
+      for (var k = 0; k < n; k++) xs[k] = base + k * 86400; // X sintético uniforme (mini-spark)
+    }
 
     var ra = rebase(a), rb = rebase(b), rc = (c && c.length) ? rebase(c) : null;
     var data = [xs, ra, rb];
@@ -759,19 +768,37 @@
     ];
     if (rc) { data.push(rc); series.push({ label: "razão", stroke: T.warm, width: 2, dash: [5, 2], points: { show: false } }); }
 
+    // Y auto-ajustado à JANELA visível (sensação leadlagreport: as linhas preenchem o painel ao dar zoom).
+    // uPlot por padrão range-ia Y sobre TODOS os dados; aqui recomputamos min/max só dos pontos no eixo-X corrente.
+    function yWindow(u, dmin, dmax) {
+      var xmin = u.scales.x.min, xmax = u.scales.x.max;
+      if (xmin == null || xmax == null) return [dmin, dmax];
+      var xd = u.data[0], lo = Infinity, hi = -Infinity;
+      for (var si = 1; si < u.data.length; si++) { var d = u.data[si]; if (!d) continue;
+        for (var i = 0; i < xd.length; i++) { if (xd[i] < xmin || xd[i] > xmax) continue; var v = d[i]; if (v == null || !isFinite(v)) continue; if (v < lo) lo = v; if (v > hi) hi = v; } }
+      if (!isFinite(lo) || !isFinite(hi)) return [dmin, dmax];
+      var pad = (hi - lo) * 0.08 || (Math.abs(hi) * 0.05) || 1; return [lo - pad, hi + pad];
+    }
+
+    var cursor = { points: { show: false }, drag: { x: false, y: false } };
+    if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] };  // compartilha crosshair E janela-x com os osciladores (Y próprio)
+
     var u = new window.uPlot({
       width: el.clientWidth || 280,
-      height: 60,
-      cursor: { points: { show: true } },
+      height: opt.height || (realX ? 200 : 60),
+      cursor: cursor,
       legend: { show: false },
-      scales: { x: { time: false } },
+      scales: { x: { time: realX }, y: realX ? { range: yWindow } : {} },
       axes: [
-        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.4), width: 0.5 }, show: false },
-        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.4), width: 0.5 }, font: "10px ui-monospace, monospace", size: 34 }
+        { show: realX ? !opt.hideX : false, stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.4), width: 0.5 }, font: "10px ui-monospace, monospace" },
+        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.4), width: 0.5 }, font: "10px ui-monospace, monospace", size: opt.axisW || 34 }
       ],
-      series: series
+      series: series,
+      plugins: opt.nav ? [navPlugin({ clamp: opt.clamp, onReset: opt.onReset })] : [],
+      hooks: opt.sync ? { setScale: [linkScaleHook(opt.sync)] } : {}  // janela-x propaga aos painéis empilhados (Ânima/risk)
     }, data, el);
     makeResponsive(u, el);
+    if (opt.sync) linkRegister(u, opt.sync);
     return keep(el, u);
   }
 

@@ -35,7 +35,7 @@
     } catch (e) { return "svg"; }
   })();
   // quais gráficos já migraram p/ uPlot (os demais seguem SVG mesmo com a flag on). Herói + osciladores empilhados (Ânima/risk).
-  var RP_UP = { price: true, osc: true, scatter: false, dual: false };
+  var RP_UP = { price: true, osc: true, scatter: false, dual: true };  // dual = intermercado lead-lag (upDual: 2 pontas + razão, empilhado c/ Ânima/risk)
   var _syncSeq = 0;  // contador de chaves de sync (1 grupo de crosshair/janela por gráfico empilhado)
   // true só quando a flag pede E a engine carregou (RPUplot.ready()). Senão → SVG (degrada gracioso).
   function uplotOn() { return RP_ENGINE === "uplot" && window.RPUplot && window.RPUplot.ready(); }
@@ -503,16 +503,16 @@
   function compareChart(list, lang, opt) {
     opt = opt || {}; var big = !!opt.big, L = lang === "en";
     var valid = list.filter(function (x) { return x && x.hist && x.hist.length > 2 && x.datas && x.datas.length === x.hist.length; });
-    if (valid.length < 2) return null;
+    if (valid.length < 2) return { err: "data" };  // #4: uma das séries não carregou / veio vazia ou sem datas
     var maps = valid.map(function (x) { var m = {}; for (var i = 0; i < x.hist.length; i++) { var d = (x.datas[i] || "").slice(0, 7); if (d && isFinite(x.hist[i])) m[d] = x.hist[i]; } return m; });
     var months = maps.map(function (m) { return Object.keys(m).sort(); });
-    if (months.some(function (mm) { return !mm.length; })) return null;
+    if (months.some(function (mm) { return !mm.length; })) return { err: "data" };
     var lo = months.map(function (mm) { return mm[0]; }).reduce(function (a, b) { return a > b ? a : b; });
     var hi = months.map(function (mm) { return mm[mm.length - 1]; }).reduce(function (a, b) { return a < b ? a : b; });
-    if (lo >= hi) return null;  // sem sobreposição temporal
+    if (lo >= hi) return { err: "overlap" };  // #4: as séries não têm NENHUM mês em comum (não se sobrepõem no tempo)
     var gset = {}; months.forEach(function (mm) { mm.forEach(function (mo) { if (mo >= lo && mo <= hi) gset[mo] = 1; }); });
     var grid = Object.keys(gset).sort();
-    if (grid.length < 3) return null;
+    if (grid.length < 3) return { err: "short" };  // #4: sobrepõem, mas < 3 meses em comum — cruzamento sem confiança
     var ff = maps.map(function (m) { var mm = Object.keys(m).sort(), out = [], last = null, j = 0; for (var k = 0; k < grid.length; k++) { while (j < mm.length && mm[j] <= grid[k]) { last = m[mm[j]]; j++; } out.push(last); } return out; });
     var base0 = ff.map(function (sx) { for (var k = 0; k < sx.length; k++) if (sx[k] != null) return sx[k]; return null; });
     var reb = ff.map(function (sx, si) { return sx.map(function (v) { return (v != null && base0[si]) ? (v / base0[si]) * 100 : null; }); });
@@ -530,6 +530,12 @@
     var pairs = [];
     for (var a = 0; a < reb.length; a++) for (var b = a + 1; b < reb.length; b++) { var cc2 = corr(reb[a], reb[b]); if (cc2 != null) pairs.push({ a: valid[a].nome, b: valid[b].nome, c: cc2.c, n: cc2.n }); }
     return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0], mn: mn, mx: mx };
+  }
+  // #4 — mensagem ESPECÍFICA de falha do Estúdio (em vez do genérico "sem sobreposição"): distingue dado ausente × sem sobreposição × janela curta.
+  function cmpErrMsg(code, L) {
+    if (code === "overlap") return L ? "these two series never coexisted in time — no overlapping period to cross. Pick a pair that lived at the same time (e.g. drop the one that starts later)." : "essas duas séries nunca coexistiram no tempo — não há período em comum para cruzar. Escolha um par que viveu ao mesmo tempo (ex.: tire a que começa depois).";
+    if (code === "short") return L ? "they overlap for fewer than 3 months — too short to cross with confidence. Try a longer-lived pair." : "o período em comum tem menos de 3 meses — curto demais para cruzar com confiança. Tente um par com mais histórico.";
+    return L ? "couldn’t load one of the series (empty or missing dates). Try another asset." : "não consegui carregar uma das séries (vazia ou sem datas). Tente outro ativo.";
   }
 
   // ── PAINEL DE TAXA-BASE (device estilo SentimenTrader): "em casos análogos, subiu em X% das vezes, mediana +Y% em 3/6/12m" ──
@@ -581,6 +587,8 @@
     // O gráfico grande é a MAIOR isca → free SEMPRE abre (sem gate de abertura). O upsell vem das FEATURES gated
     // dentro: manipular (zoom/brush), comparar A×B (Estúdio), cone completo p10–p90, overlays além dos 2 do free.
     var gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}  // login (vale em qq lugar) ou flag local
+    var imx = !!(preCmp && preCmp.length >= 2);  // ★ modo INTERMERCADO (lead-lag): big-chart = upDual (2 pontas + razão) em cima + Ânima/Risco Perene empilhados embaixo (estilo leadlagreport). s = numerador (traz risco/anima/datas globais alinhados).
+    var imxData = null;  // { a, b, c, datas, labels } — as 2 pontas (rebaseadas) + a razão, alinhadas às datas do numerador; só fica pronto após buscar den+ratio.
     var cur = s.hist[s.hist.length - 1];
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
     var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
@@ -611,7 +619,7 @@
       if (st.pos52 != null) depth += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(st.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(st.hi52)) + '</div><div class="rp-52"><i style="left:' + st.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + st.pos52 + (L ? "% of range" : "% da faixa") + '</div>';
       depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + (st.dd_top != null ? ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b>' : '') + '</div>';
       if (st.sharpe != null) depth += '<div class="rp-ml"><b style="color:var(--_' + (st.sharpe >= 0 ? "warm" : "cool") + ')">Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }
-    h += '<div class="rp-ml">' + (cone ? (L ? "price · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : "preço · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)")) + '</div>';
+    h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (cone ? (L ? "price · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : "preço · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)"))) + '</div>';
     // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis. Free: 3M/6M livres, 1A/3A/MAX no Founder (gate). Decisão do dono.
     h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) {
       var m = parseFloat(p[0]); var locked = !gpaid && (m === 0 || m > 3);  // free = só 3M (decisão do dono); 6M/1A/3A/MAX = Founder. 0 = MAX (o mais longo)
@@ -656,7 +664,7 @@
       if (animaOk) lr += '<div class="rp-ml">' + (L ? "Mood · " : "Humor · ") + '<b>' + esc(rkPos(aObj, L)) + '</b> <span style="opacity:.6">(' + (L ? "BR market" : "mercado BR") + ')</span></div>';
       h += lr + trendBlk;  // trendBlk = Tendência X/10 + vs IBOV Y/10
     }
-    h += depth;  // ★ estatísticas detalhadas (retornos/52s/vol/Sharpe/taxa-base/valuation) — abaixo da Leitura rápida e da pilha de gráficos
+    if (!imx) h += depth;  // ★ estatísticas detalhadas (retornos/52s/vol/Sharpe/taxa-base/valuation) — abaixo da Leitura rápida e da pilha de gráficos. No intermercado descrevem só o numerador (cesta sintética) → confundem; o dual+pilha+lead-lag já contam a história.
     if (meta && !(preCmp && preCmp.length >= 2)) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';  // no comparativo lead-lag a interpretação vira legenda do gráfico (não duplica aqui)
     h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
     var mw = document.createElement("div"); mw.className = "rp-mw"; mw.innerHTML = h;
@@ -688,7 +696,57 @@
     //    Mantido num builder p/ o re-tema (MutationObserver) re-desenhar com a paleta nova.
     var _upInst = null;  // instância uPlot viva (ou null em modo SVG)
     var _navClamp = null;  // FREE: janela navegável permitida {min,max} (período selecionado → fim do cone); Founder = null (sem limite). setado em setChart.
+    // ── INTERMERCADO: painel de cima = upDual (2 pontas + razão), datado e sincronizado com os osciladores Ânima/risk embaixo. ──
+    function drawDual(el) {
+      if (!imxData) return null;  // ainda buscando den/ratio — mountIntermarket redesenha quando chegar
+      if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
+      _upInst = window.RPUplot.upDual(el, imxData.a, imxData.b, imxData.c, {
+        datas: imxData.datas, sync: SYNC, big: true, height: 200, hideX: hasStack, axisW: 52, nav: true, lang: lang,
+        clamp: function () { return _navClamp; },
+        onReset: function () { var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 3; setChart(isFinite(fr) ? fr : 3); }
+      });  // nav clampada (free = zoom DENTRO do 3M sem escapar; Founder = livre, _navClamp null) — paridade c/ o gráfico do ticket; sync propaga a janela aos osciladores
+      return _upInst;
+    }
+    // busca as 2 pontas (denominador) + a razão e alinha às datas do numerador (s) → as 3 séries dividem a MESMA grade (vêm das mesmas linhas de components), então o "alinhamento delicado" some.
+    function mountIntermarket() {
+      var tgf = mw.querySelector(".rp-tgf"); if (tgf) tgf.style.display = "none";  // toggles de overlay do ativo único não valem no dual
+      chartEl.innerHTML = '<div class="rp-ml" style="opacity:.6;padding:22px 0;text-align:center">' + (L ? "loading lead-lag…" : "carregando lead-lag…") + '</div>';
+      var cod = preCmp[0].cod;
+      var aLbl = preCmp[0].nome || (L ? "Numerator" : "Numerador");
+      var denLbl = (preCmp[1] && preCmp[1].cls === "intermercado_den") ? (preCmp[1].nome || "IBOV") : "IBOV";  // pré-carga = [num, den OU razão÷IBOV, IBOV]: quando [1] é a razão, a 2ª ponta é o IBOV
+      var ratLbl = aLbl + "÷" + denLbl;
+      var serieURL = API.replace("/v1/digest", "/v1/serie");
+      var fOne = function (cls) { return fetch(serieURL + "?codigo=" + encodeURIComponent(cod) + "&classe=" + cls, FOPT).then(function (r) { return r.json(); }).catch(function () { return null; }); };
+      Promise.all([fOne("intermercado_den"), fOne("intermercado_ratio")]).then(function (res) {
+        var den = res[0], rat = res[1];
+        var mapOf = function (d) { var m = {}; if (d && d.hist && d.datas && d.hist.length === d.datas.length) { for (var i = 0; i < d.datas.length; i++) m[d.datas[i]] = d.hist[i]; } return m; };
+        var dm = mapOf(den), rm = mapOf(rat);
+        var A = [], B = [], C = [], hasB = false, hasC = false;
+        for (var i = 0; i < s.datas.length; i++) { var dt = s.datas[i];
+          A.push(s.hist[i]);
+          var bv = dm[dt]; B.push(bv != null ? bv : null); if (bv != null) hasB = true;
+          var cv = rm[dt]; C.push(cv != null ? cv : null); if (cv != null) hasC = true;
+        }
+        if (!hasB) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.7;padding:18px 0;text-align:center">' + (L ? "intermarket series unavailable" : "série do intermercado indisponível") + '</div>'; return; }
+        imxData = { a: A, b: B, c: hasC ? C : null, datas: s.datas, labels: [aLbl, denLbl, ratLbl] };
+        setChart(3);  // 3M default (free clampado) → drawUp→drawDual desenha o dual + propaga a janela aos osciladores Ânima/risk via SYNC
+        if (typeof requestAnimationFrame === "function") requestAnimationFrame(function () { setChart(3); });
+        renderImxLegend(aLbl, denLbl, ratLbl);
+      });
+    }
+    function renderImxLegend(a, b, c) {
+      var lg = mw.querySelector(".rp-imx-leg");
+      if (!lg) { lg = document.createElement("div"); lg.className = "rp-imx-leg"; lg.style.marginTop = "5px"; chartEl.parentNode.insertBefore(lg, chartEl.nextSibling); }
+      lg.innerHTML = '<div class="rp-ml">'
+        + '<span style="white-space:nowrap;margin-right:11px"><b style="color:var(--_accent)">▬</b> ' + esc(a) + '</span>'
+        + '<span style="white-space:nowrap;margin-right:11px"><b style="color:var(--_cool)">▬</b> ' + esc(b) + '</span>'
+        + '<span style="white-space:nowrap"><b style="color:var(--_warm)">▦</b> ' + esc(c) + ' <span style="opacity:.6">(' + (L ? "ratio = who leads" : "razão = quem lidera") + ')</span></span>'
+        + '</div>'
+        + (meta ? '<div class="rp-ml" style="margin-top:3px"><b style="color:var(--_accent)">Lead-lag</b> — ' + esc(meta) + '</div>' : '')
+        + '<div class="rp-ml" style="opacity:.7;margin-top:2px">' + (L ? "rebased to 100 · the two ends + their ratio · below: BR market Mood & Perene Risk, date-aligned" : "rebaseado a 100 · as duas pontas + a razão · abaixo: Humor BR & Risco Perene, alinhados pela data") + '</div>';
+    }
     function drawUp(el) {  // el = chartEl; lê o estado de overlays `ov` (free liga/desliga cone/fair/ma200)
+      if (imx) return drawDual(el);  // intermercado: dual no lugar do preço único
       var sv = {};
       for (var kk in s) if (Object.prototype.hasOwnProperty.call(s, kk)) sv[kk] = s[kk];
       if (ov.cone === false) { sv.cone = null; sv.shadow = null; }   // toggle "Projeção" off → sem cone/sombra
@@ -749,13 +807,15 @@
     if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj, gpaid); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync/janela do preço + seletor de horizonte
     setChart(3);  // abre em 3M (default legível); MAX/longos via botões (gated p/ free)
     if (useUp && typeof requestAnimationFrame === "function") requestAnimationFrame(function () { setChart(3); });  // reaplica a janela após o layout/ResizeObserver dos osciladores assentar no mount (senão o auto-range deles re-propaga "tudo" e o 3M inicial era ignorado)
-    if (!gpaid) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação)
+    if (!gpaid && !(imx && useUp)) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação) — não vale no intermercado (dual não tem cone/MM)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
         el.addEventListener("click", function () { var k = el.getAttribute("data-fk"); ov[k] = !ov[k]; el.textContent = (ov[k] ? "● " : "○ ") + el.getAttribute("data-lbl"); paint(curHist, true); });
       });
     }
+    // ── INTERMERCADO (uPlot): busca as 2 pontas (den) + a razão, alinha às datas do numerador e monta o dual empilhado. Substitui o SVG cru. ──
+    if (imx && useUp) { mountIntermarket(); }
     // ★ ESTÚDIO (TradingView): cruzar até 3 séries (qualquer classe) + escolher camadas — só assinante
-    if (gpaid) {
+    else if (gpaid) {
       var cmp = (preCmp && preCmp.length >= 2) ? preCmp.slice() : [{ cod: s.codigo, cls: s.classe, nome: title }];  // A = ticker atual (ou pré-carga do intermercado)
       var cmpCache = {}; cmpCache[s.classe + ":" + s.codigo] = s;
       var perRow = mw.querySelector(".rp-per");
@@ -772,7 +832,7 @@
       };
       var drawCompare = function (got) {
         var cc = compareChart(got.filter(Boolean), lang, { big: true });
-        if (!cc) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.7;padding:18px 0;text-align:center">' + (L ? "no time overlap between these series" : "sem sobreposição temporal entre essas séries") + '</div>'; legEl.innerHTML = ""; return; }
+        if (!cc || cc.err) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.78;padding:18px 12px;text-align:center;line-height:1.45">' + esc(cmpErrMsg(cc && cc.err, L)) + '</div>'; legEl.innerHTML = ""; return; }
         chartEl.innerHTML = cc.svg;
         yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");  // eixo-Y do cruzamento (base 100) — referência não some mais
         chartEl.appendChild(yax);
@@ -836,7 +896,7 @@
             gotF[i] = (d && d.hist) ? { nome: c.nome, hist: d.hist, datas: d.datas } : null;
             if (--pendF === 0) {
               var cc = compareChart(gotF.filter(Boolean), lang, { big: true });
-              if (!cc) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.7;padding:18px 0;text-align:center">' + (L ? "no time overlap between these series" : "sem sobreposição temporal entre essas séries") + '</div>'; return; }
+              if (!cc || cc.err) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.78;padding:18px 12px;text-align:center;line-height:1.45">' + esc(cmpErrMsg(cc && cc.err, L)) + '</div>'; return; }
               chartEl.innerHTML = cc.svg;
               yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");
               chartEl.appendChild(yax);
