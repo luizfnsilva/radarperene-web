@@ -516,7 +516,8 @@
   async function refresh(){
     var sess=(await sb.auth.getSession()).data.session;
     var pw=document.getElementById("portal-wrap");
-    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; try{localStorage.removeItem("rp_premium")}catch(x){} return; }
+    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; window.RP_TOKEN=null; try{localStorage.removeItem("rp_premium")}catch(x){} return; }
+    window.RP_TOKEN=sess.access_token;  // expõe o token da sessão ao widget radar.js → /v1/serie devolve a distribuição (Founder). onAuthStateChange re-chama refresh() no TOKEN_REFRESHED, mantendo fresco.
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     if(pw)pw.style.display="inline";
     try{ var r=await fetch(SBU+"/functions/v1/radar-api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();

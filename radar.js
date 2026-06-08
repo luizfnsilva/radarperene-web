@@ -17,7 +17,9 @@
   // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
   // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
-  var FOPT = { headers: { apikey: ANON, Authorization: "Bearer " + ANON } };
+  // headers da API: anon por padrão; se a página-host expôs o token do assinante (window.RP_TOKEN), manda-o no Authorization →
+  // o /v1/serie devolve a DISTRIBUIÇÃO completa dos análogos (Founder). Sem token (free/embed) = teaser. Apikey segue anon (gateway).
+  function fopt() { var tk = (typeof window !== "undefined" && window.RP_TOKEN) ? window.RP_TOKEN : ANON; return { headers: { apikey: ANON, Authorization: "Bearer " + tk } }; }
   var RP_CAT = [];  // catálogo de séries cruzáveis (estúdio) — montado no render a partir do digest, cresce sozinho com novos tickers
   var STYLE_ID = "rp-radar-style";
 
@@ -477,9 +479,9 @@
   }
   // bloco-análogo NOBRE (P3): a taxa-base como resumo do ativo, não como gráfico solto. Free=3m; Founder=3/6/12m.
   function analogBlock(s, nm, lang, pro) {
-    var br = s.base_rate; if (!br || !br.h) return "";
+    var br = s.base_rate; if (!br) return "";  // aceita teaser ({n,classificacao}) OU forma completa (h[])
     var L = lang === "en";
-    if (!pro) return analogFreeHTML(br, L);  // ★ free = só teaser (moat); Founder = distribuição completa
+    if (!pro || !analogHasDist(br)) return analogFreeHTML(br, L);  // ★ free OU data gateada pela API = teaser (moat); Founder = completo
     var HS = ["3m", "6m", "12m"];
     var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
     var rows = HS.map(function (hk) {
@@ -504,13 +506,14 @@
   //   "Free = onde estamos; Founder = o que aconteceu depois". Vende-se a CONCLUSÃO, não a planilha. Per-ativo NUNCA mostra o número
   //   (o macro/diário mostra a mediana do IBOV como gancho — esse é o único análogo numérico livre, e é de propósito).
   function analogFreeHTML(br, L) {
-    if (!br || !br.h) return "";
-    var hs = ["3m", "6m", "12m"], N = null;
-    for (var i = 0; i < hs.length; i++) { var d = br.h[hs[i]]; if (d && d.n != null && (N == null || d.n > N)) N = d.n; }
+    if (!br) return "";
+    // aceita as DUAS formas: TEASER da API gated ({n, classificacao, suficiente}) OU a forma completa (h[].n/mediana) — Founder recebe full.
+    var N = (br.n != null) ? br.n : null, medSign = null;
+    if (br.h) { var hs = ["3m", "6m", "12m"]; for (var i = 0; i < hs.length; i++) { var d = br.h[hs[i]]; if (d) { if (d.n != null && (N == null || d.n > N)) N = d.n; if (medSign == null && d.mediana != null) medSign = d.mediana; } } }
     if (N == null) return "";  // sem casos → não mostra (degrada honesto)
-    var dBias = br.h["6m"] || br.h["3m"] || br.h["12m"], med = (dBias && dBias.mediana != null) ? dBias.mediana : null;
-    var bias = med == null ? null : (med > 2 ? (L ? "historically leaned up" : "viés histórico de alta") : med < -2 ? (L ? "historically leaned down" : "viés histórico de baixa") : (L ? "historically neutral" : "viés histórico neutro"));
-    var suf = (N >= 8), src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
+    var biasLab = function (k) { return k === "alta" ? (L ? "historically leaned up" : "viés histórico de alta") : k === "baixa" ? (L ? "historically leaned down" : "viés histórico de baixa") : (L ? "historically neutral" : "viés histórico neutro"); };
+    var bias = br.classificacao ? biasLab(br.classificacao) : (medSign == null ? null : biasLab(medSign > 2 ? "alta" : medSign < -2 ? "baixa" : "neutro"));
+    var suf = (br.suficiente != null) ? br.suficiente : (N >= 8), src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
     var ck = checkoutURL(L ? "en" : "pt");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + ' <span style="opacity:.55;font-weight:400">(' + src + ')</span></div>'
@@ -521,6 +524,9 @@
       + '<div class="rp-ml" style="opacity:.55;margin-top:6px">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div>'
       + '</div>';
   }
+  // a data traz a DISTRIBUIÇÃO (Founder)? — usado p/ decidir teaser × completo. Robusto ao spoof de localStorage: se a API gateou
+  // (sem token de assinante), o base_rate vem como teaser (gated/sem mediana) e o cliente mostra o teaser mesmo com gpaid=true local.
+  function analogHasDist(br) { return !!(br && br.h && !br.gated && ["3m", "6m", "12m"].some(function (k) { return br.h[k] && br.h[k].mediana != null; })); }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   // ★ ESTÚDIO — cruzar até 3 séries (qualquer classe) rebaseadas a 100, alinhadas por grade MENSAL (lida com diário×mensal) + correlação
   var CMP_COLORS = ["var(--_accent)", "var(--_cool)", "var(--_warm)"];
@@ -565,8 +571,8 @@
   // ── PAINEL DE TAXA-BASE (device estilo SentimenTrader): "em casos análogos, subiu em X% das vezes, mediana +Y% em 3/6/12m" ──
   // P7: distribuição empírica de casos passados, NUNCA previsão/sinal de trade. Degrada se s.base_rate ausente/incompleto.
   function baseRatePanel(br, L, pro) {
-    if (!br || !br.h) return "";
-    if (!pro) return analogFreeHTML(br, L);  // ★ free = só teaser (moat); Founder = distribuição completa (3/6/12m)
+    if (!br) return "";  // aceita teaser ({n,classificacao}) OU forma completa (h[])
+    if (!pro || !analogHasDist(br)) return analogFreeHTML(br, L);  // ★ free OU data gateada pela API = teaser (moat); Founder com distribuição = completo
     var HS = [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]];
     var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
     var col = function (x) { return x == null ? "var(--_dim)" : x >= 0 ? "var(--_warm)" : "var(--_cool)"; };
@@ -668,7 +674,7 @@
       if (dpct != null) depth += gpaid
         ? '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'
         : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78"><span style="color:var(--_accent)">🔒</span> ' + (L ? "value in Founder" : "valor no Founder") + '</span></div>'; }
-    if (s.base_rate && s.base_rate.h) depth += baseRatePanel(s.base_rate, L, gpaid);  // taxa-base (casos análogos) — free: só 3m; 6m/12m no Founder (gpaid)
+    if (s.base_rate) depth += baseRatePanel(s.base_rate, L, gpaid);  // casos análogos — free: teaser (existência+nº+leitura) / Founder: distribuição completa
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : "Valuation · Lyn Alden ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
     if (s.dcf && s.dcf.iv != null) depth += '<div class="rp-ml" style="margin-top:4px">' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '<b>R$ ' + esc(s.dcf.iv) + '</b> · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (L ? "model from cash flow (growth " : "modelo do fluxo de caixa (cresc. ") + esc(s.dcf.g) + '% · ' + (L ? "discount " : "desconto ") + esc(s.dcf.r) + '%) — ' + (L ? "assumptions shown, not a forecast" : "premissas à mostra, não previsão") + '</div>';
@@ -743,7 +749,7 @@
       var denLbl = (preCmp[1] && preCmp[1].cls === "intermercado_den") ? (preCmp[1].nome || "IBOV") : "IBOV";  // pré-carga = [num, den OU razão÷IBOV, IBOV]: quando [1] é a razão, a 2ª ponta é o IBOV
       var ratLbl = aLbl + "÷" + denLbl;
       var serieURL = API.replace("/v1/digest", "/v1/serie");
-      var fOne = function (cls) { return fetch(serieURL + "?codigo=" + encodeURIComponent(cod) + "&classe=" + cls, FOPT).then(function (r) { return r.json(); }).catch(function () { return null; }); };
+      var fOne = function (cls) { return fetch(serieURL + "?codigo=" + encodeURIComponent(cod) + "&classe=" + cls, fopt()).then(function (r) { return r.json(); }).catch(function () { return null; }); };
       Promise.all([fOne("intermercado_den"), fOne("intermercado_ratio")]).then(function (res) {
         var den = res[0], rat = res[1];
         var mapOf = function (d) { var m = {}; if (d && d.hist && d.datas && d.hist.length === d.datas.length) { for (var i = 0; i < d.datas.length; i++) m[d.datas[i]] = d.hist[i]; } return m; };
@@ -854,7 +860,7 @@
       var btnCss = "font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer";
       var fetchSerie = function (cod, cls, cb) {
         var key = cls + ":" + cod; if (cmpCache[key]) return cb(cmpCache[key]);
-        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(cod) + "&classe=" + encodeURIComponent(cls), FOPT)
+        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(cod) + "&classe=" + encodeURIComponent(cls), fopt())
           .then(function (r) { return r.json(); }).then(function (d) { cmpCache[key] = d; cb(d); }).catch(function () { cb(null); });
       };
       var drawCompare = function (got) {
@@ -907,7 +913,7 @@
         studio.querySelectorAll("[data-rm]").forEach(function (el) { var idx = +el.getAttribute("data-rm"); if (idx > 0) el.addEventListener("click", function () { cmp.splice(idx, 1); applyMode(); }); });
         var addb = studio.querySelector(".rp-add"); if (addb) addb.addEventListener("click", openPicker);
         studio.querySelectorAll(".rp-tog").forEach(function (el) { el.addEventListener("click", function () { var k = el.getAttribute("data-k"); ov[k] = ov[k] === false ? true : false; applyMode(); }); });
-        studio.querySelectorAll(".rp-gtog").forEach(function (el) { el.addEventListener("click", function () { var gg = el.getAttribute("data-g"); if (gg === (s.g === "m" ? "m" : "d")) return; close(); fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(s.codigo) + "&classe=" + encodeURIComponent(s.classe) + "&g=" + gg, FOPT).then(function (r) { return r.json(); }).then(function (ns) { if (ns && ns.hist && ns.hist.length) openBig(ns, title, meta, lang, fund); }); }); });  // troca diário↔mensal → re-busca + reabre (recomputa a projeção)
+        studio.querySelectorAll(".rp-gtog").forEach(function (el) { el.addEventListener("click", function () { var gg = el.getAttribute("data-g"); if (gg === (s.g === "m" ? "m" : "d")) return; close(); fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(s.codigo) + "&classe=" + encodeURIComponent(s.classe) + "&g=" + gg, fopt()).then(function (r) { return r.json(); }).then(function (ns) { if (ns && ns.hist && ns.hist.length) openBig(ns, title, meta, lang, fund); }); }); });  // troca diário↔mensal → re-busca + reabre (recomputa a projeção)
       };
       if (cmp.length >= 2) applyMode(); else renderStudio();  // pré-carga (intermercado) abre já em modo compare
     }
@@ -918,7 +924,7 @@
       var legF = document.createElement("div"); legF.style.marginTop = "4px"; chartEl.parentNode.insertBefore(legF, chartEl.nextSibling);
       var gotF = [], pendF = preCmp.length;
       preCmp.forEach(function (c, i) {
-        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(c.cod) + "&classe=" + encodeURIComponent(c.cls), FOPT)
+        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(c.cod) + "&classe=" + encodeURIComponent(c.cls), fopt())
           .then(function (r) { return r.json(); }).then(function (d) {
             gotF[i] = (d && d.hist) ? { nome: c.nome, hist: d.hist, datas: d.datas } : null;
             if (--pendF === 0) {
@@ -1143,7 +1149,7 @@
   function renderAtivo(node, codigo, classe, lang, skin) {
     var L = lang === "en", cls = "rp" + (skin === "editorial" ? " skin-editorial" : "");
     node.innerHTML = '<div class="' + cls + '"><div class="sub">' + (L ? "loading…" : "carregando…") + '</div></div>';
-    fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(codigo) + "&classe=" + encodeURIComponent(classe), FOPT)
+    fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(codigo) + "&classe=" + encodeURIComponent(classe), fopt())
       .then(function (r) { return r.json(); }).then(function (s) {
         var nm = (codigo || "").toUpperCase();
         if (!s || !s.hist || s.hist.length < 2) { node.innerHTML = '<div class="' + cls + '"><div class="sub">' + (L ? "no data for " : "sem dados para ") + esc(nm) + '</div></div>'; return; }
@@ -1246,7 +1252,7 @@
           if (idenn && idenn.toUpperCase() !== "IBOV") pre.push({ cod: icod, cls: "intermercado_den", nome: idenn });
           else pre.push({ cod: icod, cls: "intermercado_ratio", nome: inome + "÷IBOV" });  // ÷IBOV: a razão É o sinal lead-lag (faltava)
           pre.push({ cod: "ibov", cls: "pulso", nome: "IBOV" });
-          fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(icod) + "&classe=intermercado", FOPT)
+          fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(icod) + "&classe=intermercado", fopt())
             .then(function (r) { return r.json(); }).then(function (s0) { if (s0 && s0.hist && s0.hist.length) openBig(s0, inome, ill, lang, null, pre); }).catch(function () { });
           return;
         }
@@ -1254,7 +1260,7 @@
         if (!chip || chip.getAttribute("data-open")) return;
         chip.setAttribute("data-open", "1"); chip.style.opacity = ".6";
         var rel = chip.getAttribute("data-rel"), fund = chip.getAttribute("data-fund"), meta = rel || "";
-        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(chip.getAttribute("data-cod")) + "&classe=" + encodeURIComponent(chip.getAttribute("data-cls") || "equity_br"), FOPT)
+        fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(chip.getAttribute("data-cod")) + "&classe=" + encodeURIComponent(chip.getAttribute("data-cls") || "equity_br"), fopt())
           .then(function (r) { return r.json(); }).then(function (s) {
             chip.style.opacity = "";
             var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
@@ -1274,7 +1280,7 @@
             if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang, fund); }); }
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
-      fetch(API + "?lang=" + lang, FOPT).then(function (r) { return r.json(); })
+      fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); })
         .then(function (d) { render(node, d, lang, sections, chrome, skin); })
         .catch(function () { node.innerHTML = '<div class="rp"><div class="sub">Radar Perene — indisponível.</div></div>'; });
     });
