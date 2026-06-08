@@ -279,8 +279,8 @@
 
     // cone (futuro, começa em hoje). placeFuture: offset0 → bi.
     var coneMid = cone ? placeFuture(cone.mid, bi, total) : null;
-    var coneHi  = (cone && pro) ? placeFuture(cone.hi, bi, total) : null;
-    var coneLo  = (cone && pro) ? placeFuture(cone.lo, bi, total) : null;
+    var coneHi  = (cone && pro && cone.hi) ? placeFuture(cone.hi, bi, total) : null;  // gateado (sem token): cone.hi/lo=null → sem banda (só a mediana), não quebra
+    var coneLo  = (cone && pro && cone.lo) ? placeFuture(cone.lo, bi, total) : null;
     var coneHi2 = (cone && pro && cone.hi2) ? placeFuture(cone.hi2, bi, total) : null;
     var coneLo2 = (cone && pro && cone.lo2) ? placeFuture(cone.lo2, bi, total) : null;
     // fallback projeção linear quando não há cone

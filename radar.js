@@ -83,7 +83,7 @@
     { id: "cone",  kind: "core", defaultOn: true,  available: function (s) { return !!(s.cone && s.cone.mid && s.cone.mid.length > 1); }, label: function (c) { return c.L ? "Cone + shadow" : "Cone + sombra"; } },
     { id: "ma200", kind: "core", defaultOn: false, available: function (s) { return s.ma200 && s.ma200.length; }, label: function (c) { return "MM" + c.ml + c.mu; } },
     { id: "ma50",  kind: "core", defaultOn: false, available: function (s) { return s.ma50 && s.ma50.length; }, label: function (c) { return "MM" + c.mc + c.mu; } },
-    { id: "fair",  kind: "core", defaultOn: false, available: function (s) { return !!s.fair; }, label: function (c) { return "Valuation (Lyn Alden)"; } },  // default OFF: o valor-justo costuma ficar longe do preço e esticaria o eixo, achatando o cone; entra por toggle (Founder)
+    { id: "fair",  kind: "core", defaultOn: true,  available: function (s) { return !!s.fair; }, label: function (c) { return "Valuation (Lyn Alden)"; } },  // default ON (Founder): o valor-justo (Lyn Alden: lucro × P/L normal) — passado + projeção futura — é diferencial do tier 149; ver preço vs justo "bom/ruim". Free continua só TEXTO (ov.fair forçado false). Decisão do dono (reverte 41b3468; valuation > prominência do cone).
     { id: "bands", kind: "core", defaultOn: false, available: function (s) { return s.bands && s.bands.length; }, label: function (c) { return c.L ? "Regime bands" : "Bandas regime"; } },
     // ── 1º PLUGIN drop-in (prova da arquitetura): Bollinger (20,2), computado do hist no cliente ──
     { id: "boll", kind: "plugin", defaultOn: false, available: function (s) { return s.hist && s.hist.length >= 20; }, label: function (c) { return "Bollinger (20,2)"; },
@@ -233,7 +233,7 @@
     var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : [];                   // fallback: projeção linear
     var futN = cone ? (cone.mid.length - 1) : (proj.length ? proj.length - 1 : 0);
     var all = hist.slice();
-    if (cone) { if (pro) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free: range só até a mediana (sem espaço morto da banda); pro: até p10–p90
+    if (cone) { if (pro && (cone.lo2 || cone.lo)) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free/gateado: range só até a mediana; pro c/ bandas: até p10–p90
     else if (proj.length) all = all.concat(proj.slice(1));
     if (opt.fair && opt.fair.length) all = all.concat(opt.fair.filter(function (v) { return v != null; }));  // FASTgraphs: a faixa de valor-justo entra no range
     if (opt.shadow && opt.shadow.lo) all = all.concat(opt.shadow.lo.filter(function (v) { return v != null; }), opt.shadow.hi.filter(function (v) { return v != null; }));  // sombra (cone no passado)
@@ -263,7 +263,7 @@
       for (var shj = hist.length - 1; shj >= 0; shj--) { if (opt.shadow.lo[shj] != null) shLR.push(X(shj).toFixed(1) + "," + Y(opt.shadow.lo[shj]).toFixed(1)); }
       if (shHP.length > 1) o += '<polygon points="' + shHP.concat(shLR).join(" ") + '" fill="var(--_warm)" opacity="0.11" stroke="var(--_warm)" stroke-width="0.4" stroke-opacity="0.3"/>';  // sombra do passado mais visível
     }
-    if (cone && pro && opt.cone !== false) { // cone assimétrico (estilo Cowen) — SÓ assinante; free vê só a mediana; toggle via opt.cone
+    if (cone && pro && cone.lo && cone.hi && opt.cone !== false) { // cone assimétrico (estilo Cowen) — SÓ assinante COM as bandas na data (gateado=null → cai p/ a mediana); toggle via opt.cone
       if (cone.lo2 && cone.hi2) { // banda externa p10–p90 (mais clara), desenhada atrás da p25–p75
         var hi2Pts = cone.hi2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); });
         var lo2Rev = cone.lo2.map(function (v, i) { return X(bi + i).toFixed(1) + "," + Y(v).toFixed(1); }).reverse();
@@ -667,7 +667,7 @@
       h += '<div class="rp-tgf" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">' + freeIds.map(function (id) { var don = ((RP_LAYERS.filter(function (l) { return l.id === id; })[0]) || {}).defaultOn; return '<button class="rp-tog" data-fk="' + id + '" data-lbl="' + esc(fLbl[id]) + '" style="font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:6px;padding:3px 9px;cursor:pointer">' + (don ? "● " : "○ ") + esc(fLbl[id]) + '</button>'; }).join("") + '<span class="rp-ml" style="opacity:.5">' + (L ? "· compare A×B & manipulate in Founder" : "· comparar A×B & manipular no Founder") + '</span></div>';
     }
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
-      if (gpaid) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);
+      if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);  // bandas só se a data trouxe (token); gateado → cai p/ a mediana abaixo (sem quebrar)
         if (dmid != null) depth += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b>' + (dlo != null && dhi != null ? ' · ' + (L ? "50% of cases " : "50% dos casos ") + sgn(dlo) + ' … ' + sgn(dhi) : '') + (dlo2 != null && dhi2 != null ? ' · ' + (L ? "80% of cases " : "80% dos casos ") + sgn(dlo2) + ' … ' + sgn(dhi2) : '') + ' · ' + (L ? "in similar situations in the past — not a forecast" : "em situações parecidas no passado — não é previsão") + '</div>'; }
       else if (dmid != null) depth += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in Founder" : "caso mediano & faixas 50% / 80% no Founder") + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
@@ -719,7 +719,7 @@
     // mesmo range que o bigChart (inclui cone/proj); posições alinhadas às linhas mín/centro/máx (pT/pB=6 de H=120 → banda 5%–95%).
     function buildYax(hist, wf) { wf = wf !== false;
       var all = hist.slice();
-      if (wf && s.cone && s.cone.mid && s.cone.mid.length > 1) { if (gpaid) all = all.concat((s.cone.lo2 || s.cone.lo).slice(1), (s.cone.hi2 || s.cone.hi).slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart (free=só mediana; pro=p10–p90)
+      if (wf && s.cone && s.cone.mid && s.cone.mid.length > 1) { if (gpaid && (s.cone.lo2 || s.cone.lo)) all = all.concat((s.cone.lo2 || s.cone.lo).slice(1), (s.cone.hi2 || s.cone.hi).slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart (free/gateado=só mediana; pro c/ bandas=p10–p90)
       else if (wf && s.proj && s.proj.length > 1) all = all.concat(s.proj.slice(1));
       var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rg = (mx - mn) || 1;
       return [[5, mx], [27.5, mn + 0.75 * rg], [50, mn + 0.5 * rg], [72.5, mn + 0.25 * rg], [95, mn]].map(function (p) {  // 5 níveis alinhados às gridlines (eixo mais legível p/ análise precisa)
