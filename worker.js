@@ -349,6 +349,15 @@ export default {
   async fetch(request, env) {
     const _url = new URL(request.url);
     const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
+    // ── Páginas de slug COMPARTILHADO (api/docs, founder, free): o PT vive em index.html (default no .com.br), o EN em
+    //    index.en.html. Sem isto, o build gerava só inglês nos 2 domínios (colisão de slug). No .com servimos a versão EN. ──
+    if (_isEN) {
+      const _shm = _url.pathname.match(/^\/(api\/docs|founder|free)\/?$/);
+      if (_shm) {
+        const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
+        if (_er.ok) return new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+      }
+    }
     // ── /sitemap.xml — ÍNDICE de sitemaps (origin-aware): amarra os 4 filhos do MESMO domínio (páginas estáticas +
     //    ativos + indicadores + arquivo diário) num só ponto de submissão. Os diários crescem sozinhos via o filho
     //    sitemap-snapshots.xml (data-driven), então o índice reflete as centenas de URLs sem regenerar nada. ──

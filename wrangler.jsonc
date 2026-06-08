@@ -2,5 +2,5 @@
   "name": "radarperene-web",
   "compatibility_date": "2026-06-01",
   "main": "worker.js",
-  "assets": { "directory": "./", "binding": "ASSETS", "run_worker_first": ["/", "/index.html", "/ativos", "/ativo/*", "/indicador/*", "/diario", "/diario/*", "/about", "/sobre", "/api/leitura-do-dia.json", "/sitemap.xml", "/sitemap-ativos.xml", "/sitemap-indicadores.xml", "/sitemap-snapshots.xml"] }
+  "assets": { "directory": "./", "binding": "ASSETS", "run_worker_first": ["/", "/index.html", "/ativos", "/ativo/*", "/indicador/*", "/diario", "/diario/*", "/about", "/sobre", "/api/leitura-do-dia.json", "/api/docs", "/api/docs/", "/founder", "/founder/", "/free", "/free/", "/sitemap.xml", "/sitemap-ativos.xml", "/sitemap-indicadores.xml", "/sitemap-snapshots.xml"] }
 }

@@ -1,29 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Public API &amp; widget — Radar Perene · technical documentation</title>
-<meta name="description" content="Public JSON endpoint of Radar Perene's Today's reading and embeddable widget. No signup, no API key. Documentation with schema, curl examples, and">
+<title>API pública e widget — Radar Perene · documentação técnica</title>
+<meta name="description" content="Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Radar Perene">
-<meta property="og:locale" content="en_US">
-<meta property="og:url" content="https://radarperene.com/api/docs/">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://radarperene.com.br/api/docs/">
 <meta property="og:image" content="https://radarperene.com.br/og.png">
-<meta property="og:title" content="Public API &amp; widget — Radar Perene · technical documentation">
-<meta property="og:description" content="Public JSON endpoint of Radar Perene's Today's reading and embeddable widget. No signup, no API key. Documentation with schema, curl examples, and">
+<meta property="og:title" content="API pública e widget — Radar Perene · documentação técnica">
+<meta property="og:description" content="Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://radarperene.com.br/og.png">
-<meta name="twitter:title" content="Public API &amp; widget — Radar Perene · technical documentation">
-<meta name="twitter:description" content="Public JSON endpoint of Radar Perene's Today's reading and embeddable widget. No signup, no API key. Documentation with schema, curl examples, and">
-<link rel="canonical" href="https://radarperene.com/api/docs/">
+<meta name="twitter:title" content="API pública e widget — Radar Perene · documentação técnica">
+<meta name="twitter:description" content="Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed.">
+<link rel="canonical" href="https://radarperene.com.br/api/docs/">
 <link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/api/docs/">
 <link rel="alternate" hreflang="en" href="https://radarperene.com/api/docs/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/api/docs/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com","logo":"https://radarperene.com/og.png","sameAs":["https://radarperene.com.br","https://brazilcomplexity.com","https://aformadopatrimonio.com.br"],"description":"Brazilian regulatory intelligence read as data — regime, intermarket and context."}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://radarperene.com/"},{"@type":"ListItem","position":2,"name":"Api","item":"https://radarperene.com/api/"},{"@type":"ListItem","position":3,"name":"Public API & widget","item":"https://radarperene.com/api/docs/"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"Public API & widget","description":"Public JSON endpoint of Radar Perene's Today's reading and embeddable widget. No signup, no API key. Documentation with schema, curl examples, and","url":"https://radarperene.com/api/docs/","documentation":"https://radarperene.com/api/docs/","provider":{"@type":"Organization","name":"Radar Perene"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com","https://brazilcomplexity.com","https://aformadopatrimonio.com.br"],"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://radarperene.com.br/"},{"@type":"ListItem","position":2,"name":"Api","item":"https://radarperene.com.br/api/"},{"@type":"ListItem","position":3,"name":"API pública e widget","item":"https://radarperene.com.br/api/docs/"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"API pública e widget","description":"Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed.","url":"https://radarperene.com.br/api/docs/","documentation":"https://radarperene.com.br/api/docs/","provider":{"@type":"Organization","name":"Radar Perene"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -156,89 +156,88 @@
 <body>
 <div class="top">
   <a class="brand" href="/" style="text-decoration:none"><svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true" style="color:var(--dim)"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><path d="M16 16 L16 2 A14 14 0 0 1 29 13 Z" fill="#b8801f" fill-opacity="0.2"/><line x1="16" y1="16" x2="16" y2="2" stroke="#b8801f" stroke-width="1.6"/><circle cx="16" cy="16" r="2" fill="#b8801f"/></svg><span class="nm">Radar <b>Perene</b></span></a>
-  <div class="lang"><a href="/">← home</a> <button id="theme-tg" class="tg" type="button" aria-label="theme">☾</button></div>
+  <div class="lang"><a href="/">← início</a> <button id="theme-tg" class="tg" type="button" aria-label="theme">☾</button></div>
 </div>
 <div class="wrap">
   <article class="pg">
     <p class="crumb"><a href="/">Radar Perene</a> / api/docs</p>
-    <h1>Public API &amp; widget</h1>
-    <p>Radar Perene's Today's reading is available as a public JSON endpoint and embeddable widget. No signup, no API key, no per-user rate limits. Attribution required.</p>
-<p>This documentation covers the endpoint, the response schema, three widget sizes, and the usage policy.</p>
+    <h1>API pública e widget</h1>
+    <p>A Leitura do dia do Radar Perene está disponível como endpoint JSON público e widget embedável. Sem cadastro, sem chave de API, sem rate limit individual. Citação obrigatória.</p>
+<p>Esta documentação cobre o endpoint, o schema do response, três tamanhos de widget e a política de uso.</p>
 <h2 class="sec">1. Endpoint</h2>
-<pre class="api"><code>GET https://radarperene.com/api/todays-reading.json</code></pre>
-<p>Response: `application/json`. CDN cache: 4 hours. CORS: open (any origin). Refresh: daily, at Brazilian market close.</p>
-<h2 class="sec">2. Call example</h2>
-<pre class="api"><code>curl -s https://radarperene.com/api/todays-reading.json | jq</code></pre>
-<p>Sample response:</p>
+<pre class="api"><code>GET https://radarperene.com.br/api/leitura-do-dia.json</code></pre>
+<p>Resposta: `application/json`. Cache CDN: 4 horas. CORS: aberto (qualquer origem). Atualização: diária, ao fechamento do pulso de mercado brasileiro.</p>
+<h2 class="sec">2. Exemplo de chamada</h2>
+<pre class="api"><code>curl -s https://radarperene.com.br/api/leitura-do-dia.json | jq</code></pre>
+<p>Resposta exemplo:</p>
 <pre class="api"><code>{
-  &quot;reference_date&quot;: &quot;2026-06-04&quot;,
-  &quot;risk_br_score&quot;: 38.1,
-  &quot;regime_br&quot;: &quot;moderately_defensive&quot;,
-  &quot;global_regime_score&quot;: 51.6,
-  &quot;regime_global&quot;: &quot;neutral&quot;,
-  &quot;featured_lens&quot;: &quot;wealth&quot;,
-  &quot;analog&quot;: &quot;2018-09&quot;,
-  &quot;visible_components&quot;: {
-    &quot;reits_ibov_percentile&quot;: 78,
-    &quot;finance_ibov_percentile&quot;: 22,
-    &quot;vale_gold_percentile&quot;: 35
+  &quot;data_referencia&quot;: &quot;2026-06-04&quot;,
+  &quot;score_risk_br&quot;: 38.1,
+  &quot;regime_br&quot;: &quot;defensivo_moderado&quot;,
+  &quot;score_regime_global&quot;: 51.6,
+  &quot;regime_global&quot;: &quot;neutro&quot;,
+  &quot;lente_destaque&quot;: &quot;patrimonial&quot;,
+  &quot;analogo&quot;: &quot;2018-09&quot;,
+  &quot;componentes_visiveis&quot;: {
+    &quot;ifix_ibov_percentil&quot;: 78,
+    &quot;financas_ibov_percentil&quot;: 22,
+    &quot;vale_ouro_percentil&quot;: 35
   },
-  &quot;divergences&quot;: [&quot;BR defensive × Global neutral — contained reading&quot;],
-  &quot;cadence&quot;: &quot;daily&quot;,
-  &quot;updated_at&quot;: &quot;2026-06-04T19:00:00-03:00&quot;,
-  &quot;methodology&quot;: &quot;https://radarperene.com/methodology&quot;,
-  &quot;disclaimer&quot;: &quot;Descriptive reading. Not advice or recommendation. Consult a licensed professional.&quot;
+  &quot;divergencias&quot;: [&quot;BR defensivo × Global neutro — leitura contida&quot;],
+  &quot;cadencia&quot;: &quot;diaria&quot;,
+  &quot;atualizado_em&quot;: &quot;2026-06-04T19:00:00-03:00&quot;,
+  &quot;metodologia&quot;: &quot;https://radarperene.com.br/metodologia&quot;,
+  &quot;disclaimer&quot;: &quot;Leitura descritiva. Não constitui parecer ou recomendação. Consulte profissional habilitado.&quot;
 }</code></pre>
-<h2 class="sec">3. Response schema</h2>
-<table class="tb"><thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>`reference_date`</td><td>`string` (ISO 8601 — `YYYY-MM-DD`)</td><td>Reading close date.</td></tr><tr><td>`risk_br_score`</td><td>`number` (0–100)</td><td>Brazil Regime aggregate score.</td></tr><tr><td>`regime_br`</td><td>`string` (enum)</td><td>Brazil Regime categorical bucket: `strong_risk_off` · `moderate_risk_off` (`moderately_defensive`) · `neutral` · `moderate_risk_on` · `broad_risk_on`.</td></tr><tr><td>`global_regime_score`</td><td>`number` (0–100)</td><td>Global Regime aggregate score.</td></tr><tr><td>`regime_global`</td><td>`string` (enum)</td><td>Global Regime categorical bucket, same set.</td></tr><tr><td>`featured_lens`</td><td>`string` (enum)</td><td>Lens pressing the aggregate reading most: `wealth` · `macro` · `institutional` · `real_estate` · `electoral`.</td></tr><tr><td>`analog`</td><td>`string` or `null`</td><td>Slug of the analog historical window (e.g., `2018-09`), or `null` when similarity is insufficient.</td></tr><tr><td>`visible_components`</td><td>`object`</td><td>Map of editorially exposed percentiles. Weights and formulas are not exposed by design (see Methodology §2.4).</td></tr><tr><td>`divergences`</td><td>`array&lt;string&gt;`</td><td>Relevant cross-axis divergences of the day.</td></tr><tr><td>`cadence`</td><td>`string`</td><td>Always `&quot;daily&quot;` for this endpoint.</td></tr><tr><td>`updated_at`</td><td>`string` (ISO 8601 with timezone)</td><td>Snapshot timestamp.</td></tr><tr><td>`methodology`</td><td>`string` (URL)</td><td>Link to the canonical methodology page.</td></tr><tr><td>`disclaimer`</td><td>`string`</td><td>Required notice when the output is displayed publicly.</td></tr></tbody></table>
-<p>Fields may be added in future versions without breaking compatibility. Existing fields will not be removed without a 90-day declared deprecation.</p>
-<h2 class="sec">4. Embeddable widget — three sizes</h2>
-<p>All widgets render crawler-readable static HTML (content does not depend on JavaScript).</p>
-<p><strong>Small</strong> (300×120 px) — Risk-BR score and bucket only:</p>
+<h2 class="sec">3. Schema do response</h2>
+<table class="tb"><thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td>`data_referencia`</td><td>`string` (ISO 8601 — `YYYY-MM-DD`)</td><td>Data de fechamento da leitura.</td></tr><tr><td>`score_risk_br`</td><td>`number` (0–100)</td><td>Score agregado do Regime Brasil.</td></tr><tr><td>`regime_br`</td><td>`string` (enum)</td><td>Bucket categórico do Regime Brasil: `risk_off_forte` · `risk_off_moderado` (`defensivo_moderado`) · `neutro` · `risk_on_moderado` · `risk_on_amplo`.</td></tr><tr><td>`score_regime_global`</td><td>`number` (0–100)</td><td>Score agregado do Regime Global.</td></tr><tr><td>`regime_global`</td><td>`string` (enum)</td><td>Bucket categórico do Regime Global, mesmo conjunto.</td></tr><tr><td>`lente_destaque`</td><td>`string` (enum)</td><td>Lente principal pressionando a leitura agregada: `patrimonial` · `macro` · `institucional` · `imobiliaria` · `eleitoral`.</td></tr><tr><td>`analogo`</td><td>`string` ou `null`</td><td>Slug da janela histórica análoga (ex.: `2018-09`), ou `null` quando não houver similaridade suficiente.</td></tr><tr><td>`componentes_visiveis`</td><td>`object`</td><td>Mapa de percentis editorialmente expostos. Pesos e fórmulas não são expostos por design (ver Metodologia §2.4).</td></tr><tr><td>`divergencias`</td><td>`array&lt;string&gt;`</td><td>Lista de divergências cross-eixo relevantes do dia.</td></tr><tr><td>`cadencia`</td><td>`string`</td><td>Sempre `&quot;diaria&quot;` para este endpoint.</td></tr><tr><td>`atualizado_em`</td><td>`string` (ISO 8601 com timezone)</td><td>Timestamp de atualização do snapshot.</td></tr><tr><td>`metodologia`</td><td>`string` (URL)</td><td>Link para a página de metodologia canônica.</td></tr><tr><td>`disclaimer`</td><td>`string`</td><td>Aviso de uso obrigatório se o output for exibido publicamente.</td></tr></tbody></table>
+<p>Campos podem ser adicionados em versões futuras sem quebrar compatibilidade. Campos existentes não serão removidos sem deprecation declarada com 90 dias de antecedência.</p>
+<h2 class="sec">4. Widget embedável — três tamanhos</h2>
+<p>Todos os widgets renderizam HTML estático legível por crawler (não dependem de JavaScript para conteúdo).</p>
+<p><strong>Pequeno</strong> (300×120 px) — apenas score Risk-BR + bucket:</p>
 <pre class="api"><code>&lt;iframe
-  src=&quot;https://radarperene.com/widget/todays-reading?size=small&amp;theme=light&quot;
+  src=&quot;https://radarperene.com.br/widget/leitura-do-dia?size=small&amp;theme=light&quot;
   width=&quot;300&quot; height=&quot;120&quot;
   frameborder=&quot;0&quot;
   loading=&quot;lazy&quot;
-  title=&quot;Radar Perene — Today's reading&quot;&gt;
+  title=&quot;Radar Perene — Leitura do dia&quot;&gt;
 &lt;/iframe&gt;</code></pre>
-<p><strong>Medium</strong> (480×280 px) — score + regime + analog + one-line comment:</p>
+<p><strong>Médio</strong> (480×280 px) — score + regime + análogo + 1-linha de comentário:</p>
 <pre class="api"><code>&lt;iframe
-  src=&quot;https://radarperene.com/widget/todays-reading?size=medium&amp;theme=light&quot;
+  src=&quot;https://radarperene.com.br/widget/leitura-do-dia?size=medium&amp;theme=light&quot;
   width=&quot;480&quot; height=&quot;280&quot;
   frameborder=&quot;0&quot;
   loading=&quot;lazy&quot;
-  title=&quot;Radar Perene — Today's reading&quot;&gt;
+  title=&quot;Radar Perene — Leitura do dia&quot;&gt;
 &lt;/iframe&gt;</code></pre>
-<p><strong>Large</strong> (720×440 px) — full reading including divergences and visible percentiles:</p>
+<p><strong>Grande</strong> (720×440 px) — leitura completa incluindo divergências e percentis visíveis:</p>
 <pre class="api"><code>&lt;iframe
-  src=&quot;https://radarperene.com/widget/todays-reading?size=large&amp;theme=light&quot;
+  src=&quot;https://radarperene.com.br/widget/leitura-do-dia?size=large&amp;theme=light&quot;
   width=&quot;720&quot; height=&quot;440&quot;
   frameborder=&quot;0&quot;
   loading=&quot;lazy&quot;
-  title=&quot;Radar Perene — Today's reading&quot;&gt;
+  title=&quot;Radar Perene — Leitura do dia&quot;&gt;
 &lt;/iframe&gt;</code></pre>
-<p>Optional parameters:</p>
-<ul><li>`theme=light | dark` (default: `light`).</li><li>`lang=pt | en` (default: detected from visitor's Accept-Language).</li></ul>
-<p>Automatic citation to Radar Perene is rendered inside the widget. Removing it is not permitted.</p>
-<h2 class="sec">5. Usage policy</h2>
-<p>Summary. Full terms at <a href="/terms/">/terms</a> §6.</p>
-<ul><li><strong>Free.</strong> No key, no signup, no per-user rate limit.</li><li><strong>Mandatory attribution</strong>: &quot;Source: Radar Perene&quot; with a clickable link to the URL of origin. The widget already carries the attribution.</li><li><strong>Commercial use permitted</strong> under the same attribution.</li><li><strong>Output modification</strong> permitted if the citation specifies that the data has been processed.</li><li><strong>Prohibited</strong>: reselling the output as your own without attribution; generating clearly abusive call volume; using for false attribution of advice; training proprietary AI models on the full corpus without authorization.</li></ul>
-<h2 class="sec">6. Versioning</h2>
-<p>The API follows semantic versioning. This is v1.</p>
-<ul><li>Changes that <strong>add</strong> fields: minor (v1.x.x → v1.(x+1).0). Compatibility preserved.</li><li>Changes that <strong>alter</strong> the semantics of existing fields: major (v1 → v2). Announced 90 days in advance. Old version remains accessible during transition at `/api/v1/todays-reading.json` (the current URL without prefix always aliases the latest stable version).</li></ul>
-<h2 class="sec">7. No formal SLA</h2>
-<p>Radar Perene does not offer a contractual SLA for the public endpoint — it is a free service. We employ reasonable efforts to keep the endpoint available with aggressive CDN caching. In case of prolonged incident, the main page (<a href="/">/</a>) carries a notice.</p>
-<p>For an SLA, consider the Founder Access plan (authenticated platform access with applicable SLA on the core services).</p>
-<h2 class="sec">8. Support</h2>
-<p>Technical questions about the API or the widget: [contact to be defined]@radarperene.com. No response-time promise for free-tier use; responses in order of arrival per solo operator capacity.</p>
-<p>---</p>
+<p>Parâmetros opcionais:</p>
+<ul><li>`theme=light | dark` (padrão: `light`).</li><li>`lang=pt | en` (padrão: detectado pelo Accept-Language do visitante).</li></ul>
+<p>Citação automática ao Radar Perene é renderizada dentro do widget. Não é permitido removê-la.</p>
+<h2 class="sec">5. Política de uso</h2>
+<p>Resumo. Termos completos em <a href="/termos/">/termos</a> §6.</p>
+<ul><li><strong>Gratuito.</strong> Sem chave, sem cadastro, sem rate limit por usuário individual.</li><li><strong>Atribuição obrigatória</strong>: &quot;Fonte: Radar Perene&quot; com link clicável para a URL de origem. O widget já carrega a atribuição.</li><li><strong>Uso comercial permitido</strong> sob a mesma atribuição.</li><li><strong>Modificação do output</strong> permitida se a citação esclarecer que o dado foi processado.</li><li><strong>Vedado</strong>: revender o output como se fosse próprio sem atribuição; gerar volume claramente abusivo; usar para falsa atribuição de parecer; treinar modelos de IA proprietários sobre o corpus completo sem autorização.</li></ul>
+<h2 class="sec">6. Versionamento</h2>
+<p>A API segue versionamento semântico. Esta é a v1.</p>
+<ul><li>Mudanças que <strong>adicionam</strong> campos: minor (v1.x.x → v1.(x+1).0). Compatibilidade preservada.</li><li>Mudanças que <strong>alteram</strong> semântica de campos existentes: major (v1 → v2). Anunciadas com 90 dias de antecedência. Versão antiga permanece acessível durante a transição em `/api/v1/leitura-do-dia.json` (URL atual sem prefixo é apelido sempre da última versão estável).</li></ul>
+<h2 class="sec">7. Sem SLA formal</h2>
+<p>O Radar Perene não oferece SLA contratual para o endpoint público — é serviço gratuito. Empregamos esforços razoáveis para manter o endpoint disponível com cache CDN agressivo. Em caso de incidente prolongado, a página principal (<a href="/">/</a>) traz aviso.</p>
+<p>Para SLA, considere o plano Founder Access (acesso à plataforma autenticada com SLA aplicável aos serviços principais).</p>
+<h2 class="sec">8. Suporte</h2>
+<p>Dúvidas técnicas sobre a API ou o widget: [contato a definir]@radarperene.com.br. Sem promessa de tempo de resposta para uso da camada gratuita; respostas em ordem de chegada conforme capacidade do solo operator.</p>
   </article>
 </div>
 <footer>
-  <nav class="ftnav"><a href="/methodology/">Methodology</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/concepts/">Concepts</a> · <a href="/lenses/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a></nav>
-  <p class="disc">The reading delivered by the API is descriptive. It does not constitute legal, accounting, economic, or investment advice. It does not recommend buying, selling, hiring, or restructuring. Consult a licensed professional before wealth or investment decisions. ```</p>
-  <p>© Radar Perene · <a href="/" style="color:var(--gold)">radarperene.com</a></p>
+  <nav class="ftnav"><a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Tier grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a></nav>
+  <p class="disc">A leitura entregue pela API é descritiva. Não constitui parecer jurídico, contábil, econômico ou de investimento. Não recomenda compra, venda, contratação ou estruturação. Consulte profissional habilitado antes de decisões patrimoniais ou de investimento.</p>
+  <p>© Radar Perene · <a href="/" style="color:var(--gold)">radarperene.com.br</a></p>
 </footer>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>
 </body>

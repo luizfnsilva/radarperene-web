@@ -439,7 +439,10 @@ ${THEME_JS}
 </html>`;
   const dir = join(ROOT, slug);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "index.html"), html);
+  // slug COMPARTILHADO (enSlug == ptSlug, ex.: api/docs, founder): o EN não pode sobrescrever o PT → vai p/ index.en.html
+  // (o worker serve a versão EN no .com; o .com.br serve o index.html em PT por padrão). Evita a página sair só em inglês.
+  const collisionEN = en && enSlug(p.slug) === p.slug;
+  writeFileSync(join(dir, collisionEN ? "index.en.html" : "index.html"), html);
 }
 
 function page(p) {
