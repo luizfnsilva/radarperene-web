@@ -36,7 +36,7 @@ const EN_BODY = (function () {
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4: "Principles",
     disc: "Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
-    ftnav: '<a href="/diario">Daily archive</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/lenses/">Lenses</a> · <a href="/concepts/">Concepts</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lenses/wealth/">Wealth</a> · <a href="/lenses/electoral/">Electoral</a> · <a href="/lenses/macro/">Macro</a> · <a href="/lenses/institutional/">Institutional</a> · <a href="/lenses/real-estate/">Real estate</a> · <a href="/lenses/vertice/">Vértice</a> · <a href="/concepts/regime-brazil/">Brazil Regime</a> · <a href="/concepts/regime-global/">Global Regime</a> · <a href="/concepts/intermarket-br/">Intermarket BR</a> · <a href="/concepts/erp-br/">ERP_BR</a> · <a href="/concepts/logarithmic-regression-cone/">Regression Cone</a> · <a href="/concepts/anima-index/">Ânima</a> · <a href="/concepts/risk-on-risk-off/">Perene Risk Index</a> · <a href="/concepts/historical-analogs/">Historical analogs</a> · <a href="/concepts/vertice/">Vértice (concept)</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>',
+    ftnav: '<a href="/daily">Daily archive</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/lenses/">Lenses</a> · <a href="/concepts/">Concepts</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lenses/wealth/">Wealth</a> · <a href="/lenses/electoral/">Electoral</a> · <a href="/lenses/macro/">Macro</a> · <a href="/lenses/institutional/">Institutional</a> · <a href="/lenses/real-estate/">Real estate</a> · <a href="/lenses/vertice/">Vértice</a> · <a href="/concepts/regime-brazil/">Brazil Regime</a> · <a href="/concepts/regime-global/">Global Regime</a> · <a href="/concepts/intermarket-br/">Intermarket BR</a> · <a href="/concepts/erp-br/">ERP_BR</a> · <a href="/concepts/logarithmic-regression-cone/">Regression Cone</a> · <a href="/concepts/anima-index/">Ânima</a> · <a href="/concepts/risk-on-risk-off/">Perene Risk Index</a> · <a href="/concepts/historical-analogs/">Historical analogs</a> · <a href="/concepts/vertice/">Vértice (concept)</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>',
     lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings and structures — pressure on wealth." },
       { n: "Electoral", d: "Electoral courts, eligibility, campaign finance and digital enforcement." },
       { n: "Macro / Rates", d: "Rates, inflation, fiscal and debt — the country&rsquo;s macro regime." },
@@ -66,7 +66,7 @@ const EN_BODY = (function () {
   const lenses = C.lenses.map((l, i) => '<a class="ln' + (l.v ? ' vx' : '') + '" href="' + LP(LSLUG[i]) + '"><div class="nm">' + (l.v ? '<span style="color:var(--gold)">✦</span> ' : '') + l.n + (l.v ? '<span class="tag">' + expTag + '</span>' : '') + '</div><p>' + l.d + '</p>' + (l.m ? '<span class="micro">' + l.m + '</span>' : '') + '</a>').join("");
   const conDD = CN.map((c) => '<a href="' + CP(c[0]) + '">' + c[1] + '</a>').join("") + '<a href="' + U_CON + '" style="color:var(--gold)">' + NAV.ac + '</a>';
   const lenDD = C.lenses.map((l, i) => '<a href="' + LP(LSLUG[i]) + '">' + l.n + '</a>').join("") + '<a href="' + U_LEN + '" style="color:var(--gold)">' + NAV.al + '</a>';
-  const topnav = '<a href="' + U_MET + '">' + NAV.met + '</a><span class="dd"><a href="' + U_CON + '" tabindex="0">' + NAV.con + ' ▾</a><div class="ddm">' + conDD + '</div></span><span class="dd"><a href="' + U_LEN + '" tabindex="0">' + NAV.len + ' ▾</a><div class="ddm">' + lenDD + '</div></span><a href="/diario">' + NAV.dia + '</a><a href="' + U_HOW + '">' + NAV.howto + '</a><a href="/free/">' + NAV.free + '</a>';
+  const topnav = '<a href="' + U_MET + '">' + NAV.met + '</a><span class="dd"><a href="' + U_CON + '" tabindex="0">' + NAV.con + ' ▾</a><div class="ddm">' + conDD + '</div></span><span class="dd"><a href="' + U_LEN + '" tabindex="0">' + NAV.len + ' ▾</a><div class="ddm">' + lenDD + '</div></span><a href="/daily">' + NAV.dia + '</a><a href="' + U_HOW + '">' + NAV.howto + '</a><a href="/free/">' + NAV.free + '</a>';
   const cgrid = CN.map((c, i) => '<a href="' + CP(c[0]) + '"><span class="cn">' + c[1] + '</span><span class="cd">' + CD[i] + '</span></a>').join("");
   const ladder = C.ladder.map((s, i) => '<div class="st"><div class="no">' + (i + 1) + '</div><div class="ti">' + s.t + '</div><div class="de">' + s.d + '</div></div>').join("");
   const scale = C.scale.map((s) => '<div class="st"><b>' + s[0] + '</b><span>' + s[1] + '</span></div>').join("");
@@ -248,7 +248,8 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const inds = snap.indicadores || [];
   const narr = snap.narrativa || {};
   const ver = snap.verificacao || null;
-  const canon = origin + "/diario/" + date;
+  const dpath = en ? "/daily" : "/diario";  // slug i18n: EN usa /daily, PT /diario (o .com 301-redireciona /diario→/daily)
+  const canon = origin + dpath + "/" + date;
   const regime = inds.find(function (i) { return i.slug === "regime-br"; });
   const title = "Radar Perene — " + date + (en ? " · Brazil market regime" : " · regime do mercado BR");
   const _rl = regime ? (regime.classificacao || regime.leitura || "") : "", _rs = (regime && regime.valor != null) ? regime.valor + "/100" : "";
@@ -301,8 +302,8 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">" +
     "<link rel=\"canonical\" href=\"" + canon + "\">" +
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
-    "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario/" + date + "\">" +
-    "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario/" + date + "\">" +
+    "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/daily/" + date + "\">" +
+    "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}") +
@@ -313,28 +314,29 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
     "<ul>" + indHtml + "</ul>" +
     "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a></p>" +
-    ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"/diario/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"/diario/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
-    "</div><footer><a href=\"/diario\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
+    ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
+    "</div><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
     _themeScript() + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 function _renderDiarioIndex(data, origin, lang) {
   const en = lang === "en";
   const itens = data.itens || [];
-  const canon = origin + "/diario";
+  const dpath = en ? "/daily" : "/diario";  // slug i18n: EN /daily, PT /diario
+  const canon = origin + dpath;
   const title = en ? "Daily archive — Radar Perene" : "Arquivo diário — Radar Perene";
   const desc = en ? "Brazil's market-regime reading by Radar Perene, archived daily and citable — see what the Radar showed on each date and what followed." : "A leitura do regime do mercado brasileiro pelo Radar Perene, arquivada todo dia e citável — veja o que o Radar mostrou em cada data e o que se seguiu.";
   const rows = itens.map(function (s) {
     const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
-    return "<li><a href=\"/diario/" + s.data + "\">" + s.data + "</a> — " + _esc(rg) + (s.global ? " · " + (en ? "global " : "global ") + _esc(s.global) : "") + "</li>";
+    return "<li><a href=\"" + dpath + "/" + s.data + "\">" + s.data + "</a> — " + _esc(rg) + (s.global ? " · " + (en ? "global " : "global ") + _esc(s.global) : "") + "</li>";
   }).join("");
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
     "<link rel=\"canonical\" href=\"" + canon + "\">" +
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario\">" +
-    "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/diario\">" +
-    "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/diario\">" +
+    "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/daily\">" +
+    "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario\">" +
     "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}") +
@@ -356,6 +358,10 @@ export default {
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
         if (_er.ok) return new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+      }
+      // slug i18n do arquivo diário: no .com (EN) /diario → 301 /daily (o conteúdo é o mesmo, só o slug muda; evita slug PT no domínio EN). /daily não redireciona → sem loop.
+      if (/^\/diario(\/|$)/.test(_url.pathname)) {
+        return Response.redirect(_url.origin + _url.pathname.replace(/^\/diario/, "/daily") + _url.search, 301);
       }
     }
     // ── /sitemap.xml — ÍNDICE de sitemaps (origin-aware): amarra os 4 filhos do MESMO domínio (páginas estáticas +
@@ -420,12 +426,13 @@ export default {
       try {
         const sr = await _diarioFetch(SNAPS_API);
         const sj = sr.ok ? await sr.json() : { itens: [] };
-        const urls = (sj.itens || []).filter(function (s) { return s && s.data; }).map(function (s) { return "<url><loc>" + _url.origin + "/diario/" + s.data + "</loc><changefreq>monthly</changefreq></url>"; }).join("");
+        const _dseg = _isEN ? "/daily/" : "/diario/";  // slug i18n: EN /daily, PT /diario
+        const urls = (sj.itens || []).filter(function (s) { return s && s.data; }).map(function (s) { return "<url><loc>" + _url.origin + _dseg + s.data + "</loc><changefreq>monthly</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
-    // ── /diario — índice cronológico do arquivo diário citável ──
-    if (_url.pathname === "/diario") {
+    // ── /diario | /daily — índice cronológico do arquivo diário citável (EN usa /daily) ──
+    if (_url.pathname === "/diario" || _url.pathname === "/daily") {
       try {
         const r = await _diarioFetch(SNAPS_API + "?lang=" + (_isEN ? "en" : "pt"));
         if (!r.ok) return env.ASSETS.fetch(request);
@@ -433,7 +440,7 @@ export default {
       } catch (e) { return env.ASSETS.fetch(request); }
     }
     // ── /diario/{YYYY-MM-DD} — a foto citável congelada daquele dia + verificação do desfecho ──
-    const _dm = _url.pathname.match(/^\/diario\/(\d{4}-\d{2}-\d{2})$/);
+    const _dm = _url.pathname.match(/^\/(?:diario|daily)\/(\d{4}-\d{2}-\d{2})$/);
     if (_dm) {
       try {
         const r = await _diarioFetch(SNAP_API + "?date=" + _dm[1] + "&lang=" + (_isEN ? "en" : "pt"));
@@ -564,7 +571,7 @@ export default {
       if (ultimas && ultimas.length) {
         const uh = ultimas.map(function (s) {
           const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
-          return '<a class="ult" href="/diario/' + s.data + '"><b>' + s.data + '</b>' + _esc(rg) + (s.global ? " · " + (isEN ? "global " : "global ") + _esc(s.global) : "") + " →</a>";
+          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><b>' + s.data + '</b>' + _esc(rg) + (s.global ? " · " + (isEN ? "global " : "global ") + _esc(s.global) : "") + " →</a>";
         }).join("");
         rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }
