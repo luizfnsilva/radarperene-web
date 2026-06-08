@@ -942,9 +942,17 @@
       '<span>Radar <b>Perene</b></span></a><span class="sub">' + (L ? "as of " : "ref. ") + esc(d.data_referencia || "-") + '</span></div>';
     function card(k, sc, r) { return '<div class="c"><div class="k">' + esc(k) + '</div><div class="b">' + (sc == null ? "—" : esc(sc)) + '</div><div class="r">' + esc(r) + '</div></div>'; }
     function brain(n, t, exp, first) { return '<div class="brain' + (first ? ' first' : '') + '"><span class="bn">' + n + '</span><span class="bt">' + t + '</span>' + (exp ? '<span class="bx">' + (L ? "experiment" : "experimento") + '</span>' : '') + '</div>'; }
-    // selo de vida honesta: frescor + cobertura datada (estático, sem pulsação — GRAPH §13.5)
-    h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") +
-      ' · ' + (L ? "coverage: 217 assets · 1.2M rows · 29 courts · since 1970" : "cobertura: 217 ativos · 1,2M linhas · 29 tribunais · desde 1970") + '</div>';
+    // selo de vida honesta: frescor + cobertura VIVA — vem do digest (fn SQL cobertura_radar); cresceu no banco → aparece
+    // sozinho, sem hardcode (GRAPH §13.5). Fallback = números reais atuais, nunca os antigos inflados.
+    var _cob = d.cobertura || {};
+    function _humN(n) { if (n == null || !isFinite(n)) return null; if (n >= 1e6) { var m = Math.round(n / 1e5) / 10; return L ? (m + "M") : (String(m).replace(".", ",") + " mi"); } if (n >= 1e3) return Math.round(n / 1e3) + (L ? "K" : " mil"); return String(n); }
+    var _ca100 = (_cob.ativos != null && _cob.ativos >= 100) ? Math.floor(_cob.ativos / 100) * 100 : null; // "mais de 100 ativos" (narrativa)
+    var covTxt = (L ? "coverage: " : "cobertura: ") +
+      (_cob.ativos != null ? _cob.ativos : "112") + (L ? " assets · " : " ativos · ") +
+      (_humN(_cob.linhas) || (L ? "490K" : "490 mil")) + (L ? " rows · " : " linhas · ") +
+      (_cob.tribunais != null ? _cob.tribunais : "15") + (L ? " courts · since " : " tribunais · desde ") +
+      (_cob.desde != null ? _cob.desde : "1970");
+    h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") + ' · ' + esc(covTxt) + '</div>';
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     h += brain("Radar", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);
@@ -1035,8 +1043,8 @@
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
     if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; h += '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
     h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
-      (L ? "The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across hundreds of assets and 50+ years of history."
-         : "O plano completo acrescenta a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção — sobre centenas de ativos e 50+ anos de histórico.") +
+      (L ? ("The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across " + (_ca100 ? "over " + _ca100 + " assets" : "over 100 assets") + " and 50+ years of history.")
+         : ("O plano completo acrescenta a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção — sobre " + (_ca100 ? "mais de " + _ca100 + " ativos" : "mais de 100 ativos") + " e 50+ anos de histórico.")) +
       (chrome ? '<br><a href="https://radarperene.com?utm_source=embed&utm_medium=widget" target="_blank" rel="noopener">' + (L ? "See the full app →" : "Ver o app completo →") + '</a>' : '') + '</div>';
     if (chrome) h += '<div class="ft">' + (d.disclaimer ? esc(d.disclaimer[lang] || d.disclaimer.pt) : "") + ' · ' + (L ? "data by" : "dados de") + ' <a href="https://radarperene.com" target="_blank" rel="noopener">Radar Perene</a></div>';
     h += '</div>';

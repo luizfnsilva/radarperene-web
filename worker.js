@@ -35,7 +35,7 @@ const EN_BODY = (function () {
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4: "Principles",
     disc: "Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
-    ftnav: '<a href="/diario">Daily archive</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/lenses/">Lenses</a> · <a href="/concepts/">Concepts</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lenses/wealth/">Wealth</a> · <a href="/lenses/electoral/">Electoral</a> · <a href="/lenses/macro/">Macro</a> · <a href="/lenses/institutional/">Institutional</a> · <a href="/lenses/real-estate/">Real estate</a> · <a href="/lenses/vertice/">Vértice</a> · <a href="/concepts/regime-brazil/">Brazil Regime</a> · <a href="/concepts/regime-global/">Global Regime</a> · <a href="/concepts/intermarket-br/">Intermarket BR</a> · <a href="/concepts/erp-br/">ERP_BR</a> · <a href="/concepts/logarithmic-regression-cone/">Regression Cone</a> · <a href="/concepts/anima-index/">Ânima</a> · <a href="/concepts/risk-on-risk-off/">Risk-on/off</a> · <a href="/concepts/historical-analogs/">Historical analogs</a> · <a href="/concepts/vertice/">Vértice (concept)</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>',
+    ftnav: '<a href="/diario">Daily archive</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/lenses/">Lenses</a> · <a href="/concepts/">Concepts</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lenses/wealth/">Wealth</a> · <a href="/lenses/electoral/">Electoral</a> · <a href="/lenses/macro/">Macro</a> · <a href="/lenses/institutional/">Institutional</a> · <a href="/lenses/real-estate/">Real estate</a> · <a href="/lenses/vertice/">Vértice</a> · <a href="/concepts/regime-brazil/">Brazil Regime</a> · <a href="/concepts/regime-global/">Global Regime</a> · <a href="/concepts/intermarket-br/">Intermarket BR</a> · <a href="/concepts/erp-br/">ERP_BR</a> · <a href="/concepts/logarithmic-regression-cone/">Regression Cone</a> · <a href="/concepts/anima-index/">Ânima</a> · <a href="/concepts/risk-on-risk-off/">Perene Risk Index</a> · <a href="/concepts/historical-analogs/">Historical analogs</a> · <a href="/concepts/vertice/">Vértice (concept)</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>',
     lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings and structures — pressure on wealth." },
       { n: "Electoral", d: "Electoral courts, eligibility, campaign finance and digital enforcement." },
       { n: "Macro / Rates", d: "Rates, inflation, fiscal and debt — the country&rsquo;s macro regime." },
@@ -60,8 +60,8 @@ const EN_BODY = (function () {
   const CP = (s) => U_CON + (ECON[s] || s) + "/";
   const expTag = "experiment";
   const NAV = { met: "Methodology", con: "Concepts", len: "Lenses", dia: "Daily", howto: "How to read", free: "Free", ac: "All concepts →", al: "All lenses →" };
-  const CN = [["regime-brasil", "Brazil Regime"], ["regime-global", "Global Regime"], ["intermercado-br", "Intermarket BR"], ["erp-br", "ERP_BR"], ["cone-de-regressao-logaritmica", "Logarithmic Cone"], ["indice-anima", "Ânima Index"], ["risk-on-risk-off", "Risk-on / Risk-off"], ["analogos-historicos", "Historical Analogs"], ["vertice", "Vértice"]];
-  const CD = ["Brazil's prevailing market state", "the external environment pressing on Brazil", "cross-reading of Brazilian wealth-sector ratios", "Brazilian equity risk premium in historical percentile", "frames price against the long-term trajectory", "proprietary reading of Brazilian market mood", "environment tilt between risk and protection", "past windows with a similar profile", "cross-domain hypotheses under Bayesian discipline"];
+  const CN = [["regime-brasil", "Brazil Regime"], ["regime-global", "Global Regime"], ["intermercado-br", "Intermarket BR"], ["erp-br", "ERP_BR"], ["cone-de-regressao-logaritmica", "Logarithmic Cone"], ["indice-anima", "Ânima Index"], ["risk-on-risk-off", "Perene Risk Index"], ["analogos-historicos", "Historical Analogs"], ["vertice", "Vértice"]];
+  const CD = ["Brazil's prevailing market state", "the external environment pressing on Brazil", "cross-reading of Brazilian wealth-sector ratios", "Brazilian equity risk premium in historical percentile", "frames price against the long-term trajectory", "proprietary reading of Brazilian market mood", "Brazil's risk-appetite gauge (0–100), stacked with Ânima", "past windows with a similar profile", "cross-domain hypotheses under Bayesian discipline"];
   const lenses = C.lenses.map((l, i) => '<a class="ln' + (l.v ? ' vx' : '') + '" href="' + LP(LSLUG[i]) + '"><div class="nm">' + (l.v ? '<span style="color:var(--gold)">✦</span> ' : '') + l.n + (l.v ? '<span class="tag">' + expTag + '</span>' : '') + '</div><p>' + l.d + '</p>' + (l.m ? '<span class="micro">' + l.m + '</span>' : '') + '</a>').join("");
   const conDD = CN.map((c) => '<a href="' + CP(c[0]) + '">' + c[1] + '</a>').join("") + '<a href="' + U_CON + '" style="color:var(--gold)">' + NAV.ac + '</a>';
   const lenDD = C.lenses.map((l, i) => '<a href="' + LP(LSLUG[i]) + '">' + l.n + '</a>').join("") + '<a href="' + U_LEN + '" style="color:var(--gold)">' + NAV.al + '</a>';
@@ -103,6 +103,38 @@ const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api
 const SNAP_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshot";
 const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshots";
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
+const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
+
+// ── cobertura VIVA: 1 fetch cacheado (1h) → preenche spans [data-cob] em QUALQUER página HTML ──
+// "engrenagem só": adicionou dado no banco → a fn SQL cobertura_radar muda → o número novo flui pro site
+// sozinho, sem rebuild. DEFENSIVO: API fora → mantém o fallback honesto já escrito no HTML.
+async function _fetchCobertura() {
+  try {
+    const r = await fetch(COB_API, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
+    return r.ok ? await r.json() : null;
+  } catch (e) { return null; }
+}
+function _humLinhas(n, en) {
+  if (n == null || !isFinite(n)) return null;
+  if (n >= 1e6) { const m = Math.round(n / 1e5) / 10; return en ? (m + "M") : (String(m).replace(".", ",") + " mi"); }
+  if (n >= 1e3) return Math.round(n / 1e3) + (en ? "K" : " mil");
+  return String(n);
+}
+function _cobRewriter(rw, cob, en) {
+  if (!cob) return rw;
+  const map = {
+    ativos: cob.ativos != null ? String(cob.ativos) : null,
+    linhas: _humLinhas(cob.linhas, en),
+    tribunais: cob.tribunais != null ? String(cob.tribunais) : null,
+    desde: cob.desde != null ? String(cob.desde) : null,
+  };
+  for (const k in map) {
+    if (map[k] == null) continue;
+    const val = map[k];
+    rw = rw.on('span[data-cob="' + k + '"]', { element(e) { e.setInnerContent(val); } });
+  }
+  return rw;
+}
 
 // escape p/ texto em HTML (defensivo: catálogo é a única fonte, mas nunca confiamos cego)
 function _esc(s) {
@@ -428,7 +460,10 @@ export default {
       const isEN = /radarperene\.com$/i.test(host) && !/\.com\.br$/i.test(host); // só .com (não .com.br)
       const isRoot = url.pathname === "/" || url.pathname === "/index.html";
       const ct = res.headers.get("content-type") || "";
-      if (!isRoot || !ct.includes("text/html")) return res; // só a home HTML é transformada
+      if (!ct.includes("text/html")) return res; // não-HTML: intacto
+      // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
+      const cob = await _fetchCobertura();
+      if (!isRoot) return cob ? _cobRewriter(new HTMLRewriter(), cob, isEN).transform(res) : res; // não-home: só cobertura, preserva o resto
 
       // AI-readability (Sprint A): busca a leitura do dia em prosa (cacheada 1h, DEFENSIVA) p/ injetar como texto + JSON-LD
       let narr = null;
@@ -446,6 +481,7 @@ export default {
       } catch (e) { /* opcional */ }
 
       let rw = new HTMLRewriter();
+      rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
       if (isEN) {
         rw = rw
           .on("html", { element(e) { e.setAttribute("lang", "en"); } })
