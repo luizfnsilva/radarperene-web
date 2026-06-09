@@ -51,6 +51,7 @@
       line:   v("--_line",   "#e6e3dc"),
       hot:    v("--_hot",    "#b02e22"),
       neu:    v("--_neu",    "#9c9c96"),
+      gold:   v("--gold",    "#c8a24a"),   // valuation/valor-justo: MESMA cor da .valstrip (Lyn Alden) p/ amarrar linha↔faixa; distinta de preço(accent)/cone(warm)/MMs(cool,dim)
       txt:    v("--_txt",    "#1a1a2e"),
       card:   v("--_card",   "#ffffff"),
       card2:  v("--_card2",  "#f3f1ec")
@@ -295,6 +296,7 @@
     var series = [{}]; // x
     var bands = [];    // uPlot: bands[] preenchem ENTRE pares de séries (hi acima de lo)
     var coneFadeByHi = {}; // [iHi] → [alpha_hoje, alpha_horizonte]: fade temporal (incerteza cresce com o horizonte) aplicado no drawBackground
+    var pastFadeByHi = {}; // [iHi] → [alpha_hoje, alpha_passado]: fade da SOMBRA p/ TRÁS (densa em hoje, some no passado) — evita que a banda alargada "suje" o histórico
 
     function addSeries(arr, conf) { data.push(arr); series.push(conf); return series.length - 1; }
 
@@ -315,7 +317,7 @@
 
     var iMa200 = ma200 ? addSeries(ma200, { label: "MM200", stroke: T.cool, width: 1.0, points: { show: false } }) : -1;
     var iMa50  = ma50  ? addSeries(ma50,  { label: "MM50", stroke: T.dim,  width: 1.0, dash: [3, 3], points: { show: false } }) : -1;
-    var iFair  = fair  ? addSeries(fair,  { label: "valor-justo", stroke: T.warm, width: 1.4, dash: [4, 2], points: { show: false } }) : -1;
+    var iFair  = fair  ? addSeries(fair,  { label: "valor-justo", stroke: T.gold, width: 1.5, dash: [7, 4], points: { show: false } }) : -1;  // GOLD (mesma cor da faixa .valstrip/Lyn Alden) + traço longo: amarra a linha ao valuation e a distingue da mediana do cone (warm), do preço (accent) e das MMs (cool/dim)
 
     // cone externo p10–p90 (banda clara) — desenhada primeiro pra ficar atrás.
     // uPlot: a banda entre series[hi] e series[lo] via opts.bands[{series:[hi,lo], fill}].
@@ -337,10 +339,14 @@
     else if (projSer) addSeries(projSer, { label: "projeção", stroke: T.warm, width: 1.4, dash: [4, 2], points: { show: false } });
 
     // shadow (passado): banda entre shadowHi e shadowLo.
+    //  A sombra é o cone-REVERSO (estreita em "hoje", alarga p/ trás). Sem fade ela alarga e "suja" o histórico
+    //  (pior em janelas longas). Solução simétrica ao cone: gradiente densa-em-hoje → some-no-passado (drawBackground),
+    //  e linhas de borda bem fracas p/ a banda larga distante virar só um fantasma, não um borrão.
     if (shadowHi && shadowLo) {
-      var iSh = addSeries(shadowHi, { label: "sombra+", stroke: withAlpha(T.warm, 0.3), width: 0.4, points: { show: false } });
-      var iShLo = addSeries(shadowLo, { label: "sombra-", stroke: withAlpha(T.warm, 0.3), width: 0.4, points: { show: false } });
+      var iSh = addSeries(shadowHi, { label: "sombra+", stroke: withAlpha(T.warm, 0.14), width: 0.35, points: { show: false } });
+      var iShLo = addSeries(shadowLo, { label: "sombra-", stroke: withAlpha(T.warm, 0.14), width: 0.35, points: { show: false } });
       bands.push({ series: [iSh, iShLo], fill: withAlpha(T.warm, 0.10) });
+      pastFadeByHi[iSh] = [0.14, 0.01];  // densa perto de "hoje", quase some no passado distante (espelha o leque futuro do cone)
     }
 
     // plugins (Bollinger etc.): {up,lo,mid} alinhados a hist → séries de linha tracejadas (paridade com o SVG bigChart).
@@ -386,6 +392,16 @@
             var bn = u.bands[bb]; var fade = bn && bn.series ? coneFadeByHi[bn.series[0]] : null; if (!fade) continue;
             try { var gr = ctx.createLinearGradient(pxT, 0, pxR, 0); gr.addColorStop(0, withAlpha(T.warm, fade[0])); gr.addColorStop(1, withAlpha(T.warm, fade[1]));
               bn.fill = (function (g) { return function () { return g; }; })(gr);  // uPlot normaliza band.fill numa FUNÇÃO no init → precisa devolver função (não o gradiente direto), com binding por-iteração
+            } catch (e) {}
+          }
+        }
+        // fade da SOMBRA p/ TRÁS: gradiente densa-em-"hoje" → some-no-passado (espelho temporal do cone) p/ a banda alargada distante não sujar o histórico.
+        var pxLft = u.bbox.left, pxTp = Math.min(pxT0, pxR);
+        if (pxTp > pxLft + 1) {
+          for (var bp = 0; bp < u.bands.length; bp++) {
+            var bnp = u.bands[bp]; var fdp = bnp && bnp.series ? pastFadeByHi[bnp.series[0]] : null; if (!fdp) continue;
+            try { var grp = ctx.createLinearGradient(pxTp, 0, pxLft, 0); grp.addColorStop(0, withAlpha(T.warm, fdp[0])); grp.addColorStop(1, withAlpha(T.warm, fdp[1]));
+              bnp.fill = (function (g) { return function () { return g; }; })(grp);
             } catch (e) {}
           }
         }
