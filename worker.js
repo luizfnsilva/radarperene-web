@@ -3,8 +3,8 @@
 // title/meta/OG/FAQ/lang para EN via HTMLRewriter (stream). DEFENSIVO: erro → serve o original.
 // run_worker_first está escopado a "/" e "/index.html" → todo o resto serve estático (risco mínimo).
 
-const EN_TITLE = "Radar Perene — Brazil market regime & country risk, read as data";
-const EN_DESC = "Brazil's market and regulatory regime, read as data: macro, rates/Selic, country risk, intermarket, FX, REITs and the equity risk premium (earnings yield vs real rate) — across 5 lenses plus the Vertice experiment. Charts with fair value and a scenario cone. Descriptive, public-source, never a recommendation.";
+const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
+const EN_DESC = "Brazil, observed — and remembered: five lenses, historical analogs and a library of precedents on public data — regimes, intermarket, valuation, sentiment and studies of “what happened next”. Descriptive, not prediction; never advice.";
 const EN_FAQ = JSON.stringify({
   "@context": "https://schema.org", "@type": "FAQPage", "inLanguage": "en", "mainEntity": [
     { "@type": "Question", "name": "How does Radar Perene compute Brazil's macro regime?", "acceptedAnswer": { "@type": "Answer", "text": "A monthly cross-market sensor outputs a Risk-BR score (0-100) from 8 domestic sub-scores (liquidity, defensive rotation, credit stress and more), calibrated on central-bank expectations (Focus since 2001) and real-rate curves (long NTN-B since 2006), isolating statistically-significant anomalies in 36-month windows." } },
@@ -27,8 +27,8 @@ const EN_FAQ = JSON.stringify({
 // Se aquele catálogo mudar, ESTE bloco precisa acompanhar (sem framework SSR no projeto).
 const EN_BODY = (function () {
   const C = {
-    h1: 'Brazil&rsquo;s regime, read as <span class="g">data</span> — not opinion.',
-    lead: "Five Lenses on Brazil&rsquo;s regime — wealth, electoral, macro, institutional and real-estate — plus the cross-asset Vértice Experiment. You choose the depth of the read. Live, below.",
+    h1: 'Brazil, observed — and <span class="g">remembered</span>.',
+    lead: "Five lenses, historical analogs and a library of precedents built on public data. Descriptive, not prediction.",
     cta1: "Join the 100 founders", cta2: "See the live radar", micro: "Educational content, public sources. Descriptive — never a recommendation.",
     eyb7: "Who it&rsquo;s for", s7: "Investors, analysts, managers — and serious newcomers.", s7s: "For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
