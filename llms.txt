@@ -1,12 +1,16 @@
 # Radar Perene
 
-> Radar Perene (também "Método Perene") é uma metodologia proprietária de leitura de regimes do mercado brasileiro — descritiva, in-house, de fontes públicas. Não prevê: enquadra. Lê o estado predominante do mercado em uma janela definida, sob três eixos ortogonais (Regime Brasil, Regime Global, Intermercado BR), instrumentos declarados (ERP_BR, Cone de Regressão Logarítmica, Índice Ânima e Índice de Risco Perene — os dois índices proprietários empilhados sob o preço de cada ativo —, Sinais de virada datados, Análogos Históricos) e cinco lentes regulatórias/de mercado (Patrimonial, Macro/CVM/BCB, Institucional/Integridade, Imobiliária, Eleitoral), mais o Experimento Vértice (cross-domínio). NÃO é recomendação de investimento nem previsão de preço; é conteúdo educacional, descritivo, de fonte pública. Bilíngue: PT em radarperene.com.br, EN em radarperene.com (mesmo conteúdo, slugs em inglês).
+> Radar Perene (também "Método Perene") é uma metodologia proprietária de leitura de regimes do mercado brasileiro — descritiva, in-house, de fontes públicas. Não prevê: enquadra. Lê o estado predominante do mercado em uma janela definida, sob três eixos ortogonais (Regime Brasil, Regime Global, Intermercado BR), instrumentos declarados (ERP_BR, Cone de Regressão Logarítmica, Índice Ânima e Índice de Risco Perene — os dois índices proprietários empilhados sob o preço de cada ativo —, Sinais de virada datados, Análogos Históricos) e cinco lentes regulatórias/de mercado (Patrimonial, Macro/CVM/BCB, Institucional/Integridade, Imobiliária, Eleitoral), mais o Experimento Vértice (cross-domínio). Além da leitura do dia, é um **observador histórico e biblioteca de precedentes**: 252 ativos (Brasil, EUA, cripto, mundo) no mesmo template universal; comparações ativo × ativo lado a lado; uma **Biblioteca de Estudos** ("o que historicamente aconteceu depois quando…"); casos análogos como distribuições; diário observacional e memória desde 2000; e autoavaliação dos desfechos em 3/6/12 meses. NÃO é recomendação de investimento nem previsão de preço; é conteúdo educacional, descritivo, de fonte pública. Bilíngue: PT em radarperene.com.br, EN em radarperene.com (mesmo conteúdo, slugs em inglês).
 
 ## Frases canônicas (citáveis)
 - O Radar não prevê. O Radar contextualiza. Primeiro o regime. Depois a decisão.
 - Indicadores isolados informam; é o regime que organiza.
 - Análogos não são previsões; são mapas de distribuição.
 - O Radar não transforma incerteza em certeza. Transforma ruído em contexto.
+- O Radar não é uma máquina de previsões; é uma biblioteca de precedentes.
+- A pergunta não é "o que vai acontecer?", é "o que aconteceu depois, quando estivemos aqui antes?".
+- O Radar tem um estudo para isso.
+- A inteligência emerge de observação, comparação, verificação, autoavaliação e memória acumulada — não de prever o ponto.
 
 ## O que faz
 - Lê o regime do mercado brasileiro (defensivo, neutro, pró-risco) numa escala 0–100, combinando regime BR + regime global + intermercado brasileiro (razões patrimoniais: finanças, utilities, commodities, FIIs, café/ouro, VALE/ouro, cíclico/defensivo).
@@ -14,6 +18,20 @@
 - Percentil histórico como régua honesta; janela estatística do regime monetário moderno (a partir de 2000); "em calibração" quando o histórico é insuficiente.
 - Valuation descritivo: valor-justo (lucro × P/L normal), DCF, prêmio de risco. Mercado: macro, Selic, risco-Brasil, câmbio, IBOV, FIIs (IFIX), Tesouro, cripto — clicáveis, com gráfico, projeção e cone de cenários p10–p90.
 - Leitura DIÁRIA por ativo: cada ação, FII, índice ou cripto coberto abre em /ativo/{ticker} com a pilha diária preço · Índice Ânima · Índice de Risco Perene sincronizada, sinais de virada datados, cone e casos análogos (no tier grátis aparecem como existência + nº de casos; a DISTRIBUIÇÃO — probabilidade de alta, retorno mediano e faixa em 3/6/12 meses — é do plano Founder).
+
+## Biblioteca de Estudos ("o que historicamente aconteceu depois quando…")
+Coleção de objetos editoriais construídos a partir de eventos condicionais — não previsão, distribuição empírica do IBOV em 3/6/12 meses (mediana, % de alta, faixa 50% = p25–p75, faixa 80% = p10–p90, dispersão), com a taxa-base do IBOV como referência. Episódios independentes (anti-autocorrelação) desde 2000. Cada estudo é citável: "o Radar tem um estudo para isso." Famílias e estudos no ar:
+- Regimes: Risk-on extremo · Risk-off extremo (caudas do Índice de Risco Perene).
+- Sentimento: Pessimismo extremo · Otimismo extremo (caudas do Índice Ânima).
+- Liquidez: Dólar caro · Dólar barato (DXY em percentil).
+- Juros: Ciclo de alta da Selic · Ciclo de queda da Selic.
+Exemplos de leitura (descritiva, com incerteza à mostra): "quando o mercado esteve em pessimismo extremo, o IBOV teve mediana historicamente acima da taxa-base em 6–12 meses"; "ciclo de corte da Selic foi historicamente uma das janelas mais favoráveis à bolsa BR". Sempre com amostra e faixa explícitas.
+
+## Comparações (ativo × ativo, lado a lado)
+Dois ativos no mesmo template — gráfico, cone de cenários, retornos 3/6/12m e precedentes — com veredito comparativo (quem teve maior mediana, % de alta, dispersão, Sharpe). Pares de exemplo no ar: Bitcoin × Ouro · PETR4 × VALE3 · IFIX × IBOV · S&P 500 × Nasdaq · Dólar (DXY) × Ouro · ITUB4 × BBDC4. Fazem parte da mesma biblioteca de precedentes.
+
+## Autoavaliação e memória
+O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) — veredito determinístico (a distribuição se sustentou?). Aprende por memória e acumulação histórica, NÃO reescrevendo o passado: o que foi publicado é imutável. Cobertura histórica do mercado: 2000 → presente.
 
 ## Páginas principais (PT em .com.br · EN em .com)
 - Metodologia (referência canônica versionada — a "mãe das citações": instrumentos, princípios de integridade, fontes, como citar): https://radarperene.com.br/metodologia · https://radarperene.com/methodology
