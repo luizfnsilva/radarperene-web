@@ -443,7 +443,9 @@ export default {
         const sr = await _diarioFetch(SNAPS_API);
         const sj = sr.ok ? await sr.json() : { itens: [] };
         const _dseg = _isEN ? "/daily/" : "/diario/";  // slug i18n: EN /daily, PT /diario
-        const urls = (sj.itens || []).filter(function (s) { return s && s.data; }).map(function (s) { return "<url><loc>" + _url.origin + _dseg + s.data + "</loc><changefreq>monthly</changefreq></url>"; }).join("");
+        // ★ lastmod = data do diário → sinal de FRESCOR p/ o Google re-rastrear (descoberta rápida do diário novo, caminho legítimo; complementa o IndexNow do Bing/Yandex). Entrada recente recebe changefreq=daily (pode ser re-enriquecida); arquivo antigo = monthly.
+        const _today = new Date().toISOString().slice(0, 10);
+        const urls = (sj.itens || []).filter(function (s) { return s && s.data; }).map(function (s) { var fresh = s.data >= _today.slice(0, 7); return "<url><loc>" + _url.origin + _dseg + s.data + "</loc><lastmod>" + s.data + "</lastmod><changefreq>" + (fresh ? "daily" : "monthly") + "</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
