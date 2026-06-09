@@ -486,18 +486,20 @@ export default {
       } catch (e) { return env.ASSETS.fetch(request); }
     }
     // ── /ativo/{ticker} — página por ativo (SEO programático B.1): reusa a home shell + widget em modo ativo + narrativa per-ativo ──
-    const _am = _url.pathname.match(/^\/ativo\/([a-z0-9]{2,8})\/?$/i);
+    const _am = _url.pathname.match(/^\/ativo\/([a-z0-9_]{2,14})\/?$/i);  // ★ aceita underscore (us_10y, eur_usd, brk_b) — antes só [a-z0-9] barrava esses
     if (_am) {
       try {
-        const tk = _am[1].toUpperCase();
-        const cls = /\d11$/.test(tk) ? "fii" : "equity_br"; // FII = XXXX11
+        const tk = _am[1].toUpperCase(), tkLower = _am[1].toLowerCase();
+        // ★ resolve a classe REAL (e o nome amigável) do /v1/tickers (cacheado na borda 1h) — antes hardcoded equity_br quebrava US/cripto/commodity/fx/índices
+        let cls = /\d11$/.test(tk) ? "fii" : "equity_br", nomeAtivo = tk;
+        try { const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (tr.ok) { const tj = await tr.json(); const m = tj.meta && tj.meta[tkLower]; if (m && m.classe) { cls = m.classe; nomeAtivo = m.nome || tk; } } } catch (e) {}
         const lang = _isEN ? "en" : "pt";
         const shell = await env.ASSETS.fetch(new Request(_url.origin + "/"));
         if (!(shell.headers.get("content-type") || "").includes("text/html")) return shell;
         let narr = null;
         try { const nr = await fetch(NARR_API + "?codigo=" + tk + "&classe=" + cls + "&lang=" + lang, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (nr.ok) narr = await nr.json(); } catch (e) {}
-        const titulo = tk + (lang === "en" ? " — Radar Perene · descriptive reading" : " — Radar Perene · leitura descritiva");
-        const desc = (narr && narr.resumo) ? _clampDesc(narr.resumo, 148) : tk;
+        const titulo = nomeAtivo + (lang === "en" ? " — Radar Perene · descriptive reading" : " — Radar Perene · leitura descritiva");
+        const desc = (narr && narr.resumo) ? _clampDesc(narr.resumo, 148) : nomeAtivo;
         let rw = new HTMLRewriter()
           .on("title", { element(e) { e.setInnerContent(titulo); } })
           .on('meta[name="description"]', { element(e) { e.setAttribute("content", desc); } })

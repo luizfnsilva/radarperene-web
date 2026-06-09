@@ -194,6 +194,29 @@
     <a class="qtag" id="qtag" href="#radar" aria-label="regime ao vivo"><span class="dot"></span><span id="qtag-txt">SINAL ATUAL · REGIME BR</span></a>
     <h1 id="h1">O regime do Brasil, lido como <span class="g">dado</span> — não como opinião.</h1>
     <p class="lead" id="lead">Cinco Lentes sobre o regime do Brasil — patrimonial, eleitoral, macro, institucional e imobiliária — mais o Experimento Vértice, cross-asset. Você escolhe a profundidade da leitura. Ao vivo, abaixo.</p>
+    <div class="rp-find" style="margin:16px 0 6px;position:relative;max-width:460px">
+      <input id="rp-q" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar um ativo — PETR4, NVDA, BTC, Ouro, Dólar…" aria-label="Buscar ativo"
+        style="width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:var(--sans);background:var(--surface);color:var(--txt);box-sizing:border-box">
+      <div id="rp-q-res" role="listbox" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.14);max-height:330px;overflow:auto"></div>
+    </div>
+    <script>
+    (function(){
+      var API="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/tickers";
+      var EN=/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname);
+      var q=document.getElementById("rp-q"), box=document.getElementById("rp-q-res"); if(!q||!box) return;
+      if(EN) q.placeholder="Search an asset — PETR4, NVDA, BTC, Gold, Dollar…";
+      var items=[], active=-1;
+      var LBL=EN?{equity_br:"BR stock",equity_us:"US stock",fii:"REIT",cripto:"Crypto",commodity:"Commodity",fx:"FX",etf_pais:"Country ETF",equity_index:"Index",macro_rate:"Rate",credito:"Credit",credito_privado:"Credit",pulso:"Index"}:{equity_br:"Ação BR",equity_us:"Ação US",fii:"FII",cripto:"Cripto",commodity:"Commodity",fx:"Moeda",etf_pais:"ETF país",equity_index:"Índice",macro_rate:"Juro",credito:"Crédito",credito_privado:"Crédito",pulso:"Índice"};
+      fetch(API).then(function(r){return r.json();}).then(function(j){ items=(j.ativos||[]).map(function(c){var m=(j.meta&&j.meta[c])||{};return{cod:c,nome:m.nome||c.toUpperCase(),classe:m.classe||""};}); }).catch(function(){});
+      function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+      function go(c){location.href="/ativo/"+c;}
+      function render(ms){ if(!ms.length){box.style.display="none";return;} box.innerHTML=ms.map(function(m){return '<a href="/ativo/'+m.cod+'" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;text-decoration:none;color:var(--txt);border-bottom:1px solid var(--line)"><span><b>'+esc(m.nome)+'</b> <span style="color:var(--dim);font-size:12px">'+esc(m.cod.toUpperCase())+'</span></span><span style="color:var(--dim);font-size:11px;white-space:nowrap">'+esc(LBL[m.classe]||m.classe)+'</span></a>';}).join(""); box.style.display="block"; active=-1; }
+      function search(){ var v=q.value.trim().toLowerCase(); if(v.length<1||!items.length){box.style.display="none";return;} var a=[],b=[]; for(var k=0;k<items.length&&a.length<8;k++){var it=items[k],cod=it.cod,nm=it.nome.toLowerCase(); if(cod.indexOf(v)===0||nm.indexOf(v)===0)a.push(it); else if(cod.indexOf(v)>=0||nm.indexOf(v)>=0)b.push(it);} render(a.concat(b).slice(0,8)); }
+      q.addEventListener("input",search);
+      q.addEventListener("keydown",function(e){ var L=box.querySelectorAll("a"); if(e.key==="ArrowDown"){e.preventDefault();active=Math.min(active+1,L.length-1);} else if(e.key==="ArrowUp"){e.preventDefault();active=Math.max(active-1,0);} else if(e.key==="Enter"){var t=(active>=0&&L[active])?L[active]:L[0]; if(t){e.preventDefault();go(t.getAttribute("href").split("/ativo/")[1]);} return;} else if(e.key==="Escape"){box.style.display="none";return;} else return; for(var i=0;i<L.length;i++)L[i].style.background=i===active?"var(--surface2)":""; });
+      document.addEventListener("click",function(e){ if(!box.contains(e.target)&&e.target!==q) box.style.display="none"; });
+    })();
+    </script>
     <a class="btn" href="#fundadores" id="cta1">Entrar para os 100 fundadores</a>
     <a class="btn ghost" href="#radar" id="cta2">Ver o radar ao vivo</a>
     <div class="micro" id="micro1">Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.</div>
