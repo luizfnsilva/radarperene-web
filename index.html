@@ -328,6 +328,9 @@
     var s=document.createElement("script");s.async=1;s.src="https://www.googletagmanager.com/gtag/js?id="+GA;document.head.appendChild(s);
     window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};
     gtag("js",new Date());gtag("config",GA);
+    // Ahrefs Web Analytics — também consent-gated (LGPD, opt-in dos 2). Chave por domínio: .com=EN, .com.br=PT.
+    var AH=/\.com\.br$/i.test(location.hostname)?"4LbsuoMGfXN4azVzHW6wPQ":"m9HGU5S9vnFEBS9K4J62rg";
+    var sa=document.createElement("script");sa.async=1;sa.src="https://analytics.ahrefs.com/analytics.js";sa.setAttribute("data-key",AH);document.head.appendChild(sa);
     // Meta Pixel (descomente e ponha o ID quando criar — entra consent-gated):
     // !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","META_PIXEL_ID");fbq("track","PageView");
   }

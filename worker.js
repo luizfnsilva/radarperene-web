@@ -121,6 +121,13 @@ function _humLinhas(n, en) {
   if (n >= 1e3) return Math.round(n / 1e3) + (en ? "K" : " mil");
   return String(n);
 }
+// ── Consentimento LGPD (opt-in) + analytics GA4 + Ahrefs, AMBOS consent-gated, chave POR DOMÍNIO via
+//    location.hostname (.com=EN, .com.br=PT). Injetado pelo worker em TODA página (estática, diário,
+//    /ativo, futuras) → cobertura universal automática. A home (index.html) tem o seu próprio (idêntico).
+const _CONSENT = '<div id="rp-cookie" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#13171c;border-top:1px solid #222a31;padding:14px 18px;font:13px/1.5 \'Inter\',system-ui,sans-serif;color:#e8ebee"><div style="max-width:1080px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center"><span id="rp-ck-txt" style="flex:1;min-width:240px;color:#8b97a3">Usamos cookies de medição (analytics) para melhorar o site. Você escolhe — sem isso, nada é rastreado.</span><button id="rp-ck-no" style="background:transparent;border:1px solid #222a31;color:#e8ebee;padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer">Recusar</button><button id="rp-ck-yes" style="background:#c9a227;border:0;color:#0a0c0f;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer">Aceitar</button></div></div>' +
+  '<script>(function(){var EN=/radarperene\\.com$/i.test(location.hostname)&&!/\\.com\\.br$/i.test(location.hostname);if(EN){var t=document.getElementById("rp-ck-txt");if(t)t.textContent="We use measurement (analytics) cookies to improve the site. Your choice — nothing is tracked without it.";document.getElementById("rp-ck-no").textContent="Decline";document.getElementById("rp-ck-yes").textContent="Accept";}var KEY="rp-consent";window.rpTrack=function(name){if(localStorage.getItem(KEY)!=="granted")return;try{if(window.gtag)gtag("event",name);}catch(e){}};function loadAnalytics(){var GA=/\\.com\\.br$/i.test(location.hostname)?"G-4LVGNLRV9L":"G-CWB77T178R";var s=document.createElement("script");s.async=1;s.src="https://www.googletagmanager.com/gtag/js?id="+GA;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());gtag("config",GA);var AH=/\\.com\\.br$/i.test(location.hostname)?"4LbsuoMGfXN4azVzHW6wPQ":"m9HGU5S9vnFEBS9K4J62rg";var sa=document.createElement("script");sa.async=1;sa.src="https://analytics.ahrefs.com/analytics.js";sa.setAttribute("data-key",AH);document.head.appendChild(sa);}var c=localStorage.getItem(KEY),bar=document.getElementById("rp-cookie");if(c==="granted"){loadAnalytics();}else if(c!=="denied"){bar.style.display="block";}document.getElementById("rp-ck-yes").onclick=function(){localStorage.setItem(KEY,"granted");bar.style.display="none";loadAnalytics();};document.getElementById("rp-ck-no").onclick=function(){localStorage.setItem(KEY,"denied");bar.style.display="none";};})();<\/script>';
+function _consentRw(rw) { return rw.on("body", { element(e) { e.append(_CONSENT, { html: true }); } }); }
+
 function _cobRewriter(rw, cob, en) {
   if (!cob) return rw;
   const map = {
@@ -234,7 +241,7 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
     (ind.leitura ? "<p>" + _esc(ind.leitura) + "</p>" : "") +
     (ind.descricao ? "<p>" + _esc(ind.descricao) + "</p>" : "") +
     "<p class=\"upd\">" + L.upd + " " + _esc(dataRef || "") + "</p>" +
-    "</div><footer><a href=\"/\">" + L.back + "</a></footer>" + _themeScript() + "</body></html>";
+    "</div><footer><a href=\"/\">" + L.back + "</a></footer>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
@@ -316,7 +323,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a></p>" +
     ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
     "</div><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
-    _themeScript() + "</body></html>";
+    _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 function _renderDiarioIndex(data, origin, lang) {
@@ -343,7 +350,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
     "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí.") + "</p>" +
     "<ul class=\"dlist\">" + rows + "</ul>" +
-    "</div><footer><a href=\"/\">" + (en ? "← Full radar" : "← Radar completo") + "</a></footer>" + _themeScript() + "</body></html>";
+    "</div><footer><a href=\"/\">" + (en ? "← Full radar" : "← Radar completo") + "</a></footer>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
@@ -357,7 +364,7 @@ export default {
       const _shm = _url.pathname.match(/^\/(api\/docs|founder|free)\/?$/);
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
-        if (_er.ok) return new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+        if (_er.ok) return _consentRw(new HTMLRewriter()).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
       }
       // slug i18n do arquivo diário: no .com (EN) /diario → 301 /daily (o conteúdo é o mesmo, só o slug muda; evita slug PT no domínio EN). /daily não redireciona → sem loop.
       if (/^\/diario(\/|$)/.test(_url.pathname)) {
@@ -472,7 +479,7 @@ export default {
           "<script type=\"application/ld+json\">" + ld + "</script>" +
           _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}") +
           "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p class=\"alist\">" + links + "</p></div>" +
-          "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" + _themeScript() + "</body></html>";
+          "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" + _themeScript() + _CONSENT + "</body></html>";
         return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=21600" } });
       } catch (e) { return env.ASSETS.fetch(request); }
     }
@@ -519,7 +526,7 @@ export default {
       if (!ct.includes("text/html")) return res; // não-HTML: intacto
       // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
       const cob = await _fetchCobertura();
-      if (!isRoot) return cob ? _cobRewriter(new HTMLRewriter(), cob, isEN).transform(res) : res; // não-home: só cobertura, preserva o resto
+      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); return rw.transform(res); } // não-home: consentimento+analytics + cobertura
 
       // AI-readability (Sprint A): busca a leitura do dia em prosa (cacheada 1h, DEFENSIVA) p/ injetar como texto + JSON-LD
       let narr = null;
