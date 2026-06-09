@@ -14,6 +14,7 @@
   // endereço absoluto do próprio radar.js — currentScript é válido AGORA (defer, exec síncrona), vira null no callback do boot.
   var RP_SRC = (document.currentScript && document.currentScript.src) || "";
   var API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
+  var ESTUDOS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/estudos";  // P3.3 Biblioteca de Estudos (Edge Function própria)
   // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
   // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
@@ -1095,6 +1096,37 @@
     }).catch(function () { var el = mw.querySelector(".rp-cmp2 .rp-ml"); if (el) el.textContent = (L ? "comparison unavailable" : "comparação indisponível"); });
   }
 
+  // ════ P3.3 — BIBLIOTECA DE ESTUDOS (laboratório): "o que aconteceu depois quando <condição>?" ════
+  //   Modal de UM estudo (objeto editorial): definição · distribuição 3/6/12m (mediana·%alta·faixa50·faixa80)
+  //   vs taxa-base do IBOV · interpretação P7 · comparações. Dados da Edge Function própria /functions/v1/estudos.
+  function openEstudo(chave, nome, lang) {
+    var L = lang === "en"; injectStyle();
+    var head = '<button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button><div class="rp-mt">📚 ' + esc(nome || chave) + '</div>';
+    var mw = document.createElement("div"); mw.className = "rp-mw";
+    mw.innerHTML = '<div class="rp rp-mc rp-est" role="dialog" aria-modal="true">' + head + '<div class="rp-ml" style="opacity:.7;padding:14px 0">' + (L ? "loading…" : "carregando…") + '</div></div>';
+    function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
+    function onkey(e) { if (e.key === "Escape") close(); }
+    mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
+    document.addEventListener("keydown", onkey);
+    document.body.appendChild(mw);
+    fetch(ESTUDOS_API + "?key=" + encodeURIComponent(chave), fopt()).then(function (r) { return r.json(); }).then(function (d) {
+      var box = mw.querySelector(".rp-est"); if (!box) return;
+      if (d.indisponivel || d.erro) { box.innerHTML = head + '<div class="rp-ml" style="margin:6px 0">' + esc(d.definicao || "") + '</div><div class="rp-ml" style="opacity:.7;padding:16px 0;text-align:center">' + (L ? "coming soon" : "em breve") + '</div>'; return; }
+      var H = d.horizontes || {}, br = d.base_rate || {}, sgn = function (v) { return (v >= 0 ? "+" : "") + v + "%"; };
+      var rowH = function (lbl, o) { return o ? '<tr><td>' + lbl + '</td><td>' + (o.mediana != null ? sgn(o.mediana) : "—") + '</td><td>' + (o.pct_positivo != null ? o.pct_positivo + "%" : "—") + '</td><td>' + (o.p25 != null ? sgn(o.p25) + "…" + sgn(o.p75) : "—") + '</td><td>' + (o.p10 != null ? sgn(o.p10) + "…" + sgn(o.p90) : "—") + '</td></tr>' : ""; };
+      var tbl = '<table class="rp-cmptbl est-tbl"><thead><tr><th></th><th>' + (L ? "Median" : "Mediana") + '</th><th>' + (L ? "% up" : "% alta") + '</th><th>' + (L ? "50% band" : "Faixa 50%") + '</th><th>' + (L ? "80% band" : "Faixa 80%") + '</th></tr></thead><tbody>'
+        + rowH("3m", H["3m"]) + rowH("6m", H["6m"]) + rowH("12m", H["12m"]) + '</tbody></table>';
+      var baseCap = '<div class="rp-ml" style="opacity:.7;margin-top:5px">' + (L ? "vs IBOV base rate: " : "vs taxa-base IBOV: ") + ["3m", "6m", "12m"].map(function (k) { return k + " " + (br[k] ? sgn(br[k].mediana) + "/" + br[k].pct_positivo + "%" : "—"); }).join(" · ") + '</div>';
+      box.innerHTML = head
+        + '<div class="rp-ml" style="margin:4px 0 9px">' + esc(d.definicao || "") + ' <span style="opacity:.6">· ' + (d.n_episodios || 0) + (L ? " episodes" : " episódios") + ' · ' + esc(d.familia || "") + '</span></div>'
+        + tbl + baseCap
+        + (d.interpretacao ? '<div class="rp-ml" style="margin-top:12px"><b>' + (L ? "Reading" : "Leitura") + '</b> — ' + esc(d.interpretacao) + '</div>' : '')
+        + (d.comparacoes ? '<div class="rp-ml" style="margin-top:6px;opacity:.85"><b>' + (L ? "Compare" : "Comparações") + '</b> — ' + esc(d.comparacoes) + '</div>' : '')
+        + (d.nota ? '<div class="rp-ml" style="margin-top:6px;opacity:.55">⚠ ' + esc(d.nota) + '</div>' : '')
+        + '<div class="rp-ml" style="margin-top:10px;opacity:.55">' + esc(d.disclaimer || "") + '</div>';
+    }).catch(function () { var el = mw.querySelector(".rp-est .rp-ml"); if (el) el.textContent = (L ? "study unavailable" : "estudo indisponível"); });
+  }
+
   // ★ collapse seguro p/ a home (briefing): mostra N itens, recolhe o resto SEM remover (chips seguem cruzáveis + crawler vê tudo). 2 containers do mesmo tipo = layout grid/flex intacto.
   function collapseList(arr, n, klass, moreL) {
     if (!arr.length) return '';
@@ -1199,6 +1231,17 @@
       ];
       h += '<div class="rp-cmprow"><div class="rp-ml" style="font-weight:700">' + (L ? "⚗ Compare two assets" : "⚗ Comparar dois ativos") + '</div><div class="rp-ml" style="opacity:.6;margin:2px 0 8px">' + (L ? "side by side — charts, cones, returns and precedents" : "lado a lado — gráficos, cones, retornos e precedentes") + '</div>' +
         CMP.map(function (p) { return '<button type="button" class="rp-cmpbtn" data-a="' + esc(p[0]) + '" data-acls="' + esc(p[1]) + '" data-an="' + esc(p[2]) + '" data-b="' + esc(p[3]) + '" data-bcls="' + esc(p[4]) + '" data-bn="' + esc(p[5]) + '">' + esc(p[2]) + ' × ' + esc(p[5]) + '</button>'; }).join("") + '</div>';
+    }
+    // ★ P3.3 — Biblioteca de estudos: "o que aconteceu depois quando…?" (só no radar completo). Dados da Edge Function própria.
+    if (!sections) {
+      var EST = [
+        ["regime-risk-on-extremo", L ? "Risk-on extreme" : "Risk-on extremo"], ["regime-risk-off-extremo", L ? "Risk-off extreme" : "Risk-off extremo"],
+        ["sentimento-pessimismo-extremo", L ? "Extreme pessimism" : "Pessimismo extremo"], ["sentimento-otimismo-extremo", L ? "Extreme optimism" : "Otimismo extremo"],
+        ["liquidez-dolar-caro", L ? "Strong dollar" : "Dólar caro"], ["liquidez-dolar-barato", L ? "Weak dollar" : "Dólar barato"],
+        ["juros-ciclo-alta", L ? "Hiking cycle" : "Selic ciclo de alta"], ["juros-ciclo-queda", L ? "Cutting cycle" : "Selic ciclo de queda"],
+      ];
+      h += '<div class="rp-cmprow"><div class="rp-ml" style="font-weight:700">' + (L ? "📚 Study library" : "📚 Biblioteca de estudos") + '</div><div class="rp-ml" style="opacity:.6;margin:2px 0 8px">' + (L ? "what historically happened next when… — empirical IBOV distribution, never a forecast" : "o que historicamente aconteceu depois quando… — distribuição empírica do IBOV, nunca previsão") + '</div>' +
+        EST.map(function (p) { return '<button type="button" class="rp-estbtn" data-key="' + esc(p[0]) + '" data-nome="' + esc(p[1]) + '">' + esc(p[1]) + '</button>'; }).join("") + '</div>';
     }
     if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4>' +
       '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
@@ -1361,8 +1404,9 @@
       if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
-        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, cmpb = null;
-        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!cmpb && ("" + (t.className || "")).indexOf("rp-cmpbtn") >= 0) cmpb = t; } t = t.parentNode; }
+        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, cmpb = null, estb = null;
+        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!cmpb && ("" + (t.className || "")).indexOf("rp-cmpbtn") >= 0) cmpb = t; if (!estb && ("" + (t.className || "")).indexOf("rp-estbtn") >= 0) estb = t; } t = t.parentNode; }
+        if (estb) { ev.stopPropagation(); openEstudo(estb.getAttribute("data-key"), estb.getAttribute("data-nome"), lang); return; }  // ★ P3.3 biblioteca de estudos
         if (cmpb) { ev.stopPropagation(); compareTwo({ cod: cmpb.getAttribute("data-a"), cls: cmpb.getAttribute("data-acls"), nome: cmpb.getAttribute("data-an") }, { cod: cmpb.getAttribute("data-b"), cls: cmpb.getAttribute("data-bcls"), nome: cmpb.getAttribute("data-bn") }, lang); return; }  // ★ P3.1 comparar lado a lado
         if (mtog) { ev.stopPropagation(); var ovv = mtog.previousElementSibling; if (ovv && ("" + (ovv.className || "")).indexOf("rp-ov") >= 0) { ovv.removeAttribute("hidden"); mtog.style.display = "none"; } return; }  // ★ "+N mais" → revela os itens recolhidos (one-way)
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
