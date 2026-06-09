@@ -1,0 +1,13 @@
+.git
+.gitignore
+.assetsignore
+node_modules
+.env
+.env.*
+.dev.vars
+wrangler.jsonc
+worker.js
+package.json
+package-lock.json
+*.md
+.DS_Store
