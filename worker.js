@@ -363,7 +363,7 @@ export default {
     // ── Páginas de slug COMPARTILHADO (api/docs, founder, free): o PT vive em index.html (default no .com.br), o EN em
     //    index.en.html. Sem isto, o build gerava só inglês nos 2 domínios (colisão de slug). No .com servimos a versão EN. ──
     if (_isEN) {
-      const _shm = _url.pathname.match(/^\/(api\/docs|founder|free)\/?$/);
+      const _shm = _url.pathname.match(/^\/(api\/docs|founder|free|widgets)\/?$/);
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
         if (_er.ok) return _consentRw(new HTMLRewriter()).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
