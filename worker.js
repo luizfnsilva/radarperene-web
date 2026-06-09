@@ -26,10 +26,11 @@ const EN_BODY = (function () {
     lead: "Five Lenses on Brazil&rsquo;s regime — wealth, electoral, macro, institutional and real-estate — plus the cross-asset Vértice Experiment. You choose the depth of the read. Live, below.",
     cta1: "Join the 100 founders", cta2: "See the live radar", micro: "Educational content, public sources. Descriptive — never a recommendation.",
     eyb7: "Who it&rsquo;s for", s7: "Investors, analysts, managers — and serious newcomers.", s7s: "For anyone who wants to read Brazil&rsquo;s market regime without noise or guesswork, at the depth they choose — from a one-line read to the data behind it.",
-    eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure; today&rsquo;s live reading is right below.",
+    eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
     eyb5: "Depth", s5: "You choose the depth", s5s: "Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6: "What&rsquo;s underneath",
-    eyb1: "Live · today", s1: "Today&rsquo;s reading", s1s: "A sample of the engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
+    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s regime right now — the regime, the five Lenses and today&rsquo;s live thesis. The full radar — intermarket, stocks, fiscal, real estate and analogs — is further below.", tzMore: "See the full radar ↓",
+    eyb1: "Live · full radar", s1: "The full radar", s1s: "The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge: "Launch · seats limited to the first 100 founders", fh: "The 100 founders unlock all five Lenses — and the Vértice Experiment", fp: "For US$149/mo — locked while your subscription stays active — you unlock what historically happened next: the full distribution of analogous cases per asset (probability of rising, median return and range over 3/6/12 months), the full quantile cone, a chart you can work. Plus all five Lenses and the Vértice Experiment. In the future the Lenses will be sold à la carte (Vértice alone will be US$290); together they add up to more than US$490/month. Pay upfront, 7-day full automatic refund (via Stripe), cancel in one click.",
     fdisc: "⚠ Work in progress: today about <b>90% of the functions and tickers aren&rsquo;t available yet</b> — they roll out gradually, at no extra cost, with your founder price locked. You secure everything as it ships; you&rsquo;re not paying for a complete product today.",
     wlbtn: "Get my invite",
@@ -79,6 +80,7 @@ const EN_BODY = (function () {
     "eyb-lng": "The Radar's language", "s-lng": "The concepts behind the reading", "s-lng-s": "Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.", "lng-cta": "See the full Radar language →",
     "eyb5": C.eyb5, "s5": C.s5, "s5s": C.s5s, "eyb6": C.eyb6,
     "eyb8": C.eyb8, "s8": C.s8, "s8s": C.s8s,
+    "eyb-tz": C.eybTz, "s-tz": C.sTz, "s-tz-s": C.sTzS, "tz-more": C.tzMore,
     "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
     "fbadge": C.fbadge, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn,
     "eyb-ult": "Latest readings", "s-ult": "The day's regime — archived and auditable", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.", "ult-cta": "See the full Diary →",
@@ -511,6 +513,7 @@ export default {
           .on('link[rel="alternate"][hreflang="pt-br"]', { element(e) { e.setAttribute("href", "https://radarperene.com.br/ativo/" + tk.toLowerCase()); } })
           .on('link[rel="alternate"][hreflang="en"]', { element(e) { e.setAttribute("href", "https://radarperene.com/ativo/" + tk.toLowerCase()); } })
           .on('link[rel="alternate"][hreflang="x-default"]', { element(e) { e.setAttribute("href", "https://radarperene.com/ativo/" + tk.toLowerCase()); } })
+          .on("#radar-teaser", { element(e) { e.remove(); } })  // teaser da home não faz sentido na página de um ticker → remove (limpo p/ crawler e usuário)
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
         if (narr && narr.texto_html) {
