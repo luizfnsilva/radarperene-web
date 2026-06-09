@@ -1,0 +1,3 @@
+
+# wrangler local runtime cache (não versionar — contém cache de conta/estado)
+.wrangler/
