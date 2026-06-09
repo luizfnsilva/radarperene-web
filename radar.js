@@ -459,12 +459,13 @@
     return c;
   }
   // legenda de UMA frase (P4): "Regime BR: próximo de neutro · traços marcam extremos passados". Lê o último valor não-nulo.
-  function oscCaption(rk, lang, kind) {
+  function oscCaption(rk, lang, kind, isBR) {
     var L = lang === "en", v = null;
     if (rk && rk.serie) for (var i = rk.serie.length - 1; i >= 0; i--) if (rk.serie[i] != null) { v = rk.serie[i]; break; }
     var pos = v == null ? "—" : v >= 70 ? (L ? "elevated" : "elevado") : v <= 30 ? (L ? "low" : "baixo") : Math.abs(v - 50) <= 8 ? (L ? "near neutral" : "próximo de neutro") : v > 50 ? (L ? "above neutral" : "acima do neutro") : (L ? "below neutral" : "abaixo do neutro");
     if (kind === "anima") return (L ? "Ânima Index · BR market mood: " : "Índice Ânima · humor do mercado BR: ") + pos + (L ? " · extremes = greed/fear" : " · extremos = ganância/medo");
-    // ★ Índice de Risco Perene = nome DIDÁTICO do apetite ao risco (o investidor BR não conhece "risk-on/off") — marca própria
+    // ★ ativo GLOBAL (mercado_br===false) → risco GLOBAL (não "Perene/BR"); ativo BR (ou dado antigo sem a flag) → Índice de Risco Perene (marca própria, didático)
+    if (isBR === false) return (L ? "Global risk-on/off · risk appetite: " : "Risco global · risk-on/off · apetite ao risco mundial: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
     return (L ? "Perene Risk Index · risk appetite: " : "Índice de Risco Perene · apetite ao risco: ") + pos + (L ? " · ticks mark past extremes" : " · traços marcam extremos passados");
   }
   // rótulo CURTO de estado (Camada 4 "Leitura rápida") a partir do último valor 0–100 de um índice (Ânima/Risco).
@@ -693,10 +694,10 @@
     var animaOk = !!aObj, riscoOk = s.risco && s.risco.serie && s.risco.serie.length > 1;
     if (useUp) {  // uPlot: placeholders vazios; os osciladores sincronizados montam após o innerHTML (mountStackOsc + wireAnima)
       if (animaOk) h += animaSelHTML(aSel, lang) + '<div class="rp-ml rp-anima-cap" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div><div class="rp-osc rp-anima"></div>';
-      if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div><div class="rp-osc rp-risk"></div>';
+      if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk", s.mercado_br)) + '</div><div class="rp-osc rp-risk"></div>';
     } else {  // SVG (embed/fallback): osciladores estáticos
       if (animaOk) h += '<div class="rp-ml" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div>' + riskPane(aObj, { big: true });
-      if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div>' + riskPane(s.risco, { big: true });
+      if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk", s.mercado_br)) + '</div>' + riskPane(s.risco, { big: true });
     }
     // indicadores de domínio (cripto: Fear&Greed/TVL; ações: volume) → leitura TEXTUAL (a pilha empilhada é o gráfico padrão de todos)
     h += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);
@@ -1302,7 +1303,7 @@
               inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : "preço · histórico → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair) ? s.fair.serie : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
-              if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (lang === "en" ? "Perene Risk Index · risk-on/off (ticks = past extremes)" : "Índice de Risco Perene · risk-on/off (traços = extremos passados)") + '</span>' + riskPane(s.risco);
+              if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (s.mercado_br === false ? (lang === "en" ? "Global risk-on/off (ticks = past extremes)" : "Risco global · risk-on/off (traços = extremos passados)") : (lang === "en" ? "Perene Risk Index · risk-on/off (ticks = past extremes)" : "Índice de Risco Perene · risk-on/off (traços = extremos passados)")) + '</span>' + riskPane(s.risco);
               inner += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);  // domínio (FnG/TVL/volume) → texto; stack completo no "ampliar"
             }
             var canBig = s && s.hist && s.hist.length > 1;
