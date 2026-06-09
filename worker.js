@@ -492,7 +492,7 @@ export default {
         const tk = _am[1].toUpperCase(), tkLower = _am[1].toLowerCase();
         // ★ resolve a classe REAL (e o nome amigável) do /v1/tickers (cacheado na borda 1h) — antes hardcoded equity_br quebrava US/cripto/commodity/fx/índices
         let cls = /\d11$/.test(tk) ? "fii" : "equity_br", nomeAtivo = tk;
-        try { const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (tr.ok) { const tj = await tr.json(); const m = tj.meta && tj.meta[tkLower]; if (m && m.classe) { cls = m.classe; nomeAtivo = m.nome || tk; } } } catch (e) {}
+        try { const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers") + "?lang=" + (_isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (tr.ok) { const tj = await tr.json(); const m = tj.meta && tj.meta[tkLower]; if (m && m.classe) { cls = m.classe; nomeAtivo = m.nome || tk; } } } catch (e) {}
         const lang = _isEN ? "en" : "pt";
         const shell = await env.ASSETS.fetch(new Request(_url.origin + "/"));
         if (!(shell.headers.get("content-type") || "").includes("text/html")) return shell;
