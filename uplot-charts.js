@@ -406,12 +406,15 @@
         ctx.beginPath(); ctx.fillStyle = T.accent; ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.fill();
         ctx.lineWidth = 1.6; ctx.strokeStyle = withAlpha(T.card, 0.95); ctx.beginPath(); ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.stroke();  // anel p/ destacar do traçado
       }
-      if (opt.todayLabel !== false) { // etiqueta discreta "hoje/now" no topo da âncora
+      if (opt.todayLabel !== false) { // etiqueta "hoje/now" no topo da âncora — pill legível, vira p/ a esquerda se não couber
         var lab = opt.lang === "en" ? "now" : "hoje";
-        ctx.font = "9px ui-monospace, monospace"; ctx.textBaseline = "top";
-        var tw = ctx.measureText(lab).width + 6;
-        ctx.fillStyle = withAlpha(T.accent, 0.92); ctx.fillRect(px + 1, top + 1, tw, 12);
-        ctx.fillStyle = T.card; ctx.fillText(lab, px + 4, top + 3);
+        ctx.font = "600 10px ui-monospace, monospace"; ctx.textBaseline = "top";
+        var tw = ctx.measureText(lab).width + 11, th = 15, ty = top + 2;
+        var rightEdge = u.bbox.left + u.bbox.width;
+        var tx = (px + 3 + tw > rightEdge) ? (px - tw - 3) : (px + 3);  // flip p/ a esquerda se estourar a borda direita
+        ctx.fillStyle = withAlpha(T.accent, 0.95);
+        if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(tx, ty, tw, th, 4); ctx.fill(); } else ctx.fillRect(tx, ty, tw, th);
+        ctx.fillStyle = T.card; ctx.fillText(lab, tx + 5.5, ty + 3);
       }
       ctx.restore();
     }
