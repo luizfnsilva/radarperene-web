@@ -1109,7 +1109,7 @@
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
     document.addEventListener("keydown", onkey);
     document.body.appendChild(mw);
-    fetch(ESTUDOS_API + "?key=" + encodeURIComponent(chave), fopt()).then(function (r) { return r.json(); }).then(function (d) {
+    fetch(ESTUDOS_API + "?key=" + encodeURIComponent(chave) + "&lang=" + (L ? "en" : "pt"), fopt()).then(function (r) { return r.json(); }).then(function (d) {
       var box = mw.querySelector(".rp-est"); if (!box) return;
       if (d.indisponivel || d.erro) { box.innerHTML = head + '<div class="rp-ml" style="margin:6px 0">' + esc(d.definicao || "") + '</div><div class="rp-ml" style="opacity:.7;padding:16px 0;text-align:center">' + (L ? "coming soon" : "em breve") + '</div>'; return; }
       var H = d.horizontes || {}, br = d.base_rate || {}, sgn = function (v) { return (v >= 0 ? "+" : "") + v + "%"; };
