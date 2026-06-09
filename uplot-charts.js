@@ -419,6 +419,9 @@
       var pcur = (price[bi] != null && isFinite(price[bi])) ? price[bi] : curPx;
       if (pcur != null) {
         var py = u.valToPos(pcur, "y", true);
+        // #4 halo suave (2 camadas) ATRÁS do ●: arredonda o vértice da pinça (cone→largura-0 em "hoje") sem tocar na geometria — o olho pousa no ponto-âncora, não no "X" abrupto. Honesto: a incerteza segue 0 em hoje.
+        ctx.beginPath(); ctx.fillStyle = withAlpha(T.accent, 0.10); ctx.arc(px, py, 9.5, 0, 2 * Math.PI); ctx.fill();
+        ctx.beginPath(); ctx.fillStyle = withAlpha(T.accent, 0.16); ctx.arc(px, py, 5.5, 0, 2 * Math.PI); ctx.fill();
         ctx.beginPath(); ctx.fillStyle = T.accent; ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.fill();
         ctx.lineWidth = 1.6; ctx.strokeStyle = withAlpha(T.card, 0.95); ctx.beginPath(); ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.stroke();  // anel p/ destacar do traçado
       }
@@ -431,6 +434,22 @@
         ctx.fillStyle = withAlpha(T.accent, 0.95);
         if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(tx, ty, tw, th, 4); ctx.fill(); } else ctx.fillRect(tx, ty, tw, th);
         ctx.fillStyle = T.card; ctx.fillText(lab, tx + 5.5, ty + 3);
+      }
+      // #7 legenda inline do cone (só Founder, bandas presentes): explica na PRÓPRIA tela 50% (p25/p75) vs 80% (p10/p90). Chip discreto no topo-direito, fundo translúcido p/ ler sobre o cone.
+      if (coneHi && coneLo) {
+        var s1 = "50%", s2 = Lt ? "80% of cases" : "80% dos casos";
+        ctx.font = "600 9.5px ui-monospace, monospace"; ctx.textBaseline = "middle"; ctx.textAlign = "left";
+        var sw = 9, gp = 5, mid = 12, pd = 8;
+        var w1 = ctx.measureText(s1).width, w2 = ctx.measureText(s2).width;
+        var boxW = pd * 2 + sw + gp + w1 + mid + sw + gp + w2, boxH = 18;
+        var bx = u.bbox.left + u.bbox.width - boxW - 5, by = top + 4;
+        ctx.fillStyle = withAlpha(T.card2, 0.9); ctx.strokeStyle = withAlpha(T.line, 1); ctx.lineWidth = 0.8;
+        if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(bx, by, boxW, boxH, 4); ctx.fill(); ctx.stroke(); } else { ctx.fillRect(bx, by, boxW, boxH); ctx.strokeRect(bx, by, boxW, boxH); }
+        var cy = by + boxH / 2, cx = bx + pd;
+        ctx.fillStyle = withAlpha(T.warm, 0.40); ctx.fillRect(cx, cy - sw / 2, sw, sw); ctx.lineWidth = 0.7; ctx.strokeStyle = withAlpha(T.warm, 0.75); ctx.strokeRect(cx, cy - sw / 2, sw, sw); cx += sw + gp; // banda interna (densa) = 50%
+        ctx.fillStyle = T.dim; ctx.fillText(s1, cx, cy + 0.5); cx += w1 + mid;
+        ctx.fillStyle = withAlpha(T.warm, 0.18); ctx.fillRect(cx, cy - sw / 2, sw, sw); ctx.strokeStyle = withAlpha(T.warm, 0.5); ctx.strokeRect(cx, cy - sw / 2, sw, sw); cx += sw + gp; // banda externa (clara) = 80%
+        ctx.fillStyle = T.dim; ctx.fillText(s2, cx, cy + 0.5);
       }
       ctx.restore();
     }
@@ -564,6 +583,10 @@
       // zonas de extremo (hot acima de hi, cool abaixo de lo) + linhas threshold.
       var ctx = u.ctx, left = u.bbox.left, w = u.bbox.width;
       function yOf(val) { return u.valToPos(val, "y", true); }
+      // #3 zona futura: à direita do ÚLTIMO dado real (xs[n-1]) o painel não tem observação, mas a janela-X é compartilhada com o preço (que vai até o fim do cone) → sobrava ~28% vazio.
+      //    Mesma sombra warm do painel de preço p/ o vazio ler como "futuro = leque, não medida", consistente em TODOS os painéis empilhados.
+      var rEdge = left + w, pxFut = u.valToPos(xs[n - 1], "x", true), pxF = Math.max(left, pxFut);
+      if (pxF < rEdge - 0.5) { ctx.fillStyle = withAlpha(T.warm, 0.045); ctx.fillRect(pxF, u.bbox.top, rEdge - pxF, u.bbox.height); }
       // zona risco-off (topo)
       var yHi = yOf(hi), yTop = u.bbox.top;
       ctx.fillStyle = withAlpha(T.hot, 0.06);
