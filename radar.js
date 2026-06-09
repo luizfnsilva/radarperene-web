@@ -112,6 +112,10 @@
       ".rp .c{background:var(--_card);border:1px solid var(--_cardb);border-radius:9px;padding:11px}" +
       ".rp .rp-mtog{margin-top:8px;font-size:11px;background:transparent;border:1px solid var(--_line);color:var(--_dim);border-radius:7px;padding:5px 11px;cursor:pointer}.rp .rp-mtog:hover{color:var(--_txt);border-color:var(--_cardb)}.rp .rp-ov{margin-top:8px}" +
       ".rp .rp-tier2{display:flex;align-items:center;gap:11px;margin:30px 0 6px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim);font-weight:600}.rp .rp-tier2::before,.rp .rp-tier2::after{content:'';flex:1;height:1px;background:var(--_line)}" +  // camada 2: separa o primário (regime/lentes/tese) dos indicadores de apoio
+      ".rp .rp-cmprow{margin:6px 0 4px}.rp .rp-cmpbtn{font-size:11.5px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:8px;padding:6px 11px;cursor:pointer;margin:0 6px 6px 0;white-space:nowrap}.rp .rp-cmpbtn:hover{border-color:var(--_accent);color:var(--_accent)}" +  // P3.1 launcher
+      ".rp-cmp2{max-width:940px}.rp-cmp2 .rp-cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.rp-cmp2 .rp-cmpcol{min-width:0}.rp-cmp2 .rp-mt2{font-family:var(--rp-serif,Georgia,serif);font-size:16px;font-weight:600;margin-bottom:5px;color:var(--_txt)}.rp-cmp2 .rp-cmpchart{margin:4px 0 2px}" +
+      ".rp-cmptbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}.rp-cmptbl th,.rp-cmptbl td{padding:6px 9px;border-bottom:1px solid var(--_line);text-align:right}.rp-cmptbl th:first-child,.rp-cmptbl td:first-child{text-align:left;color:var(--_dim)}.rp-cmptbl td.win{color:var(--_warm);font-weight:700}" +
+      "@media(max-width:640px){.rp-cmp2 .rp-cmpgrid{grid-template-columns:1fr;gap:14px}}" +
       ".rp .c .k{font-size:10.5px;color:var(--_dim)}.rp .c .b{font-size:20px;font-weight:var(--_numw);font-family:var(--_numf);margin-top:2px}.rp .c .r{font-size:10.5px;color:var(--_dim);margin-top:2px}" +
       ".rp .valstrip{margin-top:8px;background:var(--_card);border:1px solid var(--_line);border-left:3px solid var(--gold,#c8a24a);border-radius:9px;padding:10px 12px;cursor:pointer;transition:border-color .15s}" +
       ".rp .valstrip:hover{border-color:var(--gold,#c8a24a)}" +
@@ -1024,6 +1028,73 @@
     document.addEventListener("keydown", onkey);  // (appendChild(mw) já feito antes do setChart, p/ o uPlot montar com o modal no DOM)
   }
 
+  // ════ P3.1/P3.2 — COMPARAÇÃO lado a lado (laboratório) ════════════════════════════════════════════
+  //   Dois ativos, cada um com SEU gráfico+cone, cards de retorno e precedentes (taxa-base) — reusa as
+  //   funções PURAS bigChart/baseRatePanel. P3.2 = veredito comparativo (mediana/hit/dispersão/Sharpe/vol,
+  //   vencedor destacado). Gating idêntico ao modal: free vê cone-mediana + precedentes-teaser; a
+  //   distribuição (mediana/hit/dispersão) é Founder. Sem manipulação (snapshot read-only).
+  function _cmpFetch(cod, cls) { return fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(cod) + "&classe=" + encodeURIComponent(cls), fopt()).then(function (r) { return r.json(); }).catch(function () { return null; }); }
+  function _cmpRetCards(s, L) {
+    if (!s.stats || !s.stats.ret) return "";
+    var st = s.stats, neutral = st.is_asset === false;
+    var cells = [["m3", "3m"], ["m6", "6m"], ["y1", "12m"]].map(function (p) { var v = st.ret[p[0]]; if (v == null) return ""; var col = neutral ? "var(--_txt)" : (v >= 0 ? "var(--_warm)" : "var(--_cool)"); return '<div class="rp-rcard"><b style="color:' + col + '">' + (v >= 0 ? "+" : "") + v + '%</b><span>' + esc(p[1]) + '</span></div>'; }).join("");
+    return cells ? '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "Returns" : "Retornos") + '</b></div><div class="rp-rc">' + cells + '</div>' : "";
+  }
+  function _cmpConeLine(s, L, gpaid) {
+    var cur = s.hist[s.hist.length - 1], cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null; if (!cone || !cur) return "";
+    var dp = function (v) { return v != null ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; }, sgn = function (x) { return (x >= 0 ? "+" : "") + x + "%"; };
+    var dmid = dp(cone.mid[cone.mid.length - 1]);
+    if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null, dhi2 = cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null;
+      return '<div class="rp-ml" style="margin-top:6px"><b style="color:var(--_warm)">' + (L ? "Median " : "Mediana ") + sgn(dmid) + '</b>' + (dlo != null ? ' · 50% ' + sgn(dlo) + '…' + sgn(dhi) : '') + (dlo2 != null ? ' · 80% ' + sgn(dlo2) + '…' + sgn(dhi2) : '') + '</div>'; }
+    return dmid != null ? '<div class="rp-ml" style="margin-top:6px;opacity:.8"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median & ranges in Founder" : "mediana & faixas no Founder") + '</div>' : "";
+  }
+  function _cmpCol(s, x, L, gpaid) {
+    if (!s || !s.hist || s.hist.length < 2) return '<div class="rp-cmpcol"><div class="rp-mt2">' + esc(x.nome) + '</div><div class="rp-ml" style="opacity:.7;padding:22px 0;text-align:center">' + (L ? "series unavailable" : "série indisponível") + '</div></div>';
+    return '<div class="rp-cmpcol"><div class="rp-mt2">' + esc(x.nome) + ' <span style="opacity:.55;font-weight:400">' + esc(fmtNum(s.hist[s.hist.length - 1])) + '</span></div><div class="rp-cmpchart">' + bigChart(s, { big: true, pro: gpaid }) + '</div>' + _cmpConeLine(s, L, gpaid) + _cmpRetCards(s, L) + (s.base_rate ? baseRatePanel(s.base_rate, L, gpaid) : '') + '</div>';
+  }
+  function _cmpVerdict(sA, sB, xA, xB, L, gpaid) {
+    var rows = [], h6 = function (s, k) { var br = s && s.base_rate; return (br && br.h && br.h["6m"]) ? br.h["6m"][k] : null; };
+    var num = function (v) { return (v != null && isFinite(v)) ? v : null; };
+    function row(label, va, vb, fmt, higherWins) {
+      if (va == null && vb == null) return;
+      var win = (va != null && vb != null && va !== vb) ? (higherWins ? (va > vb ? 'a' : 'b') : (va < vb ? 'a' : 'b')) : '';
+      rows.push('<tr><td>' + esc(label) + '</td><td' + (win === 'a' ? ' class="win"' : '') + '>' + (va != null ? fmt(va) : '—') + '</td><td' + (win === 'b' ? ' class="win"' : '') + '>' + (vb != null ? fmt(vb) : '—') + '</td></tr>');
+    }
+    var pf = function (v) { return (v >= 0 ? "+" : "") + v + "%"; }, pp = function (v) { return v + "pp"; };
+    var nA = sA && sA.base_rate ? (sA.base_rate.n != null ? sA.base_rate.n : h6(sA, "n")) : null, nB = sB && sB.base_rate ? (sB.base_rate.n != null ? sB.base_rate.n : h6(sB, "n")) : null;
+    row(L ? "Episodes (n)" : "Episódios (n)", num(nA), num(nB), function (v) { return "" + v; }, true);
+    var distA = sA && sA.base_rate && sA.base_rate.h && !sA.base_rate.gated, distB = sB && sB.base_rate && sB.base_rate.h && !sB.base_rate.gated;
+    if (distA || distB) {
+      row(L ? "Median 6m" : "Mediana 6m", num(h6(sA, "mediana")), num(h6(sB, "mediana")), pf, true);
+      row(L ? "Hit rate 6m" : "Taxa de alta 6m", num(h6(sA, "hit")), num(h6(sB, "hit")), function (v) { return v + "%"; }, true);
+      var disp = function (s) { var p7 = h6(s, "p75"), p2 = h6(s, "p25"); return (p7 != null && p2 != null) ? Math.round((p7 - p2) * 10) / 10 : null; };
+      row(L ? "Dispersion 6m (p25–p75)" : "Dispersão 6m (p25–p75)", num(disp(sA)), num(disp(sB)), pp, true);
+    } else { rows.push('<tr><td>' + (L ? "Median · hit · dispersion 6m" : "Mediana · alta · dispersão 6m") + '</td><td colspan="2" style="text-align:center;opacity:.65"><span style="color:var(--_accent)">🔒</span> Founder</td></tr>'); }
+    row(L ? "Volatility" : "Volatilidade", num(sA && sA.stats && sA.stats.vol), num(sB && sB.stats && sB.stats.vol), function (v) { return v + "%"; }, false);
+    row("Sharpe", num(sA && sA.stats && sA.stats.sharpe), num(sB && sB.stats && sB.stats.sharpe), function (v) { return "" + v; }, true);
+    if (rows.length < 2) return "";
+    return '<div class="rp-tier2" style="margin-top:20px">' + (L ? "Precedents · head to head" : "Precedentes · comparativo") + '</div>' +
+      '<table class="rp-cmptbl"><thead><tr><th></th><th>' + esc(xA.nome) + '</th><th>' + esc(xB.nome) + '</th></tr></thead><tbody>' + rows.join("") + '</tbody></table>' +
+      '<div class="rp-ml" style="margin-top:6px;opacity:.6">' + (L ? "highlighted = the asset that led on each metric · descriptive, never a recommendation" : "destacado = o ativo que liderou em cada métrica · descritivo, nunca recomendação") + '</div>';
+  }
+  function compareTwo(a, b, lang) {
+    var L = lang === "en", gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}
+    injectStyle();
+    var head = '<button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button><div class="rp-mt">' + (L ? "Compare" : "Comparar") + ' — ' + esc(a.nome) + ' × ' + esc(b.nome) + '</div>';
+    var mw = document.createElement("div"); mw.className = "rp-mw";
+    mw.innerHTML = '<div class="rp rp-mc rp-cmp2" role="dialog" aria-modal="true">' + head + '<div class="rp-ml" style="opacity:.7;padding:14px 0">' + (L ? "loading…" : "carregando…") + '</div></div>';
+    function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
+    function onkey(e) { if (e.key === "Escape") close(); }
+    mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
+    document.addEventListener("keydown", onkey);
+    document.body.appendChild(mw);
+    Promise.all([_cmpFetch(a.cod, a.cls), _cmpFetch(b.cod, b.cls)]).then(function (res) {
+      var box = mw.querySelector(".rp-cmp2"); if (!box) return;
+      box.innerHTML = head + '<div class="rp-ml" style="margin-bottom:11px">' + (L ? "side by side · price, analog-case cone, returns and precedents — descriptive, never a recommendation" : "lado a lado · preço, cone de casos análogos, retornos e precedentes — descritivo, nunca recomendação") + '</div>' +
+        '<div class="rp-cmpgrid">' + _cmpCol(res[0], a, L, gpaid) + _cmpCol(res[1], b, L, gpaid) + '</div>' + _cmpVerdict(res[0], res[1], a, b, L, gpaid);
+    }).catch(function () { var el = mw.querySelector(".rp-cmp2 .rp-ml"); if (el) el.textContent = (L ? "comparison unavailable" : "comparação indisponível"); });
+  }
+
   // ★ collapse seguro p/ a home (briefing): mostra N itens, recolhe o resto SEM remover (chips seguem cruzáveis + crawler vê tudo). 2 containers do mesmo tipo = layout grid/flex intacto.
   function collapseList(arr, n, klass, moreL) {
     if (!arr.length) return '';
@@ -1116,6 +1187,19 @@
     // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese) dos indicadores/dados de APOIO.
     //   Só no radar COMPLETO (!sections) — o teaser (regime,lentes) e embeds filtrados não recebem o divisor órfão.
     if (!sections) h += '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>';
+    // ★ P3.1 — Laboratório: comparar dois ativos lado a lado (pares-preset). Só no radar completo.
+    if (!sections) {
+      var CMP = [
+        ["petr4", "equity_br", "PETR4", "vale3", "equity_br", "VALE3"],
+        ["sp500", "equity_us", "S&P 500", "nasdaq", "equity_index", "Nasdaq"],
+        ["btc", "cripto", "Bitcoin", "gold", "commodity", L ? "Gold" : "Ouro"],
+        ["ifix", "indice_ms", "IFIX", "ibov", "pulso", "IBOV"],
+        ["dxy", "fx", L ? "US Dollar (DXY)" : "Dólar (DXY)", "gold", "commodity", L ? "Gold" : "Ouro"],
+        ["itub4", "equity_br", "ITUB4", "bbdc4", "equity_br", "BBDC4"],
+      ];
+      h += '<div class="rp-cmprow"><div class="rp-ml" style="font-weight:700">' + (L ? "⚗ Compare two assets" : "⚗ Comparar dois ativos") + '</div><div class="rp-ml" style="opacity:.6;margin:2px 0 8px">' + (L ? "side by side — charts, cones, returns and precedents" : "lado a lado — gráficos, cones, retornos e precedentes") + '</div>' +
+        CMP.map(function (p) { return '<button type="button" class="rp-cmpbtn" data-a="' + esc(p[0]) + '" data-acls="' + esc(p[1]) + '" data-an="' + esc(p[2]) + '" data-b="' + esc(p[3]) + '" data-bcls="' + esc(p[4]) + '" data-bn="' + esc(p[5]) + '">' + esc(p[2]) + ' × ' + esc(p[5]) + '</button>'; }).join("") + '</div>';
+    }
     if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4>' +
       '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
       rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
@@ -1277,8 +1361,9 @@
       if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
-        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null;
-        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; } t = t.parentNode; }
+        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, cmpb = null;
+        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!cmpb && ("" + (t.className || "")).indexOf("rp-cmpbtn") >= 0) cmpb = t; } t = t.parentNode; }
+        if (cmpb) { ev.stopPropagation(); compareTwo({ cod: cmpb.getAttribute("data-a"), cls: cmpb.getAttribute("data-acls"), nome: cmpb.getAttribute("data-an") }, { cod: cmpb.getAttribute("data-b"), cls: cmpb.getAttribute("data-bcls"), nome: cmpb.getAttribute("data-bn") }, lang); return; }  // ★ P3.1 comparar lado a lado
         if (mtog) { ev.stopPropagation(); var ovv = mtog.previousElementSibling; if (ovv && ("" + (ovv.className || "")).indexOf("rp-ov") >= 0) { ovv.removeAttribute("hidden"); mtog.style.display = "none"; } return; }  // ★ "+N mais" → revela os itens recolhidos (one-way)
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
           ev.stopPropagation();
