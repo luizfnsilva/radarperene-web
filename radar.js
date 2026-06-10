@@ -935,14 +935,20 @@
       }
       paint(curHist, true);
     }
-    if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
+    // ── FASE A (síncrona, NO CLIQUE): pinta o chrome do modal (título · períodos · .rp-chart) e devolve o clique RÁPIDO → INP curto. O mount caro de canvas sai p/ a Fase B (próximo frame). ──
     lockScroll();  // congela a página atrás (sem 2ª rolagem) + compensa a barra (sem pulo) ANTES de montar
-    document.body.appendChild(mw);  // ★ modal no DOM ANTES do setChart — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
-    // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group propaga a janela do último a setá-la → o preço (setChart) impõe
-    // a janela a Ânima/risk (senão o autoscale dos osciladores na montagem sobrescreveria o período do preço).
-    if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj, gpaid); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync/janela do preço + seletor de horizonte
-    setChart(3);  // abre em 3M (default legível); MAX/longos via botões (gated p/ free)
-    if (useUp && typeof requestAnimationFrame === "function") requestAnimationFrame(function () { setChart(3); });  // reaplica a janela após o layout/ResizeObserver dos osciladores assentar no mount (senão o auto-range deles re-propaga "tudo" e o 3M inicial era ignorado)
+    document.body.appendChild(mw);  // ★ modal no DOM ANTES do mount — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
+    document.addEventListener("keydown", onkey);  // Esc fecha já na Fase A (antes do mount caro)
+    if (useUp) chartEl.innerHTML = '<div class="rp-ml" style="opacity:.5;display:flex;align-items:center;justify-content:center;height:200px">' + (L ? "Loading chart…" : "Carregando gráfico…") + '</div>';  // placeholder até a Fase B (.rp-chart já reserva 200px → sem CLS; upPrice→clear() o remove ao montar)
+    // ── FASE B (PRÓXIMO FRAME, task separada): o mount CARO — mountStackOsc (osciladores) + setChart (instanciar os uPlots/canvas) — sai do caminho do clique. Medido: ~65ms @4×CPU saem do INP da interação. ──
+    function rpMountBig() {
+      if (!mw.parentNode) return;  // abriu e fechou no mesmo frame → aborta o mount (sem draw-after-close)
+      if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
+      // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group propaga a janela do último a setá-la → o preço (setChart) impõe
+      // a janela a Ânima/risk (senão o autoscale dos osciladores na montagem sobrescreveria o período do preço).
+      if (useUp) { mountStackOsc(mw.querySelector(".rp-anima"), mw.querySelector(".rp-risk"), s, SYNC, lang, true, aObj, gpaid); wireAnima(mw, s, lang, gpaid, SYNC, true); }  // osciladores empilhados (Ânima/risk) no MESMO grupo de sync/janela do preço + seletor de horizonte
+      setChart(3);  // abre em 3M (default legível); MAX/longos via botões (gated p/ free)
+      if (useUp && typeof requestAnimationFrame === "function") requestAnimationFrame(function () { setChart(3); });  // reaplica a janela após o layout/ResizeObserver dos osciladores assentar no mount (senão o auto-range deles re-propaga "tudo" e o 3M inicial era ignorado)
     if (!gpaid && !(imx && useUp)) {  // free: liga/desliga os 2 overlays + repinta (sem estúdio/manipulação) — não vale no intermercado (dual não tem cone/MM)
       mw.querySelectorAll(".rp-tog[data-fk]").forEach(function (el) {
         el.addEventListener("click", function () { var k = el.getAttribute("data-fk"); ov[k] = !ov[k]; el.textContent = (ov[k] ? "● " : "○ ") + el.getAttribute("data-lbl"); paint(curHist, true); });
@@ -1107,7 +1113,10 @@
         setChart(parseFloat(btn.getAttribute("data-m")));
       });
     })(perBtns[pi]); }
-    document.addEventListener("keydown", onkey);  // (appendChild(mw) já feito antes do setChart, p/ o uPlot montar com o modal no DOM)
+    }
+    // DOUBLE-rAF (não 1): o 1º frame PINTA o shell+"Carregando" (handler ~11ms = INP curto), o mount caro vai p/ o 2º frame.
+    //   Com 1 rAF só, o mount roda DENTRO do render do frame do clique (antes do 1º paint) → a long task ainda conta no INP. Medido @4×CPU: 1-rAF canvas já no frame 1 · 2-rAF placeholder no frame 1, canvas no frame 2.
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(function () { requestAnimationFrame(rpMountBig); }); else rpMountBig();
   }
 
   // ════ P3.1/P3.2 — COMPARAÇÃO lado a lado (laboratório) ════════════════════════════════════════════
