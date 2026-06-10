@@ -549,6 +549,13 @@ export default {
       const cob = await _fetchCobertura();
       if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); return rw.transform(res); } // não-home: consentimento+analytics + cobertura
 
+      // ★ digest do dia (home payload) inlinado no HTML → o teaser/radar pintam SEM o round-trip cliente (~2-4s, o
+      //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
+      //   idêntico, moat intacto. cacheTtl 1800 (muda 1×/dia no pulso) mantém quente. Concorrente com narr/ultimas.
+      const _digP = fetch(NARR_API.replace("/v1/narrative", "/v1/digest") + "?lang=" + (isEN ? "en" : "pt"),
+        { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 1800, cacheEverything: true } })
+        .then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; });
+
       // AI-readability (Sprint A): busca a leitura do dia em prosa (cacheada 1h, DEFENSIVA) p/ injetar como texto + JSON-LD
       let narr = null;
       try {
@@ -603,6 +610,15 @@ export default {
         }).join("");
         rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }
+      // ★ inline do digest no FIM do body (não bloqueia o paint do shell; radar.js lê window.__RP_DIGEST no boot).
+      //   Opcional/defensivo: falha no fetch → sem inline → radar.js faz o fetch normal (degrada gracioso).
+      try {
+        const dRaw = await _digP;
+        if (dRaw) {
+          const dj = dRaw.replace(/</g, "\\u003c"); const lk = isEN ? "en" : "pt"; // emite < p/ todo "<" → </script>-safe no inline
+          rw = rw.on("body", { element(e) { e.append('<script>window.__RP_DIGEST=window.__RP_DIGEST||{};window.__RP_DIGEST["' + lk + '"]=' + dj + ';</script>', { html: true }); } });
+        }
+      } catch (e) { /* inline é opcional — nunca quebra a home */ }
       return rw.transform(res);
     } catch (e) {
       return res; // nunca quebra: na dúvida, serve o original

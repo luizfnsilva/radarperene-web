@@ -17,7 +17,16 @@
   var ESTUDOS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/estudos";  // P3.3 Biblioteca de Estudos (Edge Function própria)
   // ★ dedupe do digest: teaser + radar completo (mesma página/idioma) compartilham UMA busca → ~metade do time-to-insight.
   var _digestP = {};
-  function _getDigest(lang) { if (!_digestP[lang]) _digestP[lang] = fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); }); return _digestP[lang]; }
+  // ★ time-to-insight: se o worker já inlinou o digest do dia no HTML (window.__RP_DIGEST[lang]), usa-o direto
+  //   (0 round-trip ~2-4s — o gargalo real do paint). O /v1/digest é token-agnóstico (o handler ignora o
+  //   Authorization), então serve anon e Founder idêntico; o moat segue no /v1/serie (per-token). Sem inline → fetch.
+  function _getDigest(lang) {
+    if (!_digestP[lang]) {
+      var pre = (typeof window !== "undefined" && window.__RP_DIGEST && window.__RP_DIGEST[lang]) ? window.__RP_DIGEST[lang] : null;
+      _digestP[lang] = pre ? Promise.resolve(pre) : fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); });
+    }
+    return _digestP[lang];
+  }
   // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
   // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
@@ -1389,12 +1398,26 @@
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   }
 
+  // ★ time-to-insight: um nó SÓ precisa do uPlot se vai desenhar gráfico no render (radar completo, /ativo,
+  //   ou seção com gráfico). O teaser (regime,lentes) é texto + sparkline SVG → não deve esperar ~100KB de uPlot.
+  function rpNeedsCharts(node) {
+    if (node.getAttribute("data-asset")) return true;                 // /ativo → renderAtivo desenha o herói
+    var sa = node.getAttribute("data-sections");
+    if (!sa) return true;                                             // radar completo (sections=null) desenha gráficos
+    var SVG_ONLY = { regime: 1, lentes: 1, indices: 1 };              // seções sem uPlot inline (texto + sparkline SVG)
+    return sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean).some(function (s) { return !SVG_ONLY[s]; });
+  }
   function boot() {
     injectStyle();
     rpWatchTheme();
     var nodes = document.querySelectorAll("#radar-perene,[data-radar-perene]");
     if (!nodes.length) return;
-    ensureUplot(function () { bootNodes(nodes); });
+    // ★ nós sem-gráfico (teaser) pintam JÁ, sem bloquear no download do uPlot; os com-gráfico esperam a engine.
+    //   ensureUplot roda SEMPRE (em paralelo) → engine fica quente p/ cliques/modais mesmo numa página só-teaser.
+    var charty = [], chartless = [];
+    [].forEach.call(nodes, function (n) { (rpNeedsCharts(n) ? charty : chartless).push(n); });
+    if (chartless.length) bootNodes(chartless);
+    ensureUplot(function () { if (charty.length) bootNodes(charty); });
   }
   function bootNodes(nodes) {
     nodes.forEach(function (node) {
@@ -1459,7 +1482,7 @@
   //   <radar-perene widget="regime-br"></radar-perene>   → preset de seções
   //   <radar-perene symbol="PETR4"></radar-perene>       → modo ativo único
   //   atributos: lang(pt|en) market(br|us) skin(editorial) chrome(off) sections="a,b" classe(p/ symbol)
-  function rpBootOne(inner) { injectStyle(); rpWatchTheme(); ensureUplot(function () { bootNodes([inner]); }); }
+  function rpBootOne(inner) { injectStyle(); rpWatchTheme(); if (rpNeedsCharts(inner)) ensureUplot(function () { bootNodes([inner]); }); else { bootNodes([inner]); ensureUplot(function () {}); } }
   if (typeof customElements !== "undefined" && !customElements.get("radar-perene")) {
     try {
       customElements.define("radar-perene", class extends HTMLElement {
