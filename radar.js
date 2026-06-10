@@ -15,6 +15,9 @@
   var RP_SRC = (document.currentScript && document.currentScript.src) || "";
   var API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
   var ESTUDOS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/estudos";  // P3.3 Biblioteca de Estudos (Edge Function própria)
+  // ★ dedupe do digest: teaser + radar completo (mesma página/idioma) compartilham UMA busca → ~metade do time-to-insight.
+  var _digestP = {};
+  function _getDigest(lang) { if (!_digestP[lang]) _digestP[lang] = fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); }); return _digestP[lang]; }
   // anon key pública do Supabase (feita p/ viver no client — vive no bundle de todo site Supabase;
   // o gateway exige um JWT válido, a proteção real é a RLS/função que só expõe o digest curado).
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
@@ -1446,7 +1449,7 @@
             if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang, fund); }); }
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
-      fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); })
+      _getDigest(lang)  // ★ promise compartilhada (teaser + completo não duplicam o fetch)
         .then(function (d) { render(node, d, lang, sections, chrome, skin); })
         .catch(function () { node.innerHTML = '<div class="rp"><div class="sub">Radar Perene — indisponível.</div></div>'; });
     });

@@ -514,6 +514,10 @@ export default {
           .on('meta[name="description"]', { element(e) { e.setAttribute("content", desc); } })
           .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", titulo); } })
           .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", desc); } })
+          // ★ PÁGINA FOCADA no ticker: esconde as seções de PITCH da home (paraquem/oque/lentes/Free×Founder/…) → mata o conteúdo
+          //   quase-duplicado das 252 páginas /ativo. Mantém hero(ticker+busca) + #radar(widget+narrativa) + #faq (contexto+schema).
+          //   Conversão segue pelo 🔒 dentro do widget + a FAQ. (.hero não é <section> → permanece.)
+          .on("head", { element(e) { e.append("<style>.wrap section:not(#radar):not(#faq){display:none!important}</style>", { html: true }); } })
           // ★ H1/lead do TICKER (o JS da home não sobrescreve mais em /ativo — guard _isHomePg) → 252 páginas com H1≈title coerente
           .on("#h1", { element(e) { e.setInnerContent(nomeAtivo); } })
           .on("#lead", { element(e) { e.setInnerContent(lang === "en" ? ("Descriptive reading of " + nomeAtivo + " — price, historical analogs and regime, observed and remembered. Descriptive, not prediction.") : ("Leitura descritiva de " + nomeAtivo + " — preço, casos análogos e regime, observado e lembrado. Descritivo, não previsão.")); } })
