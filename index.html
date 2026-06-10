@@ -365,9 +365,15 @@
   var _seo=LANG==="en"
     ? {t:"Radar Perene — Brazil, observed and remembered",d:"Brazil, observed — and remembered: five lenses, historical analogs and a library of precedents on public data — regimes, intermarket, valuation, sentiment and studies of “what happened next”. Descriptive, not prediction; never advice."}
     : {t:"Radar Perene — o Brasil observado e lembrado",d:"O Brasil observado — e lembrado: cinco lentes, casos análogos e uma biblioteca de precedentes sobre dados públicos — regimes, intermercado, valuation, sentimento e estudos do “o que aconteceu depois”. Descritivo, não previsão; nunca recomendação."};
-  document.title=_seo.t; try{document.documentElement.lang=LANG;}catch(e){}
-  ['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]'].forEach(function(sel){var e=document.querySelector(sel);if(e)e.setAttribute("content",_seo.d);});
-  ['meta[property="og:title"]','meta[name="twitter:title"]'].forEach(function(sel){var e=document.querySelector(sel);if(e)e.setAttribute("content",_seo.t);});
+  try{document.documentElement.lang=LANG;}catch(e){}
+  // ★ /ativo/{ticker} reusa o shell da home → o worker JÁ SSR'a title/desc/H1/lead do TICKER.
+  //   NÃO sobrescrever (senão as 252 páginas de ativo herdam o título/H1 da home no Google, que renderiza JS).
+  var _isHomePg=location.pathname==="/"||location.pathname==="/index.html";
+  if(_isHomePg){
+    document.title=_seo.t;
+    ['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]'].forEach(function(sel){var e=document.querySelector(sel);if(e)e.setAttribute("content",_seo.d);});
+    ['meta[property="og:title"]','meta[name="twitter:title"]'].forEach(function(sel){var e=document.querySelector(sel);if(e)e.setAttribute("content",_seo.t);});
+  }
   // toggle de tema claro/escuro (persiste; ícone = próximo modo)
   var _tg=document.getElementById("theme-tg");
   function _themeIcon(){if(_tg)_tg.textContent=document.documentElement.getAttribute("data-theme")==="dark"?"☀":"☾";}
@@ -441,7 +447,8 @@
     ok:"Você está na lista — entraremos em contato.",err:"Não consegui registrar. Tente de novo.",inv:"Digite um email válido."
   };
   function set(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html}
-  set("h1",C.h1);set("lead",C.lead);set("cta1",C.cta1);set("cta2",C.cta2);set("micro1",C.micro);
+  if(_isHomePg){set("h1",C.h1);set("lead",C.lead);}  // /ativo: H1/lead vêm do worker (ticker), não da home
+  set("cta1",C.cta1);set("cta2",C.cta2);set("micro1",C.micro);
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);

@@ -514,6 +514,9 @@ export default {
           .on('meta[name="description"]', { element(e) { e.setAttribute("content", desc); } })
           .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", titulo); } })
           .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", desc); } })
+          // ★ H1/lead do TICKER (o JS da home não sobrescreve mais em /ativo — guard _isHomePg) → 252 páginas com H1≈title coerente
+          .on("#h1", { element(e) { e.setInnerContent(nomeAtivo); } })
+          .on("#lead", { element(e) { e.setInnerContent(lang === "en" ? ("Descriptive reading of " + nomeAtivo + " — price, historical analogs and regime, observed and remembered. Descriptive, not prediction.") : ("Leitura descritiva de " + nomeAtivo + " — preço, casos análogos e regime, observado e lembrado. Descritivo, não previsão.")); } })
           .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", _url.origin + "/ativo/" + tk.toLowerCase()); } })
           .on("link#rp-canonical", { element(e) { e.setAttribute("href", _url.origin + "/ativo/" + tk.toLowerCase()); } })
           // hreflang self-referente (Ahrefs #4/5): senão herda os do index apontando p/ a home "/"
