@@ -427,7 +427,10 @@ function _applySec(resp, request) {
     h.set("X-Content-Type-Options", "nosniff");
     h.set("Referrer-Policy", "strict-origin-when-cross-origin");
     h.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
-    if (new URL(request.url).pathname === "/radar-embed.html") { h.set("Content-Security-Policy", "frame-ancestors *"); }  // Forma 3: iframe embedável por terceiros
+    const _pn = new URL(request.url).pathname;
+    // Forma 3 = iframe embedável por terceiros. CF 307-redireciona /radar-embed.html → /radar-embed (extensionless),
+    // então AMBOS precisam de frame-ancestors * (senão o iframe quebra em sites de terceiros).
+    if (_pn === "/radar-embed" || _pn === "/radar-embed.html") { h.set("Content-Security-Policy", "frame-ancestors *"); }
     else { h.set("X-Frame-Options", "SAMEORIGIN"); h.set("Content-Security-Policy", "frame-ancestors 'self'"); }          // resto: anti-clickjacking
     const noBody = resp.status === 101 || resp.status === 204 || resp.status === 304;
     return new Response(noBody ? null : resp.body, { status: resp.status, statusText: resp.statusText, headers: h });
