@@ -315,9 +315,9 @@
     <div class="eyebrow" id="eyb3">Para o seu site · grátis</div>
     <h2 class="sec" id="s3">Use nosso mini-radar onde quiser</h2>
     <p class="secsub" id="s3s">Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.</p>
-    <pre id="apicode"><span class="url">GET https://radarperene.com.br/api/v1/digest?lang=pt</span>
+    <pre id="apicode"><span class="url" id="api-url">GET https://radarperene.com.br/api/v1/digest?lang=pt</span>
 
-&lt;iframe src="https://radarperene.com/radar-embed" width="100%" height="1400" style="border:0"&gt;&lt;/iframe&gt;</pre>
+<span id="api-embed">&lt;iframe src="https://radarperene.com.br/radar-embed" width="100%" height="1400" style="border:0"&gt;&lt;/iframe&gt;</span></pre>
   </section>
 
   <section>
@@ -385,6 +385,11 @@
   var _lpt=document.getElementById("l-pt"),_len=document.getElementById("l-en");
   if(_prod){if(_lpt)_lpt.href="https://radarperene.com.br/";if(_len)_len.href="https://radarperene.com/";}
   else{if(_lpt)_lpt.href="?lang=pt";if(_len)_len.href="?lang=en";}
+  // Exemplo de API: deriva da ORIGEM servida (mesmo domínio) + língua ativa → coerente em PT/EN e em qualquer
+  //   língua/domínio futuro (zh etc.) sem hardcode. Worker faz o mesmo SSR p/ crawler EN; aqui cobre o render vivo.
+  (function(){var _ab=location.origin,_au=document.getElementById("api-url"),_ae=document.getElementById("api-embed");
+    if(_au)_au.textContent="GET "+_ab+"/api/v1/digest?lang="+LANG;
+    if(_ae)_ae.textContent='<iframe src="'+_ab+'/radar-embed" width="100%" height="1400" style="border:0"></iframe>';})();
   // SEO bilíngue: título/descrição/OG/lang por idioma (Google renderiza JS; .com herda EN, .com.br fica PT)
   var _seo=LANG==="en"
     ? {t:"Radar Perene — Brazil, observed and remembered",d:"Brazil, observed — and remembered: five lenses, historical analogs and a library of precedents on public data — regimes, intermarket, valuation, sentiment and studies of “what happened next”. Descriptive, not prediction; never advice."}

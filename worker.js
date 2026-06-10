@@ -705,6 +705,10 @@ async function _route(request, env) {
         rw = rw
           .on("#lng-cta", { element(e) { e.setAttribute("href", "/concepts/"); } })
           .on("#l-sobre", { element(e) { e.setAttribute("href", "/about"); } });
+        // exemplo de API: PT estático (.com.br) → EN no .com p/ crawler/no-JS (o JS deriva de location.origin no render vivo)
+        rw = rw
+          .on("#api-url", { element(e) { e.setInnerContent("GET https://radarperene.com/api/v1/digest?lang=en"); } })
+          .on("#api-embed", { element(e) { e.setInnerContent('<iframe src="https://radarperene.com/radar-embed" width="100%" height="1400" style="border:0"></iframe>'); } });
         rw = _enDailyRw(rw); // nav/footer/CTA do arquivo diário no .com → /daily (evita 301)
       }
       if (narr && narr.texto_html) {
