@@ -61,14 +61,22 @@
 
   // Carrega vendor/uplot + uplot-charts SÓ se a flag pedir; resolve quando a engine estiver pronta.
   // Flag off → nunca baixa nada (cb imediato). onerror→cb mantém o widget vivo em SVG se o asset falhar.
+  // ★ load-once + fila de callbacks: com lazy-load (IO + idle-warm + guard do modal) ensureUplot pode ser
+  //   chamado por várias fontes quase juntas → SEM a fila, cada chamada injetaria scripts duplicados (uPlot 2×).
+  var _upLoading = false, _upQueue = [];
   function ensureUplot(cb) {
     if (RP_ENGINE !== "uplot") return cb();                  // flag off → caminho legado, zero download
     if (window.RPUplot && window.RPUplot.ready()) return cb();
+    _upQueue.push(cb);
+    if (_upLoading) return;                                  // load já em voo → só enfileira (não re-injeta)
+    _upLoading = true;
     var base = (RP_SRC || "radar.js").replace(/radar\.js(\?.*)?$/, "");  // src absoluto (capturado no topo) → vendor carrega de radarperene.com/vendor/ em qq página/embed, não relativo a /ativo/…
     function load(tag, attr, url, onload) { var e = document.createElement(tag); e[attr] = url; if (tag === "link") e.rel = "stylesheet"; e.onload = onload; e.onerror = onload; (document.head || document.body).appendChild(e); }
     load("link", "href", base + "vendor/uplot/uPlot.min.css");
     load("script", "src", base + "vendor/uplot/uPlot.iife.min.js", function () {
-      load("script", "src", base + "uplot-charts.js", function () { cb(); });   // engine só depois do vendor
+      load("script", "src", base + "uplot-charts.js", function () {   // engine só depois do vendor
+        _upLoading = false; var q = _upQueue.splice(0); for (var i = 0; i < q.length; i++) { try { q[i](); } catch (e) {} }
+      });
     });
   }
 
@@ -224,6 +232,20 @@
     var b = document.body;
     b.style.overflow = _mLock.ov; b.style.paddingRight = _mLock.pr;
     try { if (_mLock.focus && _mLock.focus.focus) _mLock.focus.focus(); } catch (e) {}
+  }
+  // ── modal de "carregando" enquanto a engine uPlot baixa (lazy-load): o clique abre JÁ um shell com
+  //    "Carregando gráfico…" (mesma trava de scroll, sem 2ª rolagem) → quando a engine pronta, fecha e
+  //    abre o gráfico rico. Nunca degrada p/ SVG. Clicar fora cancela (ref.cancelled → não reabre).
+  function rpLoadingModal(lang) {
+    var L = lang === "en";
+    var mw = document.createElement("div"); mw.className = "rp-mw";
+    mw.innerHTML = '<div class="rp rp-mc" role="dialog" aria-modal="true" aria-busy="true"><div class="rp-ml" style="padding:34px 12px;text-align:center;opacity:.82">' + (L ? "Loading chart…" : "Carregando gráfico…") + '</div></div>';
+    var ref = { cancelled: false };
+    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); unlockScroll(); }
+    mw.addEventListener("click", function (e) { if (e.target === mw) { ref.cancelled = true; close(); } });
+    lockScroll(); document.body.appendChild(mw);
+    ref.close = close;
+    return ref;
   }
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&]/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]; }); }
@@ -666,8 +688,15 @@
     return out;
   }
 
-  function openBig(s, title, meta, lang, fund, preCmp) {
+  function openBig(s, title, meta, lang, fund, preCmp, _retry) {
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
+    // ★ lazy-load: engine pedida mas ainda não carregou → "Carregando gráfico…" + ensureUplot, depois reabre rico
+    //   (nunca cai em SVG por falta de engine). _retry evita laço se o asset falhar (aí segue p/ o fallback SVG).
+    if (RP_ENGINE === "uplot" && !uplotOn() && !_retry) {
+      var pend = rpLoadingModal(lang);
+      ensureUplot(function () { pend.close(); if (!pend.cancelled) openBig(s, title, meta, lang, fund, preCmp, true); });
+      return;
+    }
     // O gráfico grande é a MAIOR isca → free SEMPRE abre (sem gate de abertura). O upsell vem das FEATURES gated
     // dentro: manipular (zoom/brush), comparar A×B (Estúdio), cone completo p10–p90, overlays além dos 2 do free.
     var gpaid = rpIsPro();  // leitor canônico do plano (single-source-of-truth)
@@ -1458,18 +1487,42 @@
   }
   function rpOnPremiumChange() { var sig = rpRenderSig(); if (sig === _rpLastSig) return; _rpLastSig = sig; rpRerenderAll(); }  // repinta na mudança de plano OU quando o token destrava os dados
   if (typeof window !== "undefined" && window.addEventListener) window.addEventListener("rp-premium-change", rpOnPremiumChange);
+  // ── lazy-load do uPlot p/ o radar completo abaixo da dobra: IntersectionObserver carrega a engine +
+  //    boota o nó SÓ quando ele se aproxima do viewport (rootMargin 800px = pronto quando chega). Fallback
+  //    sem IO = comportamento de hoje (carrega já). NÃO se aplica a /ativo (gráfico-herói = eager).
+  function rpLazyChart(node) {
+    if (typeof IntersectionObserver === "undefined") { ensureUplot(function () { bootNodes([node]); }); return; }
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) { if (ents[i].isIntersecting) { io.disconnect(); ensureUplot(function () { bootNodes([node]); }); return; } }
+    }, { rootMargin: "800px 0px" });
+    io.observe(node);
+  }
+  // ── idle-warm: esquenta a engine no ocioso (~4s) mesmo sem rolar/clicar → modais instantâneos p/ quem fica
+  //    na página, sem bloquear o paint inicial (melhor LCP). Quem sai em <4s economiza o download (casual).
+  var _warmed = false;
+  function rpIdleWarm() {
+    if (_warmed || RP_ENGINE !== "uplot") return; _warmed = true;
+    var warm = function () { ensureUplot(function () {}); };
+    if (typeof requestIdleCallback === "function") requestIdleCallback(warm, { timeout: 4000 });
+    else setTimeout(warm, 4000);
+  }
   function boot() {
     injectStyle();
     rpWatchTheme();
     _rpLastSig = rpRenderSig();  // estado de render no 1º paint → o evento depois só repinta se a assinatura mudar
     var nodes = document.querySelectorAll("#radar-perene,[data-radar-perene]");
     if (!nodes.length) return;
-    // ★ nós sem-gráfico (teaser) pintam JÁ, sem bloquear no download do uPlot; os com-gráfico esperam a engine.
-    //   ensureUplot roda SEMPRE (em paralelo) → engine fica quente p/ cliques/modais mesmo numa página só-teaser.
-    var charty = [], chartless = [];
-    [].forEach.call(nodes, function (n) { (rpNeedsCharts(n) ? charty : chartless).push(n); });
+    // teaser (sem-gráfico) pinta JÁ; /ativo (data-asset = herói acima da dobra) carrega a engine eager;
+    // radar completo (com-gráfico, sem asset = abaixo da dobra) entra no lazy-load (IO). idle-warm cobre os modais.
+    var eager = [], lazy = [], chartless = [];
+    [].forEach.call(nodes, function (n) {
+      if (!rpNeedsCharts(n)) { chartless.push(n); return; }
+      (n.getAttribute("data-asset") ? eager : lazy).push(n);
+    });
     if (chartless.length) bootNodes(chartless);
-    ensureUplot(function () { if (charty.length) bootNodes(charty); });
+    if (eager.length) ensureUplot(function () { bootNodes(eager); });
+    if (lazy.length) lazy.forEach(rpLazyChart);
+    rpIdleWarm();  // engine quente p/ cliques/modais (inclusive em página só-teaser), sem bloquear o paint
   }
   function bootNodes(nodes) {
     nodes.forEach(function (node) {
