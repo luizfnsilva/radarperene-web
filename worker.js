@@ -186,8 +186,12 @@ async function _proxyApi(request, _url, sub) {
     // GET anon = a esmagadora maioria do tráfego (free + embed) → cacheável na borda. Chave = sub+query ENCODADA (sem ? & = soltos).
     if (request.method === "GET" && isAnon) {
       const body = await _cachedText(upstream, "api-" + encodeURIComponent(sub + _url.search), 900);
-      if (body != null) return new Response(body, Object.assign({ status: 200 }, { headers: Object.assign({ "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=900", "x-rp-proxy": "anon" }, _API_CORS) }));
-      return new Response('{"erro":"indisponivel"}', { status: 503, headers: Object.assign({ "content-type": "application/json" }, _API_CORS) }); // upstream down + sem stale → degrada, não 500
+      if (body != null) return new Response(body, { status: 200, headers: Object.assign({ "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=900", "x-rp-proxy": "anon" }, _API_CORS) });
+      // _cachedText null = upstream NÃO-200 (ex.: 404 estudo inexistente / 400 param ruim) OU down sem stale. NÃO mascarar
+      //   como 503: repassa o status+corpo REAIS (sem cachear) → o cliente vê o mesmo que veria batendo o edge direto.
+      const fb = await _fetchT(upstream, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON } });
+      const fbody = await fb.text();
+      return new Response(fbody, { status: fb.status, headers: Object.assign({ "content-type": fb.headers.get("content-type") || "application/json; charset=utf-8", "x-rp-proxy": "anon-passthru" }, _API_CORS) });
     }
     // Founder (GET c/ token real) ou POST (waitlist) → pass-through, forward do Authorization do cliente, SEM cache.
     const init = { method: request.method, headers: { apikey: apikey, Authorization: auth || ("Bearer " + NARR_ANON) } };
