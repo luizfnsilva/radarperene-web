@@ -116,11 +116,24 @@ const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api
 // ── cobertura VIVA: 1 fetch cacheado (1h) → preenche spans [data-cob] em QUALQUER página HTML ──
 // "engrenagem só": adicionou dado no banco → a fn SQL cobertura_radar muda → o número novo flui pro site
 // sozinho, sem rebuild. DEFENSIVO: API fora → mantém o fallback honesto já escrito no HTML.
+// ── resiliência upstream (Supabase): timeout (AbortController) + single-flight + stale-on-error. NÃO é circuit
+//    breaker — só evita (a) request pendurado, (b) thundering herd no cache frio, (c) tela vazia num soluço do
+//    upstream. _UPSTREAM_TIMEOUT_MS > o cold do /digest (~4,3s): corta só o que está REALMENTE pendurado.
+const _UPSTREAM_TIMEOUT_MS = 9000;
+async function _fetchT(url, opts, ms) {
+  const ctl = new AbortController();
+  const to = setTimeout(function () { ctl.abort(); }, ms || _UPSTREAM_TIMEOUT_MS);
+  try { return await fetch(url, Object.assign({}, opts || {}, { signal: ctl.signal })); }
+  finally { clearTimeout(to); }
+}
+const _inflight = new Map();  // single-flight por chave (colapsa fetches concorrentes no mesmo isolate)
+let _cobLast = null;          // último cobertura bom → stale-on-error
 async function _fetchCobertura() {
   try {
-    const r = await fetch(COB_API, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
-    return r.ok ? await r.json() : null;
-  } catch (e) { return null; }
+    const r = await _fetchT(COB_API, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
+    if (r.ok) { const j = await r.json(); _cobLast = j; return j; }
+    return _cobLast;  // upstream !ok → última boa (badge de cobertura não some)
+  } catch (e) { return _cobLast; }  // timeout/erro → stale
 }
 // ── Cache na borda do WORKER via Cache API (caches.default). ⚠️ cf:{cacheTtl,cacheEverything} NÃO cacheia os
 //    subrequests ao supabase.co: a resposta carrega Set-Cookie (__cf_bm, do Bot Management da CF na frente do
@@ -131,15 +144,25 @@ async function _cachedText(url, key, ttl) {
   try {
     const cache = caches.default;
     const ck = new Request("https://rp-cache.internal/" + key);
-    let hit = await cache.match(ck);
-    if (!hit) {
-      const fresh = await fetch(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON } });
-      if (!fresh.ok) return null;
-      const body = await fresh.text();
-      hit = new Response(body, { headers: { "content-type": "application/json", "cache-control": "public, max-age=" + ttl } });
-      await cache.put(ck, hit.clone());  // cópia sem Set-Cookie → cacheável
-    }
-    return await hit.text();
+    const sk = new Request("https://rp-cache.internal/stale/" + key);  // cópia stale (24h) p/ stale-on-error
+    const hit = await cache.match(ck);
+    if (hit) return await hit.text();
+    if (_inflight.has(key)) return await _inflight.get(key);  // single-flight: 1 fetch por chave concorrente no isolate
+    const p = (async function () {
+      try {
+        const fresh = await _fetchT(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON } });
+        if (!fresh.ok) throw new Error("upstream " + fresh.status);
+        const body = await fresh.text();
+        await cache.put(ck, new Response(body, { headers: { "content-type": "application/json", "cache-control": "public, max-age=" + ttl } }));   // fresco (TTL)
+        await cache.put(sk, new Response(body, { headers: { "content-type": "application/json", "cache-control": "public, max-age=86400" } }));     // stale (24h)
+        return body;
+      } catch (e) {
+        const stale = await cache.match(sk);  // stale-on-error: soluço/timeout do upstream → serve a última boa
+        return stale ? await stale.text() : null;
+      }
+    })();
+    _inflight.set(key, p);
+    try { return await p; } finally { _inflight.delete(key); }
   } catch (e) { return null; }
 }
 async function _cachedJson(url, key, ttl) { const t = await _cachedText(url, key, ttl); if (t == null) return null; try { return JSON.parse(t); } catch (e) { return null; } }
@@ -282,7 +305,7 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
 
 // ── ARQUIVO DIÁRIO (/diario) — páginas citáveis congeladas + verificação do desfecho ──
 function _diarioFetch(url) {
-  return fetch(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
+  return _fetchT(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
 }
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
@@ -391,6 +414,27 @@ function _renderDiarioIndex(data, origin, lang) {
 
 export default {
   async fetch(request, env) {
+    let _resp;
+    try { _resp = await _route(request, env); } catch (e) { _resp = new Response("", { status: 500 }); }
+    return _applySec(_resp, request);
+  },
+};
+// ── headers de segurança em 1 chokepoint (TODA resposta). Baixo risco; framing liberado só p/ o iframe embed. ──
+function _applySec(resp, request) {
+  try {
+    const h = new Headers(resp.headers);
+    h.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    h.set("X-Content-Type-Options", "nosniff");
+    h.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    h.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+    if (new URL(request.url).pathname === "/radar-embed.html") { h.set("Content-Security-Policy", "frame-ancestors *"); }  // Forma 3: iframe embedável por terceiros
+    else { h.set("X-Frame-Options", "SAMEORIGIN"); h.set("Content-Security-Policy", "frame-ancestors 'self'"); }          // resto: anti-clickjacking
+    const noBody = resp.status === 101 || resp.status === 204 || resp.status === 304;
+    return new Response(noBody ? null : resp.body, { status: resp.status, statusText: resp.statusText, headers: h });
+  } catch (e) { return resp; }
+}
+// roteador real (envolvido por _applySec acima)
+async function _route(request, env) {
     const _url = new URL(request.url);
     const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
     // ── Páginas de slug COMPARTILHADO (api/docs, founder, free): o PT vive em index.html (default no .com.br), o EN em
@@ -422,7 +466,7 @@ export default {
     // ── /sitemap-ativos.xml — sitemap programático dos /ativo (B.1): a lista REAL (~77), via /v1/tickers ──
     if (_url.pathname === "/sitemap-ativos.xml") {
       try {
-        const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
+        const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
         const tj = tr.ok ? await tr.json() : { ativos: [] };
         const urls = (tj.ativos || []).map(function (t) { return "<url><loc>" + _url.origin + "/ativo/" + t + "</loc><changefreq>daily</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=21600" } });
@@ -458,7 +502,7 @@ export default {
     // ── /api/leitura-do-dia.json — endpoint público (documentado em /api/docs): proxy do edge, CORS aberto, cache 4h ──
     if (_url.pathname === "/api/leitura-do-dia.json") {
       try {
-        const r = await fetch(LDD_API + "?lang=" + (_isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } });
+        const r = await _fetchT(LDD_API + "?lang=" + (_isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } });
         const body = r.ok ? await r.text() : '{"erro":"indisponivel"}';
         return new Response(body, { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=14400", "access-control-allow-origin": "*" } });
       } catch (e) { return new Response('{"erro":"indisponivel"}', { headers: { "content-type": "application/json", "access-control-allow-origin": "*" } }); }
@@ -498,7 +542,7 @@ export default {
     if (_url.pathname === "/ativos") {
       try {
         const en = _isEN;
-        const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
+        const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
         const tj = tr.ok ? await tr.json() : { ativos: [] };
         const ativos = (tj.ativos || []).map(function (t) { return String(t).toUpperCase(); }).sort();
         const canon = _url.origin + "/ativos";
@@ -527,12 +571,12 @@ export default {
         const tk = _am[1].toUpperCase(), tkLower = _am[1].toLowerCase();
         // ★ resolve a classe REAL (e o nome amigável) do /v1/tickers (cacheado na borda 1h) — antes hardcoded equity_br quebrava US/cripto/commodity/fx/índices
         let cls = /\d11$/.test(tk) ? "fii" : "equity_br", nomeAtivo = tk;
-        try { const tr = await fetch(NARR_API.replace("/v1/narrative", "/v1/tickers") + "?lang=" + (_isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (tr.ok) { const tj = await tr.json(); const m = tj.meta && tj.meta[tkLower]; if (m && m.classe) { cls = m.classe; nomeAtivo = m.nome || tk; } } } catch (e) {}
+        try { const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers") + "?lang=" + (_isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (tr.ok) { const tj = await tr.json(); const m = tj.meta && tj.meta[tkLower]; if (m && m.classe) { cls = m.classe; nomeAtivo = m.nome || tk; } } } catch (e) {}
         const lang = _isEN ? "en" : "pt";
         const shell = await env.ASSETS.fetch(new Request(_url.origin + "/"));
         if (!(shell.headers.get("content-type") || "").includes("text/html")) return shell;
         let narr = null;
-        try { const nr = await fetch(NARR_API + "?codigo=" + tk + "&classe=" + cls + "&lang=" + lang, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (nr.ok) narr = await nr.json(); } catch (e) {}
+        try { const nr = await _fetchT(NARR_API + "?codigo=" + tk + "&classe=" + cls + "&lang=" + lang, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } }); if (nr.ok) narr = await nr.json(); } catch (e) {}
         const titulo = nomeAtivo + (lang === "en" ? " — Radar Perene · descriptive reading" : " — Radar Perene · leitura descritiva");
         const desc = (narr && narr.resumo) ? _clampDesc(narr.resumo, 148) : nomeAtivo;
         let rw = new HTMLRewriter()
@@ -646,4 +690,4 @@ export default {
       return res; // nunca quebra: na dúvida, serve o original
     }
   }
-};
+}
