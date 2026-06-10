@@ -146,8 +146,10 @@
     if (typeof ResizeObserver === "function") {
       var ro = new ResizeObserver(fit); ro.observe(el);
       u._rpRO = ro; // guarda pra cleanup externo se preciso
+      u._rpCleanup = function () { try { ro.disconnect(); } catch (e) {} };  // clear()/destroy() desliga o RO (senão vaza ao fechar modal)
     } else {
       window.addEventListener("resize", fit);
+      u._rpCleanup = function () { try { window.removeEventListener("resize", fit); } catch (e) {} };  // idem p/ o fallback de resize
     }
     return fit;
   }
@@ -176,7 +178,8 @@
   function clear(el) {
     if (el && el._rpU) {
       var u = el._rpU;
-      if (u._linkKey && _links[u._linkKey]) { var g = _links[u._linkKey], ix = g.indexOf(u); if (ix >= 0) g.splice(ix, 1); }
+      try { if (u._rpCleanup) u._rpCleanup(); } catch (e) {}  // desliga o ResizeObserver/resize-listener (makeResponsive) — senão vaza
+      if (u._linkKey && _links[u._linkKey]) { var g = _links[u._linkKey], ix = g.indexOf(u); if (ix >= 0) g.splice(ix, 1); }  // tira do grupo de sync
       try { u.destroy(); } catch (e) {} el._rpU = null;
     }
     while (el && el.firstChild) el.removeChild(el.firstChild);
@@ -851,6 +854,7 @@
     upPrice: upPrice,
     upOscillator: upOscillator,
     upScatter: upScatter,
-    upDual: upDual
+    upDual: upDual,
+    destroy: function (el) { clear(el); }  // teardown externo (radar.js fecha modal): destrói instância + RO + sync, sem vazar
   };
 })();

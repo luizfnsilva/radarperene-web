@@ -247,6 +247,14 @@
     ref.close = close;
     return ref;
   }
+  // ── teardown dos uPlots de um modal ao fechar (achado nº1: sem isto, preço+Ânima+risco vazavam — instância +
+  //    ResizeObserver + entrada no grupo de sync + closures da série — a cada abre/fecha). RPUplot.destroy = clear(el)
+  //    desliga o RO, tira do _links e destrói. `.rp-chart` = preço/dual · `.rp-osc` = Ânima e risco empilhados.
+  function rpTeardownCharts(root) {
+    if (!root || !window.RPUplot || !window.RPUplot.destroy) return;
+    var els = root.querySelectorAll(".rp-chart, .rp-osc");
+    for (var i = 0; i < els.length; i++) { try { window.RPUplot.destroy(els[i]); } catch (e) {} }
+  }
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&]/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]; }); }
   function cls(v) { return v == null ? "" : v >= 75 ? "hot" : v >= 55 ? "warm" : v <= 45 ? "cool" : ""; }
@@ -785,7 +793,7 @@
     if (meta && !(preCmp && preCmp.length >= 2)) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';  // no comparativo lead-lag a interpretação vira legenda do gráfico (não duplica aqui)
     h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
     var mw = document.createElement("div"); mw.className = "rp-mw"; mw.innerHTML = h;
-    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // guard = idempotente → unlockScroll roda 1× só
+    function close() { if (!mw.parentNode) return; rpTeardownCharts(mw); mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // teardown uPlot+RO (sem vazar) · guard = idempotente
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
@@ -1157,7 +1165,7 @@
     var head = '<button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button><div class="rp-mt">' + (L ? "Compare" : "Comparar") + ' — ' + esc(a.nome) + ' × ' + esc(b.nome) + '</div>';
     var mw = document.createElement("div"); mw.className = "rp-mw";
     mw.innerHTML = '<div class="rp rp-mc rp-cmp2" role="dialog" aria-modal="true">' + head + '<div class="rp-ml" style="opacity:.7;padding:14px 0">' + (L ? "loading…" : "carregando…") + '</div></div>';
-    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // guard = idempotente → unlockScroll roda 1× só
+    function close() { if (!mw.parentNode) return; rpTeardownCharts(mw); mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // teardown uPlot+RO (sem vazar) · guard = idempotente
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
     document.addEventListener("keydown", onkey);
@@ -1178,7 +1186,7 @@
     var head = '<button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button><div class="rp-mt">📚 ' + esc(nome || chave) + '</div>';
     var mw = document.createElement("div"); mw.className = "rp-mw";
     mw.innerHTML = '<div class="rp rp-mc rp-est" role="dialog" aria-modal="true">' + head + '<div class="rp-ml" style="opacity:.7;padding:14px 0">' + (L ? "loading…" : "carregando…") + '</div></div>';
-    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // guard = idempotente → unlockScroll roda 1× só
+    function close() { if (!mw.parentNode) return; rpTeardownCharts(mw); mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // teardown uPlot+RO (sem vazar) · guard = idempotente
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
     document.addEventListener("keydown", onkey);
