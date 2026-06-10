@@ -13,8 +13,14 @@
 (function () {
   // endereço absoluto do próprio radar.js — currentScript é válido AGORA (defer, exec síncrona), vira null no callback do boot.
   var RP_SRC = (document.currentScript && document.currentScript.src) || "";
-  var API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
-  var ESTUDOS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/estudos";  // P3.3 Biblioteca de Estudos (Edge Function própria)
+  // ★ API sob o MESMO domínio (radarperene.com/api/* → Worker → Supabase): edge-cache do /v1/serie anon (~1,14MB,
+  //   3,7s→0,2s medido), domínio único, observabilidade. Base = origin do PRÓPRIO radar.js (RP_SRC) → o embed de
+  //   terceiros chama de volta radarperene.com/api (não o supabase.co), e .com/.com.br batem cada um no seu worker.
+  //   fopt() segue mandando o token do Founder no Authorization → o proxy repassa → moat intacto (Founder recomputa
+  //   sem cache; anon compartilha a cache da borda). Auth (supabase-js no host) continua direto no Supabase, fora daqui.
+  var RP_ORIGIN = (function () { try { return new URL(RP_SRC).origin; } catch (e) { return (typeof location !== "undefined" ? location.origin : ""); } })();
+  var API = RP_ORIGIN + "/api/v1/digest";
+  var ESTUDOS_API = RP_ORIGIN + "/api/estudos";  // P3.3 Biblioteca de Estudos (via proxy /api)
   // ★ dedupe do digest: teaser + radar completo (mesma página/idioma) compartilham UMA busca → ~metade do time-to-insight.
   var _digestP = {};
   // ★ time-to-insight: se o worker já inlinou o digest do dia no HTML (window.__RP_DIGEST[lang]), usa-o direto

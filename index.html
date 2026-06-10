@@ -202,7 +202,7 @@
     </div>
     <script>
     (function(){
-      var API="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/tickers";
+      var API=location.origin+"/api/v1/tickers"; // ★ via proxy /api (mesmo domínio)
       var EN=/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname);
       var q=document.getElementById("rp-q"), box=document.getElementById("rp-q-res"); if(!q||!box) return;
       if(EN) q.placeholder="Search an asset — PETR4, NVDA, BTC, Gold, Dollar…";
@@ -373,8 +373,8 @@
 
 <script>
 (function(){
-  var DIGEST="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest";
-  var WAITLIST="https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/waitlist";
+  var DIGEST=location.origin+"/api/v1/digest"; // ★ via proxy /api
+  var WAITLIST=location.origin+"/api/waitlist"; // ★ via proxy /api
   // idioma: ?lang sobrepõe; senão pelo domínio (.com.br→pt, .com→en); pages.dev/local→pt
   var _q=new URLSearchParams(location.search).get("lang");
   var LANG=(_q==="en"||_q==="pt")?_q:(/\.com\.br$/i.test(location.hostname)?"pt":(/radarperene\.com$/i.test(location.hostname)?"en":"pt"));
@@ -521,10 +521,10 @@
   try{var _of=document.getElementById("rp-faq-ld");if(_of)_of.remove();var ld={"@context":"https://schema.org","@type":"FAQPage","inLanguage":LANG==="en"?"en":"pt-BR","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.id="rp-faq-ld";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
   // contador de fundadores ao vivo (escassez X/100) — degrada p/ "vagas limitadas" se o endpoint/secret não responder
   try{var FANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
-  fetch("https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/founders",{headers:{apikey:FANON,Authorization:"Bearer "+FANON}}).then(function(r){return r.json()}).then(function(f){var b=document.getElementById("fbadge");if(b&&f&&f.founders!=null)b.textContent=(LANG==="en"?(f.founders+"/100 founder seats taken · "+f.restantes+" left"):(f.founders+"/100 vagas preenchidas · "+f.restantes+" restantes"))}).catch(function(){})}catch(e){}
+  fetch(location.origin+"/api/v1/founders",{headers:{apikey:FANON,Authorization:"Bearer "+FANON}}).then(function(r){return r.json()}).then(function(f){var b=document.getElementById("fbadge");if(b&&f&&f.founders!=null)b.textContent=(LANG==="en"?(f.founders+"/100 founder seats taken · "+f.restantes+" left"):(f.founders+"/100 vagas preenchidas · "+f.restantes+" restantes"))}).catch(function(){})}catch(e){}
   // Hero quant-terminal: tag de regime AO VIVO (puxa o dado real, soma ao H1 editorial)
   try{var QA="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
-  fetch("https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/radar?lang="+LANG,{headers:{apikey:QA,Authorization:"Bearer "+QA}}).then(function(r){return r.json()}).then(function(d){var br=(d&&d.regime&&d.regime.brasil)||null,el=document.getElementById("qtag-txt");if(br&&el){var lbl=String(br.regime||"").toUpperCase().replace(/_/g," ");el.textContent=(LANG==="en"?"CURRENT SIGNAL · BR ":"SINAL ATUAL · BR ")+lbl+" · "+Math.round(br.score)+"/100";}}).catch(function(){})}catch(e){}
+  fetch(location.origin+"/api/v1/radar?lang="+LANG,{headers:{apikey:QA,Authorization:"Bearer "+QA}}).then(function(r){return r.json()}).then(function(d){var br=(d&&d.regime&&d.regime.brasil)||null,el=document.getElementById("qtag-txt");if(br&&el){var lbl=String(br.regime||"").toUpperCase().replace(/_/g," ");el.textContent=(LANG==="en"?"CURRENT SIGNAL · BR ":"SINAL ATUAL · BR ")+lbl+" · "+Math.round(br.score)+"/100";}}).catch(function(){})}catch(e){}
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   document.querySelectorAll("#radar-perene,[data-radar-perene]").forEach(function(n){n.setAttribute("data-lang",LANG);});  // teaser (topo) + radar completo herdam o idioma
@@ -563,7 +563,7 @@
     if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; window.RP_TOKEN=null; try{localStorage.removeItem("rp_premium")}catch(x){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} return; }
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     if(pw)pw.style.display="inline";
-    try{ var r=await fetch(SBU+"/functions/v1/radar-api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
+    try{ var r=await fetch(location.origin+"/api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
       if(d&&d.premium){ window.RP_PREMIUM=true; window.RP_TOKEN=sess.access_token;  /* ★ destrava os DADOS no /v1/serie (fopt manda este Bearer) — mesma sessão do selo; sem isso o Founder via teaser */ try{localStorage.setItem("rp_premium","1")}catch(e){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founding Member #":"Membro Fundador #")+d.rank;}
         try{ var rd=document.getElementById("radar"), he=document.querySelector(".hero");
           if(rd&&he&&!document.getElementById("rp-welcome")){ // logado: sobe o Radar pro topo + saudação do fundador (experiência premium)
