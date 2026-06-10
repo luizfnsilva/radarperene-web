@@ -621,7 +621,7 @@ export default {
       if (narr && narr.texto_html) {
         rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
         if (narr.jsonld) {
-          const ld = JSON.stringify(narr.jsonld).replace(/</g, "\u003c"); // seguro dentro de <script>
+          const ld = JSON.stringify(narr.jsonld).replace(/</g, "\\u003c"); // emite < escapado p/ </script>-safe no inline (barra dupla; "<" sozinho era no-op)
           rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } });
         }
       }
