@@ -122,6 +122,27 @@ async function _fetchCobertura() {
     return r.ok ? await r.json() : null;
   } catch (e) { return null; }
 }
+// ── Cache na borda do WORKER via Cache API (caches.default). ⚠️ cf:{cacheTtl,cacheEverything} NÃO cacheia os
+//    subrequests ao supabase.co: a resposta carrega Set-Cookie (__cf_bm, do Bot Management da CF na frente do
+//    Supabase) e a Cloudflare RECUSA cachear qualquer resposta com Set-Cookie. Workaround: guardamos uma cópia
+//    LIMPA (corpo + content-type, sem Set-Cookie) numa chave sintética → vira HIT nas próximas invocações do
+//    worker no mesmo colo. DEFENSIVO: qualquer falha → null (a home/página degrada pro caminho sem o dado).
+async function _cachedText(url, key, ttl) {
+  try {
+    const cache = caches.default;
+    const ck = new Request("https://rp-cache.internal/" + key);
+    let hit = await cache.match(ck);
+    if (!hit) {
+      const fresh = await fetch(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON } });
+      if (!fresh.ok) return null;
+      const body = await fresh.text();
+      hit = new Response(body, { headers: { "content-type": "application/json", "cache-control": "public, max-age=" + ttl } });
+      await cache.put(ck, hit.clone());  // cópia sem Set-Cookie → cacheável
+    }
+    return await hit.text();
+  } catch (e) { return null; }
+}
+async function _cachedJson(url, key, ttl) { const t = await _cachedText(url, key, ttl); if (t == null) return null; try { return JSON.parse(t); } catch (e) { return null; } }
 function _humLinhas(n, en) {
   if (n == null || !isFinite(n)) return null;
   if (n >= 1e6) { const m = Math.round(n / 1e5) / 10; return en ? (m + "M") : (String(m).replace(".", ",") + " mi"); }
@@ -552,19 +573,14 @@ export default {
       // ★ digest do dia (home payload) inlinado no HTML → o teaser/radar pintam SEM o round-trip cliente (~2-4s, o
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
       //   idêntico, moat intacto. cacheTtl 1800 (muda 1×/dia no pulso) mantém quente. Concorrente com narr/ultimas.
-      const _digP = fetch(NARR_API.replace("/v1/narrative", "/v1/digest") + "?lang=" + (isEN ? "en" : "pt"),
-        { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 1800, cacheEverything: true } })
-        .then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; });
+      const _lk = isEN ? "en" : "pt";
+      const _digP = _cachedText(NARR_API.replace("/v1/narrative", "/v1/digest") + "?lang=" + _lk, "digest-" + _lk, 1800);
 
       // ★ narrativa (AI-readability) + últimas leituras: disparadas JUNTO com o digest (acima) e aguardadas em
       //   PARALELO → o TTFB do worker = MAX(narr, ultimas, digest), não a soma (antes eram await sequencial).
       //   Todas DEFENSIVAS (falha → null, home intacta).
-      const _narrP = fetch(NARR_API + "?lang=" + (isEN ? "en" : "pt"),
-        { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } })
-        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
-      const _ultP = fetch(SNAPS_API + "?lang=" + (isEN ? "en" : "pt"),
-        { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } })
-        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      const _narrP = _cachedJson(NARR_API + "?lang=" + _lk, "narr-" + _lk, 3600);
+      const _ultP = _cachedJson(SNAPS_API + "?lang=" + _lk, "ult-" + _lk, 14400);
       let narr = null;
       try { narr = await _narrP; } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
       let ultimas = null;
@@ -614,8 +630,8 @@ export default {
       try {
         const dRaw = await _digP;
         if (dRaw) {
-          const dj = dRaw.replace(/</g, "\\u003c"); const lk = isEN ? "en" : "pt"; // emite < p/ todo "<" → </script>-safe no inline
-          rw = rw.on("body", { element(e) { e.append('<script>window.__RP_DIGEST=window.__RP_DIGEST||{};window.__RP_DIGEST["' + lk + '"]=' + dj + ';</script>', { html: true }); } });
+          const dj = dRaw.replace(/</g, "\\u003c"); // emite < p/ todo "<" → </script>-safe no inline
+          rw = rw.on("body", { element(e) { e.append('<script>window.__RP_DIGEST=window.__RP_DIGEST||{};window.__RP_DIGEST["' + _lk + '"]=' + dj + ';</script>', { html: true }); } });
         }
       } catch (e) { /* inline é opcional — nunca quebra a home */ }
       return rw.transform(res);
