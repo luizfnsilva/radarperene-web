@@ -157,6 +157,11 @@ function _humLinhas(n, en) {
 const _CONSENT = '<div id="rp-cookie" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#13171c;border-top:1px solid #222a31;padding:14px 18px;font:13px/1.5 \'Inter\',system-ui,sans-serif;color:#e8ebee"><div style="max-width:1080px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center"><span id="rp-ck-txt" style="flex:1;min-width:240px;color:#8b97a3">Usamos cookies de medição (analytics) para melhorar o site. Você escolhe — sem isso, nada é rastreado.</span><button id="rp-ck-no" style="background:transparent;border:1px solid #222a31;color:#e8ebee;padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer">Recusar</button><button id="rp-ck-yes" style="background:#c9a227;border:0;color:#0a0c0f;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer">Aceitar</button></div></div>' +
   '<script>(function(){var EN=/radarperene\\.com$/i.test(location.hostname)&&!/\\.com\\.br$/i.test(location.hostname);if(EN){var t=document.getElementById("rp-ck-txt");if(t)t.textContent="We use measurement (analytics) cookies to improve the site. Your choice — nothing is tracked without it.";document.getElementById("rp-ck-no").textContent="Decline";document.getElementById("rp-ck-yes").textContent="Accept";}var KEY="rp-consent";window.rpTrack=function(name){if(localStorage.getItem(KEY)!=="granted")return;try{if(window.gtag)gtag("event",name);}catch(e){}};function loadAhrefs(){var AH=/\\.com\\.br$/i.test(location.hostname)?"4LbsuoMGfXN4azVzHW6wPQ":"m9HGU5S9vnFEBS9K4J62rg";var sa=document.createElement("script");sa.async=1;sa.src="https://analytics.ahrefs.com/analytics.js";sa.setAttribute("data-key",AH);document.head.appendChild(sa);}loadAhrefs();function loadAnalytics(){var GA=/\\.com\\.br$/i.test(location.hostname)?"G-4LVGNLRV9L":"G-CWB77T178R";var s=document.createElement("script");s.async=1;s.src="https://www.googletagmanager.com/gtag/js?id="+GA;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());gtag("config",GA);}var c=localStorage.getItem(KEY),bar=document.getElementById("rp-cookie");if(c==="granted"){loadAnalytics();}else if(c!=="denied"){bar.style.display="block";}document.getElementById("rp-ck-yes").onclick=function(){localStorage.setItem(KEY,"granted");bar.style.display="none";loadAnalytics();};document.getElementById("rp-ck-no").onclick=function(){localStorage.setItem(KEY,"denied");bar.style.display="none";};})();<\/script>';
 function _consentRw(rw) { return rw.on("body", { element(e) { e.append(_CONSENT, { html: true }); } }); }
+// ── slug i18n do arquivo diário NO .com (EN): reescreve qualquer link /diario… → /daily… ANTES de servir, em vez de
+//    deixar o 301 /diario→/daily atuar no clique. O Ahrefs marca "Page has links to redirect" quando uma página
+//    LINKA p/ uma URL que redireciona — então o link tem de já apontar p/ o destino final. SEMPRE gated por isEN no
+//    chamador (no .com.br /diario é 200, não se toca). /daily não redireciona → sem loop. HTMLRewriter = streaming, custo ~0.
+function _enDailyRw(rw) { return rw.on('a[href^="/diario"]', { element(e) { const h = e.getAttribute("href"); if (h) e.setAttribute("href", h.replace(/^\/diario/, "/daily")); } }); }
 
 function _cobRewriter(rw, cob, en) {
   if (!cob) return rw;
@@ -394,7 +399,7 @@ export default {
       const _shm = _url.pathname.match(/^\/(api\/docs|founder|free|widgets)\/?$/);
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
-        if (_er.ok) return _consentRw(new HTMLRewriter()).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
+        if (_er.ok) return _enDailyRw(_consentRw(new HTMLRewriter())).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
       }
       // slug i18n do arquivo diário: no .com (EN) /diario → 301 /daily (o conteúdo é o mesmo, só o slug muda; evita slug PT no domínio EN). /daily não redireciona → sem loop.
       if (/^\/diario(\/|$)/.test(_url.pathname)) {
@@ -551,6 +556,7 @@ export default {
           .on("#radar-teaser", { element(e) { e.remove(); } })  // teaser da home não faz sentido na página de um ticker → remove (limpo p/ crawler e usuário)
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
+        if (_isEN) rw = _enDailyRw(rw); // /ativo herda a nav da home shell → /diario→/daily no .com
         if (narr && narr.texto_html) {
           rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
           if (narr.jsonld) { const ld = JSON.stringify(narr.jsonld).replace(/</g, "\\u003c"); rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } }); }
@@ -568,7 +574,7 @@ export default {
       if (!ct.includes("text/html")) return res; // não-HTML: intacto
       // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
       const cob = await _fetchCobertura();
-      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); return rw.transform(res); } // não-home: consentimento+analytics + cobertura
+      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); if (isEN) rw = _enDailyRw(rw); return rw.transform(res); } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com)
 
       // ★ digest do dia (home payload) inlinado no HTML → o teaser/radar pintam SEM o round-trip cliente (~2-4s, o
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
@@ -610,6 +616,7 @@ export default {
         rw = rw
           .on("#lng-cta", { element(e) { e.setAttribute("href", "/concepts/"); } })
           .on("#l-sobre", { element(e) { e.setAttribute("href", "/about"); } });
+        rw = _enDailyRw(rw); // nav/footer/CTA do arquivo diário no .com → /daily (evita 301)
       }
       if (narr && narr.texto_html) {
         rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
