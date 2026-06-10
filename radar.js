@@ -234,6 +234,18 @@
       ".rp-mc .rp-lock{border:1px dashed var(--_accent);border-radius:10px;padding:18px 16px;text-align:center;background:var(--_card2);min-height:120px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-lock b{display:block;font-size:13px;margin-bottom:5px;color:var(--_txt)}.rp-mc .rp-lock small{font-size:10.5px;color:var(--_dim);line-height:1.5}.rp-mc .rp-lock .cta{display:inline-block;margin-top:11px;background:var(--_accent);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none}.rp-mc .rp-lock .rp-anchor{display:block;margin-top:9px;font-size:10.5px;font-style:normal;color:var(--_warm);opacity:.92}.rp-mc .rp-gate{position:relative}.rp-mc .rp-gate .rp-blur{filter:blur(7px) saturate(.6);opacity:.5;pointer-events:none;user-select:none}.rp-mc .rp-gate .rp-lock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:90%;width:340px;box-shadow:0 10px 34px rgba(0,0,0,.45)}" +
       ".rp-mc .rp-chart{position:relative;min-height:200px}" +  // P1#4/#6: reserva a altura do gráfico → não colapsa→expande enquanto o uPlot monta (sem pulo na abertura/troca de período)
       ".rp-mc .rp-xh{position:absolute;top:0;bottom:16px;width:1px;background:var(--_accent);opacity:.55;pointer-events:none;transform:translateX(-0.5px)}.rp-mc .rp-xt{position:absolute;top:0;transform:translateX(-50%);background:var(--_accent);color:#fff;font-size:9px;font-family:var(--rp-mono,ui-monospace,monospace);padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}.rp-mc .rp-yax{position:absolute;top:0;left:0;right:0;bottom:16px;pointer-events:none}.rp-mc .rp-yl{position:absolute;right:3px;transform:translateY(-50%);font-family:var(--_mono);font-size:9.5px;font-weight:600;color:var(--_txt);background:var(--_card2);padding:0 3px;border-radius:2px;opacity:.95;letter-spacing:-.2px;font-feature-settings:'tnum';box-shadow:0 0 0 1px var(--_line)}.rp-mc .rp-bsel{position:absolute;top:0;bottom:16px;background:var(--_accent);opacity:.14;pointer-events:none;border-left:1px solid var(--_accent);border-right:1px solid var(--_accent)}.rp-mc .rp-reset{margin-top:6px;font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer}" +
+      // ── Fase 1: drawer "Explorar" (slide-in direita / bottom-sheet no mobile). z-index 10 ABAIXO do .rp-mw (modal empilha por cima).
+      ".rp-dw{position:fixed;inset:0;z-index:2147483590;background:rgba(8,10,14,0);transition:background .22s ease;display:flex;justify-content:flex-end}" +
+      ".rp-dw.rp-open{background:rgba(8,10,14,.5)}" +
+      ".rp-dc{position:relative;background:var(--_bg);border-left:1px solid var(--_line);width:min(480px,92vw);max-width:480px;height:100%;overflow:auto;padding:18px 18px 26px;box-shadow:-18px 0 60px rgba(0,0,0,.32);transform:translateX(100%);transition:transform .22s cubic-bezier(.22,.61,.36,1);font-family:var(--_font);cursor:default}" +
+      ".rp-dw.rp-open .rp-dc{transform:translateX(0)}" +
+      ".rp-dc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-dc .rp-x:hover{color:var(--_accent)}" +
+      ".rp-dc .rp-dt{font-weight:700;font-size:15px;margin:0 28px 10px 0}" +
+      ".rp-dc .rp-dtab{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--_line);margin-bottom:11px}" +
+      ".rp-dc .rp-dtb{font-size:12px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--_dim);padding:5px 9px;margin-bottom:-1px;cursor:pointer;font-family:var(--_font)}" +
+      ".rp-dc .rp-dtb:hover{color:var(--_txt)}.rp-dc .rp-dtb.on{color:var(--_accent);border-bottom-color:var(--_accent);font-weight:700}" +
+      ".rp-dc .rp-dbody{font-size:12px;color:var(--_txt)}" +
+      "@media(max-width:600px){.rp-dw{justify-content:stretch;align-items:flex-end}.rp-dc{width:100%;max-width:100%;height:auto;max-height:90vh;border-left:0;border-top:1px solid var(--_line);transform:translateY(100%);box-shadow:0 -18px 60px rgba(0,0,0,.32)}.rp-dw.rp-open .rp-dc{transform:translateY(0)}}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -283,6 +295,44 @@
     //   retém o nó do gráfico e, via a árvore DESTACADA (parentNode/childNodes), o MODAL INTEIRO a cada abre/fecha
     //   (~189 nós + ~19 listeners/ciclo). O prune lazy (linha ~87) só roda no toggle de tema; aqui libera JÁ no fechar.
     for (var j = _upMounted.length - 1; j >= 0; j--) { var mEl = _upMounted[j].el; if (!mEl || root.contains(mEl) || !mEl.isConnected) _upMounted.splice(j, 1); }
+  }
+
+  // ── Fase 1: UM drawer "Explorar" com abas (Mercados/Comparações/Estudos/Termômetros). Espelha o ciclo dos modais
+  //    (lockScroll/unlockScroll/rpTeardownCharts/_upMounted). z-index 10 ABAIXO do .rp-mw → openBig aberto de dentro
+  //    do drawer empilha por cima. Lazy por aba (build na 1ª ativação, cacheado). Abas registradas pelos sub-steps.
+  var RP_TABS = [];  // { key, lpt, len, build(pane, ctx) } — ctx = { close, lang, registerChart(el, draw) }
+  function rpRegisterTab(key, lpt, len, build) { if (!RP_TABS.some(function (t) { return t.key === key; })) RP_TABS.push({ key: key, lpt: lpt, len: len, build: build }); }
+  function rpOpenExplorar(lang, initialTab) {
+    if (!RP_TABS.length) return null;  // inerte enquanto nenhuma aba estiver registrada (1A entrega o shell sem abas)
+    var L = lang === "en";
+    var dw = document.createElement("div"); dw.className = "rp-dw";
+    var tabs = RP_TABS.map(function (t) { return '<button class="rp-dtb" data-tab="' + esc(t.key) + '" role="tab">' + esc(L ? t.len : t.lpt) + '</button>'; }).join("");
+    dw.innerHTML = '<div class="rp rp-dc" role="dialog" aria-modal="true" aria-label="' + (L ? "Explore" : "Explorar") + '">'
+      + '<button class="rp-x" aria-label="' + (L ? "Close" : "Fechar") + '">×</button>'
+      + '<div class="rp-dt">' + (L ? "Explore" : "Explorar") + '</div>'
+      + (RP_TABS.length > 1 ? '<div class="rp-dtab" role="tablist">' + tabs + '</div>' : '')
+      + '<div class="rp-dbody"></div></div>';
+    var body = dw.querySelector(".rp-dbody"), built = {};
+    function onkey(e) { if (e.key === "Escape") close(); }
+    function close() { if (!dw.parentNode) return; rpTeardownCharts(dw); dw.classList.remove("rp-open"); document.removeEventListener("keydown", onkey); setTimeout(function () { if (dw.parentNode) dw.parentNode.removeChild(dw); }, 220); unlockScroll(); }  // remove o nó após a transição de saída (~220ms); ref-count do lockScroll permite aninhar drawer→modal
+    var ctx = { close: close, lang: lang, registerChart: function (el, draw) { _upMounted.push({ el: el, draw: draw }); } };
+    function showTab(key) {
+      var t = RP_TABS.filter(function (x) { return x.key === key; })[0] || RP_TABS[0];
+      dw.querySelectorAll(".rp-dtb").forEach(function (b) { var on = b.getAttribute("data-tab") === t.key; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
+      if (!built[t.key]) { var pane = document.createElement("div"); pane.className = "rp-dpane"; body.appendChild(pane); built[t.key] = pane; try { t.build(pane, ctx); } catch (e) { pane.innerHTML = '<div class="rp-ml" style="opacity:.7">—</div>'; } }  // build lazy + cacheado
+      for (var k in built) if (built.hasOwnProperty(k)) built[k].style.display = (k === t.key) ? "" : "none";
+    }
+    dw.addEventListener("click", function (e) {
+      var t = e.target;
+      if (t === dw) { close(); return; }                                  // backdrop
+      if (t.getAttribute && t.className === "rp-x") { close(); return; }    // ×
+      var tb = t.getAttribute && t.getAttribute("data-tab"); if (tb) showTab(tb);  // troca de aba (sem refetch — cacheado)
+    });
+    document.addEventListener("keydown", onkey);
+    lockScroll(); document.body.appendChild(dw);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { dw.classList.add("rp-open"); }); });  // double-rAF: pinta o transform inicial antes de animar a entrada
+    showTab(initialTab || RP_TABS[0].key);
+    return { close: close };
   }
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&"']/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&#34;", "'": "&#39;" }[c]; }); }  // escapa aspas também: ~30 sinks usam esc() DENTRO de atributos (data-nome="…", data-ll="…") — sem isto um " em valor de DB/feed/LLM quebra o atributo (attribute-injection XSS). Entidades renderizam idênticas em texto → zero regressão visual.
