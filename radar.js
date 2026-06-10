@@ -260,7 +260,7 @@
     for (var j = _upMounted.length - 1; j >= 0; j--) { var mEl = _upMounted[j].el; if (!mEl || root.contains(mEl) || !mEl.isConnected) _upMounted.splice(j, 1); }
   }
 
-  function esc(x) { return String(x == null ? "" : x).replace(/[<>&]/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]; }); }
+  function esc(x) { return String(x == null ? "" : x).replace(/[<>&"']/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&#34;", "'": "&#39;" }[c]; }); }  // escapa aspas também: ~30 sinks usam esc() DENTRO de atributos (data-nome="…", data-ll="…") — sem isto um " em valor de DB/feed/LLM quebra o atributo (attribute-injection XSS). Entidades renderizam idênticas em texto → zero regressão visual.
   function cls(v) { return v == null ? "" : v >= 75 ? "hot" : v >= 55 ? "warm" : v <= 45 ? "cool" : ""; }
   function clz(z) { return z >= 2 ? "hot" : z >= 1 ? "warm" : z <= -1 ? "cool" : ""; }
   // sparkline tríade: histórico sólido → "hoje" (hairline) → projeção linear tracejada/fraca (P7: não é previsão)
