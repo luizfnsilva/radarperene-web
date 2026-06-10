@@ -690,4 +690,3 @@ async function _route(request, env) {
       return res; // nunca quebra: na dúvida, serve o original
     }
   }
-}
