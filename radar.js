@@ -43,7 +43,26 @@
   //   /v1/me no host) OU flag local rp_premium. A página-host também expõe window.RP_TOKEN (= access_token Supabase) p/ o fopt()
   //   destravar os DADOS no /v1/serie. UI (rpIsPro) e dados (RP_TOKEN) saem da MESMA sessão → não divergem mais.
   function rpIsPro() { var p = (typeof window !== "undefined" && window.RP_PREMIUM === true); try { p = p || localStorage.getItem("rp_premium") === "1"; } catch (e) {} return p; }
-  var RP_CAT = [];  // catálogo de séries cruzáveis (estúdio) — montado no render a partir do digest, cresce sozinho com novos tickers
+  var RP_CAT = [];  // catálogo de séries cruzáveis (estúdio) — SEED do digest (~40, render inicial). cresce sozinho com novos tickers
+  // ★ Fase 0 — universo COMPLETO (~233, auto-crescente) do /v1/catalog: agrupado por setor/classe. Lazy (1ª vez que o picker abre),
+  //   via fopt() (auth → sem 401). Fecha o gap site↔widget: o picker do Estúdio alcança os mesmos ativos que /ativo + sitemap.
+  var RP_CAT_FULL = null, RP_CAT_LOADING = false, RP_CAT_WAIT = [];
+  function rpEnsureCatalog(lang, cb) {
+    if (RP_CAT_FULL) return cb();
+    RP_CAT_WAIT.push(cb);
+    if (RP_CAT_LOADING) return;
+    RP_CAT_LOADING = true;
+    fetch(API.replace("/v1/digest", "/v1/catalog") + (lang === "en" ? "?lang=en" : ""), fopt())
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var uni = (d && d.grupos) ? d.grupos.map(function (g) { return { cat: g.cat, items: g.items }; }) : [];
+        var SYNTH = { intermercado: 1, intermercado_ratio: 1, intermercado_den: 1, macro: 1 };  // composições intermercado + imóveis/FIPEZAP + fiscal vivem SÓ no digest (fora do universo /v1/tickers) → preserva-as
+        var digestOnly = (RP_CAT || []).filter(function (g) { return g.items.some(function (it) { return SYNTH[it.cls]; }); });
+        RP_CAT_FULL = uni.length ? uni.concat(digestOnly) : RP_CAT;
+        RP_CAT_LOADING = false; var w = RP_CAT_WAIT; RP_CAT_WAIT = []; w.forEach(function (f) { f(); });
+      })
+      .catch(function () { RP_CAT_LOADING = false; var w = RP_CAT_WAIT; RP_CAT_WAIT = []; w.forEach(function (f) { f(); }); });  // falha → segue com o seed do digest
+  }
   var STYLE_ID = "rp-radar-style";
 
   // ── Sprint 1: engine de gráfico atrás de flag. Default = SVG legado (zero mudança). ─────────────
@@ -1022,19 +1041,23 @@
           var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 0; setChart(isFinite(fr) ? fr : 0);
         }
       };
-      var openPicker = function () {
-        if (studio.querySelector(".rp-pkbox")) { studio.querySelector(".rp-pkbox").remove(); return; }
-        var pk = document.createElement("div"); pk.className = "rp-pkbox"; pk.style.cssText = "margin-top:5px;max-height:170px;overflow:auto;border:1px solid var(--_line);border-radius:7px;padding:6px;background:var(--_card2)";
+      var fillPicker = function (pk) {  // preenche o picker da fonte ATUAL (universo completo se já carregou; senão o seed do digest)
+        var src = (RP_CAT_FULL && RP_CAT_FULL.length) ? RP_CAT_FULL : RP_CAT;
         var chosen = {}; cmp.forEach(function (c) { chosen[c.cls + ":" + c.cod] = 1; });
         var html = "";
-        RP_CAT.forEach(function (g) {
+        src.forEach(function (g) {
           var items = g.items.filter(function (it) { return !chosen[it.cls + ":" + it.cod]; });
           if (!items.length) return;
           html += '<div class="rp-ml" style="opacity:.6;margin-top:3px">' + esc(g.cat) + '</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px">' + items.map(function (it) { return '<button class="rp-pk" data-cod="' + esc(it.cod) + '" data-cls="' + esc(it.cls) + '" data-nome="' + esc(it.nome) + '" style="font-family:var(--_mono);font-size:10px;background:transparent;border:1px solid var(--_line);color:var(--_dim);border-radius:4px;padding:2px 7px;cursor:pointer">' + esc(it.nome) + '</button>'; }).join("") + '</div>';
         });
         pk.innerHTML = html || '<div class="rp-ml" style="opacity:.6">' + (L ? "nothing else to add" : "nada mais a adicionar") + '</div>';
-        studio.appendChild(pk);
         pk.querySelectorAll(".rp-pk").forEach(function (el) { el.addEventListener("click", function (e) { e.stopPropagation(); if (cmp.length >= 3) return; cmp.push({ cod: el.getAttribute("data-cod"), cls: el.getAttribute("data-cls"), nome: el.getAttribute("data-nome") }); applyMode(); }); });
+      };
+      var openPicker = function () {
+        if (studio.querySelector(".rp-pkbox")) { studio.querySelector(".rp-pkbox").remove(); return; }
+        var pk = document.createElement("div"); pk.className = "rp-pkbox"; pk.style.cssText = "margin-top:5px;max-height:170px;overflow:auto;border:1px solid var(--_line);border-radius:7px;padding:6px;background:var(--_card2)";
+        fillPicker(pk); studio.appendChild(pk);  // mostra JÁ (seed); upgrade p/ o universo completo quando o /v1/catalog chega
+        rpEnsureCatalog(lang, function () { if (pk.parentNode) fillPicker(pk); });
       };
       var renderStudio = function () {
         var html = '<div class="rp-ml" style="opacity:.7">' + (L ? "Studio · cross up to 3 (any series)" : "Estúdio · cruze até 3 (qualquer série)") + '</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;align-items:center">';
