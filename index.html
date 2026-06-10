@@ -548,7 +548,8 @@
 })();
 </script>
 <!-- Login leve do Radar free (Supabase Auth) → selo do nº de fundador + desbloqueio em qq lugar. Atendimento/cobrança = Stripe. -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/vendor/supabase-js/supabase.min.js"></script><!-- ★ self-host (era cdn.jsdelivr @2 flutuante sem SRI): tira a CDN do caminho de auth do Founder = fecha o supply-chain. Bytes = @2.108.1 dist/umd (idênticos ao que a CDN servia), global window.supabase preservado. -->
+
 <script>(function(){
   if(!window.supabase)return;
   var SBU="https://zcjtkgltrxdnlacezpny.supabase.co";
