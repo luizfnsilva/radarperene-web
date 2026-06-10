@@ -353,9 +353,13 @@
       var t = e.target; if (!t || !t.getAttribute || ("" + (t.className || "")).indexOf("rp-mkt") < 0) return;
       var cod = t.getAttribute("data-cod"), cls = t.getAttribute("data-cls"), nome = t.getAttribute("data-nome");
       if (!cod) return; t.style.opacity = ".5";
+      var pend = rpLoadingModal(ctx.lang);  // feedback imediato: "Carregando gráfico…" (séries grandes levam ~2s; o chip esmaecido sozinho não bastava). Backdrop cancela.
       fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(cod) + "&classe=" + encodeURIComponent(cls), fopt())
-        .then(function (r) { return r.json(); }).then(function (s) { t.style.opacity = ""; if (s && s.hist && s.hist.length) openBig(s, nome, "", ctx.lang, null); })
-        .catch(function () { t.style.opacity = ""; });
+        .then(function (r) { return r.json(); }).then(function (s) {
+          t.style.opacity = ""; pend.close(); if (pend.cancelled) return;  // usuário fechou o loading enquanto carregava → não abre
+          if (s && s.hist && s.hist.length) openBig(s, nome, "", ctx.lang, null);
+        })
+        .catch(function () { t.style.opacity = ""; pend.close(); });
     });
   }
   rpRegisterTab("mercados", "Mercados", "Markets", rpBuildMercados);
