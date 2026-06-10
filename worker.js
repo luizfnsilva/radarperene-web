@@ -679,10 +679,11 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/" + host + "/" + _lk;
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v1/" + host + "/" + _lk; // /v1/ versiona a chave (busta poison antigo)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
+      const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
-      if (_hfresh) return _hserve(await _hfresh.text()); // edge HIT fresco (≤120s) → sem SSR/awaits
+      if (_hfresh) { const _ff = await _hfresh.text(); if (_hok(_ff)) return _hserve(_ff); } // edge HIT fresco (≤120s) só se completo
       const _renderHome = async () => {
       const _digP = _cachedText(NARR_API.replace("/v1/narrative", "/v1/digest") + "?lang=" + _lk, "digest-" + _lk, 1800);
 
@@ -751,15 +752,15 @@ async function _route(request, env, ctx) {
       } catch (e) { /* inline é opcional — nunca quebra a home */ }
       return await rw.transform(res).text(); // buffer do HTML reescrito → cacheável
       };
-      const _hput = (b) => Promise.all([
+      const _hput = (b) => _hok(b) ? Promise.all([                                                                                                                      // só cacheia render COMPLETO (anti-poison)
         _hcache.put(new Request(_hk), new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120" } })),          // fresco (120s)
         _hcache.put(new Request(_hk + "/stale"), new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=86400" } })), // stale (24h)
-      ]).catch(function () { });
+      ]).catch(function () { }) : Promise.resolve();
       const _hstaleR = await _hcache.match(new Request(_hk + "/stale"));
-      if (_hstaleR && ctx && ctx.waitUntil) { ctx.waitUntil(_renderHome().then(_hput).catch(function () { })); return _hserve(await _hstaleR.text()); } // serve stale JÁ, revalida em bg
-      const _hb = await _renderHome(); // sem stale (1ª vez/colo frio) → render inline
-      if (ctx && ctx.waitUntil) ctx.waitUntil(_hput(_hb));
-      return _hserve(_hb);
+      if (_hstaleR && ctx && ctx.waitUntil) { const _hs = await _hstaleR.text(); if (_hok(_hs)) { ctx.waitUntil(_renderHome().then(_hput).catch(function () { })); return _hserve(_hs); } } // serve stale (se completo) JÁ + revalida bg
+      const _hb = await _renderHome(); // sem stale válido → render inline
+      if (_hok(_hb)) { if (ctx && ctx.waitUntil) ctx.waitUntil(_hput(_hb)); return _hserve(_hb); }
+      return _hserve(await env.ASSETS.fetch(request).then(function (r) { return r.text(); }).catch(function () { return _hb || ""; })); // render falhou → asset cru (válido), SEM cache
     } catch (e) {
       return res; // nunca quebra: na dúvida, serve o original
     }
