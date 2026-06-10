@@ -166,6 +166,37 @@ async function _cachedText(url, key, ttl) {
   } catch (e) { return null; }
 }
 async function _cachedJson(url, key, ttl) { const t = await _cachedText(url, key, ttl); if (t == null) return null; try { return JSON.parse(t); } catch (e) { return null; } }
+// ── PROXY /api/* → Supabase functions, sob o MESMO domínio. Forward de Authorization+apikey do cliente → o
+//    token-gating do moat (premiumFromReq valida o JWT real) sobrevive intacto. GET ANON → _cachedText (single-flight
+//    + stale-on-error + cópia limpa sem Set-Cookie); Founder (Bearer≠anon) e POST → pass-through SEM cache (jamais
+//    grava resposta premium na chave anon → casa com o Vary:Authorization do edge, moat preservado). Anti-SSRF: host
+//    fixo + só radar-api/v1/* | estudos | waitlist alcançáveis (regex sem '.' → sem traversal); query sanitizada no edge.
+const _API_CORS = { "access-control-allow-origin": "*", "access-control-allow-headers": "authorization, apikey, content-type", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-max-age": "86400" };
+function _apiUpstream(sub, search) {
+  const u = sub.toLowerCase().indexOf("v1/") === 0 ? "/radar-api/" + sub : "/" + sub;
+  return "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1" + u + (search || "");
+}
+async function _proxyApi(request, _url, sub) {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: _API_CORS });
+  const upstream = _apiUpstream(sub, _url.search);
+  const auth = request.headers.get("Authorization") || "";
+  const apikey = request.headers.get("apikey") || NARR_ANON;
+  const isAnon = !auth || auth === "Bearer " + NARR_ANON;
+  try {
+    // GET anon = a esmagadora maioria do tráfego (free + embed) → cacheável na borda. Chave = sub+query ENCODADA (sem ? & = soltos).
+    if (request.method === "GET" && isAnon) {
+      const body = await _cachedText(upstream, "api-" + encodeURIComponent(sub + _url.search), 900);
+      if (body != null) return new Response(body, Object.assign({ status: 200 }, { headers: Object.assign({ "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=900", "x-rp-proxy": "anon" }, _API_CORS) }));
+      return new Response('{"erro":"indisponivel"}', { status: 503, headers: Object.assign({ "content-type": "application/json" }, _API_CORS) }); // upstream down + sem stale → degrada, não 500
+    }
+    // Founder (GET c/ token real) ou POST (waitlist) → pass-through, forward do Authorization do cliente, SEM cache.
+    const init = { method: request.method, headers: { apikey: apikey, Authorization: auth || ("Bearer " + NARR_ANON) } };
+    if (request.method !== "GET" && request.method !== "HEAD") { init.body = await request.text(); init.headers["content-type"] = request.headers.get("content-type") || "application/json"; }
+    const r = await _fetchT(upstream, init);
+    const txt = await r.text();
+    return new Response(txt, { status: r.status, headers: Object.assign({ "content-type": r.headers.get("content-type") || "application/json; charset=utf-8", "x-rp-proxy": isAnon ? "anon-nocache" : "founder" }, _API_CORS) });
+  } catch (e) { return new Response('{"erro":"indisponivel"}', { status: 503, headers: Object.assign({ "content-type": "application/json" }, _API_CORS) }); }
+}
 function _humLinhas(n, en) {
   if (n == null || !isFinite(n)) return null;
   if (n >= 1e6) { const m = Math.round(n / 1e5) / 10; return en ? (m + "M") : (String(m).replace(".", ",") + " mi"); }
@@ -501,6 +532,13 @@ async function _route(request, env) {
       } catch (e) {
         return new Response("Not found.", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
       }
+    }
+    // ── /api/* — proxy unificado do edge (radar-api/v1/* · estudos · waitlist). Tira o cliente de cima do supabase.co
+    //    direto → edge-cache do /v1/serie anon, domínio único, observabilidade. /api/docs (página) e a
+    //    /api/leitura-do-dia.json (handler abaixo) NÃO casam o regex (exige v1/ | estudos | waitlist) → intactas. ──
+    {
+      const _am = _url.pathname.match(/^\/api\/(v1\/[a-z0-9_\/-]+|estudos|waitlist)$/i);
+      if (_am) return _proxyApi(request, _url, _am[1]);
     }
     // ── /api/leitura-do-dia.json — endpoint público (documentado em /api/docs): proxy do edge, CORS aberto, cache 4h ──
     if (_url.pathname === "/api/leitura-do-dia.json") {
