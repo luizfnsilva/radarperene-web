@@ -448,12 +448,17 @@ function _renderDiarioIndex(data, origin, lang) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     let _resp;
-    try { _resp = await _route(request, env); } catch (e) { _resp = new Response("", { status: 500 }); }
+    try { _resp = await _route(request, env, ctx); } catch (e) { _resp = new Response("", { status: 500 }); }
     return _applySec(_resp, request);
   },
 };
+// ── A: Link de preconnect às origens de fonte (Google Fonts) p/ Early Hints (103). O LCP da home é o H1 serif
+//    (Fraunces); o TTFB do worker é represado pelos awaits (digest/narr/ultimas), então o 103 emitido ANTES do
+//    corpo abre a conexão TLS ao CDN de fonte durante essa janela. URLs SEM query (sem vírgula/ponto-e-vírgula que
+//    quebram o parsing do header Link). CF guarda o Link e replica como 103 nas próximas req (Early Hints ON). ──
+const _FONT_LINK = "<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect; crossorigin";
 // ── headers de segurança em 1 chokepoint (TODA resposta). Baixo risco; framing liberado só p/ o iframe embed. ──
 function _applySec(resp, request) {
   try {
@@ -462,6 +467,7 @@ function _applySec(resp, request) {
     h.set("X-Content-Type-Options", "nosniff");
     h.set("Referrer-Policy", "strict-origin-when-cross-origin");
     h.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+    if ((resp.headers.get("content-type") || "").includes("text/html") && !h.has("Link")) h.set("Link", _FONT_LINK); // A: só em HTML; não pisa Link já setado
     const _pn = new URL(request.url).pathname;
     // Forma 3 = iframe embedável por terceiros. CF 307-redireciona /radar-embed.html → /radar-embed (extensionless),
     // então AMBOS precisam de frame-ancestors * (senão o iframe quebra em sites de terceiros).
@@ -472,7 +478,7 @@ function _applySec(resp, request) {
   } catch (e) { return resp; }
 }
 // roteador real (envolvido por _applySec acima)
-async function _route(request, env) {
+async function _route(request, env, ctx) {
     const _url = new URL(request.url);
     const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
     // ── Páginas de slug COMPARTILHADO (api/docs, founder, free): o PT vive em index.html (default no .com.br), o EN em
@@ -669,6 +675,15 @@ async function _route(request, env) {
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
       //   idêntico, moat intacto. cacheTtl 1800 (muda 1×/dia no pulso) mantém quente. Concorrente com narr/ultimas.
       const _lk = isEN ? "en" : "pt";
+      // ── B: edge-cache da home RENDERIZADA + SWR (Cache API). O HTML é anon-idêntico por host+lang (digest é
+      //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
+      //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
+      //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
+      const _hcache = caches.default, _hk = "https://rp-home.internal/" + host + "/" + _lk;
+      const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
+      const _hfresh = await _hcache.match(new Request(_hk));
+      if (_hfresh) return _hserve(await _hfresh.text()); // edge HIT fresco (≤120s) → sem SSR/awaits
+      const _renderHome = async () => {
       const _digP = _cachedText(NARR_API.replace("/v1/narrative", "/v1/digest") + "?lang=" + _lk, "digest-" + _lk, 1800);
 
       // ★ narrativa (AI-readability) + últimas leituras: disparadas JUNTO com o digest (acima) e aguardadas em
@@ -734,7 +749,17 @@ async function _route(request, env) {
           rw = rw.on("body", { element(e) { e.append('<script>window.__RP_DIGEST=window.__RP_DIGEST||{};window.__RP_DIGEST["' + _lk + '"]=' + dj + ';</script>', { html: true }); } });
         }
       } catch (e) { /* inline é opcional — nunca quebra a home */ }
-      return rw.transform(res);
+      return await rw.transform(res).text(); // buffer do HTML reescrito → cacheável
+      };
+      const _hput = (b) => Promise.all([
+        _hcache.put(new Request(_hk), new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120" } })),          // fresco (120s)
+        _hcache.put(new Request(_hk + "/stale"), new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=86400" } })), // stale (24h)
+      ]).catch(function () { });
+      const _hstaleR = await _hcache.match(new Request(_hk + "/stale"));
+      if (_hstaleR && ctx && ctx.waitUntil) { ctx.waitUntil(_renderHome().then(_hput).catch(function () { })); return _hserve(await _hstaleR.text()); } // serve stale JÁ, revalida em bg
+      const _hb = await _renderHome(); // sem stale (1ª vez/colo frio) → render inline
+      if (ctx && ctx.waitUntil) ctx.waitUntil(_hput(_hb));
+      return _hserve(_hb);
     } catch (e) {
       return res; // nunca quebra: na dúvida, serve o original
     }
