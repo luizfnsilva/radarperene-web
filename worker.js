@@ -556,20 +556,19 @@ export default {
         { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 1800, cacheEverything: true } })
         .then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; });
 
-      // AI-readability (Sprint A): busca a leitura do dia em prosa (cacheada 1h, DEFENSIVA) p/ injetar como texto + JSON-LD
+      // ★ narrativa (AI-readability) + últimas leituras: disparadas JUNTO com o digest (acima) e aguardadas em
+      //   PARALELO → o TTFB do worker = MAX(narr, ultimas, digest), não a soma (antes eram await sequencial).
+      //   Todas DEFENSIVAS (falha → null, home intacta).
+      const _narrP = fetch(NARR_API + "?lang=" + (isEN ? "en" : "pt"),
+        { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } })
+        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      const _ultP = fetch(SNAPS_API + "?lang=" + (isEN ? "en" : "pt"),
+        { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } })
+        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
       let narr = null;
-      try {
-        const nr = await fetch(NARR_API + "?lang=" + (isEN ? "en" : "pt"),
-          { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
-        if (nr.ok) narr = await nr.json();
-      } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
-
-      // Últimas leituras (3 diários mais recentes) → injeta no #rp-ultimas (crawler-first, links pro arquivo)
+      try { narr = await _narrP; } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
       let ultimas = null;
-      try {
-        const ur = await fetch(SNAPS_API + "?lang=" + (isEN ? "en" : "pt"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 14400, cacheEverything: true } });
-        if (ur.ok) { const uj = await ur.json(); ultimas = (uj.itens || []).slice(0, 3); }
-      } catch (e) { /* opcional */ }
+      try { const uj = await _ultP; if (uj) ultimas = (uj.itens || []).slice(0, 3); } catch (e) { /* opcional */ }
 
       let rw = new HTMLRewriter();
       rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
