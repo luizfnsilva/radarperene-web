@@ -246,6 +246,10 @@
       ".rp-dc .rp-dtb:hover{color:var(--_txt)}.rp-dc .rp-dtb.on{color:var(--_accent);border-bottom-color:var(--_accent);font-weight:700}" +
       ".rp-dc .rp-dbody{font-size:12px;color:var(--_txt)}" +
       "@media(max-width:600px){.rp-dw{justify-content:stretch;align-items:flex-end}.rp-dc{width:100%;max-width:100%;height:auto;max-height:90vh;border-left:0;border-top:1px solid var(--_line);transform:translateY(100%);box-shadow:0 -18px 60px rgba(0,0,0,.32)}.rp-dw.rp-open .rp-dc{transform:translateY(0)}}" +
+      // Fase 1B: porta discreta "Explorar →" (não é menu) + grade da aba Mercados dentro do drawer
+      ".rp .rp-explore{display:inline-flex;align-items:center;gap:5px;margin:2px 0 8px;font-size:12.5px;color:var(--_dim);background:transparent;border:0;cursor:pointer;padding:5px 0;font-family:var(--_font)}.rp .rp-explore:hover{color:var(--_accent)}.rp .rp-explore .a{transition:transform .15s}.rp .rp-explore:hover .a{transform:translateX(3px)}" +
+      ".rp-dc .rp-mkg{margin-bottom:13px}.rp-dc .rp-mkh{font-size:11px;color:var(--_dim);font-weight:700;margin-bottom:5px}.rp-dc .rp-mkt-row{display:flex;gap:5px;flex-wrap:wrap}" +
+      ".rp-dc .rp-mkt{font-family:var(--_mono);font-size:11px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:6px;padding:4px 9px;cursor:pointer;transition:border-color .12s,color .12s}.rp-dc .rp-mkt:hover{border-color:var(--_accent);color:var(--_accent)}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -334,6 +338,27 @@
     showTab(initialTab || RP_TABS[0].key);
     return { close: close };
   }
+  // aba "Mercados": o universo completo do /v1/catalog (RP_CAT_FULL — mesmo do picker do Estúdio), por setor/classe.
+  //   Clique = abre o gráfico rico (openBig) ACIMA do drawer. Caminho moat-safe: fopt() no fetch, gating no openBig.
+  function rpBuildMercados(pane, ctx) {
+    var L = ctx.lang === "en";
+    pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "Loading the market universe…" : "Carregando o universo de mercado…") + '</div>';
+    rpEnsureCatalog(ctx.lang, function () {
+      var src = (RP_CAT_FULL && RP_CAT_FULL.length) ? RP_CAT_FULL : RP_CAT;
+      if (!src.length) { pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "catalog unavailable" : "catálogo indisponível") + '</div>'; return; }
+      pane.innerHTML = '<div class="rp-ml" style="opacity:.72;margin-bottom:10px">' + (L ? "Every series the Radar tracks, by sector and class — click any for its chart, analogs and projection." : "Todas as séries que o Radar acompanha, por setor e classe — clique em qualquer uma para o gráfico, análogos e projeção.") + '</div>' +
+        src.map(function (g) { return '<div class="rp-mkg"><div class="rp-mkh">' + esc(g.cat) + ' <span style="opacity:.55;font-weight:400">· ' + g.items.length + '</span></div><div class="rp-mkt-row">' + g.items.map(function (it) { return '<button class="rp-mkt" data-cod="' + esc(it.cod) + '" data-cls="' + esc(it.cls) + '" data-nome="' + esc(it.nome) + '">' + esc(it.nome) + '</button>'; }).join("") + '</div></div>'; }).join("");
+    });
+    pane.addEventListener("click", function (e) {
+      var t = e.target; if (!t || !t.getAttribute || ("" + (t.className || "")).indexOf("rp-mkt") < 0) return;
+      var cod = t.getAttribute("data-cod"), cls = t.getAttribute("data-cls"), nome = t.getAttribute("data-nome");
+      if (!cod) return; t.style.opacity = ".5";
+      fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(cod) + "&classe=" + encodeURIComponent(cls), fopt())
+        .then(function (r) { return r.json(); }).then(function (s) { t.style.opacity = ""; if (s && s.hist && s.hist.length) openBig(s, nome, "", ctx.lang, null); })
+        .catch(function () { t.style.opacity = ""; });
+    });
+  }
+  rpRegisterTab("mercados", "Mercados", "Markets", rpBuildMercados);
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&"']/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&#34;", "'": "&#39;" }[c]; }); }  // escapa aspas também: ~30 sinks usam esc() DENTRO de atributos (data-nome="…", data-ll="…") — sem isto um " em valor de DB/feed/LLM quebra o atributo (attribute-injection XSS). Entidades renderizam idênticas em texto → zero regressão visual.
   function cls(v) { return v == null ? "" : v >= 75 ? "hot" : v >= 55 ? "warm" : v <= 45 ? "cool" : ""; }
@@ -1414,7 +1439,8 @@
     h += rpTeseHTML(rr, L);  // ★ Tese viva — protagonismo (briefing): logo após as 5 lentes
     // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese) dos indicadores/dados de APOIO.
     //   Só no radar COMPLETO (!sections) — o teaser (regime,lentes) e embeds filtrados não recebem o divisor órfão.
-    if (!sections) h += '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>';
+    if (!sections) h += '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>'
+      + '<button type="button" class="rp-explore">' + (L ? "Explore" : "Explorar") + ' <span class="a">→</span></button>';  // Fase 1B: porta p/ o drawer "Explorar" (aba Mercados = catálogo completo). Discreta — é uma porta, não um menu.
     // ★ P3.1 — Laboratório: comparar dois ativos lado a lado (pares-preset). Só no radar completo.
     if (!sections) {
       var CMP = [
@@ -1439,14 +1465,10 @@
       h += '<div class="rp-cmprow"><div class="rp-ml" style="font-weight:700">' + (L ? "📚 Study library" : "📚 Biblioteca de estudos") + '</div><div class="rp-ml" style="opacity:.6;margin:2px 0 8px">' + (L ? "what historically happened next when… — empirical IBOV distribution, never a forecast" : "o que historicamente aconteceu depois quando… — distribuição empírica do IBOV, nunca previsão") + '</div>' +
         EST.map(function (p) { return '<button type="button" class="rp-estbtn" data-key="' + esc(p[0]) + '" data-nome="' + esc(p[1]) + '">' + esc(p[1]) + '</button>'; }).join("") + '</div>';
     }
-    if (show("macro") && rr.macro_essencial && rr.macro_essencial.length) { h += '<h4>' + (L ? "Indicators behind it · macro" : "Indicadores por trás · macro") + '</h4>' +
-      '<div class="legend">' + (L ? "the technical drivers behind the lenses — for those who want to go deeper" : "os motores técnicos por trás das lentes — para quem quer ir fundo") + '</div><div>' +
-      rr.macro_essencial.map(function (m) { return '<span class="chip">' + (m.valor != null ? '<b>' + esc(m.valor) + '</b> <span class="u">' + esc(m.unidade) + '</span> ' : '') + esc(m.nome) + (m.leitura ? ' <span class="u">· ' + esc(m.leitura) + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+    // Fase 1B: macro · ações 1/setor · imóveis SAÍRAM da home → aba "Mercados" do drawer (porta "Explorar →"), p/ tirar o aspecto de screener.
+    //   Intermercado, fiscal, análogo e scatter (editoriais) PERMANECEM. As séries do macro/ações/imóveis seguem no catálogo /v1/catalog (Mercados).
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "Indicators ⇒ BR intermarket" : "Indicadores ⇒ intermercado BR") + '</h4>' +
       collapseList(rr.intermercado_br.map(function (x) { var hasTk = x.tickers && x.tickers.length, xp = x.fonte || hasTk || (x.leadlag && x.leadlag.txt); return '<div class="t ' + esc(x.tom) + '"' + (xp ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (xp ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.spark2 && x.spark2.a ? '<div class="legend" style="margin-top:5px"><span style="color:var(--_accent)">▬</span> ' + esc(x.spark2.an) + ' <span style="color:var(--_cool)">▬</span> ' + esc(x.spark2.bn) + (x.spark2.c ? ' <span style="color:var(--_warm)">▦</span> ' + esc(x.spark2.cn) : '') + (x.spark2.ar ? '<span style="opacity:.6;display:block;margin-top:1px">' + (L ? "left axis " : "eixo esq ") + esc(fmtNum(x.spark2.ar[0])) + '–' + esc(fmtNum(x.spark2.ar[1])) + ' · ' + (L ? "right axis " : "eixo dir ") + esc(fmtNum(x.spark2.br[0])) + '–' + esc(fmtNum(x.spark2.br[1])) + '</span>' : '') + '</div>' + dualSpark(x.spark2.a, x.spark2.b, x.spark2.c) : '') + (xp ? '<div class="more">' + (x.fonte ? '<div class="mi">' + (L ? "What it is — " : "O que é — ") + esc(x.fonte) + '</div>' : '') + (x.leadlag && x.leadlag.txt ? '<div class="mi"><b>Lead-lag</b> — ' + esc(x.leadlag.txt) + '</div>' : '') + (hasTk ? '<div class="mi" style="margin-bottom:3px">' + (L ? "components (click):" : "componentes (clique):") + '</div><div class="tk">' + x.tickers.map(function (tk) { return '<span class="i" data-cod="' + esc(String(tk.ticker).toLowerCase()) + '" data-cls="' + esc(tk.cls || "equity_br") + '"><span class="sy">' + esc(tk.ticker) + '</span>' + (tk.dy != null ? '<span class="mt">DY ' + esc(tk.dy) + '%</span>' : '') + '</span>'; }).join("") + '</div>' : '') + (x.cod ? '<button class="rp-imxp" data-cod="' + esc(x.cod) + '" data-nome="' + esc(x.numn || x.nome) + '" data-denn="' + esc(x.denn || "IBOV") + '" data-ll="' + esc((x.leadlag && x.leadlag.txt) || x.fonte || "") + '">⤢ ' + (L ? "compare (lead-lag overlay)" : "comparar (overlay lead-lag)") + '</button>' : '') + '</div>' : '') + '</div>'; }), 3, "g3", L ? "more pairs" : "mais pares"); }
-    // ações: tira diversa 1-por-setor (com relação risk-on/off). Tesouro (M) e FIIs (R) agora vivem DENTRO das lentes (amostra).
-    if (show("acoes") && rr.tickers_acoes && rr.tickers_acoes.length) { h += '<h4>' + (L ? "BR stocks · one per sector" : "Ações BR · 1 por setor") + '</h4><div class="legend">' + (L ? "a diverse cut across sectors — click any for the chart; each lens above opens its own curated 5" : "uma tira diversa por setor — clique pra ver o gráfico; cada lente acima abre os 5 dela") + '</div>' +
-      collapseList(rr.tickers_acoes.map(function (t) { var rel = (t.razao_nome ? "∈ " + t.razao_nome + (t.razao_leitura ? " · " + t.razao_leitura : "") : "") + (t.risk ? ((t.razao_nome ? " · " : "") + t.risk) : ""); var fund = (t.pl != null ? "P/L " + t.pl : "") + (t.dy != null ? ((t.pl != null ? " · " : "") + "DY " + t.dy + "%") : "") + (t.roe != null ? " · ROE " + t.roe + "%" : ""); return '<span class="i" data-cod="' + esc(String(t.ticker).toLowerCase()) + '" data-cls="equity_br"' + (rel ? ' data-rel="' + esc(rel) + '"' : '') + (fund ? ' data-fund="' + esc(fund) + '"' : '') + '><span class="sy">' + esc(t.ticker) + '</span><span class="pr">R$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w range" : "% da faixa 52s") + '</span>' : '') + (t.setor ? '<span class="mt">' + esc(t.setor) + '</span>' : '') + '</span>'; }), 6, "tk", L ? "more stocks" : "mais ações"); }
     if (show("fiscal") && rr.fiscal && ((rr.fiscal.series && rr.fiscal.series.length) || (rr.fiscal.composicao && rr.fiscal.composicao.length))) {
       h += '<h4>' + (L ? "Fiscal & monetary" : "Fiscal & monetário") + '</h4><div class="legend">' + (L ? "the public accounts behind the regime — debt/GDP, fiscal stress, real rate, Selic; click for the long history" : "as contas públicas por trás do regime — dívida/PIB, stress fiscal, juro real, Selic; clique pra ver a história longa") + '</div>';
       if (rr.fiscal.series && rr.fiscal.series.length) h += '<div class="tk">' + rr.fiscal.series.map(function (x) { return '<span class="i" data-cod="' + esc(x.cod) + '" data-cls="' + esc(x.cls || "macro") + '"><span class="sy">' + esc(x.nome) + '</span><span class="pr">' + esc(x.valor) + (x.unidade ? ' ' + esc(x.unidade) : '') + '</span></span>'; }).join("") + '</div>';
@@ -1456,9 +1478,6 @@
           rr.fiscal.composicao.map(function (c) { return '<span style="white-space:nowrap"><b style="color:var(--_' + esc(c.tom || 'neu') + ')">▮</b> ' + esc(c.nome) + ' ' + c.pct + '%</span>'; }).join(" · ") + '</div>';
       }
     }
-    if (show("imovel") && rr.imovel_m2 && rr.imovel_m2.length) { h += '<h4>' + (L ? "Real estate · price per m² (FipeZap)" : "Imóveis · custo do m² (FipeZap)") + '</h4><div class="legend">' + (L ? "residential — sale (R$/m²), rent (R$/m²·mo) and gross yield; click for the city's history since 2008" : "residencial — venda (R$/m²), aluguel (R$/m²·mês) e rentabilidade bruta; clique pra ver a história da cidade desde 2008") + '</div>' +
-      collapseList(rr.imovel_m2.map(function (m) { return '<span class="i" data-cod="' + esc(m.cod) + '" data-cls="' + esc(m.cls || "macro") + '"><span class="sy">' + esc(m.cidade) + '</span><span class="pr">R$ ' + esc(m.venda) + (L ? "/m²" : "/m²") + '</span>' + (m.aluguel != null ? '<span class="mt">' + (L ? "rent " : "aluguel ") + 'R$ ' + esc(m.aluguel) + '/m²·' + (L ? "mo" : "mês") + '</span>' : '') + (m.rend != null ? '<span class="mt">' + (L ? "yield " : "rend. ") + esc(m.rend) + '%/' + (L ? "yr" : "ano") + '</span>' : '') + '</span>'; }), 4, "tk", L ? "more cities" : "mais cidades"); }
-
     // Tese viva movida p/ logo após as 5 lentes (rpTeseHTML) — protagonismo (briefing)
     if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br; h += '<h4>' + (L ? "BR analog · past → future" : "Análogo BR · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(ab.pergunta) + '</div>' + (ab.datas_analogas && ab.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') + '<div class="stat"><div><div class="v">' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median (IBOV)" : "mediana (IBOV)") + '</div></div><div><div class="v">' + esc(ab.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(ab.n_analogos) + '</div></div></div>' + (ab.n_analogos && ab.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>'; }
     if (show("scatter") && rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);
@@ -1657,6 +1676,7 @@
       if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
+        if (ev.target && ev.target.classList && ev.target.classList.contains("rp-explore")) { ev.stopPropagation(); rpOpenExplorar(lang, "mercados"); return; }  // Fase 1B: porta "Explorar →" → drawer
         var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, cmpb = null, estb = null;
         while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!cmpb && ("" + (t.className || "")).indexOf("rp-cmpbtn") >= 0) cmpb = t; if (!estb && ("" + (t.className || "")).indexOf("rp-estbtn") >= 0) estb = t; } t = t.parentNode; }
         if (estb) { ev.stopPropagation(); openEstudo(estb.getAttribute("data-key"), estb.getAttribute("data-nome"), lang); return; }  // ★ P3.3 biblioteca de estudos
