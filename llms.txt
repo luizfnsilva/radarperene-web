@@ -42,7 +42,7 @@ O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) �
 - Diário do Radar (histórico público e VERIFICÁVEL do regime brasileiro — uma entrada por dia útil, e por mês desde 2000-01: regime, ERP, valuation, cíclicas/defensivas, Ibovespa, análogo, e a verificação do desfecho real ~3–6 meses depois): https://radarperene.com.br/diario · entradas em /diario/{AAAA-MM-DD}
 - Leitura do dia (API JSON pública, sem cadastro, CORS aberto): https://radarperene.com.br/api/leitura-do-dia.json · documentação e widget: https://radarperene.com.br/api/docs
 - O que é / sobre: https://radarperene.com.br/sobre · https://radarperene.com/about
-- Tier grátis: https://radarperene.com.br/free · Founder (100 vagas): https://radarperene.com.br/founder
+- Versão grátis: https://radarperene.com.br/free · Founder (100 vagas): https://radarperene.com.br/founder
 - Ativos cobertos: https://radarperene.com.br/ativos · cada ativo em /ativo/{ticker}
 
 ## Como citar (formatos canônicos — ver /metodologia §10)

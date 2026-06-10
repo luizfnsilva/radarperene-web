@@ -33,6 +33,10 @@
   // headers da API: anon por padrão; se a página-host expôs o token do assinante (window.RP_TOKEN), manda-o no Authorization →
   // o /v1/serie devolve a DISTRIBUIÇÃO completa dos análogos (Founder). Sem token (free/embed) = teaser. Apikey segue anon (gateway).
   function fopt() { var tk = (typeof window !== "undefined" && window.RP_TOKEN) ? window.RP_TOKEN : ANON; return { headers: { apikey: ANON, Authorization: "Bearer " + tk } }; }
+  // ★ LEITOR CANÔNICO do plano (P0#1 single-source-of-truth): TODO gating de UI lê daqui — login (window.RP_PREMIUM, setado pelo
+  //   /v1/me no host) OU flag local rp_premium. A página-host também expõe window.RP_TOKEN (= access_token Supabase) p/ o fopt()
+  //   destravar os DADOS no /v1/serie. UI (rpIsPro) e dados (RP_TOKEN) saem da MESMA sessão → não divergem mais.
+  function rpIsPro() { var p = (typeof window !== "undefined" && window.RP_PREMIUM === true); try { p = p || localStorage.getItem("rp_premium") === "1"; } catch (e) {} return p; }
   var RP_CAT = [];  // catálogo de séries cruzáveis (estúdio) — montado no render a partir do digest, cresce sozinho com novos tickers
   var STYLE_ID = "rp-radar-style";
 
@@ -122,7 +126,7 @@
       ".rp *{box-sizing:border-box}" +
       ".rp h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--_dim);margin:16px 0 7px;font-weight:600}" +
       ".rp .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:8px}" +
-      ".rp .c{background:var(--_card);border:1px solid var(--_cardb);border-radius:9px;padding:11px}" +
+      ".rp .c{background:var(--_card);border:1px solid var(--_cardb);border-radius:9px;padding:11px;min-height:74px}" +  // P2#7: piso de altura → linhas uniformes mesmo quando quebram p/ a 2ª fileira
       ".rp .rp-mtog{margin-top:8px;font-size:11px;background:transparent;border:1px solid var(--_line);color:var(--_dim);border-radius:7px;padding:5px 11px;cursor:pointer}.rp .rp-mtog:hover{color:var(--_txt);border-color:var(--_cardb)}.rp .rp-ov{margin-top:8px}" +
       ".rp .rp-tier2{display:flex;align-items:center;gap:11px;margin:30px 0 6px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim);font-weight:600}.rp .rp-tier2::before,.rp .rp-tier2::after{content:'';flex:1;height:1px;background:var(--_line)}" +  // camada 2: separa o primário (regime/lentes/tese) dos indicadores de apoio
       ".rp .rp-cmprow{margin:6px 0 4px}.rp .rp-cmpbtn{font-size:11.5px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:8px;padding:6px 11px;cursor:pointer;margin:0 6px 6px 0;white-space:nowrap}.rp .rp-cmpbtn:hover{border-color:var(--_accent);color:var(--_accent)}" +  // P3.1 launcher
@@ -165,7 +169,7 @@
       ".rp .brain.first{border-top:0;padding-top:2px;margin-top:6px}.rp .brain .bn{font-size:13px;font-weight:700;letter-spacing:.02em}.rp .brain .bt{font-size:10.5px;color:var(--_dim)}" +
       ".rp .brain .bx{margin-left:auto;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--_accent);border:1px solid var(--_accent);border-radius:999px;padding:1px 7px}" +
       ".rp .lns{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:7px}" +
-      ".rp .ln{background:var(--_card2);border:1px solid var(--_line);border-left:3px solid var(--_neu);border-radius:8px;padding:9px}" +
+      ".rp .ln{background:var(--_card2);border:1px solid var(--_line);border-left:3px solid var(--_neu);border-radius:8px;padding:9px;min-height:78px}" +  // P2#7: piso de altura das lentes
       ".rp .ln.hot{border-left-color:var(--_hot);background:linear-gradient(160deg,color-mix(in srgb,var(--_hot) 7%,var(--_card2)),var(--_card2) 72%)}.rp .ln.warm{border-left-color:var(--_warm);background:linear-gradient(160deg,color-mix(in srgb,var(--_warm) 7%,var(--_card2)),var(--_card2) 72%)}.rp .ln.cool{border-left-color:var(--_cool);background:linear-gradient(160deg,color-mix(in srgb,var(--_cool) 7%,var(--_card2)),var(--_card2) 72%)}" +
       ".rp .ln .lk{font-size:11.5px;font-weight:700}.rp .ln .li{font-size:9.5px;color:var(--_dim);margin:2px 0 5px;line-height:1.25;min-height:23px}.rp .ln .lv{font-size:14px;font-weight:700}.rp .ln .lr{font-size:9.5px;color:var(--_dim)}" +
       ".rp ul.ll{margin:6px 0 0;padding:0;list-style:none}.rp ul.ll li{font-size:11.5px;padding:6px 0;border-top:1px solid var(--_line);color:var(--_txt)}.rp ul.ll .tag{color:var(--_dim);font-size:9.5px}" +
@@ -191,13 +195,35 @@
       ".rp-mc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-mc .rp-x:hover{color:var(--_accent)}" +
       ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}@media(max-width:600px){.rp-mw{padding:5px}.rp-mc{padding:13px 13px 12px!important;max-height:94vh}.rp-mc .rp-mt{font-size:13.5px;margin-right:26px}.rp-mc .rp-ml{font-size:9.8px;margin-top:4px}.rp-mc .bc.big{height:124px}.rp-mc .rp-per{gap:4px}}" +
       ".rp-mc .rp-strip{display:flex;gap:9px 20px;flex-wrap:wrap;margin-top:4px}.rp-mc .rp-st{display:flex;flex-direction:column;min-width:34px;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-st b{font-size:13px;line-height:1.15;white-space:nowrap}.rp-mc .rp-st span{font-size:9px;color:var(--_dim);margin-top:1px}" +
-      ".rp-mc .rp-rc{display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:6px;margin-top:5px}.rp-mc .rp-rcard{background:var(--_card2);border:1px solid var(--_line);border-radius:8px;padding:8px 5px;text-align:center}.rp-mc .rp-rcard b{display:block;font-size:13.5px;line-height:1.1;white-space:nowrap;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-rcard span{display:block;font-size:8.5px;color:var(--_dim);margin-top:3px;letter-spacing:.02em;text-transform:uppercase}" +
+      ".rp-mc .rp-rc{display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:6px;margin-top:5px}.rp-mc .rp-rcard{background:var(--_card2);border:1px solid var(--_line);border-radius:8px;padding:8px 5px;text-align:center;min-height:46px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-rcard b{display:block;font-size:13.5px;line-height:1.1;white-space:nowrap;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-rcard span{display:block;font-size:8.5px;color:var(--_dim);margin-top:3px;letter-spacing:.02em;text-transform:uppercase}" +
       ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
       ".rp-mc .rp-per{display:flex;gap:5px;margin:7px 0 3px;flex-wrap:wrap}.rp-mc .rp-per button{border:1px solid var(--_line);background:var(--_card2);color:var(--_dim);border-radius:6px;font-size:10px;padding:3px 10px;cursor:pointer;font-family:var(--rp-font,'Inter',system-ui,sans-serif)}.rp-mc .rp-per button.on{border-color:var(--_accent);color:var(--_accent)}.rp-mc .rp-per button.lock{color:var(--_accent);font-weight:600}" +
       ".rp-mc .rp-lock{border:1px dashed var(--_accent);border-radius:10px;padding:18px 16px;text-align:center;background:var(--_card2);min-height:120px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-lock b{display:block;font-size:13px;margin-bottom:5px;color:var(--_txt)}.rp-mc .rp-lock small{font-size:10.5px;color:var(--_dim);line-height:1.5}.rp-mc .rp-lock .cta{display:inline-block;margin-top:11px;background:var(--_accent);color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none}.rp-mc .rp-lock .rp-anchor{display:block;margin-top:9px;font-size:10.5px;font-style:normal;color:var(--_warm);opacity:.92}.rp-mc .rp-gate{position:relative}.rp-mc .rp-gate .rp-blur{filter:blur(7px) saturate(.6);opacity:.5;pointer-events:none;user-select:none}.rp-mc .rp-gate .rp-lock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:90%;width:340px;box-shadow:0 10px 34px rgba(0,0,0,.45)}" +
-      ".rp-mc .rp-chart{position:relative}.rp-mc .rp-xh{position:absolute;top:0;bottom:16px;width:1px;background:var(--_accent);opacity:.55;pointer-events:none;transform:translateX(-0.5px)}.rp-mc .rp-xt{position:absolute;top:0;transform:translateX(-50%);background:var(--_accent);color:#fff;font-size:9px;font-family:var(--rp-mono,ui-monospace,monospace);padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}.rp-mc .rp-yax{position:absolute;top:0;left:0;right:0;bottom:16px;pointer-events:none}.rp-mc .rp-yl{position:absolute;right:3px;transform:translateY(-50%);font-family:var(--_mono);font-size:9.5px;font-weight:600;color:var(--_txt);background:var(--_card2);padding:0 3px;border-radius:2px;opacity:.95;letter-spacing:-.2px;font-feature-settings:'tnum';box-shadow:0 0 0 1px var(--_line)}.rp-mc .rp-bsel{position:absolute;top:0;bottom:16px;background:var(--_accent);opacity:.14;pointer-events:none;border-left:1px solid var(--_accent);border-right:1px solid var(--_accent)}.rp-mc .rp-reset{margin-top:6px;font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer}" +
+      ".rp-mc .rp-chart{position:relative;min-height:200px}" +  // P1#4/#6: reserva a altura do gráfico → não colapsa→expande enquanto o uPlot monta (sem pulo na abertura/troca de período)
+      ".rp-mc .rp-xh{position:absolute;top:0;bottom:16px;width:1px;background:var(--_accent);opacity:.55;pointer-events:none;transform:translateX(-0.5px)}.rp-mc .rp-xt{position:absolute;top:0;transform:translateX(-50%);background:var(--_accent);color:#fff;font-size:9px;font-family:var(--rp-mono,ui-monospace,monospace);padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}.rp-mc .rp-yax{position:absolute;top:0;left:0;right:0;bottom:16px;pointer-events:none}.rp-mc .rp-yl{position:absolute;right:3px;transform:translateY(-50%);font-family:var(--_mono);font-size:9.5px;font-weight:600;color:var(--_txt);background:var(--_card2);padding:0 3px;border-radius:2px;opacity:.95;letter-spacing:-.2px;font-feature-settings:'tnum';box-shadow:0 0 0 1px var(--_line)}.rp-mc .rp-bsel{position:absolute;top:0;bottom:16px;background:var(--_accent);opacity:.14;pointer-events:none;border-left:1px solid var(--_accent);border-right:1px solid var(--_accent)}.rp-mc .rp-reset{margin-top:6px;font-family:var(--_mono);font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:5px;padding:3px 9px;cursor:pointer}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
+  }
+
+  // ── trava de scroll do modal (P0/P1/P2): congela a página atrás do modal (sem 2ª área de rolagem),
+  //    compensa a largura da barra de rolagem (evita o "pulo" lateral ao abrir) e devolve o foco ao
+  //    gatilho ao fechar (preserva contexto). overflow:hidden no body MANTÉM o scrollTop atual. Refcount
+  //    p/ modais sobrepostos (ex.: comparar aberto a partir do gráfico grande): só destrava o último.
+  var _mLock = { n: 0, ov: "", pr: "", focus: null };
+  function lockScroll() {
+    if (_mLock.n++ > 0) return;  // já travado por outro modal acima
+    var de = document.documentElement, b = document.body;
+    _mLock.focus = document.activeElement;  // gatilho que abriu → foco volta p/ cá no close
+    var sbw = window.innerWidth - de.clientWidth;  // largura da barra que vai sumir com overflow:hidden
+    _mLock.ov = b.style.overflow; _mLock.pr = b.style.paddingRight;
+    b.style.overflow = "hidden";
+    if (sbw > 0) b.style.paddingRight = ((parseFloat(getComputedStyle(b).paddingRight) || 0) + sbw) + "px";  // compensação → sem reflow lateral
+  }
+  function unlockScroll() {
+    if (_mLock.n <= 0 || --_mLock.n > 0) return;  // ainda há modal aberto acima
+    var b = document.body;
+    b.style.overflow = _mLock.ov; b.style.paddingRight = _mLock.pr;
+    try { if (_mLock.focus && _mLock.focus.focus) _mLock.focus.focus(); } catch (e) {}
   }
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&]/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]; }); }
@@ -644,7 +670,7 @@
     if (!s || !s.hist || s.hist.length < 2) return; var L = lang === "en";
     // O gráfico grande é a MAIOR isca → free SEMPRE abre (sem gate de abertura). O upsell vem das FEATURES gated
     // dentro: manipular (zoom/brush), comparar A×B (Estúdio), cone completo p10–p90, overlays além dos 2 do free.
-    var gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}  // login (vale em qq lugar) ou flag local
+    var gpaid = rpIsPro();  // leitor canônico do plano (single-source-of-truth)
     var imx = !!(preCmp && preCmp.length >= 2);  // ★ modo INTERMERCADO (lead-lag): big-chart = upDual (2 pontas + razão) em cima + Ânima/Risco Perene empilhados embaixo (estilo leadlagreport). s = numerador (traz risco/anima/datas globais alinhados).
     var imxData = null;  // { a, b, c, datas, labels } — as 2 pontas (rebaseadas) + a razão, alinhadas às datas do numerador; só fica pronto após buscar den+ratio.
     var cur = s.hist[s.hist.length - 1];
@@ -730,7 +756,7 @@
     if (meta && !(preCmp && preCmp.length >= 2)) h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "relation — " : "relação — ") + esc(meta) + '</div>';  // no comparativo lead-lag a interpretação vira legenda do gráfico (não duplica aqui)
     h += '<div class="rp-ml" style="margin-top:9px">' + (L ? "descriptive, never a recommendation · full depth (custom ranges, correlations, scenarios) in the app →" : "descritivo, nunca recomendação · profundidade completa (períodos, correlações, cenários) no app →") + '</div></div>';
     var mw = document.createElement("div"); mw.className = "rp-mw"; mw.innerHTML = h;
-    function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
+    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // guard = idempotente → unlockScroll roda 1× só
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.getAttribute("aria-label") && t.className === "rp-x")) close(); });
     // seletor de período: janelas livres re-renderizam o gráfico; [MAX 🔒] mostra o gate (login+Stripe hospedado)
@@ -861,13 +887,19 @@
           var pastSpan = (endTs != null && mn != null) ? (endTs - mn) : futSpan;
           var futShown = futSpan > 0 ? Math.min(futSpan, Math.max(pastSpan * 0.42, futSpan * 0.2)) : 0;
           var mx = (endTs != null) ? (endTs + futShown + futShown * 0.06) : (maxFull != null ? maxFull : null);
-          if (mn != null && mx != null && mx > mn) { _upInst.setScale("x", { min: mn, max: mx }); _navClamp = gpaid ? null : { min: mn, max: mx }; }  // FREE: trava a navegação nesta janela (zoom/pan dentro, sem escapar pro passado)
+          if (mn != null && mx != null && mx > mn) { _upInst.setScale("x", { min: mn, max: mx }); _navClamp = gpaid ? null : { min: mn, max: mx };
+            // P0#2: garante explicitamente a janela nos osciladores empilhados (Ânima/risk). O linkScaleHook já propaga via grupo
+            //   de sync, mas reaplicar direto pelo _rpU (instância viva, setada no keep()) blinda contra qualquer corrida de
+            //   timing — se já estão na janela, é no-op (setScale a valores iguais); o guard do hook evita laço de volta ao preço.
+            [".rp-anima", ".rp-risk"].forEach(function (sel) { var oe = mw.querySelector(sel), ou = oe && oe._rpU; if (ou && ou.setScale && ou.scales && ou.scales.x && (ou.scales.x.min !== mn || ou.scales.x.max !== mx)) { try { ou.setScale("x", { min: mn, max: mx }); } catch (e) {} } });
+          }  // FREE: trava a navegação nesta janela (zoom/pan dentro, sem escapar pro passado)
         }
         return;
       }
       paint(curHist, true);
     }
     if (useUp) { _upMounted.push({ el: chartEl, draw: drawUp }); }  // registra p/ re-tema (re-desenha no toggle claro/escuro)
+    lockScroll();  // congela a página atrás (sem 2ª rolagem) + compensa a barra (sem pulo) ANTES de montar
     document.body.appendChild(mw);  // ★ modal no DOM ANTES do setChart — uPlot monta em elemento vivo/dimensionado (senão erra e o modal nem abre)
     // osciladores PRIMEIRO, preço POR ÚLTIMO: o link-group propaga a janela do último a setá-la → o preço (setChart) impõe
     // a janela a Ânima/risk (senão o autoscale dos osciladores na montagem sobrescreveria o período do preço).
@@ -1091,15 +1123,16 @@
       '<div class="rp-ml" style="margin-top:6px;opacity:.6">' + (L ? "highlighted = the asset that led on each metric · descriptive, never a recommendation" : "destacado = o ativo que liderou em cada métrica · descritivo, nunca recomendação") + '</div>';
   }
   function compareTwo(a, b, lang) {
-    var L = lang === "en", gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}
+    var L = lang === "en", gpaid = rpIsPro();
     injectStyle();
     var head = '<button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button><div class="rp-mt">' + (L ? "Compare" : "Comparar") + ' — ' + esc(a.nome) + ' × ' + esc(b.nome) + '</div>';
     var mw = document.createElement("div"); mw.className = "rp-mw";
     mw.innerHTML = '<div class="rp rp-mc rp-cmp2" role="dialog" aria-modal="true">' + head + '<div class="rp-ml" style="opacity:.7;padding:14px 0">' + (L ? "loading…" : "carregando…") + '</div></div>';
-    function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
+    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // guard = idempotente → unlockScroll roda 1× só
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
     document.addEventListener("keydown", onkey);
+    lockScroll();
     document.body.appendChild(mw);
     Promise.all([_cmpFetch(a.cod, a.cls), _cmpFetch(b.cod, b.cls)]).then(function (res) {
       var box = mw.querySelector(".rp-cmp2"); if (!box) return;
@@ -1116,10 +1149,11 @@
     var head = '<button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button><div class="rp-mt">📚 ' + esc(nome || chave) + '</div>';
     var mw = document.createElement("div"); mw.className = "rp-mw";
     mw.innerHTML = '<div class="rp rp-mc rp-est" role="dialog" aria-modal="true">' + head + '<div class="rp-ml" style="opacity:.7;padding:14px 0">' + (L ? "loading…" : "carregando…") + '</div></div>';
-    function close() { if (mw.parentNode) mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); }
+    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }  // guard = idempotente → unlockScroll roda 1× só
     function onkey(e) { if (e.key === "Escape") close(); }
     mw.addEventListener("click", function (e) { var t = e.target; if (t === mw || (t.getAttribute && t.className === "rp-x")) close(); });
     document.addEventListener("keydown", onkey);
+    lockScroll();
     document.body.appendChild(mw);
     fetch(ESTUDOS_API + "?key=" + encodeURIComponent(chave) + "&lang=" + (L ? "en" : "pt"), fopt()).then(function (r) { return r.json(); }).then(function (d) {
       var box = mw.querySelector(".rp-est"); if (!box) return;
@@ -1327,7 +1361,7 @@
       .then(function (r) { return r.json(); }).then(function (s) {
         var nm = (codigo || "").toUpperCase();
         if (!s || !s.hist || s.hist.length < 2) { node.innerHTML = '<div class="' + cls + '"><div class="sub">' + (L ? "no data for " : "sem dados para ") + esc(nm) + '</div></div>'; return; }
-        var gpaid = (window.RP_PREMIUM === true); try { gpaid = gpaid || localStorage.getItem("rp_premium") === "1"; } catch (e) {}
+        var gpaid = rpIsPro();
         var useUp = uplotOn() && RP_UP.price;
         var aSel = animaActive(s, "estr", gpaid), aObj = aSel.obj;  // ★ Ânima: free=estrutural, curto=Founder (seletor)
         var animaOk = !!aObj, riscoOk = s.risco && s.risco.serie && s.risco.serie.length > 1;
@@ -1407,9 +1441,27 @@
     var SVG_ONLY = { regime: 1, lentes: 1, indices: 1 };              // seções sem uPlot inline (texto + sparkline SVG)
     return sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean).some(function (s) { return !SVG_ONLY[s]; });
   }
+  // ── P0#1: re-render dos widgets quando o plano muda (login resolve /v1/me DEPOIS do 1º render, ou localStorage estava stale).
+  //    Sem isto, o Founder logado via o widget travado até dar reload (selo atualizava, widget não). _rpBooted guarda os nós +
+  //    params p/ repintar; o listener do rdr-host (window 'rp-premium-change') dispara só na MUDANÇA real de plano (sem churn).
+  var _rpBooted = [], _rpLastSig = null;
+  // assinatura do estado de render = plano + presença do token. O token importa porque destrava os DADOS no /v1/serie: o
+  // Founder que volta já tem localStorage "1" (plano não "transiciona"), mas o token só chega após o /v1/me → a fonte de dados
+  // muda e o widget PRECISA repintar (1º fetch foi sem token = teaser). Repintar só quando a assinatura muda evita churn.
+  function rpRenderSig() { return (rpIsPro() ? "1" : "0") + ((typeof window !== "undefined" && window.RP_TOKEN) ? "T" : "-"); }
+  function rpRerenderAll() {
+    _rpBooted.forEach(function (b) {
+      if (!b.node || !b.node.isConnected) return;
+      if (b.asset) { renderAtivo(b.node, b.asset, b.classe, b.lang, b.skin); return; }  // listener próprio (rp-ob) é re-amarrado no innerHTML novo
+      _getDigest(b.lang).then(function (d) { render(b.node, d, b.lang, b.sections, b.chrome, b.skin); }).catch(function () {});  // delegação no nó sobrevive ao innerHTML (não re-amarra)
+    });
+  }
+  function rpOnPremiumChange() { var sig = rpRenderSig(); if (sig === _rpLastSig) return; _rpLastSig = sig; rpRerenderAll(); }  // repinta na mudança de plano OU quando o token destrava os dados
+  if (typeof window !== "undefined" && window.addEventListener) window.addEventListener("rp-premium-change", rpOnPremiumChange);
   function boot() {
     injectStyle();
     rpWatchTheme();
+    _rpLastSig = rpRenderSig();  // estado de render no 1º paint → o evento depois só repinta se a assinatura mudar
     var nodes = document.querySelectorAll("#radar-perene,[data-radar-perene]");
     if (!nodes.length) return;
     // ★ nós sem-gráfico (teaser) pintam JÁ, sem bloquear no download do uPlot; os com-gráfico esperam a engine.
@@ -1427,6 +1479,7 @@
       var sections = sa ? sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : null;
       var skin = node.getAttribute("data-skin") === "editorial" ? "editorial" : null;  // "editorial" = preset quiet-luxury (hairlines, números serif leves, paleta contida) p/ embeds premium
       var asset = node.getAttribute("data-asset");  // ★ modo ATIVO ÚNICO (opt-in, p/ páginas /ativo/{ticker}) — embed normal (SEM data-asset) fica IDÊNTICO, não quebra backlink
+      _rpBooted.push({ node: node, lang: lang, sections: sections, chrome: chrome, skin: skin, asset: asset ? asset.trim() : null, classe: node.getAttribute("data-classe") || "equity_br" });  // P0#1: registra p/ repintar no login
       if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
@@ -1458,7 +1511,7 @@
             var box = document.createElement("span"); box.style.cssText = "flex-basis:100%;width:100%;margin-top:4px";
             var inner = "";
             if (s && s.hist && s.hist.length > 1) {
-              var _gp = (window.RP_PREMIUM === true); try { _gp = _gp || localStorage.getItem("rp_premium") === "1"; } catch (e) {}  // linha de valor-justo = Founder (free vê só texto)
+              var _gp = rpIsPro();  // linha de valor-justo = Founder (free vê só texto)
               inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : "preço · histórico → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair) ? s.fair.serie : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
