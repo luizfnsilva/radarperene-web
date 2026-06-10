@@ -824,7 +824,7 @@
     // ── uPlot (Sprint 1, herói): clona s refletindo os toggles free e (re)instancia upPrice no chartEl. ──
     //    Mantido num builder p/ o re-tema (MutationObserver) re-desenhar com a paleta nova.
     var _upInst = null;  // instância uPlot viva (ou null em modo SVG)
-    var _navClamp = null;  // FREE: janela navegável permitida {min,max} (período selecionado → fim do cone); Founder = null (sem limite). setado em setChart.
+    var _navClamp = null;  // janela navegável permitida {min,max} = período selecionado (vale p/ FREE e Founder; BUG C). setado em setChart.
     // ── INTERMERCADO: painel de cima = upDual (2 pontas + razão), datado e sincronizado com os osciladores Ânima/risk embaixo. ──
     function drawDual(el) {
       if (!imxData) return null;  // ainda buscando den/ratio — mountIntermarket redesenha quando chegar
@@ -928,7 +928,7 @@
           var pastSpan = (endTs != null && mn != null) ? (endTs - mn) : futSpan;
           var futShown = futSpan > 0 ? Math.min(futSpan, Math.max(pastSpan * 0.42, futSpan * 0.2)) : 0;
           var mx = (endTs != null) ? (endTs + futShown + futShown * 0.06) : (maxFull != null ? maxFull : null);
-          if (mn != null && mx != null && mx > mn) { _upInst.setScale("x", { min: mn, max: mx }); _navClamp = gpaid ? null : { min: mn, max: mx };
+          if (mn != null && mx != null && mx > mn) { _upInst.setScale("x", { min: mn, max: mx }); _navClamp = { min: mn, max: mx };  // BUG C: o PERÍODO é o controle de largura p/ TODOS (Founder incluso) — pan/zoom preso à janela; ver mais = trocar período (6M/1A/3A/MAX). Antes gpaid?null deixava o Founder navegar o histórico inteiro dentro do 3M.
             // P0#2: garante explicitamente a janela nos osciladores empilhados (Ânima/risk). O linkScaleHook já propaga via grupo
             //   de sync, mas reaplicar direto pelo _rpU (instância viva, setada no keep()) blinda contra qualquer corrida de
             //   timing — se já estão na janela, é no-op (setScale a valores iguais); o guard do hook evita laço de volta ao preço.
@@ -1448,7 +1448,7 @@
           wireAnima(node, s, lang, gpaid, SYNC, true);  // seletor de horizonte (estrutural↔curto🔒) re-monta no mesmo grupo de sync/janela
           var pEl = node.querySelector(".rp-ativo-price");
           if (pEl) {
-            var _navClampA = null;  // FREE: janela navegável permitida (~3a → fim do cone); Founder = null
+            var _navClampA = null;  // janela navegável permitida (~3a → fim do cone) p/ FREE e Founder (BUG C)
             var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, nav: true, clamp: function () { return _navClampA; }, sinais: s.sinais };  // free navega COM zoom mas clampado ao tempo permitido; Founder = livre. pinos do buy signal (Índice de Risco Perene)
             var up = window.RPUplot.upPrice(pEl, gateSerie(s, gpaid), pOpt);
             if (up) {
@@ -1460,7 +1460,7 @@
                 var toTs = function (d) { var t = Date.parse(String(d).length <= 10 ? d + "T00:00:00Z" : d); return isFinite(t) ? t / 1000 : null; };
                 var mn = toTs(s.datas[i0]), xarr = up.data && up.data[0], maxFull = (xarr && xarr.length) ? xarr[xarr.length - 1] : null;
                 if (mn != null && maxFull != null && maxFull > mn) {  // inclui o futuro do cone; propaga a janela aos osciladores via link-group
-                  _navClampA = gpaid ? null : { min: mn, max: maxFull };  // free: trava a navegação na janela ~3a
+                  _navClampA = { min: mn, max: maxFull };  // BUG C: trava a navegação na janela ~3a p/ TODOS (Founder incluso) — coerente com o modal; ver mais = ampliar/trocar período
                   var _applyWin = function () { try { up.setScale("x", { min: mn, max: maxFull }); } catch (e) {} };
                   _applyWin(); if (typeof requestAnimationFrame === "function") requestAnimationFrame(_applyWin);  // re-aplica APÓS o init deferido (rAF) do uPlot dos osciladores — senão o autoscale deles sobrescreve a janela ~3a
                 }

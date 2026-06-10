@@ -294,6 +294,22 @@
     var shadowHi = (pro && s.shadow && s.shadow.hi) ? padTail(s.shadow.hi, total) : null;
     var shadowLo = (pro && s.shadow && s.shadow.lo) ? padTail(s.shadow.lo, total) : null;
 
+    // BUG A — emenda passado×futuro em "hoje": por construção a sombra (cone-reverso) e o cone colapsam à LARGURA 0
+    //  EXATAMENTE no índice bi (shLoR[0]=0 no backend; cone.{lo,hi}[0]=preço), enquanto bi-1 e bi+1 já têm a largura do
+    //  1º passo (h1). Esse mergulho-a-zero num ÚNICO ponto é o "buraco"/pinça branca na junção. Fix: dar ao pescoço (bi)
+    //  a MESMA largura h1 dos vizinhos, nos dois lados — a faixa flui contínua passado→hoje→futuro. A mediana (linha)
+    //  segue ancorada no preço de hoje (o ● e o traço "hoje" marcam o ponto observado; só as BANDAS deixam de pinçar).
+    if (cone) {
+      var _c = s.cone;
+      if (coneHi  && _c.hi  && _c.hi.length  > 1) coneHi[bi]  = _c.hi[1];
+      if (coneLo  && _c.lo  && _c.lo.length  > 1) coneLo[bi]  = _c.lo[1];
+      if (coneHi2 && _c.hi2 && _c.hi2.length > 1) coneHi2[bi] = _c.hi2[1];
+      if (coneLo2 && _c.lo2 && _c.lo2.length > 1) coneLo2[bi] = _c.lo2[1];
+      // a sombra termina em bi com a largura EXTERNA (p10/p90) com que o cone abre → as duas faixas se encontram sem degrau
+      if (shadowHi && _c.hi2 && _c.hi2.length > 1) shadowHi[bi] = _c.hi2[1];
+      if (shadowLo && _c.lo2 && _c.lo2.length > 1) shadowLo[bi] = _c.lo2[1];
+    }
+
     // monta data[] e series[] dinamicamente (só inclui o que existe).
     var data = [xs];
     var series = [{}]; // x
@@ -422,7 +438,7 @@
       var pcur = (price[bi] != null && isFinite(price[bi])) ? price[bi] : curPx;
       if (pcur != null) {
         var py = u.valToPos(pcur, "y", true);
-        // #4 halo suave (2 camadas) ATRÁS do ●: arredonda o vértice da pinça (cone→largura-0 em "hoje") sem tocar na geometria — o olho pousa no ponto-âncora, não no "X" abrupto. Honesto: a incerteza segue 0 em hoje.
+        // #4 halo suave (2 camadas) ATRÁS do ●: destaca o ponto-âncora "hoje" (último preço observado) onde a observação vira distribuição — o olho pousa no ponto, não na emenda. (A pinça-a-zero das BANDAS foi resolvida no BUG A: o pescoço agora tem a largura h1; a mediana/linha segue ancorada no preço.)
         ctx.beginPath(); ctx.fillStyle = withAlpha(T.accent, 0.10); ctx.arc(px, py, 9.5, 0, 2 * Math.PI); ctx.fill();
         ctx.beginPath(); ctx.fillStyle = withAlpha(T.accent, 0.16); ctx.arc(px, py, 5.5, 0, 2 * Math.PI); ctx.fill();
         ctx.beginPath(); ctx.fillStyle = T.accent; ctx.arc(px, py, 3.6, 0, 2 * Math.PI); ctx.fill();
