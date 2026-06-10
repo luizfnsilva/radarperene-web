@@ -5,7 +5,8 @@ servimos o widget — você não precisa re-subir nada. Escolha UMA das três fo
 grátis, e **P7** (descritivo, educacional, **nunca recomendação**).
 
 > **Já no ar:** o widget e os scripts são servidos por **`radarperene.com`**. A API de dados (JSON) fica em
-> `https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api`.
+> **`https://radarperene.com.br/api/v1`** — mesmo domínio, sem expor a infraestrutura. Você sempre consome a
+> **API do Radar**, não o backend.
 
 > **Atalho — Leitura do dia (JSON canônico, citável):** `GET https://radarperene.com.br/api/leitura-do-dia.json`
 > retorna a leitura agregada do dia (regime BR + score, regime global, lente em destaque, análogo, componentes
@@ -46,7 +47,7 @@ Sem CSS, usa o tema escuro/dourado padrão. Para inglês: `data-lang="en"`.
 Para integrar no próprio front-end / app / newsletter, em qualquer linguagem.
 
 ```
-GET https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/digest?lang=pt
+GET https://radarperene.com.br/api/v1/digest?lang=pt
 ```
 Retorna a leitura de HOJE (resumo do formato):
 ```json
@@ -66,7 +67,7 @@ Retorna a leitura de HOJE (resumo do formato):
   "premium": {...}, "disclaimer": {"pt":"...","en":"..."}
 }
 ```
-`?lang=en` traduz tudo. Endpoints parciais: `/v1/radar`, `/v1/vertice`.
+`?lang=en` traduz tudo. Endpoints parciais: `https://radarperene.com.br/api/v1/radar`, `https://radarperene.com.br/api/v1/vertice`.
 
 ---
 
