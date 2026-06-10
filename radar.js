@@ -254,6 +254,10 @@
     if (!root || !window.RPUplot || !window.RPUplot.destroy) return;
     var els = root.querySelectorAll(".rp-chart, .rp-osc");
     for (var i = 0; i < els.length; i++) { try { window.RPUplot.destroy(els[i]); } catch (e) {} }
+    // ★ achado nº2: também remove do registro de re-tema (_upMounted) as entradas deste modal. Sem isto, _upMounted
+    //   retém o nó do gráfico e, via a árvore DESTACADA (parentNode/childNodes), o MODAL INTEIRO a cada abre/fecha
+    //   (~189 nós + ~19 listeners/ciclo). O prune lazy (linha ~87) só roda no toggle de tema; aqui libera JÁ no fechar.
+    for (var j = _upMounted.length - 1; j >= 0; j--) { var mEl = _upMounted[j].el; if (!mEl || root.contains(mEl) || !mEl.isConnected) _upMounted.splice(j, 1); }
   }
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&]/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]; }); }
