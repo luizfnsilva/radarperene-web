@@ -646,13 +646,34 @@
     function corr(a, b) { var da = [], db = []; for (var k = 1; k < a.length; k++) { if (a[k] != null && a[k - 1] != null && b[k] != null && b[k - 1] != null) { da.push(a[k] - a[k - 1]); db.push(b[k] - b[k - 1]); } } if (da.length < 6) return null; var ma = da.reduce(function (x, y) { return x + y; }, 0) / da.length, mb = db.reduce(function (x, y) { return x + y; }, 0) / db.length, num = 0, va = 0, vb = 0; for (var i = 0; i < da.length; i++) { num += (da[i] - ma) * (db[i] - mb); va += (da[i] - ma) * (da[i] - ma); vb += (db[i] - mb) * (db[i] - mb); } return { c: Math.round((num / (Math.sqrt(va * vb) || 1)) * 100) / 100, n: da.length }; }  // P1: devolve n p/ gatear confiança (janela curta = correlação não-confiável)
     var pairs = [];
     for (var a = 0; a < reb.length; a++) for (var b = a + 1; b < reb.length; b++) { var cc2 = corr(reb[a], reb[b]); if (cc2 != null) pairs.push({ a: valid[a].nome, b: valid[b].nome, c: cc2.c, n: cc2.n }); }
-    return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0], mn: mn, mx: mx };
+    return { svg: o, leg: valid.map(function (x, i) { return { nome: x.nome, color: CMP_COLORS[i % 3], fim: reb[i].filter(function (v) { return v != null; }).slice(-1)[0] }; }), pairs: pairs, desde: grid[0], mn: mn, mx: mx, grid: grid, reb: reb };  // BUG B: grid (meses comuns) + reb (séries rebaseadas) p/ o mount interativo (upCompare); o SVG segue como fallback
   }
   // #4 — mensagem ESPECÍFICA de falha do Estúdio (em vez do genérico "sem sobreposição"): distingue dado ausente × sem sobreposição × janela curta.
   function cmpErrMsg(code, L) {
     if (code === "overlap") return L ? "these two series never coexisted in time — no overlapping period to cross. Pick a pair that lived at the same time (e.g. drop the one that starts later)." : "essas duas séries nunca coexistiram no tempo — não há período em comum para cruzar. Escolha um par que viveu ao mesmo tempo (ex.: tire a que começa depois).";
     if (code === "short") return L ? "they overlap for fewer than 3 months — too short to cross with confidence. Try a longer-lived pair." : "o período em comum tem menos de 3 meses — curto demais para cruzar com confiança. Tente um par com mais histórico.";
     return L ? "couldn’t load one of the series (empty or missing dates). Try another asset." : "não consegui carregar uma das séries (vazia ou sem datas). Tente outro ativo.";
+  }
+  // BUG B — comparativo INTERATIVO: monta o cruzamento rebaseado (compareChart) como uPlot (pan/zoom/crosshair nativos,
+  //   igual ao gráfico principal) quando a engine está ligada; senão cai no SVG estático de sempre. redrawSelf = no toque de
+  //   tema (claro/escuro) redesenha ESTE comparativo enquanto o modo estiver ativo (assume a entrada de re-tema do preço em
+  //   _upMounted; o Estúdio restaura p/ drawUp ao voltar a 1 série). Devolve true se montou em uPlot.
+  function rpMountCompareChart(cc, chartEl, yax, redrawSelf) {
+    if (uplotOn() && cc.grid && cc.reb && cc.reb.length >= 2 && window.RPUplot.upCompare) {
+      var datas = cc.grid.map(function (mo) { return mo + "-01"; });  // mês YYYY-MM → dia 1 (timestamp) p/ o eixo temporal
+      var list = cc.reb.map(function (vals, i) { return { vals: vals, nome: (cc.leg[i] || {}).nome || "", color: (cc.leg[i] || {}).color }; });
+      chartEl.innerHTML = "";  // limpa SVG/eixo anterior antes do mount (clear() do uPlot cuida da instância)
+      var u = window.RPUplot.upCompare(chartEl, list, { datas: datas, preRebased: true, height: 200, nav: true, axisW: 52, hideX: false });
+      if (u) {
+        for (var i = _upMounted.length - 1; i >= 0; i--) if (_upMounted[i].el === chartEl) _upMounted.splice(i, 1);
+        if (redrawSelf) _upMounted.push({ el: chartEl, draw: redrawSelf });  // re-tema redesenha o comparativo, não o preço
+        return true;
+      }
+    }
+    chartEl.innerHTML = cc.svg;
+    yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");
+    chartEl.appendChild(yax);
+    return false;
   }
 
   // ── PAINEL DE TAXA-BASE (device estilo SentimenTrader): "em casos análogos, subiu em X% das vezes, mediana +Y% em 3/6/12m" ──
@@ -979,9 +1000,7 @@
       var drawCompare = function (got) {
         var cc = compareChart(got.filter(Boolean), lang, { big: true });
         if (!cc || cc.err) { chartEl.innerHTML = '<div class="rp-ml" style="opacity:.78;padding:18px 12px;text-align:center;line-height:1.45">' + esc(cmpErrMsg(cc && cc.err, L)) + '</div>'; legEl.innerHTML = ""; return; }
-        chartEl.innerHTML = cc.svg;
-        yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");  // eixo-Y do cruzamento (base 100) — referência não some mais
-        chartEl.appendChild(yax);
+        rpMountCompareChart(cc, chartEl, yax, function () { drawCompare(got); });  // BUG B: uPlot interativo (pan/zoom) com fallback SVG; eixo-Y base-100 nativo do upCompare
         legEl.innerHTML = (meta ? '<div class="rp-ml" style="margin-top:3px"><b style="color:var(--_accent)">Lead-lag</b> — ' + esc(meta) + '</div>' : '') + '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { var lowc = p.n < 24; return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c + (lowc ? ' <span style="color:var(--_warm);opacity:.9">(' + (L ? "short window · n=" : "janela curta · n=") + p.n + (L ? "m, low confidence" : "m, baixa confiança") + ')</span>' : ''); }).join(" · ") : '') + '</div>';
       };
       var applyMode = function () {
@@ -992,6 +1011,8 @@
           cmp.forEach(function (c, i) { fetchSerie(c.cod, c.cls, function (d) { got[i] = (d && d.hist) ? { nome: c.nome, hist: d.hist, datas: d.datas } : null; if (--pend === 0) drawCompare(got); }); });
         } else {
           compareActive = false; if (perRow) perRow.style.display = ""; legEl.innerHTML = "";
+          for (var ui = _upMounted.length - 1; ui >= 0; ui--) if (_upMounted[ui].el === chartEl) _upMounted.splice(ui, 1);  // BUG B: devolve o re-tema do chartEl ao preço (drawUp) — o compare havia assumido a entrada
+          if (useUp) _upMounted.push({ el: chartEl, draw: drawUp });
           var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 0; setChart(isFinite(fr) ? fr : 0);
         }
       };

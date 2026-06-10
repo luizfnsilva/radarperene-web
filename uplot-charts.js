@@ -863,6 +863,72 @@
     return keep(el, u);
   }
 
+  // upCompare: N séries JÁ alinhadas ao MESMO eixo de datas → linhas interativas (rebase 100, nav/zoom, window-Y, sync).
+  //  Generaliza o upDual p/ o Estúdio e o overlay lead-lag (até 3 séries arbitrárias, cada uma com cor/rótulo próprios —
+  //  não só A/B/razão). BUG B: substitui o SVG ESTÁTICO do comparativo → ganha pan/zoom igual ao gráfico principal.
+  //  list = [{ vals, nome, color, dash, width }]; opt.preRebased=true se `vals` já vêm rebaseados a 100. opt.datas = eixo comum.
+  function upCompare(el, list, opt) {
+    if (!ready()) { warnNoUplot(); return null; }
+    if (!el || !list || list.length < 2 || !list[0].vals || list[0].vals.length < 2) return null;
+    opt = opt || {};
+    var T = theme(el);
+    clear(el);
+    function rebase(arr) {
+      if (!arr) return null;
+      var base0 = null;
+      for (var i = 0; i < arr.length; i++) if (arr[i] != null && isFinite(arr[i])) { base0 = arr[i]; break; }
+      if (base0 == null || base0 === 0) return arr.slice();
+      return arr.map(function (v) { return (v != null && isFinite(v)) ? (v / base0) * 100 : null; });
+    }
+    var n = list[0].vals.length;
+    var xs = new Array(n), realX = !!(opt.datas && opt.datas.length === n);
+    if (realX) { for (var i = 0; i < n; i++) { var ts = dateToTs(opt.datas[i]); xs[i] = (ts != null) ? ts : (Date.now() / 1000 - (n - i) * 2629800); } }
+    else { var base = Date.now() / 1000 - (n - 1) * 2629800; for (var k = 0; k < n; k++) xs[k] = base + k * 2629800; }  // mensal sintético (~30,4d) se não vier datas
+    var data = [xs], series = [{}];
+    list.forEach(function (it) {
+      data.push(opt.preRebased ? it.vals : rebase(it.vals));
+      series.push({ label: it.nome || "", stroke: it.color || T.accent, width: it.width || 1.5, dash: it.dash || null, points: { show: false } });
+    });
+    // Y auto-ajustado à JANELA visível (mesma sensação do upDual: as linhas preenchem o painel ao dar zoom).
+    function yWindow(u, dmin, dmax) {
+      var xmin = u.scales.x.min, xmax = u.scales.x.max;
+      if (xmin == null || xmax == null) return [dmin, dmax];
+      var xd = u.data[0], lo = Infinity, hi = -Infinity;
+      for (var si = 1; si < u.data.length; si++) { var d = u.data[si]; if (!d) continue;
+        for (var i = 0; i < xd.length; i++) { if (xd[i] < xmin || xd[i] > xmax) continue; var v = d[i]; if (v == null || !isFinite(v)) continue; if (v < lo) lo = v; if (v > hi) hi = v; } }
+      if (!isFinite(lo) || !isFinite(hi)) return [dmin, dmax];
+      var pad = (hi - lo) * 0.08 || (Math.abs(hi) * 0.05) || 1; return [lo - pad, hi + pad];
+    }
+    // base-100 (referência do rebase): linha tracejada fraca ATRÁS das séries (drawClear = canvas já limpo, antes das linhas).
+    function drawBase100(u) {
+      try { var y100 = u.valToPos(100, "y", true); if (!isFinite(y100)) return; var ctx = u.ctx;
+        ctx.save(); ctx.strokeStyle = withAlpha(T.line, 0.9); ctx.lineWidth = 0.5; ctx.setLineDash([2, 2]);
+        ctx.beginPath(); ctx.moveTo(u.bbox.left, y100); ctx.lineTo(u.bbox.left + u.bbox.width, y100); ctx.stroke(); ctx.restore();
+      } catch (e) {}
+    }
+    var cursor = { points: { show: false }, drag: { x: false, y: false } };
+    if (opt.sync) cursor.sync = { key: opt.sync, scales: ["x", null] };
+    var hooks = { drawClear: [drawBase100] };
+    if (opt.sync) hooks.setScale = [linkScaleHook(opt.sync)];
+    var u = new window.uPlot({
+      width: el.clientWidth || 280,
+      height: opt.height || 200,
+      cursor: cursor,
+      legend: { show: false },
+      scales: { x: { time: realX }, y: { range: yWindow } },
+      axes: [
+        { show: realX ? !opt.hideX : false, stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.4), width: 0.5 }, font: "10px ui-monospace, monospace" },
+        { stroke: T.dim, grid: { stroke: withAlpha(T.line, 0.4), width: 0.5 }, font: "10px ui-monospace, monospace", size: opt.axisW || 38, values: function (u, sp) { return sp.map(function (v) { return Math.round(v); }); } }  // base-100 → eixo em inteiros
+      ],
+      series: series,
+      plugins: opt.nav ? [navPlugin({ clamp: opt.clamp, onReset: opt.onReset })] : [],
+      hooks: hooks
+    }, data, el);
+    makeResponsive(u, el);
+    if (opt.sync) linkRegister(u, opt.sync);
+    return keep(el, u);
+  }
+
   // -------------------------------------------------------------------------
   window.RPUplot = {
     ready: ready,
@@ -871,6 +937,7 @@
     upOscillator: upOscillator,
     upScatter: upScatter,
     upDual: upDual,
+    upCompare: upCompare,
     destroy: function (el) { clear(el); }  // teardown externo (radar.js fecha modal): destrói instância + RO + sync, sem vazar
   };
 })();
