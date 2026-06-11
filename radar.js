@@ -728,6 +728,9 @@
     return { mode: m, obj: obj, estr: estr, curt: curt, canCurto: canCurto };
   }
   function checkoutURL(lang) { return window.RP_CHECKOUT || (lang === "en" ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"); }
+  // ★ cadeado SEMPRE clicável → checkout (religado 2026-06-11: o gate do MAX morreu quando os períodos viraram livres
+  //   e os 🔒 restantes ficaram inertes — cadeado que não leva à compra é vitrine trancada sem porta).
+  function lockA(L, inner) { return '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;cursor:pointer" title="' + (L ? "Unlock with Founder" : "Destravar com o Founder") + '">' + inner + '</a>'; }
   // ★ embed domain-aware (briefing: separar .com / .com.br). Sem override explícito (data-market), a ORIGEM do próprio radar.js (RP_SRC) revela o mercado → backlink/atribuição vão p/ o domínio certo, mesmo num site terceiro.
   function detectMarketFromSrc() { var m = (RP_SRC || "").match(/radarperene\.com(\.br)?/i); return m ? (m[1] ? "br" : "us") : ""; }
   function rpMarket(market, lang) { market = ("" + (market || "")).toLowerCase(); if (market === "br" || market === "us") return market; var d = detectMarketFromSrc(); if (d) return d; return lang === "en" ? "us" : "br"; }
@@ -841,7 +844,7 @@
     }).join("");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</div>' + rows
-      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85"><span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in Founder" : "horizontes 6m e 12m no Founder") + '</div>' : '')
+      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in Founder" : "horizontes 6m e 12m no Founder")) + '</div>' : '')
       + '<div class="rp-ml" style="margin-top:5px;opacity:.6">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div></div>';
   }
   // ★ MOAT — bloco-análogo no FREE = só TEASER (existência + nº de casos + leitura qualitativa); a DISTRIBUIÇÃO (probabilidade
@@ -862,7 +865,7 @@
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + ' <span style="opacity:.55;font-weight:400">(' + src + ')</span></div>'
       + '<div class="rp-ml" style="margin-top:5px;color:var(--_txt)"><b style="font-family:var(--_mono)">' + N.toLocaleString(L ? "en-US" : "pt-BR") + '</b> ' + (L ? "analogous cases found" : "casos análogos encontrados") + '</div>'
       + '<div class="rp-ml" style="opacity:.85">' + (suf ? (L ? "✓ enough for analysis" : "✓ amostra suficiente para análise") : (L ? "· limited sample" : "· amostra limitada")) + (bias ? ' · ' + (L ? "reading: " : "leitura: ") + bias : '') + '</div>'
-      + '<div class="rp-ml" style="margin-top:8px;opacity:.95"><span style="color:var(--_accent)">🔒</span> ' + (L ? "probability of rising · median return · case range (50% / 80%) · 3 / 6 / 12 months" : "probabilidade de alta · retorno mediano · faixa dos casos (50% / 80%) · 3 / 6 / 12 meses") + '</div>'
+      + '<div class="rp-ml" style="margin-top:8px;opacity:.95">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "probability of rising · median return · case range (50% / 80%) · 3 / 6 / 12 months" : "probabilidade de alta · retorno mediano · faixa dos casos (50% / 80%) · 3 / 6 / 12 meses")) + '</div>'
       + '<a href="' + ck + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--_accent);text-decoration:none">' + (L ? "What historically happened next? → Founder" : "O que historicamente aconteceu depois? → Founder") + '</a>'
       + '<div class="rp-ml" style="opacity:.55;margin-top:6px">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div>'
       + '</div>';
@@ -989,7 +992,7 @@
       ' <span style="color:var(--_dim);opacity:.7">(' + src + ')</span></div>';
     out += rows;
     out += '<div style="margin-top:7px">' + bars + '</div>';
-    if (!pro) out += '<div class="rp-ml" style="margin-top:5px;opacity:.92"><span style="color:var(--_accent)">🔒</span> ' + (L ? "6-month & 12-month horizons in Founder" : "prazos de 6 e 12 meses no Founder") + '</div>';  // free = só 3m; demais prazos = investigação paga
+    if (!pro) out += '<div class="rp-ml" style="margin-top:5px;opacity:.92">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6-month & 12-month horizons in Founder" : "prazos de 6 e 12 meses no Founder")) + '</div>';  // free = só 3m; demais prazos = investigação paga
     out += '<div class="rp-ml" style="opacity:.6;margin-top:6px">' + (L ? "empirical distribution of past analogous cases — not a forecast" : "distribuição de casos análogos passados — não é previsão") + '</div>';
     return out;
   }
@@ -1070,11 +1073,11 @@
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);  // bandas só se a data trouxe (token); gateado → cai p/ a mediana abaixo (sem quebrar)
         if (dmid != null) lead += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b>' + (dlo != null && dhi != null ? ' · ' + (L ? "50% of cases " : "50% dos casos ") + sgn(dlo) + ' … ' + sgn(dhi) : '') + (dlo2 != null && dhi2 != null ? ' · ' + (L ? "80% of cases " : "80% dos casos ") + sgn(dlo2) + ' … ' + sgn(dhi2) : '') + ' · ' + (L ? "in similar situations in the past — not a forecast" : "em situações parecidas no passado — não é previsão") + '</div>'; }
-      else if (dmid != null) lead += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in Founder" : "caso mediano & faixas 50% / 80% no Founder") + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
+      else if (dmid != null) lead += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in Founder" : "caso mediano & faixas 50% / 80% no Founder")) + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) lead += gpaid
         ? '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'
-        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78"><span style="color:var(--_accent)">🔒</span> ' + (L ? "value in Founder" : "valor no Founder") + '</span></div>'; }
+        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "value in Founder" : "valor no Founder")) + '</span></div>'; }
     if (s.base_rate) lead += baseRatePanel(s.base_rate, L, gpaid);  // casos análogos — free: teaser (existência+nº+leitura) / Founder: distribuição completa
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : "Valuation ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
@@ -1751,8 +1754,8 @@
         // ★ VALUATION (Lyn Alden) — leitura TEXTUAL p/ FREE (prêmio/desconto vs valor-justo, citável p/ IA/SEO);
         //   a LINHA de valor-justo no gráfico + a investigação (DCF/cenários) ficam no Founder (🔒). Decisão do dono.
         if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
-          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72"><span style="color:var(--_accent)">🔒</span> ' + (L ? "Valuation line on chart in Founder" : "linha de Valuation no gráfico no Founder") + '</span>') + '</div>'; }
-        else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72"><span style="color:var(--_accent)">🔒</span> ' + (L ? "model & scenarios in Founder" : "modelo & cenários no Founder") + '</span>') + '</div>';
+          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "Valuation line on chart in Founder" : "linha de Valuation no gráfico no Founder")) + '</span>') + '</div>'; }
+        else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "model & scenarios in Founder" : "modelo & cenários no Founder")) + '</span>') + '</div>';
         if (s.trend && s.trend.score != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
         h += analogBlock(s, nm, lang, gpaid);  // taxa-base nobre (P3)
         h += '<div class="rp-ml" style="margin-top:8px;opacity:.7">' + (L ? "descriptive, never a recommendation · distribution, not a forecast" : "descritivo, nunca recomendação · distribuição, não previsão") + '</div>';
