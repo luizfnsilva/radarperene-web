@@ -363,11 +363,12 @@
       var inp = pane.querySelector(".rp-mks"), noneEl = pane.querySelector(".rp-mks-none");
       var norm = function (s) { s = String(s || "").toLowerCase(); try { s = s.normalize("NFD").replace(/[̀-ͯ]/g, ""); } catch (e) {} return s; };
       if (inp) inp.addEventListener("input", function () {
-        var q = norm(inp.value).trim(), any = false;
+        var toks = norm(inp.value).split(/\s+/).filter(Boolean), any = false;  // multi-palavra: TODOS os tokens, em qualquer ordem ("são paulo venda" acha "São Paulo · venda m²")
         pane.querySelectorAll(".rp-mkg").forEach(function (gEl) {
           var vis = 0;
           gEl.querySelectorAll(".rp-mkt").forEach(function (b) {
-            var hit = !q || norm(b.getAttribute("data-nome")).indexOf(q) >= 0 || norm(b.getAttribute("data-cod")).indexOf(q) >= 0;
+            var hay = norm(b.getAttribute("data-nome")) + " " + norm(b.getAttribute("data-cod")) + " " + norm((gEl.querySelector(".rp-mkh") || {}).textContent || "");
+            var hit = !toks.length || toks.every(function (t) { return hay.indexOf(t) >= 0; });
             b.style.display = hit ? "" : "none"; if (hit) vis++;
           });
           gEl.style.display = vis ? "" : "none"; if (vis) any = true;
