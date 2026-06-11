@@ -803,7 +803,7 @@
   }
   // barra de overlays (P2): Preço · MM200 · Mediana análoga (free) + P25–P75 · P10–P90 · Bollinger · Valor-justo (Founder, com 🔒). Clique → openBig.
   function overlayBar(s, lang, pro) {
-    var L = lang === "en", chips = [{ on: true, lock: false, lbl: L ? "Price" : "Preço" }];
+    var L = lang === "en", chips = [{ on: true, lock: false, lbl: serieDiff(s) || (s.stats && s.stats.is_asset === false) ? (L ? "Series" : "Série") : (L ? "Price" : "Preço") }];  // 1E p2: IPCA/curva não é "preço"
     if (s.ma200 && s.ma200.length) chips.push({ on: true, lock: false, lbl: "MM200" });
     if (s.cone) chips.push({ on: true, lock: false, lbl: L ? "Analog median" : "Mediana análoga" });
     if (s.cone && (s.cone.lo || s.cone.lo2)) { chips.push({ on: pro, lock: !pro, lbl: "P25–P75" }); chips.push({ on: pro, lock: !pro, lbl: "P10–P90" }); }
@@ -820,7 +820,8 @@
     var L = lang === "en";
     if (!pro || !analogHasDist(br)) return analogFreeHTML(br, L);  // ★ free OU data gateada pela API = teaser (moat); Founder = completo
     var HS = ["3m", "6m", "12m"];
-    var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
+    var U = brUnit(br);  // 1E p2: série diff → mediana/faixa em pp (variação do nível), não % (retorno)
+    var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (U === "pp" ? Math.round(x * 100) / 100 : Math.round(x * 10) / 10) + U; };
     var rows = HS.map(function (hk) {
       var d = br.h[hk]; if (!d) return "";
       var lab = hk === "3m" ? (L ? "3 months" : "3 meses") : hk === "6m" ? (L ? "6 months" : "6 meses") : (L ? "12 months" : "12 meses");
@@ -830,7 +831,7 @@
         + (d.hit != null ? '<b style="color:var(--_' + (d.hit >= 50 ? "warm" : "cool") + ')">' + (L ? "Rose in " : "Subiu em ") + Math.round(d.hit) + '%</b>' + (L ? " of cases" : " dos casos") : '')
         + (d.mediana != null ? ' · ' + (L ? "median " : "mediana ") + '<b>' + sgn(d.mediana) + '</b>' : '')
         + (d.p25 != null && d.p75 != null ? ' · ' + (L ? "range " : "faixa ") + sgn(d.p25) + ' ' + (L ? "to" : "a") + ' ' + sgn(d.p75) : '')
-        + (d.n != null ? ' · <span style="opacity:.7">' + d.n.toLocaleString(L ? "en-US" : "pt-BR") + (L ? " analog cases" : " casos análogos") + (thin ? (L ? " (limited)" : " (limitada)") : "") + '</span>' : '')
+        + (d.n != null ? ' · <span style="opacity:.7">' + d.n.toLocaleString(L ? "en-US" : "pt-BR") + (L ? " analog cases" : " casos análogos") + (d.n_efetivo != null ? (L ? " · effective n " : " · n efetivo ") + d.n_efetivo : "") + (thin ? (L ? " (limited)" : " (limitada)") : "") + '</span>' : '')
         + '</div></div>';
     }).join("");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
@@ -864,6 +865,22 @@
   // a data traz a DISTRIBUIÇÃO (Founder)? — usado p/ decidir teaser × completo. Robusto ao spoof de localStorage: se a API gateou
   // (sem token de assinante), o base_rate vem como teaser (gated/sem mediana) e o cliente mostra o teaser mesmo com gpaid=true local.
   function analogHasDist(br) { return !!(br && br.h && !br.gated && ["3m", "6m", "12m"].some(function (k) { return br.h[k] && br.h[k].mediana != null; })); }
+  // ★ 1E parte 2 — série de DIFERENÇAS (cruza zero: IPCA, curvas, term premium): o servidor manda
+  //   base_rate.modo:"diff"/unidade:"pp" e o cone vem ADITIVO (lastV + quantil das diferenças). Aqui o sinal
+  //   primário é a unidade do base_rate (sobrevive ao gate free); fallback = cone presente + hist com ≤0
+  //   (espelho da regra temNeg do servidor: cone de razão NUNCA roda em série que cruza zero).
+  function serieDiff(s) { if (!s) return false; var br = s.base_rate; if (br && (br.unidade === "pp" || br.modo === "diff")) return true; return !!(s.cone && s.hist && s.hist.some(function (v) { return v != null && v <= 0; })); }
+  function brUnit(br) { return (br && (br.unidade === "pp" || br.modo === "diff")) ? "pp" : "%"; }
+  // variação em pp computada do PRÓPRIO histórico (display, não método novo) — substitui os cards de retorno %
+  // em série diff (stats.ret de razão vira lixo com base ~0: IPCA marcava "+644% em 6m").
+  function ppDeltas(s) {
+    if (!s || !s.hist || !s.datas || s.datas.length !== s.hist.length || s.hist.length < 2) return null;
+    var n = s.hist.length, last = s.hist[n - 1], ld = new Date(String(s.datas[n - 1]).slice(0, 10) + "T00:00:00Z");
+    if (last == null || !isFinite(last) || isNaN(+ld)) return null;
+    var at = function (mo) { var t = new Date(+ld); t.setUTCMonth(t.getUTCMonth() - mo); var iso = t.toISOString().slice(0, 10);
+      for (var i = n - 1; i >= 0; i--) { if (String(s.datas[i]).slice(0, 10) <= iso) { var v = s.hist[i]; return (v != null && isFinite(v)) ? Math.round((last - v) * 100) / 100 : null; } } return null; };
+    return { m1: at(1), m3: at(3), m6: at(6), y1: at(12) };
+  }
   // modal "ampliar": gráfico grande (futuro realçado) + complementares + correlações — 3ª camada de profundidade
   // ★ ESTÚDIO — cruzar até 3 séries (qualquer classe) rebaseadas a 100, alinhadas por grade MENSAL (lida com diário×mensal) + correlação
   var CMP_COLORS = ["var(--_accent)", "var(--_cool)", "var(--_warm)"];
@@ -932,7 +949,8 @@
     if (!br) return "";  // aceita teaser ({n,classificacao}) OU forma completa (h[])
     if (!analogHasDist(br)) return analogFreeHTML(br, L);  // ★ P1 (rodada 50 personas): a API decide — free recebe h.3m COMPLETO (a jornada termina numa resposta real); spoof local não adiciona dado (6m/12m só vêm com token Founder)
     var HS = [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]];
-    var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
+    var U = brUnit(br);  // 1E p2: série diff → pp
+    var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (U === "pp" ? Math.round(x * 100) / 100 : Math.round(x * 10) / 10) + U; };
     var col = function (x) { return x == null ? "var(--_dim)" : x >= 0 ? "var(--_warm)" : "var(--_cool)"; };
     var rows = "", bars = "";
     for (var i = 0; i < HS.length; i++) {
@@ -943,7 +961,7 @@
       // linha forte: hit% destacado · mediana com sinal · faixa p25…p75 · n casos
       var hitTxt = (hit == null) ? "—" : (L ? "rose in " : "subiu em ") + '<b class="num" style="font-family:var(--_mono);color:' + (thin ? "var(--_dim)" : col(med)) + '">' + hit + '%</b>' + (L ? " of cases" : " dos casos");
       var rng = (p25 != null && p75 != null) ? ' · <span class="num" style="font-family:var(--_mono);color:var(--_dim)">' + sgn(p25) + '…' + sgn(p75) + '</span>' : "";
-      var nTxt = (d.n != null) ? ' · <span style="color:var(--_dim)">' + d.n + (L ? " analogous cases" : " casos análogos") + '</span>' : "";
+      var nTxt = (d.n != null) ? ' · <span style="color:var(--_dim)">' + d.n + (L ? " analogous cases" : " casos análogos") + (d.n_efetivo != null ? (L ? " · effective n " : " · n efetivo ") + d.n_efetivo : "") + '</span>' : "";  // §7.1: janelas sobrepostas → n cru engana; n_efetivo é a amostra independente
       // comparação condicional vs incondicional (o valor real do device): só fonte=knn, se base[hX] existe
       var vsBase = "";
       if (br.fonte === "knn" && br.base && br.base[hk] != null && isFinite(br.base[hk])) {
@@ -987,8 +1005,12 @@
     var imxData = null;  // { a, b, c, datas, labels } — as 2 pontas (rebaseadas) + a razão, alinhadas às datas do numerador; só fica pronto após buscar den+ratio.
     var cur = s.hist[s.hist.length - 1];
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
-    var dp = function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
-    var sgn = function (x) { return (x >= 0 ? "+" : "") + x + "%"; };
+    // 1E p2: série diff (cruza zero) → cone é ADITIVO; o delta é (v − cur) em pp, nunca razão (dividir por ~0 explode)
+    var isDiff = serieDiff(s);
+    var dp = isDiff
+      ? function (v) { return (v != null && cur != null) ? Math.round((v - cur) * 100) / 100 : null; }
+      : function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
+    var sgn = function (x) { return (x >= 0 ? "+" : "") + x + (isDiff ? "pp" : "%"); };
     // gate embed-friendly: o widget só LINKA pro fluxo hospedado (login Google/Apple + Stripe vivem no domínio) — funciona de qualquer site (backlink)
     var checkout = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));  // Stripe Founder: EN=US$149 · PT=R$149
     var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
@@ -1007,7 +1029,13 @@
     if (s.trend_rel && s.trend_rel.score != null) { var trr = s.trend_rel.score;
       var trl = trr >= 8 ? (L ? "strongly outperforming the IBOV" : "forte vs IBOV") : trr >= 6 ? (L ? "outperforming the IBOV" : "acima do IBOV") : trr >= 4 ? (L ? "in line with the IBOV" : "em linha com o IBOV") : trr >= 2 ? (L ? "lagging the IBOV" : "abaixo do IBOV") : (L ? "strongly lagging the IBOV" : "fraco vs IBOV");
       trendBlk += '<div class="rp-ml"><b>' + (L ? "vs IBOV " : "vs IBOV ") + trr + '/10</b> · ' + esc(trl) + ' <span style="opacity:.6">(' + (L ? "the intermarket as a score" : "o intermercado com cara de score") + ')</span></div>'; }
-    if (s.stats) { var st = s.stats;
+    if (s.stats && isDiff) { var stD = s.stats, ppd = ppDeltas(s);
+      // 1E p2 — stats de RAZÃO viram lixo em série que cruza zero (IPCA marcava "+644% em 6m", vol 651%):
+      // variação honesta em pp computada do próprio histórico; vol/Sharpe/drawdown (domínio de razão) abstêm.
+      if (ppd) { var cellsD = [["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]].map(function (p) { var val = ppd[p[0]]; if (val == null) return ""; return '<div class="rp-rcard"><b style="color:var(--_txt)">' + (val >= 0 ? "+" : "") + val + 'pp</b><span>' + esc(p[1]) + '</span></div>'; }).join("");
+        if (cellsD) depth += '<div class="rp-ml" style="margin-top:9px"><b>' + (L ? "Change (pp)" : "Variação (pp)") + '</b></div><div class="rp-rc">' + cellsD + '</div>'; }
+      if (stD.pos52 != null) depth += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(stD.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(stD.hi52)) + '</div><div class="rp-52"><i style="left:' + stD.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + stD.pos52 + (L ? "% of range" : "% da faixa") + '</div>'; }
+    else if (s.stats) { var st = s.stats;
       var labs = st.monthly ? [["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]] : [["d1", "1d"], ["w1", "1sem"], ["m1", "1m"], ["m3", "3m"], ["m6", "6m"], ["y1", "12m"]];
       var neutral = st.is_asset === false;  // P1: macro/fiscal — variação é fato, não bom/ruim; sem cor de valência
       var cells = labs.map(function (p) { var val = st.ret[p[0]]; if (val == null) return ""; var col = neutral ? "var(--_txt)" : (val >= 0 ? "var(--_warm)" : "var(--_cool)"); return '<div class="rp-rcard"><b style="color:' + col + '">' + (val >= 0 ? "+" : "") + val + '%</b><span>' + esc(L && p[1] === "1sem" ? "1w" : p[1]) + '</span></div>'; }).join("");
@@ -1015,7 +1043,8 @@
       if (st.pos52 != null) depth += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(st.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(st.hi52)) + '</div><div class="rp-52"><i style="left:' + st.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + st.pos52 + (L ? "% of range" : "% da faixa") + '</div>';
       depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + (st.dd_top != null ? ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b>' : '') + '</div>';
       if (st.sharpe != null) depth += '<div class="rp-ml" style="opacity:.6"><b>Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0.3 ? (L ? "beats the risk-free" : "supera a renda fixa") : st.sharpe <= -0.3 ? (L ? "below the risk-free" : "abaixo da renda fixa") : (L ? "statistically indistinguishable from the risk-free" : "estatisticamente indistinguível da renda fixa")) + '</div>'; }  // ★ Sharpe demovido (briefing: baixa prioridade, não compete com os precedentes)
-    h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (cone ? (L ? "price · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : "preço · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)"))) + '</div>';
+    var wSerie = (isDiff || (s.stats && s.stats.is_asset === false)) ? (L ? "series" : "série") : (L ? "price" : "preço");  // 1E p2: subtítulo "preço" genérico era mentira p/ IPCA/curva
+    h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (cone ? wSerie + (L ? " · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : " · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : wSerie + (L ? " · history → today → projection (dashed)" : " · histórico → hoje → projeção (tracejada)"))) + '</div>';
     // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis.
     // ★ P1 2026-06-10 (rodada 50 personas): TODOS os períodos do gráfico de PREÇO são free — histórico de preço é commodity ("travar é incoerente com o pitch de memória", ~20 personas); o moat real (cone/faixas/hit-rate) segue gateado no SERVIDOR. Fecha também o furo B3 (lock era só client-side).
     h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", L ? "1Y" : "1A"], ["36", L ? "3Y" : "3A"], ["0", "MAX"]].map(function (p) {
@@ -1406,14 +1435,20 @@
   //   distribuição (mediana/hit/dispersão) é Founder. Sem manipulação (snapshot read-only).
   function _cmpFetch(cod, cls) { return fetch(API.replace("/v1/digest", "/v1/serie") + "?codigo=" + encodeURIComponent(cod) + "&classe=" + encodeURIComponent(cls), fopt()).then(function (r) { return r.json(); }).catch(function () { return null; }); }
   function _cmpRetCards(s, L) {
+    if (serieDiff(s)) { var ppd = ppDeltas(s);  // 1E p2: série diff → variação em pp (stats.ret de razão engana)
+      if (!ppd) return "";
+      var cellsD = [["m3", "3m"], ["m6", "6m"], ["y1", "12m"]].map(function (p) { var v = ppd[p[0]]; if (v == null) return ""; return '<div class="rp-rcard"><b style="color:var(--_txt)">' + (v >= 0 ? "+" : "") + v + 'pp</b><span>' + esc(p[1]) + '</span></div>'; }).join("");
+      return cellsD ? '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "Change (pp)" : "Variação (pp)") + '</b></div><div class="rp-rc">' + cellsD + '</div>' : "";
+    }
     if (!s.stats || !s.stats.ret) return "";
     var st = s.stats, neutral = st.is_asset === false;
     var cells = [["m3", "3m"], ["m6", "6m"], ["y1", "12m"]].map(function (p) { var v = st.ret[p[0]]; if (v == null) return ""; var col = neutral ? "var(--_txt)" : (v >= 0 ? "var(--_warm)" : "var(--_cool)"); return '<div class="rp-rcard"><b style="color:' + col + '">' + (v >= 0 ? "+" : "") + v + '%</b><span>' + esc(p[1]) + '</span></div>'; }).join("");
     return cells ? '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "Returns" : "Retornos") + '</b></div><div class="rp-rc">' + cells + '</div>' : "";
   }
   function _cmpConeLine(s, L, gpaid) {
-    var cur = s.hist[s.hist.length - 1], cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null; if (!cone || !cur) return "";
-    var dp = function (v) { return v != null ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; }, sgn = function (x) { return (x >= 0 ? "+" : "") + x + "%"; };
+    var cur = s.hist[s.hist.length - 1], cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null; if (!cone || cur == null) return "";
+    var isDiff = serieDiff(s);  // 1E p2: cone aditivo → delta em pp
+    var dp = isDiff ? function (v) { return v != null ? Math.round((v - cur) * 100) / 100 : null; } : function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; }, sgn = function (x) { return (x >= 0 ? "+" : "") + x + (isDiff ? "pp" : "%"); };
     var dmid = dp(cone.mid[cone.mid.length - 1]);
     if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null, dhi2 = cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null;
       return '<div class="rp-ml" style="margin-top:6px"><b style="color:var(--_warm)">' + (L ? "Median " : "Mediana ") + sgn(dmid) + '</b>' + (dlo != null ? ' · 50% ' + sgn(dlo) + '…' + sgn(dhi) : '') + (dlo2 != null ? ' · 80% ' + sgn(dlo2) + '…' + sgn(dhi2) : '') + '</div>'; }
@@ -1426,23 +1461,27 @@
   function _cmpVerdict(sA, sB, xA, xB, L, gpaid) {
     var rows = [], h6 = function (s, k) { var br = s && s.base_rate; return (br && br.h && br.h["6m"]) ? br.h["6m"][k] : null; };
     var num = function (v) { return (v != null && isFinite(v)) ? v : null; };
-    function row(label, va, vb, fmt, higherWins) {
+    function row(label, va, vb, fmt, higherWins, fmtB) {
       if (va == null && vb == null) return;
-      var win = (va != null && vb != null && va !== vb) ? (higherWins ? (va > vb ? 'a' : 'b') : (va < vb ? 'a' : 'b')) : '';
-      rows.push('<tr><td>' + esc(label) + '</td><td' + (win === 'a' ? ' class="win"' : '') + '>' + (va != null ? fmt(va) : '—') + '</td><td' + (win === 'b' ? ' class="win"' : '') + '>' + (vb != null ? fmt(vb) : '—') + '</td></tr>');
+      var win = (higherWins != null && va != null && vb != null && va !== vb) ? (higherWins ? (va > vb ? 'a' : 'b') : (va < vb ? 'a' : 'b')) : '';  // higherWins null = sem vencedor (unidades diferentes não competem)
+      rows.push('<tr><td>' + esc(label) + '</td><td' + (win === 'a' ? ' class="win"' : '') + '>' + (va != null ? fmt(va) : '—') + '</td><td' + (win === 'b' ? ' class="win"' : '') + '>' + (vb != null ? (fmtB || fmt)(vb) : '—') + '</td></tr>');
     }
-    var pf = function (v) { return (v >= 0 ? "+" : "") + v + "%"; }, pp = function (v) { return v + "pp"; };
+    // 1E p2: unidade POR LADO (série diff = pp, preço = %); lados com unidades distintas não disputam o "win"
+    var uA = brUnit(sA && sA.base_rate), uB = brUnit(sB && sB.base_rate), mixed = uA !== uB;
+    var pfU = function (u) { return function (v) { return (v >= 0 ? "+" : "") + v + u; }; };
+    var pp = function (v) { return v + "pp"; };
     var nA = sA && sA.base_rate ? (sA.base_rate.n != null ? sA.base_rate.n : h6(sA, "n")) : null, nB = sB && sB.base_rate ? (sB.base_rate.n != null ? sB.base_rate.n : h6(sB, "n")) : null;
     row(L ? "Episodes (n)" : "Episódios (n)", num(nA), num(nB), function (v) { return "" + v; }, true);
     var distA = sA && sA.base_rate && sA.base_rate.h && !sA.base_rate.gated, distB = sB && sB.base_rate && sB.base_rate.h && !sB.base_rate.gated;
     if (distA || distB) {
-      row(L ? "Median 6m" : "Mediana 6m", num(h6(sA, "mediana")), num(h6(sB, "mediana")), pf, true);
+      row(L ? "Median 6m" : "Mediana 6m", num(h6(sA, "mediana")), num(h6(sB, "mediana")), pfU(uA), mixed ? null : true, pfU(uB));
       row(L ? "Hit rate 6m" : "Taxa de alta 6m", num(h6(sA, "hit")), num(h6(sB, "hit")), function (v) { return v + "%"; }, true);
       var disp = function (s) { var p7 = h6(s, "p75"), p2 = h6(s, "p25"); return (p7 != null && p2 != null) ? Math.round((p7 - p2) * 10) / 10 : null; };
-      row(L ? "Dispersion 6m (p25–p75)" : "Dispersão 6m (p25–p75)", num(disp(sA)), num(disp(sB)), pp, true);
+      row(L ? "Dispersion 6m (p25–p75)" : "Dispersão 6m (p25–p75)", num(disp(sA)), num(disp(sB)), pp, mixed ? null : true);
     } else { rows.push('<tr><td>' + (L ? "Median · hit · dispersion 6m" : "Mediana · alta · dispersão 6m") + '</td><td colspan="2" style="text-align:center;opacity:.65"><span style="color:var(--_accent)">🔒</span> Founder</td></tr>'); }
-    row(L ? "Volatility" : "Volatilidade", num(sA && sA.stats && sA.stats.vol), num(sB && sB.stats && sB.stats.vol), function (v) { return v + "%"; }, false);
-    row("Sharpe", num(sA && sA.stats && sA.stats.sharpe), num(sB && sB.stats && sB.stats.sharpe), function (v) { return "" + v; }, true);
+    // vol/Sharpe são domínio de RAZÃO → lado diff abstém (IPCA marcava vol 651%)
+    row(L ? "Volatility" : "Volatilidade", num(!serieDiff(sA) && sA && sA.stats && sA.stats.vol), num(!serieDiff(sB) && sB && sB.stats && sB.stats.vol), function (v) { return v + "%"; }, false);
+    row("Sharpe", num(!serieDiff(sA) && sA && sA.stats && sA.stats.sharpe), num(!serieDiff(sB) && sB && sB.stats && sB.stats.sharpe), function (v) { return "" + v; }, true);
     if (rows.length < 2) return "";
     return '<div class="rp-tier2" style="margin-top:20px">' + (L ? "Precedents · head to head" : "Precedentes · comparativo") + '</div>' +
       '<table class="rp-cmptbl"><thead><tr><th></th><th>' + esc(xA.nome) + '</th><th>' + esc(xB.nome) + '</th></tr></thead><tbody>' + rows.join("") + '</tbody></table>' +
@@ -1858,7 +1897,8 @@
             var inner = "";
             if (s && s.hist && s.hist.length > 1) {
               var _gp = rpIsPro();  // linha de valor-justo = Founder (free vê só texto)
-              inner += '<span class="mt" style="display:block">' + (lang === "en" ? "price · history → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : "preço · histórico → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair) ? s.fair.serie : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
+              var _wS = (serieDiff(s) || (s.stats && s.stats.is_asset === false)) ? (lang === "en" ? "series" : "série") : (lang === "en" ? "price" : "preço");  // 1E p2: subtítulo honesto
+              inner += '<span class="mt" style="display:block">' + (lang === "en" ? _wS + " · history → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : _wS + " · histórico → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair) ? s.fair.serie : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
               if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (s.mercado_br === false ? (lang === "en" ? "Global risk-on/off (ticks = past extremes)" : "Risco global · risk-on/off (traços = extremos passados)") : (lang === "en" ? "Perene Risk Index · risk-on/off (ticks = past extremes)" : "Índice de Risco Perene · risk-on/off (traços = extremos passados)")) + '</span>' + riskPane(s.risco);
