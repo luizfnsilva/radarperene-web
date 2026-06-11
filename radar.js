@@ -276,14 +276,16 @@
   }
   // ── modal de "carregando" enquanto a engine uPlot baixa (lazy-load): o clique abre JÁ um shell com
   //    "Carregando gráfico…" (mesma trava de scroll, sem 2ª rolagem) → quando a engine pronta, fecha e
-  //    abre o gráfico rico. Nunca degrada p/ SVG. Clicar fora cancela (ref.cancelled → não reabre).
+  //    abre o gráfico rico. Nunca degrada p/ SVG. Clicar fora OU Esc cancela (ref.cancelled → não reabre).
   function rpLoadingModal(lang) {
     var L = lang === "en";
     var mw = document.createElement("div"); mw.className = "rp-mw";
     mw.innerHTML = '<div class="rp rp-mc" role="dialog" aria-modal="true" aria-busy="true"><div class="rp-ml" style="padding:34px 12px;text-align:center;opacity:.82">' + (L ? "Loading chart…" : "Carregando gráfico…") + '</div></div>';
     var ref = { cancelled: false };
-    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); unlockScroll(); }
+    function close() { if (!mw.parentNode) return; mw.parentNode.removeChild(mw); document.removeEventListener("keydown", onkey); unlockScroll(); }
+    function onkey(e) { if (e.key === "Escape") { ref.cancelled = true; close(); } }
     mw.addEventListener("click", function (e) { if (e.target === mw) { ref.cancelled = true; close(); } });
+    document.addEventListener("keydown", onkey);
     lockScroll(); document.body.appendChild(mw);
     ref.close = close;
     return ref;
@@ -317,7 +319,7 @@
       + (RP_TABS.length > 1 ? '<div class="rp-dtab" role="tablist">' + tabs + '</div>' : '')
       + '<div class="rp-dbody"></div></div>';
     var body = dw.querySelector(".rp-dbody"), built = {};
-    function onkey(e) { if (e.key === "Escape") close(); }
+    function onkey(e) { if (e.key === "Escape" && !document.querySelector(".rp-mw")) close(); }  // modal/loading (.rp-mw) empilhado por cima → o Esc é dele (o listener do drawer registra ANTES e dispararia junto); o drawer fecha só no próximo Esc
     function close() { if (!dw.parentNode) return; rpTeardownCharts(dw); dw.classList.remove("rp-open"); document.removeEventListener("keydown", onkey); setTimeout(function () { if (dw.parentNode) dw.parentNode.removeChild(dw); }, 220); unlockScroll(); }  // remove o nó após a transição de saída (~220ms); ref-count do lockScroll permite aninhar drawer→modal
     var ctx = { close: close, lang: lang, registerChart: function (el, draw) { _upMounted.push({ el: el, draw: draw }); } };
     function showTab(key) {
