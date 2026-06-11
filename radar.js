@@ -226,7 +226,7 @@
       ".rp-mw{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,10,14,.55)}" +
       ".rp-mc{position:relative;max-width:560px!important;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px!important;box-shadow:0 18px 60px rgba(0,0,0,.4);cursor:default}" +
       ".rp-mc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-mc .rp-x:hover{color:var(--_accent)}" +
-      ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}@media(max-width:600px){.rp-mw{padding:5px}.rp-mc{padding:13px 13px 12px!important;max-height:94vh}.rp-mc .rp-mt{font-size:13.5px;margin-right:26px}.rp-mc .rp-ml{font-size:9.8px;margin-top:4px}.rp-mc .bc.big{height:124px}.rp-mc .rp-per{gap:4px}}" +
+      ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}@media(max-width:600px){.rp-mw{padding:5px}.rp-mc{padding:13px 13px 12px!important;max-height:94vh}.rp-mc .rp-mt{font-size:13.5px;margin-right:26px}.rp-mc .rp-ml{font-size:9.8px;margin-top:4px}.rp-mc .bc.big{height:124px}.rp-mc .rp-per{gap:6px}.rp-mc .rp-per button{padding:11px 13px;font-size:11px}.rp-mc .rp-x,.rp-dc .rp-x{padding:12px 14px;top:0;right:0}.rp-mc .rp-ob,.rp-mc .rp-asel{padding:10px 12px!important}.rp .rp-explore{padding:13px 0;font-size:13.5px}}" +  // B4 (QA mobile): alvos de toque ≥40px no celular (chips 25px / × 27px / toggles 19px reprovaram); desktop intacto
       ".rp-mc .rp-strip{display:flex;gap:9px 20px;flex-wrap:wrap;margin-top:4px}.rp-mc .rp-st{display:flex;flex-direction:column;min-width:34px;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-st b{font-size:13px;line-height:1.15;white-space:nowrap}.rp-mc .rp-st span{font-size:9px;color:var(--_dim);margin-top:1px}" +
       ".rp-mc .rp-rc{display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:6px;margin-top:5px}.rp-mc .rp-rcard{background:var(--_card2);border:1px solid var(--_line);border-radius:8px;padding:8px 5px;text-align:center;min-height:46px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-rcard b{display:block;font-size:13.5px;line-height:1.1;white-space:nowrap;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-rcard span{display:block;font-size:8.5px;color:var(--_dim);margin-top:3px;letter-spacing:.02em;text-transform:uppercase}" +
       ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
@@ -248,6 +248,7 @@
       "@media(max-width:600px){.rp-dw{justify-content:stretch;align-items:flex-end}.rp-dc{width:100%;max-width:100%;height:auto;max-height:90vh;border-left:0;border-top:1px solid var(--_line);transform:translateY(100%);box-shadow:0 -18px 60px rgba(0,0,0,.32)}.rp-dw.rp-open .rp-dc{transform:translateY(0)}}" +
       // Fase 1B: porta discreta "Explorar →" (não é menu) + grade da aba Mercados dentro do drawer
       ".rp .rp-explore{display:inline-flex;align-items:center;gap:5px;margin:2px 0 8px;font-size:12.5px;color:var(--_dim);background:transparent;border:0;cursor:pointer;padding:5px 0;font-family:var(--_font)}.rp .rp-explore:hover{color:var(--_accent)}.rp .rp-explore .a{transition:transform .15s}.rp .rp-explore:hover .a{transform:translateX(3px)}" +
+      ".rp-dc .rp-mks{display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:9px 12px;font:12.5px var(--_font);color:var(--_txt);background:var(--_card2);border:1px solid var(--_line);border-radius:8px;outline:none}.rp-dc .rp-mks:focus{border-color:var(--_accent)}.rp-dc .rp-mks::placeholder{color:var(--_dim)}" +  // busca da aba Mercados (fricção nº 11 da rodada)
       ".rp-dc .rp-mkg{margin-bottom:13px}.rp-dc .rp-mkh{font-size:11px;color:var(--_dim);font-weight:700;margin-bottom:5px}.rp-dc .rp-mkt-row{display:flex;gap:5px;flex-wrap:wrap}" +
       ".rp-dc .rp-mkt{font-family:var(--_mono);font-size:11px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:6px;padding:4px 9px;cursor:pointer;transition:border-color .12s,color .12s}.rp-dc .rp-mkt:hover{border-color:var(--_accent);color:var(--_accent)}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
@@ -348,8 +349,26 @@
     rpEnsureCatalog(ctx.lang, function () {
       var src = (RP_CAT_FULL && RP_CAT_FULL.length) ? RP_CAT_FULL : RP_CAT;
       if (!src.length) { pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "catalog unavailable" : "catálogo indisponível") + '</div>'; return; }
-      pane.innerHTML = '<div class="rp-ml" style="opacity:.72;margin-bottom:10px">' + (L ? "Every series the Radar tracks, by sector and class — click any for its chart, analogs and projection." : "Todas as séries que o Radar acompanha, por setor e classe — clique em qualquer uma para o gráfico, análogos e projeção.") + '</div>' +
+      pane.innerHTML = '<div class="rp-ml" style="opacity:.72;margin-bottom:8px">' + (L ? "Every series the Radar tracks, by sector and class — click any for its chart, analogs and projection." : "Todas as séries que o Radar acompanha, por setor e classe — clique em qualquer uma para o gráfico, análogos e projeção.") + '</div>' +
+        '<input class="rp-mks" type="search" autocomplete="off" placeholder="' + (L ? "Search asset (name or ticker)…" : "Buscar ativo (nome ou código)…") + '" aria-label="' + (L ? "Search asset" : "Buscar ativo") + '">' +
+        '<div class="rp-mks-none rp-ml" style="display:none;opacity:.7;margin:8px 0">' + (L ? "no asset matches the search" : "nenhum ativo corresponde à busca") + '</div>' +
         src.map(function (g) { return '<div class="rp-mkg"><div class="rp-mkh">' + esc(g.cat) + ' <span style="opacity:.55;font-weight:400">· ' + g.items.length + '</span></div><div class="rp-mkt-row">' + g.items.map(function (it) { return '<button class="rp-mkt" data-cod="' + esc(it.cod) + '" data-cls="' + esc(it.cls) + '" data-nome="' + esc(it.nome) + '">' + esc(it.nome) + '</button>'; }).join("") + '</div></div>'; }).join("");
+      // busca local (fricção nº 11 da rodada 50 personas: "drawer sem busca interna"): filtra nome+código,
+      // acento-insensível; grupo sem resultado some. Sem fetch — opera sobre o catálogo já montado.
+      var inp = pane.querySelector(".rp-mks"), noneEl = pane.querySelector(".rp-mks-none");
+      var norm = function (s) { s = String(s || "").toLowerCase(); try { s = s.normalize("NFD").replace(/[̀-ͯ]/g, ""); } catch (e) {} return s; };
+      if (inp) inp.addEventListener("input", function () {
+        var q = norm(inp.value).trim(), any = false;
+        pane.querySelectorAll(".rp-mkg").forEach(function (gEl) {
+          var vis = 0;
+          gEl.querySelectorAll(".rp-mkt").forEach(function (b) {
+            var hit = !q || norm(b.getAttribute("data-nome")).indexOf(q) >= 0 || norm(b.getAttribute("data-cod")).indexOf(q) >= 0;
+            b.style.display = hit ? "" : "none"; if (hit) vis++;
+          });
+          gEl.style.display = vis ? "" : "none"; if (vis) any = true;
+        });
+        if (noneEl) noneEl.style.display = any ? "none" : "";
+      });
     });
     pane.addEventListener("click", function (e) {
       var t = e.target; if (!t || !t.getAttribute || ("" + (t.className || "")).indexOf("rp-mkt") < 0) return;
@@ -786,7 +805,7 @@
   // P7: distribuição empírica de casos passados, NUNCA previsão/sinal de trade. Degrada se s.base_rate ausente/incompleto.
   function baseRatePanel(br, L, pro) {
     if (!br) return "";  // aceita teaser ({n,classificacao}) OU forma completa (h[])
-    if (!pro || !analogHasDist(br)) return analogFreeHTML(br, L);  // ★ free OU data gateada pela API = teaser (moat); Founder com distribuição = completo
+    if (!analogHasDist(br)) return analogFreeHTML(br, L);  // ★ P1 (rodada 50 personas): a API decide — free recebe h.3m COMPLETO (a jornada termina numa resposta real); spoof local não adiciona dado (6m/12m só vêm com token Founder)
     var HS = [["3m", "3m"], ["6m", "6m"], ["12m", "12m"]];
     var sgn = function (x) { return (x == null || !isFinite(x)) ? "—" : (x >= 0 ? "+" : "") + (Math.round(x * 10) / 10) + "%"; };
     var col = function (x) { return x == null ? "var(--_dim)" : x >= 0 ? "var(--_warm)" : "var(--_cool)"; };
@@ -872,9 +891,10 @@
       depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + (st.dd_top != null ? ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b>' : '') + '</div>';
       if (st.sharpe != null) depth += '<div class="rp-ml" style="opacity:.6"><b>Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }  // ★ Sharpe demovido (briefing: baixa prioridade, não compete com os precedentes)
     h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (cone ? (L ? "price · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : "preço · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)"))) + '</div>';
-    // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis. Free: 3M/6M livres, 1A/3A/MAX no Founder (gate). Decisão do dono.
-    h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", "1A"], ["36", "3A"], ["0", "MAX"]].map(function (p) {
-      var m = parseFloat(p[0]); var locked = !gpaid && (m === 0 || m > 3);  // free = só 3M (decisão do dono); 6M/1A/3A/MAX = Founder. 0 = MAX (o mais longo)
+    // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis.
+    // ★ P1 2026-06-10 (rodada 50 personas): TODOS os períodos do gráfico de PREÇO são free — histórico de preço é commodity ("travar é incoerente com o pitch de memória", ~20 personas); o moat real (cone/faixas/hit-rate) segue gateado no SERVIDOR. Fecha também o furo B3 (lock era só client-side).
+    h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", L ? "1Y" : "1A"], ["36", L ? "3Y" : "3A"], ["0", "MAX"]].map(function (p) {
+      var m = parseFloat(p[0]); var locked = false; void m;  // períodos livres p/ todos (ver acima)
       var cls = (p[0] === "3" ? "on" : "") + (locked ? " lock" : "");
       return '<button data-m="' + p[0] + '"' + (locked ? ' data-max="1"' : '') + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + esc(p[1]) + (locked ? " 🔒" : "") + '</button>';
     }).join("") + '</div>';
@@ -1489,7 +1509,7 @@
     if (show("scatter") && rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);
       h += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "today's regime band" : "faixa do regime de hoje") + ' · <span style="color:var(--_warm)">●</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">●</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' +
         '<div style="display:flex;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:230px">' + scatterChart(sct) + '<div class="legend" style="margin-top:3px">' + (L ? "the cloud · today highlighted" : "a nuvem · hoje em destaque") + '</div></div>' +
-        (dist ? '<div style="flex:1;min-width:230px">' + dist.svg + '<div class="legend" style="margin-top:3px">' + (L ? "outcome distribution · most between " : "distribuição dos desfechos · maioria entre ") + (dist.p25 >= 0 ? "+" : "") + dist.p25 + '% ' + (L ? "and " : "e ") + (dist.p75 >= 0 ? "+" : "") + dist.p75 + '% (' + (L ? "median " : "mediana ") + (dist.p50 >= 0 ? "+" : "") + dist.p50 + '%, n=' + dist.n + ')</div></div>' : '') +
+        (dist ? '<div style="flex:1;min-width:230px">' + dist.svg + '<div class="legend" style="margin-top:3px">' + (L ? "outcomes within today's band (scatter cut — a different method from the k-NN analog above) · most between " : "desfechos na faixa de hoje (recorte do scatter — método distinto do análogo k-NN acima) · maioria entre ") + (dist.p25 >= 0 ? "+" : "") + dist.p25 + '% ' + (L ? "and " : "e ") + (dist.p75 >= 0 ? "+" : "") + dist.p75 + '% (' + (L ? "median " : "mediana ") + (dist.p50 >= 0 ? "+" : "") + dist.p50 + '%, n=' + dist.n + ')</div></div>' : '') +
         '</div>' + (sct.leitura ? '<div class="legend" style="margin-top:4px">' + esc(sct.leitura) + '</div>' : ''); }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
