@@ -1472,6 +1472,20 @@
             (a.total && a.total > a.itens.length ? '<div class="legend">+ ' + (a.total - a.itens.length) + ' ' + esc(a.nota || (L ? 'in the app' : 'no app')) + '</div>' : '');
         };
         var am = buildAm(l.amostra) + buildAm(l.amostra2);  // amostra2 = grupo extra clicável+cruzável (Macro fiscal/M, Imobiliária custo/crédito)
+        // ★ card do m² (2026-06-11, pedido do dono): cidade · venda R$/m² (DATA) · aluguel (DATA, clicável aninhado —
+        //   a delegação acha o data-cod mais próximo) · rendimento · análogo 3m. Payload: rr.imovel_m2 (digest).
+        if ((l.key === "imobiliaria" || /imobili/i.test(l.nome || "")) && rr.imovel_m2 && rr.imovel_m2.length) {
+          var fD = function (d) { return d ? " · " + String(d).slice(5, 7) + "/" + String(d).slice(0, 4) : ""; };
+          am += '<div class="mi" style="margin:7px 0 2px"><b>' + (L ? "Cost per m² (FipeZap)" : "Custo do m² (FipeZap)") + '</b></div><div class="tk">' +
+            rr.imovel_m2.map(function (m) {
+              var an = m.analogos && m.analogos.venda && m.analogos.venda["3m"];
+              var mt = (m.venda != null ? "R$ " + Number(m.venda).toLocaleString(L ? "en-US" : "pt-BR") + "/m²" + fD(m.data) : "") +
+                (m.rend != null ? " · " + (L ? "yield " : "rend ") + m.rend + "%" : "") +
+                (an && an.med != null ? " · 3m " + (an.med >= 0 ? "+" : "") + an.med + "%" + (an.hit != null ? " (" + an.hit + "%↑)" : "") : "");
+              var alug = (m.aluguel != null && m.cod_aluguel) ? '<span data-cod="' + esc(String(m.cod_aluguel).toLowerCase()) + '" data-cls="' + esc(m.cls || "macro") + '" style="text-decoration:underline dotted;cursor:pointer"> · ' + (L ? "rent" : "aluguel") + ' R$ ' + m.aluguel + fD(m.data_aluguel) + '</span>' : "";
+              return '<span class="i" data-cod="' + esc(String(m.cod).toLowerCase()) + '" data-cls="' + esc(m.cls || "macro") + '"><span class="sy">' + esc(m.cidade) + '</span><span class="mt">' + mt + alug + '</span></span>';
+            }).join("") + '</div><div class="legend">' + (L ? "click the city → dated sale chart · click rent → rent chart · 3m = median analog (hit)" : "clique na cidade → gráfico datado da venda · clique no aluguel → gráfico do aluguel · 3m = análogo mediano (hit)") + '</div>';
+        }
         var more = (l.desc || l.indicador_desc || am) ? '<div class="more">' + (l.desc ? '<div class="mi">' + (L ? "The lens — " : "A lente — ") + esc(l.desc) + '</div>' : '') + (l.indicador_desc ? '<div class="mi"><b>' + esc(l.indicador) + ':</b> ' + esc(l.indicador_desc) + '</div>' : '') + am + '</div>' : '';
         return '<div class="ln ' + esc(l.tom) + '"' + (more ? ' data-exp="1"' : '') + '><div class="lk">' + esc(l.nome) + (more ? ' <span class="lr" style="opacity:.55">＋</span>' : '') + '</div><div class="li">' + esc(l.indicador) + '</div>' +
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
