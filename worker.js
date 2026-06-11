@@ -449,7 +449,11 @@ function _renderDiarioIndex(data, origin, lang) {
   //   dia a manchete diária já existe.)
   const rows = itens.map(function (s) {
     const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
-    return "<li><a href=\"" + dpath + "/" + s.data + "\">" + s.data + "</a>" + (s.global ? " — " + (en ? "global " : "global ") + _esc(s.global) : "") + " · <span class=\"mn\">" + (en ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg) + "</span></li>";
+    // 30b: a linha PULSA — Perene/Ânima mudam todo dia útil (vêm do /v1/snapshots); regime mensal fica como cauda rotulada
+    const dia = [s.perene != null ? (en ? "Perene Risk " : "Perene ") + "<b>" + s.perene + "</b>" : null,
+      s.anima != null ? "Ânima <b>" + s.anima + "</b>" : null,
+      s.global ? (en ? "global " : "global ") + _esc(s.global) : null].filter(Boolean).join(" · ");
+    return "<li><a href=\"" + dpath + "/" + s.data + "\">" + s.data + "</a>" + (dia ? " — " + dia : "") + " · <span class=\"mn\">" + (en ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg) + "</span></li>";
   }).join("");
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
