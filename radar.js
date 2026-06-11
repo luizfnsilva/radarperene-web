@@ -254,6 +254,7 @@
       // Fase 1B: porta discreta "Explorar →" (não é menu) + grade da aba Mercados dentro do drawer
       ".rp .rp-explore{display:inline-flex;align-items:center;gap:5px;margin:2px 0 8px;font-size:12.5px;color:var(--_dim);background:transparent;border:0;cursor:pointer;padding:5px 0;font-family:var(--_font)}.rp .rp-explore:hover{color:var(--_accent)}.rp .rp-explore .a{transition:transform .15s}.rp .rp-explore:hover .a{transform:translateX(3px)}" +
       ".rp-dc .rp-mks{display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:9px 12px;font:12.5px var(--_font);color:var(--_txt);background:var(--_card2);border:1px solid var(--_line);border-radius:8px;outline:none}.rp-dc .rp-mks:focus{border-color:var(--_accent)}.rp-dc .rp-mks::placeholder{color:var(--_dim)}" +  // busca da aba Mercados (fricção nº 11 da rodada)
+      ".rp-dc .rp-mkix{display:flex;flex-wrap:wrap;gap:4px 6px;margin:0 0 12px}.rp-dc .rp-mki{font-family:var(--_mono);font-size:10px;color:var(--_dim);background:transparent;border:1px solid var(--_line);border-radius:6px;padding:4px 8px;cursor:pointer}.rp-dc .rp-mki b{color:var(--_txt);font-weight:600}.rp-dc .rp-mki:hover{border-color:var(--_accent);color:var(--_accent)}.rp-dc .rp-mki:hover b{color:var(--_accent)}" +  // counts-forward: índice nome·contagem → ancora no grupo (sem accordion)
       ".rp-dc .rp-mkg{margin-bottom:13px}.rp-dc .rp-mkh{font-size:11px;color:var(--_dim);font-weight:700;margin-bottom:5px}.rp-dc .rp-mkt-row{display:flex;gap:5px;flex-wrap:wrap}" +
       ".rp-dc .rp-mkt{font-family:var(--_mono);font-size:11px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:6px;padding:4px 9px;cursor:pointer;transition:border-color .12s,color .12s}.rp-dc .rp-mkt:hover{border-color:var(--_accent);color:var(--_accent)}" +
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
@@ -356,15 +357,21 @@
       if (!src.length) { pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "catalog unavailable" : "catálogo indisponível") + '</div>'; return; }
       pane.innerHTML = '<div class="rp-ml" style="opacity:.72;margin-bottom:8px">' + (L ? "Every series the Radar tracks, by sector and class — click any for its chart, analogs and projection." : "Todas as séries que o Radar acompanha, por setor e classe — clique em qualquer uma para o gráfico, análogos e projeção.") + '</div>' +
         '<input class="rp-mks" type="search" autocomplete="off" placeholder="' + (L ? "Search asset (name or ticker)…" : "Buscar ativo (nome ou código)…") + '" aria-label="' + (L ? "Search asset" : "Buscar ativo") + '">' +
+        // ★ counts-forward (decisão do dono pós-rodada): linha-ÍNDICE com nome · contagem de cada grupo; clique ancora
+        //   no grupo. Escaneável SEM accordion (guardrail) — a lista inteira continua renderizada abaixo.
+        '<div class="rp-mkix">' + src.map(function (g, i) { return '<button type="button" class="rp-mki" data-gi="' + i + '">' + esc(g.cat) + ' <b>' + g.items.length + '</b></button>'; }).join("") + '</div>' +
         '<div class="rp-mks-none rp-ml" style="display:none;opacity:.7;margin:8px 0">' + (L ? "no asset matches the search" : "nenhum ativo corresponde à busca") + '</div>' +
         src.map(function (g) { return '<div class="rp-mkg"><div class="rp-mkh">' + esc(g.cat) + ' <span style="opacity:.55;font-weight:400">· ' + g.items.length + '</span></div><div class="rp-mkt-row">' + g.items.map(function (it) { return '<button class="rp-mkt" data-cod="' + esc(it.cod) + '" data-cls="' + esc(it.cls) + '" data-nome="' + esc(it.nome) + '">' + esc(it.nome) + '</button>'; }).join("") + '</div></div>'; }).join("");
+      pane.querySelectorAll(".rp-mki").forEach(function (b) {
+        b.addEventListener("click", function () { var i = parseInt(b.getAttribute("data-gi"), 10); var gEl = pane.querySelectorAll(".rp-mkg")[i]; if (gEl) gEl.scrollIntoView({ behavior: "smooth", block: "start" }); });
+      });
       // busca local (fricção nº 11 da rodada 50 personas: "drawer sem busca interna"): filtra nome+código,
       // acento-insensível; grupo sem resultado some. Sem fetch — opera sobre o catálogo já montado.
       var inp = pane.querySelector(".rp-mks"), noneEl = pane.querySelector(".rp-mks-none");
       var norm = function (s) { s = String(s || "").toLowerCase(); try { s = s.normalize("NFD").replace(/[̀-ͯ]/g, ""); } catch (e) {} return s; };
       if (inp) inp.addEventListener("input", function () {
         var toks = norm(inp.value).split(/\s+/).filter(Boolean), any = false;  // multi-palavra: TODOS os tokens, em qualquer ordem ("são paulo venda" acha "São Paulo · venda m²")
-        pane.querySelectorAll(".rp-mkg").forEach(function (gEl) {
+        pane.querySelectorAll(".rp-mkg").forEach(function (gEl, gi) {
           var vis = 0;
           gEl.querySelectorAll(".rp-mkt").forEach(function (b) {
             var hay = norm(b.getAttribute("data-nome")) + " " + norm(b.getAttribute("data-cod")) + " " + norm((gEl.querySelector(".rp-mkh") || {}).textContent || "");
@@ -372,6 +379,7 @@
             b.style.display = hit ? "" : "none"; if (hit) vis++;
           });
           gEl.style.display = vis ? "" : "none"; if (vis) any = true;
+          var ix = pane.querySelectorAll(".rp-mki")[gi]; if (ix) ix.style.display = vis ? "" : "none";  // índice acompanha a busca
         });
         if (noneEl) noneEl.style.display = any ? "none" : "";
       });
