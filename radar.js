@@ -57,7 +57,12 @@
       .then(function (d) {
         var uni = (d && d.grupos) ? d.grupos.map(function (g) { return { cat: g.cat, items: g.items }; }) : [];
         var SYNTH = { intermercado: 1, intermercado_ratio: 1, intermercado_den: 1, macro: 1 };  // composições intermercado + imóveis/FIPEZAP + fiscal vivem SÓ no digest (fora do universo /v1/tickers) → preserva-as
-        var digestOnly = (RP_CAT || []).filter(function (g) { return g.items.some(function (it) { return SYNTH[it.cls]; }); });
+        // ★ catálogo TOTAL (2026-06-11): o /v1/catalog agora traz imóveis/macro/tesouro — dedupe por cod|cls p/ o
+        //   item do digest não aparecer 2x; sobram no digestOnly só composições que o catálogo ainda não tem.
+        var seen = {}; uni.forEach(function (g) { g.items.forEach(function (it) { seen[it.cod + "|" + it.cls] = 1; }); });
+        var digestOnly = (RP_CAT || []).filter(function (g) { return g.items.some(function (it) { return SYNTH[it.cls]; }); })
+          .map(function (g) { return { cat: g.cat, items: g.items.filter(function (it) { return !seen[it.cod + "|" + it.cls]; }) }; })
+          .filter(function (g) { return g.items.length; });
         RP_CAT_FULL = uni.length ? uni.concat(digestOnly) : RP_CAT;
         RP_CAT_LOADING = false; var w = RP_CAT_WAIT; RP_CAT_WAIT = []; w.forEach(function (f) { f(); });
       })
