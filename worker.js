@@ -105,6 +105,11 @@ const EN_GRAPH = JSON.stringify({
   ]
 });
 
+// freshness do Dataset do @graph (auditoria SEO 2026-06-11): fecha o temporalCoverage na data da leitura e
+// adiciona dateModified — funciona por SPLICE na string serializada (EN_GRAPH e o graph PT estático do index.html
+// têm a MESMA âncora "2000-01-01/.."). Sem data → graph original, intacto.
+function _graphDated(g, dt) { return dt ? g.replace('"temporalCoverage":"2000-01-01/.."', '"temporalCoverage":"2000-01-01/' + dt + '","dateModified":"' + dt + '"') : g; }
+
 const NARR_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
 const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/narrative";
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
@@ -305,6 +310,7 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
     "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" },
     "isAccessibleForFree": true,
     "datePublished": dataRef || undefined,
+    "dateModified": dataRef || undefined,  // freshness (auditoria SEO 2026-06-11): a leitura muda ~diariamente; sem dateModified o crawler não vê
     "variableMeasured": {
       "@type": "PropertyValue",
       "name": ind.nome,
@@ -537,7 +543,9 @@ async function _route(request, env, ctx) {
       try {
         const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
         const tj = tr.ok ? await tr.json() : { ativos: [] };
-        const urls = (tj.ativos || []).map(function (t) { return "<url><loc>" + _url.origin + "/ativo/" + t + "</loc><changefreq>daily</changefreq></url>"; }).join("");
+        // ★ lastmod POR URL = última data de dado do ativo (meta[t].ultima, matview diária no edge) — freshness
+        //   honesto: série parada (ex.: FIPEZAP mensal) não finge mudança diária; série viva sinaliza re-crawl.
+        const urls = (tj.ativos || []).map(function (t) { var u = tj.meta && tj.meta[t] && tj.meta[t].ultima; return "<url><loc>" + _url.origin + "/ativo/" + t + "</loc>" + (u ? "<lastmod>" + u + "</lastmod>" : "") + "<changefreq>daily</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=21600" } });
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
@@ -546,7 +554,8 @@ async function _route(request, env, ctx) {
       try {
         const ir = await _fetchIndicadores(_isEN ? "en" : "pt");
         const ij = ir.ok ? await ir.json() : { indicadores: [] };
-        const urls = (ij.indicadores || []).filter(function (i) { return i && i.slug; }).map(function (i) { return "<url><loc>" + _url.origin + "/indicador/" + encodeURIComponent(i.slug) + "</loc><changefreq>daily</changefreq></url>"; }).join("");
+        const _ilm = ij.data_referencia ? "<lastmod>" + ij.data_referencia + "</lastmod>" : "";  // lastmod = data da leitura do catálogo (todas mudam juntas no pulso diário)
+        const urls = (ij.indicadores || []).filter(function (i) { return i && i.slug; }).map(function (i) { return "<url><loc>" + _url.origin + "/indicador/" + encodeURIComponent(i.slug) + "</loc>" + _ilm + "<changefreq>daily</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
@@ -719,6 +728,7 @@ async function _route(request, env, ctx) {
       const _ultP = _cachedJson(SNAPS_API + "?lang=" + _lk, "ult-" + _lk, 14400);
       let narr = null;
       try { narr = await _narrP; } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
+      const _gdt = narr && narr.data_referencia ? String(narr.data_referencia).slice(0, 10) : null;  // data da leitura → dateModified do @graph
       let ultimas = null;
       try { const uj = await _ultP; if (uj) ultimas = (uj.itens || []).slice(0, 3); } catch (e) { /* opcional */ }
 
@@ -736,7 +746,7 @@ async function _route(request, env, ctx) {
           .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
           .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
           .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } })
-          .on("#rp-graph-ld", { element(e) { e.setInnerContent(EN_GRAPH, { html: true }); } });
+          .on("#rp-graph-ld", { element(e) { e.setInnerContent(_graphDated(EN_GRAPH, _gdt), { html: true }); } });
         // SSR-EN do BODY: traduz/preenche cada nó estático PT com o EN do catálogo (idêntico ao que o JS faz em-browser)
         for (const _id in EN_BODY) {
           const _html = EN_BODY[_id];
@@ -751,6 +761,11 @@ async function _route(request, env, ctx) {
           .on("#api-url", { element(e) { e.setInnerContent("GET https://radarperene.com/api/v1/digest?lang=en"); } })
           .on("#api-embed", { element(e) { e.setInnerContent('<iframe src="https://radarperene.com/radar-embed" width="100%" height="1400" style="border:0"></iframe>'); } });
         rw = _enDailyRw(rw); // nav/footer/CTA do arquivo diário no .com → /daily (evita 301)
+      } else if (_gdt) {
+        // PT: o graph estático vive no index.html → data o Dataset via BUFFER do texto inline (chunks do
+        //   HTMLRewriter podem partir a âncora no meio; acumula tudo e emite 1× no último chunk).
+        let _gbuf = "";
+        rw = rw.on("#rp-graph-ld", { text(t) { _gbuf += t.text; t.remove(); if (t.lastInTextNode) t.replace(_graphDated(_gbuf, _gdt), { html: true }); } });
       }
       if (narr && narr.texto_html) {
         rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
