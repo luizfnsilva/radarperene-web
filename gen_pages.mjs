@@ -404,11 +404,11 @@ function renderFile(p, lg, block, raw, title, desc) {
 <meta property="og:site_name" content="Radar Perene">
 <meta property="og:locale" content="${en ? "en_US" : "pt_BR"}">
 <meta property="og:url" content="${canon}">
-<meta property="og:image" content="https://radarperene.com.br/og.png">
+<meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://radarperene.com.br/og.png">
+<meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
 <link rel="canonical" href="${canon}">
