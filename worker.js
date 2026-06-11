@@ -616,7 +616,7 @@ async function _route(request, env, ctx) {
       } catch (e) { return env.ASSETS.fetch(request); }
     }
     // ── /ativo/{ticker} — página por ativo (SEO programático B.1): reusa a home shell + widget em modo ativo + narrativa per-ativo ──
-    const _am = _url.pathname.match(/^\/ativo\/([a-z0-9_]{2,14})\/?$/i);  // ★ aceita underscore (us_10y, eur_usd, brk_b) — antes só [a-z0-9] barrava esses
+    const _am = _url.pathname.match(/^\/ativo\/([a-z0-9_-]{2,44})\/?$/i);  // ★ aceita underscore (us_10y) E hífen+slug longo (fipezap_sp_res_venda 20c, tesouro-prefixado-com-juros-semestrais-01012031 44c) — {2,14} barrava o catálogo total 2026-06-11
     if (_am) {
       try {
         const tk = _am[1].toUpperCase(), tkLower = _am[1].toLowerCase();
