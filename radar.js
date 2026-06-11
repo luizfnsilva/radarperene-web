@@ -733,7 +733,12 @@
   function rpMarket(market, lang) { market = ("" + (market || "")).toLowerCase(); if (market === "br" || market === "us") return market; var d = detectMarketFromSrc(); if (d) return d; return lang === "en" ? "us" : "br"; }
   function rpBacklink(market, lang) { return "https://" + (rpMarket(market, lang) === "us" ? "radarperene.com" : "radarperene.com.br"); }
   // presets do briefing → conjunto de seções (data-sections). widget="regime-br" etc. é açúcar declarativo.
-  var RP_WIDGETS = { "regime-br": "lentes,macro,intermercado,acoes", "panorama": "lentes,intermercado,divergencias", "lentes": "lentes", "lenses": "lentes", "termometros": "termometros", "thermometers": "termometros", "global": "termometros,cripto,extras,leadlag,analogo,divergencias", "cripto": "cripto", "crypto": "cripto" };
+  // ★ Fase 2 (camadas formais, PLANO_COMPRESSAO §1/§5): "editorial" = Camada 1 (o que importa hoje — inferência);
+  //   "exploracao" = Camada 2 (de onde isso vem — dados de apoio + portas do drawer). Partição limpa:
+  //   editorial ∪ exploracao = o radar completo (sections=null). "tese" e "portas" são chaves novas de seção.
+  var RP_WIDGETS = { "regime-br": "lentes,tese,macro,intermercado,acoes", "panorama": "lentes,intermercado,divergencias", "lentes": "lentes", "lenses": "lentes", "termometros": "termometros", "thermometers": "termometros", "global": "termometros,cripto,extras,leadlag,analogo,divergencias", "cripto": "cripto", "crypto": "cripto",
+    "editorial": "regime,lentes,tese,analogo_br,scatter,termometros,leadlag,analogo,divergencias,par",
+    "exploracao": "indices,intermercado,fiscal,cripto,extras,portas", "exploration": "indices,intermercado,fiscal,cripto,extras,portas" };
   // leitura TEXTUAL de um indicador de domínio (cripto: Fear&Greed/TVL; ações: volume). Substitui o gráfico cru — a pilha
   // empilhada (preço·Ânima·risk) é o gráfico padrão de TODO ticker; o resto vira linha de texto (último valor + faixa).
   function oscTextLine(arr, label, lang) {
@@ -1642,13 +1647,13 @@
         return '<div class="ln ' + esc(l.tom) + '"' + (more ? ' data-exp="1"' : '') + '><div class="lk">' + esc(l.nome) + (more ? ' <span class="lr" style="opacity:.55">＋</span>' : '') + '</div><div class="li">' + esc(l.indicador) + '</div>' +
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
         '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + more + '</div>'; }).join("") + '</div>'; }
-    h += rpTeseHTML(rr, L);  // ★ Tese viva — protagonismo (briefing): logo após as 5 lentes
+    if (show("tese")) h += rpTeseHTML(rr, L);  // ★ Tese viva — protagonismo (briefing): logo após as 5 lentes. Fase 2: chave própria ("tese") — preset/embed filtrado só a recebe se pedir (o teaser da home pede; um embed "termometros" não carrega a tese regulatória junto)
     // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese) dos indicadores/dados de APOIO.
     //   Só no radar COMPLETO (!sections) — o teaser (regime,lentes) e embeds filtrados não recebem o divisor órfão.
     // ★ Fase 1C — comparar e estudos SAÍRAM da home (2 muros de chips a menos) → abas do drawer. As 3 portas
     //   delicadas mantêm a descoberta (fricção das personas: "ferramentas 6 telas abaixo"); data-tab abre a aba certa.
     //   Contagem VIVA na porta de Mercados (d.cobertura, cresce com o banco) — comunica que os tickers moram aqui.
-    if (!sections) h += '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>'
+    if (!sections || show("portas")) h += (!sections ? '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>' : '')  // Fase 2: preset "exploracao" recebe as portas (chave "portas"); o divisor de camada segue só no radar completo
       + '<div class="rp-portas">'
       + '<button type="button" class="rp-explore" data-tab="mercados">' + (L ? "Explore " : "Explorar ") + (_cob.ativos ? (L ? "all " + _cob.ativos + " assets" : "os " + _cob.ativos + " ativos") : (L ? "all assets" : "todos os ativos")) + ' <span class="a">→</span></button>'
       + '<button type="button" class="rp-explore" data-tab="comparacoes">⚗ ' + (L ? "Compare two assets" : "Comparar dois ativos") + ' <span class="a">→</span></button>'
@@ -1800,7 +1805,7 @@
     if (node.getAttribute("data-asset")) return true;                 // /ativo → renderAtivo desenha o herói
     var sa = node.getAttribute("data-sections");
     if (!sa) return true;                                             // radar completo (sections=null) desenha gráficos
-    var SVG_ONLY = { regime: 1, lentes: 1, indices: 1 };              // seções sem uPlot inline (texto + sparkline SVG)
+    var SVG_ONLY = { regime: 1, lentes: 1, indices: 1, tese: 1, portas: 1 };  // seções sem uPlot inline (texto + sparkline SVG)
     return sa.split(",").map(function (s) { return s.trim(); }).filter(Boolean).some(function (s) { return !SVG_ONLY[s]; });
   }
   // ── P0#1: re-render dos widgets quando o plano muda (login resolve /v1/me DEPOIS do 1º render, ou localStorage estava stale).
