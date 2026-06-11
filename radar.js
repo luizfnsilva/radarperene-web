@@ -167,7 +167,7 @@
       ".rp .c{background:var(--_card);border:1px solid var(--_cardb);border-radius:9px;padding:11px;min-height:74px}" +  // P2#7: piso de altura → linhas uniformes mesmo quando quebram p/ a 2ª fileira
       ".rp .rp-mtog{margin-top:8px;font-size:11px;background:transparent;border:1px solid var(--_line);color:var(--_dim);border-radius:7px;padding:5px 11px;cursor:pointer}.rp .rp-mtog:hover{color:var(--_txt);border-color:var(--_cardb)}.rp .rp-ov{margin-top:8px}" +
       ".rp .rp-tier2{display:flex;align-items:center;gap:11px;margin:30px 0 6px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim);font-weight:600}.rp .rp-tier2::before,.rp .rp-tier2::after{content:'';flex:1;height:1px;background:var(--_line)}" +  // camada 2: separa o primário (regime/lentes/tese) dos indicadores de apoio
-      ".rp .rp-cmprow{margin:6px 0 4px}.rp .rp-cmpbtn{font-size:11.5px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:8px;padding:6px 11px;cursor:pointer;margin:0 6px 6px 0;white-space:nowrap}.rp .rp-cmpbtn:hover{border-color:var(--_accent);color:var(--_accent)}" +  // P3.1 launcher
+      ".rp .rp-cmpbtn{font-size:11.5px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:8px;padding:6px 11px;cursor:pointer;margin:0 6px 6px 0;white-space:nowrap}.rp .rp-cmpbtn:hover{border-color:var(--_accent);color:var(--_accent)}" +  // P3.1 → 1C: pares-preset, agora na aba Comparações do drawer (.rp-cmprow saiu com o muro da home)
       ".rp-cmp2{max-width:940px}.rp-cmp2 .rp-cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.rp-cmp2 .rp-cmpcol{min-width:0}.rp-cmp2 .rp-mt2{font-family:var(--rp-serif,Georgia,serif);font-size:16px;font-weight:600;margin-bottom:5px;color:var(--_txt)}.rp-cmp2 .rp-cmpchart{margin:4px 0 2px}" +
       ".rp-cmptbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}.rp-cmptbl th,.rp-cmptbl td{padding:6px 9px;border-bottom:1px solid var(--_line);text-align:right}.rp-cmptbl th:first-child,.rp-cmptbl td:first-child{text-align:left;color:var(--_dim)}.rp-cmptbl td.win{color:var(--_warm);font-weight:700}" +
       "@media(max-width:640px){.rp-cmp2 .rp-cmpgrid{grid-template-columns:1fr;gap:14px}}" +
@@ -257,6 +257,12 @@
       ".rp-dc .rp-mkix{display:flex;flex-wrap:wrap;gap:4px 6px;margin:0 0 12px}.rp-dc .rp-mki{font-family:var(--_mono);font-size:10px;color:var(--_dim);background:transparent;border:1px solid var(--_line);border-radius:6px;padding:4px 8px;cursor:pointer}.rp-dc .rp-mki b{color:var(--_txt);font-weight:600}.rp-dc .rp-mki:hover{border-color:var(--_accent);color:var(--_accent)}.rp-dc .rp-mki:hover b{color:var(--_accent)}" +  // counts-forward: índice nome·contagem → ancora no grupo (sem accordion)
       ".rp-dc .rp-mkg{margin-bottom:13px}.rp-dc .rp-mkh{font-size:11px;color:var(--_dim);font-weight:700;margin-bottom:5px}.rp-dc .rp-mkt-row{display:flex;gap:5px;flex-wrap:wrap}" +
       ".rp-dc .rp-mkt{font-family:var(--_mono);font-size:11px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:6px;padding:4px 9px;cursor:pointer;transition:border-color .12s,color .12s}.rp-dc .rp-mkt:hover{border-color:var(--_accent);color:var(--_accent)}" +
+      ".rp .rp-portas{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 10px}.rp .rp-portas .rp-explore{margin:0}" +  // Fase 1C: as portas da camada 2 lado a lado (mercados · comparações · estudos)
+      ".rp-dc .rp-slotrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.rp-dc .rp-slot{font-size:12.5px;background:var(--_card2);border:1px dashed var(--_line);color:var(--_dim);border-radius:8px;padding:9px 14px;cursor:pointer;font-family:var(--_font)}.rp-dc .rp-slot.filled{border-style:solid;color:var(--_txt);font-weight:600}.rp-dc .rp-slot.on,.rp-dc .rp-slot:hover{border-color:var(--_accent);color:var(--_accent)}" +  // 1C: slots [ativo]×[ativo]
+      ".rp-dc .rp-cmpgo{font-size:12.5px;font-weight:700;background:var(--_card2);border:1px solid var(--_accent);color:var(--_accent);border-radius:8px;padding:9px 15px;cursor:pointer;font-family:var(--_font)}.rp-dc .rp-cmpgo:disabled{border-color:var(--_line);color:var(--_dim);opacity:.55;cursor:default}" +
+      ".rp-dc .rp-pkbox2{margin-top:10px;max-height:300px;overflow:auto;border:1px solid var(--_line);border-radius:8px;padding:10px;background:var(--_card)}" +  // picker do slot: rola por dentro (a folha do drawer continua escaneável)
+      "@media(max-width:600px){.rp-dc .rp-slot,.rp-dc .rp-cmpgo{padding:12px 15px}}" +  // B4: alvo de toque ≥40px no celular
+
       "@media(max-width:520px){.rp{padding:15px}.rp h4{margin:13px 0 6px}.rp .brain{margin-top:16px}}";
     document.head.appendChild(s);
   }
@@ -398,6 +404,111 @@
     });
   }
   rpRegisterTab("mercados", "Mercados", "Markets", rpBuildMercados);
+
+  // ── aba "Comparações" (Fase 1C): 2 slots do universo COMPLETO (picker com busca, mesmo /v1/catalog do Mercados)
+  //    + os pares mais usados → compareTwo (modal empilha por cima do drawer, mesmo ciclo do openBig do Mercados).
+  //    Os presets .rp-cmpbtn SAÍRAM da home (compressão); aqui é a casa deles.
+  function rpBuildComparacoes(pane, ctx) {
+    var L = ctx.lang === "en";
+    var CMP = [
+      ["petr4", "equity_br", "PETR4", "vale3", "equity_br", "VALE3"],
+      ["sp500", "equity_us", "S&P 500", "nasdaq", "equity_index", "Nasdaq"],
+      ["btc", "cripto", "Bitcoin", "gold", "commodity", L ? "Gold" : "Ouro"],
+      ["ifix", "indice_ms", "IFIX", "ibov", "pulso", "IBOV"],
+      ["dxy", "fx", L ? "US Dollar (DXY)" : "Dólar (DXY)", "gold", "commodity", L ? "Gold" : "Ouro"],
+      ["itub4", "equity_br", "ITUB4", "bbdc4", "equity_br", "BBDC4"],
+    ];
+    var sel = [null, null], picking = -1;
+    var norm = function (s) { s = String(s || "").toLowerCase(); try { s = s.normalize("NFD").replace(/[̀-ͯ]/g, ""); } catch (e) {} return s; };
+    function slotBtn(i) { var c = sel[i]; return '<button type="button" class="rp-slot' + (picking === i ? " on" : "") + (c ? " filled" : "") + '" data-slot="' + i + '">' + (c ? esc(c.nome) : (L ? "choose asset ⌄" : "escolher ativo ⌄")) + '</button>'; }
+    function paint() {
+      pane.innerHTML = '<div class="rp-ml" style="opacity:.72;margin-bottom:10px">' + (L ? "Two assets side by side — charts, analog cones, returns and precedents. Descriptive, never a recommendation." : "Dois ativos lado a lado — gráficos, cones de análogos, retornos e precedentes. Descritivo, nunca recomendação.") + '</div>'
+        + '<div class="rp-slotrow">' + slotBtn(0) + '<span class="rp-ml">×</span>' + slotBtn(1) + '<button type="button" class="rp-cmpgo"' + (sel[0] && sel[1] ? "" : " disabled") + '>' + (L ? "Compare →" : "Comparar →") + '</button></div>'
+        + '<div class="rp-pkslot"></div>'
+        + '<div class="rp-ml" style="font-weight:700;margin-top:16px">' + (L ? "Most used pairs" : "Pares mais usados") + '</div>'
+        + '<div class="rp-mkt-row" style="margin-top:7px">' + CMP.map(function (p) { return '<button type="button" class="rp-cmpbtn" data-a="' + esc(p[0]) + '" data-acls="' + esc(p[1]) + '" data-an="' + esc(p[2]) + '" data-b="' + esc(p[3]) + '" data-bcls="' + esc(p[4]) + '" data-bn="' + esc(p[5]) + '">' + esc(p[2]) + ' × ' + esc(p[5]) + '</button>'; }).join("") + '</div>';
+      if (picking >= 0) {
+        var box = pane.querySelector(".rp-pkslot");
+        box.innerHTML = '<div class="rp-pkbox2"><input class="rp-mks" type="search" autocomplete="off" placeholder="' + (L ? "Search asset (name or ticker)…" : "Buscar ativo (nome ou código)…") + '" aria-label="' + (L ? "Search asset" : "Buscar ativo") + '"><div class="rp-pklist rp-ml" style="opacity:.7">' + (L ? "Loading the universe…" : "Carregando o universo…") + '</div></div>';
+        rpEnsureCatalog(ctx.lang, function () {
+          var list = box.querySelector(".rp-pklist"); if (!list) return;  // usuário já fechou/trocou o slot
+          var src = (RP_CAT_FULL && RP_CAT_FULL.length) ? RP_CAT_FULL : RP_CAT;
+          list.style.opacity = ""; list.innerHTML = src.map(function (g) { return '<div class="rp-mkg"><div class="rp-mkh">' + esc(g.cat) + '</div><div class="rp-mkt-row">' + g.items.map(function (it) { return '<button type="button" class="rp-mkt" data-cod="' + esc(it.cod) + '" data-cls="' + esc(it.cls) + '" data-nome="' + esc(it.nome) + '">' + esc(it.nome) + '</button>'; }).join("") + '</div></div>'; }).join("");
+          var inp = box.querySelector(".rp-mks");
+          if (inp) { inp.addEventListener("input", function () {
+            var toks = norm(inp.value).split(/\s+/).filter(Boolean);
+            list.querySelectorAll(".rp-mkg").forEach(function (gEl) { var vis = 0;
+              gEl.querySelectorAll(".rp-mkt").forEach(function (b) { var hay = norm(b.getAttribute("data-nome")) + " " + norm(b.getAttribute("data-cod")) + " " + norm((gEl.querySelector(".rp-mkh") || {}).textContent || ""); var hit = !toks.length || toks.every(function (tk) { return hay.indexOf(tk) >= 0; }); b.style.display = hit ? "" : "none"; if (hit) vis++; });
+              gEl.style.display = vis ? "" : "none"; });
+          }); inp.focus(); }
+        });
+      }
+    }
+    pane.addEventListener("click", function (e) {
+      var t = e.target, slot = null, go = null, pk = null, pre = null;
+      while (t && t !== pane) { if (t.getAttribute) { var cn = "" + (t.className || ""); if (!slot && t.getAttribute("data-slot") != null) slot = t; if (!go && cn.indexOf("rp-cmpgo") >= 0) go = t; if (!pk && cn.indexOf("rp-mkt") >= 0 && cn.indexOf("rp-mkt-row") < 0) pk = t; if (!pre && cn.indexOf("rp-cmpbtn") >= 0) pre = t; } t = t.parentNode; }  // slot pelo ATRIBUTO (a classe casaria com o container .rp-slotrow ao subir a árvore)
+      if (pk && picking >= 0) { sel[picking] = { cod: pk.getAttribute("data-cod"), cls: pk.getAttribute("data-cls"), nome: pk.getAttribute("data-nome") }; picking = (picking === 0 && !sel[1]) ? 1 : -1; paint(); return; }  // escolheu o A → picker já pula pro B (fluxo de 2 toques)
+      if (slot) { var i = parseInt(slot.getAttribute("data-slot"), 10); picking = (picking === i) ? -1 : i; paint(); return; }
+      if (go && sel[0] && sel[1]) { compareTwo(sel[0], sel[1], ctx.lang); return; }
+      if (pre) { compareTwo({ cod: pre.getAttribute("data-a"), cls: pre.getAttribute("data-acls"), nome: pre.getAttribute("data-an") }, { cod: pre.getAttribute("data-b"), cls: pre.getAttribute("data-bcls"), nome: pre.getAttribute("data-bn") }, ctx.lang); return; }
+    });
+    paint();
+  }
+  rpRegisterTab("comparacoes", "Comparações", "Compare", rpBuildComparacoes);
+
+  // ── aba "Estudos" (Fase 1C): o catálogo REAL da Biblioteca (edge /estudos — mesma fonte do modal openEstudo),
+  //    com busca + populares, agrupado por família. Os .rp-estbtn saíram da home; fallback = os 8 presets de sempre.
+  function rpBuildEstudos(pane, ctx) {
+    var L = ctx.lang === "en";
+    var POP = [["regime-risk-on-extremo", L ? "Risk-on extreme" : "Risk-on extremo"], ["liquidez-dolar-caro", L ? "Strong dollar" : "Dólar caro"], ["juros-ciclo-queda", L ? "Cutting cycle" : "Selic ciclo de queda"]];
+    var FALLBACK = [
+      ["regime-risk-on-extremo", L ? "Risk-on extreme" : "Risk-on extremo"], ["regime-risk-off-extremo", L ? "Risk-off extreme" : "Risk-off extremo"],
+      ["sentimento-pessimismo-extremo", L ? "Extreme pessimism" : "Pessimismo extremo"], ["sentimento-otimismo-extremo", L ? "Extreme optimism" : "Otimismo extremo"],
+      ["liquidez-dolar-caro", L ? "Strong dollar" : "Dólar caro"], ["liquidez-dolar-barato", L ? "Weak dollar" : "Dólar barato"],
+      ["juros-ciclo-alta", L ? "Hiking cycle" : "Selic ciclo de alta"], ["juros-ciclo-queda", L ? "Cutting cycle" : "Selic ciclo de queda"],
+    ];
+    var norm = function (s) { s = String(s || "").toLowerCase(); try { s = s.normalize("NFD").replace(/[̀-ͯ]/g, ""); } catch (e) {} return s; };
+    var intro = '<div class="rp-ml" style="opacity:.72;margin-bottom:10px">' + (L ? "What historically happened next when…? Empirical IBOV distribution under each condition — descriptive, never a forecast." : "O que historicamente aconteceu depois quando…? Distribuição empírica do IBOV sob cada condição — descritivo, nunca previsão.") + '</div>';
+    var btn = function (chave, nome, def, pronto) { return '<button type="button" class="rp-mkt rp-estu" data-key="' + esc(chave) + '" data-nome="' + esc(nome) + '"' + (def ? ' title="' + esc(def) + '"' : '') + (pronto === false ? ' style="opacity:.55"' : '') + '>' + esc(nome) + (pronto === false ? ' · ' + (L ? "soon" : "em breve") : '') + '</button>'; };
+    function paintFlat(pairs) { pane.innerHTML = intro + '<div class="rp-mkt-row">' + pairs.map(function (p) { return btn(p[0], p[1], null, true); }).join("") + '</div>'; }
+    pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "Loading the study library…" : "Carregando a biblioteca de estudos…") + '</div>';
+    fetch(ESTUDOS_API + "?lang=" + (L ? "en" : "pt"), fopt()).then(function (r) { return r.json(); }).then(function (d) {
+      var fams = (d && d.familias) || [];
+      if (!fams.length) { paintFlat(FALLBACK); return; }
+      pane.innerHTML = intro
+        + '<input class="rp-mks" type="search" autocomplete="off" placeholder="' + (L ? "Search study (condition, family)…" : "Buscar estudo (condição, família)…") + '" aria-label="' + (L ? "Search study" : "Buscar estudo") + '">'
+        + '<div class="rp-ml" style="font-weight:700;margin:0 0 6px">' + (L ? "Popular" : "Populares") + '</div><div class="rp-mkt-row rp-estpop" style="margin-bottom:13px">' + POP.map(function (p) { return btn(p[0], p[1], null, true); }).join("") + '</div>'
+        + '<div class="rp-mks-none rp-ml" style="display:none;opacity:.7;margin:8px 0">' + (L ? "no study matches the search" : "nenhum estudo corresponde à busca") + '</div>'
+        + fams.map(function (g) { return '<div class="rp-mkg"><div class="rp-mkh">' + esc(g.familia) + ' <span style="opacity:.55;font-weight:400">· ' + g.estudos.length + '</span></div><div class="rp-mkt-row">' + g.estudos.map(function (es) { return btn(es.chave, es.nome, es.definicao, es.status === "pronto"); }).join("") + '</div></div>'; }).join("");
+      var inp = pane.querySelector(".rp-mks"), noneEl = pane.querySelector(".rp-mks-none");
+      if (inp) inp.addEventListener("input", function () {
+        var toks = norm(inp.value).split(/\s+/).filter(Boolean), any = false;
+        pane.querySelectorAll(".rp-mkg").forEach(function (gEl) { var vis = 0;
+          gEl.querySelectorAll(".rp-estu").forEach(function (b) { var hay = norm(b.getAttribute("data-nome")) + " " + norm(b.getAttribute("data-key")) + " " + norm(b.getAttribute("title")) + " " + norm((gEl.querySelector(".rp-mkh") || {}).textContent || ""); var hit = !toks.length || toks.every(function (tk) { return hay.indexOf(tk) >= 0; }); b.style.display = hit ? "" : "none"; if (hit) vis++; });
+          gEl.style.display = vis ? "" : "none"; if (vis) any = true; });
+        if (noneEl) noneEl.style.display = any ? "none" : "";
+      });
+    }).catch(function () { paintFlat(FALLBACK); });
+    pane.addEventListener("click", function (e) {
+      var t = e.target; while (t && t !== pane && !(t.getAttribute && t.getAttribute("data-key"))) t = t.parentNode;
+      if (t && t !== pane) openEstudo(t.getAttribute("data-key"), t.getAttribute("data-nome"), ctx.lang);
+    });
+  }
+  rpRegisterTab("estudos", "Estudos", "Studies", rpBuildEstudos);
+
+  // ── aba "Termômetros" (Fase 1D): a lista COMPLETA do digest (a home mantém top-3 +3 recolhidos), com descrição
+  //    e composição ABERTAS — no drawer a folha é escaneável de uma vez, sem a 2ª camada de toggle da home.
+  function rpBuildTermometros(pane, ctx) {
+    var L = ctx.lang === "en";
+    pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "Loading…" : "Carregando…") + '</div>';
+    _getDigest(ctx.lang).then(function (d) {
+      var tms = (((d || {}).vertice || {}).termometros || []).slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
+      if (!tms.length) { pane.innerHTML = '<div class="rp-ml" style="opacity:.7">' + (L ? "thermometers unavailable" : "termômetros indisponíveis") + '</div>'; return; }
+      pane.innerHTML = '<div class="rp-ml" style="opacity:.72;margin-bottom:10px">' + (L ? "All " + tms.length + " thermometers · 0 = calm · 50 = neutral · 100 = extreme · sorted by today's distance from neutral." : "Todos os " + tms.length + " termômetros · 0 = calmo · 50 = neutro · 100 = extremo · do mais ao menos distante do neutro hoje.") + '</div><div class="g3">'
+        + tms.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' + (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + (t.desc ? '<div class="rr" style="margin-top:5px">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="rr" style="margin-top:4px;opacity:.75"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>'; }).join("") + '</div>';
+    }).catch(function () { pane.innerHTML = '<div class="rp-ml" style="opacity:.7">—</div>'; });
+  }
+  rpRegisterTab("termometros", "Termômetros", "Thermometers", rpBuildTermometros);
 
   function esc(x) { return String(x == null ? "" : x).replace(/[<>&"']/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&#34;", "'": "&#39;" }[c]; }); }  // escapa aspas também: ~30 sinks usam esc() DENTRO de atributos (data-nome="…", data-ll="…") — sem isto um " em valor de DB/feed/LLM quebra o atributo (attribute-injection XSS). Entidades renderizam idênticas em texto → zero regressão visual.
   function cls(v) { return v == null ? "" : v >= 75 ? "hot" : v >= 55 ? "warm" : v <= 45 ? "cool" : ""; }
@@ -903,7 +1014,7 @@
       if (cells) depth += '<div class="rp-ml" style="margin-top:9px"><b>' + (L ? "Returns" : "Retornos") + '</b></div><div class="rp-rc">' + cells + '</div>';  // ★ retornos como cards (briefing: cara de laboratório, não tira de texto)
       if (st.pos52 != null) depth += '<div class="rp-ml" style="margin-top:8px">' + (L ? "52-week range · " : "Faixa de 52 semanas · ") + (L ? "low " : "mín ") + esc(fmtNum(st.lo52)) + ' ─ ' + (L ? "high " : "máx ") + esc(fmtNum(st.hi52)) + '</div><div class="rp-52"><i style="left:' + st.pos52 + '%"></i></div><div class="rp-ml" style="opacity:.6">' + (L ? "at " : "em ") + st.pos52 + (L ? "% of range" : "% da faixa") + '</div>';
       depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + (st.dd_top != null ? ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b>' : '') + '</div>';
-      if (st.sharpe != null) depth += '<div class="rp-ml" style="opacity:.6"><b>Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0 ? (L ? "beats the risk-free" : "supera a renda fixa") : (L ? "below the risk-free" : "abaixo da renda fixa")) + '</div>'; }  // ★ Sharpe demovido (briefing: baixa prioridade, não compete com os precedentes)
+      if (st.sharpe != null) depth += '<div class="rp-ml" style="opacity:.6"><b>Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0.3 ? (L ? "beats the risk-free" : "supera a renda fixa") : st.sharpe <= -0.3 ? (L ? "below the risk-free" : "abaixo da renda fixa") : (L ? "statistically indistinguishable from the risk-free" : "estatisticamente indistinguível da renda fixa")) + '</div>'; }  // ★ Sharpe demovido (briefing: baixa prioridade, não compete com os precedentes)
     h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (cone ? (L ? "price · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : "preço · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : (L ? "price · history → today → projection (dashed)" : "preço · histórico → hoje → projeção (tracejada)"))) + '</div>';
     // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis.
     // ★ P1 2026-06-10 (rodada 50 personas): TODOS os períodos do gráfico de PREÇO são free — histórico de preço é commodity ("travar é incoerente com o pitch de memória", ~20 personas); o moat real (cone/faixas/hit-rate) segue gateado no SERVIDOR. Fecha também o furo B3 (lock era só client-side).
@@ -1456,7 +1567,9 @@
     if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + '</h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
-      if (g.valuation) { var vl = g.valuation; var erpTxt = vl.erp == null ? "" : ((vl.erp >= 0 ? "+" : "") + vl.erp + "pp"); h += '<div class="i valstrip" data-cod="erp_br" data-cls="macro" data-nome="' + esc(L ? "Equity risk premium" : "Prêmio de risco das ações") + '"><div class="vl-l"><span class="vl-t">' + (L ? "Valuation BR · risk premium" : "Valuation BR · prêmio de risco") + '</span><span class="vl-r">' + esc(vl.regime) + '</span></div><div class="vl-b"><span class="vl-s">' + esc(vl.score) + '%</span> <span class="vl-x">' + (L ? "below fair value" : "abaixo do valor-justo") + (vl.n ? " · " + vl.n + (L ? " stocks" : " ações") : "") + (erpTxt ? " · ERP " + erpTxt : "") + '</span></div></div>'; } }
+      // ★ item 10 pós-B6 (2 grandezas): o clique abre a SÉRIE do número exibido — a breadth (% abaixo do valor-justo,
+      //   187 meses em series_historicas_macro) — e não mais o z do ERP (que segue citado no texto como secundário).
+      if (g.valuation) { var vl = g.valuation; var erpTxt = vl.erp == null ? "" : ((vl.erp >= 0 ? "+" : "") + vl.erp + "pp"); h += '<div class="i valstrip" data-cod="valuation_breadth_br" data-cls="macro" data-nome="' + esc(L ? "BR valuation breadth (% below fair value)" : "Breadth de valuation BR (% abaixo do valor-justo)") + '"><div class="vl-l"><span class="vl-t">' + (L ? "Valuation BR" : "Valuation BR") + '</span><span class="vl-r">' + esc(vl.regime) + '</span></div><div class="vl-b"><span class="vl-s">' + esc(vl.score) + '%</span> <span class="vl-x">' + (L ? "below fair value" : "abaixo do valor-justo") + (vl.n ? " · " + vl.n + (L ? " stocks" : " ações") : "") + (erpTxt ? " · ERP " + erpTxt : "") + '</span></div></div>'; } }
     if (show("regime") && rr.cambio) { h += '<div class="tk" style="margin-top:8px"><span class="i" data-cod="' + esc(rr.cambio.codigo) + '" data-cls="pulso"><span class="sy">' + esc(rr.cambio.nome) + '</span><span class="pr">R$ ' + esc(rr.cambio.valor) + '</span>' + (rr.cambio.var30 != null ? '<span class="mt">' + (rr.cambio.var30 >= 0 ? "+" : "") + esc(rr.cambio.var30) + '% 30d</span>' : '') + '</span></div>'; }
     if (show("indices") && rr.indices && rr.indices.length) { h += '<h4>' + (L ? "Indices · overview" : "Índices · panorama") + '</h4><div class="legend">' + (L ? "click to chart · + more in the app" : "clique pra ver o gráfico · + outros no app") + '</div><div class="tk">' +
       rr.indices.map(function (ix) { return '<span class="i" data-cod="' + esc(ix.codigo) + '" data-cls="' + esc(ix.classe) + '"><span class="sy">' + esc(ix.nome) + '</span><span class="pr">' + esc(ix.valor) + '</span>' + (ix.var12m != null ? '<span class="mt">' + (ix.var12m >= 0 ? "+" : "") + esc(ix.var12m) + '% 12m</span>' : '') + '</span>'; }).join("") + '</div>'; }
@@ -1493,32 +1606,15 @@
     h += rpTeseHTML(rr, L);  // ★ Tese viva — protagonismo (briefing): logo após as 5 lentes
     // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese) dos indicadores/dados de APOIO.
     //   Só no radar COMPLETO (!sections) — o teaser (regime,lentes) e embeds filtrados não recebem o divisor órfão.
+    // ★ Fase 1C — comparar e estudos SAÍRAM da home (2 muros de chips a menos) → abas do drawer. As 3 portas
+    //   delicadas mantêm a descoberta (fricção das personas: "ferramentas 6 telas abaixo"); data-tab abre a aba certa.
+    //   Contagem VIVA na porta de Mercados (d.cobertura, cresce com o banco) — comunica que os tickers moram aqui.
     if (!sections) h += '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>'
-      + '<button type="button" class="rp-explore">' + (L ? "Explore " : "Explorar ") + (_cob.ativos ? (L ? "all " + _cob.ativos + " assets" : "os " + _cob.ativos + " ativos") : (L ? "all assets" : "todos os ativos")) + ' <span class="a">→</span></button>';  // porta p/ o drawer (aba Mercados). 2026-06-11 (dono: "parece texto normal, demorei a achar"): virou botão delicado + contagem VIVA (d.cobertura, cresce com o banco) — comunica que os tickers moram aqui.
-    // ★ P3.1 — Laboratório: comparar dois ativos lado a lado (pares-preset). Só no radar completo.
-    if (!sections) {
-      var CMP = [
-        ["petr4", "equity_br", "PETR4", "vale3", "equity_br", "VALE3"],
-        ["sp500", "equity_us", "S&P 500", "nasdaq", "equity_index", "Nasdaq"],
-        ["btc", "cripto", "Bitcoin", "gold", "commodity", L ? "Gold" : "Ouro"],
-        ["ifix", "indice_ms", "IFIX", "ibov", "pulso", "IBOV"],
-        ["dxy", "fx", L ? "US Dollar (DXY)" : "Dólar (DXY)", "gold", "commodity", L ? "Gold" : "Ouro"],
-        ["itub4", "equity_br", "ITUB4", "bbdc4", "equity_br", "BBDC4"],
-      ];
-      h += '<div class="rp-cmprow"><div class="rp-ml" style="font-weight:700">' + (L ? "⚗ Compare two assets" : "⚗ Comparar dois ativos") + '</div><div class="rp-ml" style="opacity:.6;margin:2px 0 8px">' + (L ? "side by side — charts, cones, returns and precedents" : "lado a lado — gráficos, cones, retornos e precedentes") + '</div>' +
-        CMP.map(function (p) { return '<button type="button" class="rp-cmpbtn" data-a="' + esc(p[0]) + '" data-acls="' + esc(p[1]) + '" data-an="' + esc(p[2]) + '" data-b="' + esc(p[3]) + '" data-bcls="' + esc(p[4]) + '" data-bn="' + esc(p[5]) + '">' + esc(p[2]) + ' × ' + esc(p[5]) + '</button>'; }).join("") + '</div>';
-    }
-    // ★ P3.3 — Biblioteca de estudos: "o que aconteceu depois quando…?" (só no radar completo). Dados da Edge Function própria.
-    if (!sections) {
-      var EST = [
-        ["regime-risk-on-extremo", L ? "Risk-on extreme" : "Risk-on extremo"], ["regime-risk-off-extremo", L ? "Risk-off extreme" : "Risk-off extremo"],
-        ["sentimento-pessimismo-extremo", L ? "Extreme pessimism" : "Pessimismo extremo"], ["sentimento-otimismo-extremo", L ? "Extreme optimism" : "Otimismo extremo"],
-        ["liquidez-dolar-caro", L ? "Strong dollar" : "Dólar caro"], ["liquidez-dolar-barato", L ? "Weak dollar" : "Dólar barato"],
-        ["juros-ciclo-alta", L ? "Hiking cycle" : "Selic ciclo de alta"], ["juros-ciclo-queda", L ? "Cutting cycle" : "Selic ciclo de queda"],
-      ];
-      h += '<div class="rp-cmprow"><div class="rp-ml" style="font-weight:700">' + (L ? "📚 Study library" : "📚 Biblioteca de estudos") + '</div><div class="rp-ml" style="opacity:.6;margin:2px 0 8px">' + (L ? "what historically happened next when… — empirical IBOV distribution, never a forecast" : "o que historicamente aconteceu depois quando… — distribuição empírica do IBOV, nunca previsão") + '</div>' +
-        EST.map(function (p) { return '<button type="button" class="rp-estbtn" data-key="' + esc(p[0]) + '" data-nome="' + esc(p[1]) + '">' + esc(p[1]) + '</button>'; }).join("") + '</div>';
-    }
+      + '<div class="rp-portas">'
+      + '<button type="button" class="rp-explore" data-tab="mercados">' + (L ? "Explore " : "Explorar ") + (_cob.ativos ? (L ? "all " + _cob.ativos + " assets" : "os " + _cob.ativos + " ativos") : (L ? "all assets" : "todos os ativos")) + ' <span class="a">→</span></button>'
+      + '<button type="button" class="rp-explore" data-tab="comparacoes">⚗ ' + (L ? "Compare two assets" : "Comparar dois ativos") + ' <span class="a">→</span></button>'
+      + '<button type="button" class="rp-explore" data-tab="estudos">📚 ' + (L ? "Study library" : "Biblioteca de estudos") + ' <span class="a">→</span></button>'
+      + '</div>';
     // Fase 1B: macro · ações 1/setor · imóveis SAÍRAM da home → aba "Mercados" do drawer (porta "Explorar →"), p/ tirar o aspecto de screener.
     //   Intermercado, fiscal, análogo e scatter (editoriais) PERMANECEM. As séries do macro/ações/imóveis seguem no catálogo /v1/catalog (Mercados).
     if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "Indicators ⇒ BR intermarket" : "Indicadores ⇒ intermercado BR") + '</h4>' +
@@ -1542,12 +1638,16 @@
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
-    if (show("termometros") && v.termometros) { var tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); }), tShown = tms.slice(0, 6), tRest = tms.length - tShown.length;
-      h += '<h4>' + (L ? "Thermometers · loudest today" : "Termômetros · os mais ativos hoje") + '</h4>' +
-      '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + (tRest > 0 ? " · +" + tRest + (L ? " more in the app" : " no app") : "") + '</div><div class="g3">' +
-      tShown.map(function (t) { var more = (t.desc || t.comp) ? '<div class="more">' + (t.desc ? '<div class="mi">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="mi"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>' : '';
+    // ★ Fase 1D — home mantém top-3 (+3 recolhidos via collapseList); a lista COMPLETA mora na aba Termômetros do
+    //   drawer (porta abaixo, só no radar completo — embeds filtrados ficam como estão).
+    if (show("termometros") && v.termometros) { var tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
+      var tCards = tms.slice(0, 6).map(function (t) { var more = (t.desc || t.comp) ? '<div class="more">' + (t.desc ? '<div class="mi">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="mi"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>' : '';
         return '<div class="t ' + cls(t.valor) + '"' + (more ? ' data-exp="1"' : '') + '><div class="n">' + esc(t.nome) + (more ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
-        (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + more + '</div>'; }).join("") + '</div>'; }
+        (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + more + '</div>'; });
+      h += '<h4>' + (L ? "Thermometers · loudest today" : "Termômetros · os mais ativos hoje") + '</h4>' +
+      '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div>' +
+      collapseList(tCards, 3, "g3", L ? "more thermometers" : "termômetros") +
+      (!sections ? '<button type="button" class="rp-explore" data-tab="termometros" style="margin-top:8px">' + (L ? "All " + tms.length + " thermometers" : "Todos os " + tms.length + " termômetros") + ' <span class="a">→</span></button>' : ''); }
     if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4>' + (v.cripto_sentimento ? '<div class="legend">Fear &amp; Greed: ' + esc(v.cripto_sentimento.fng) + ' (' + esc(v.cripto_sentimento.leitura) + ')</div>' : '') + (v.cripto_onchain ? '<div class="legend">' + esc(v.cripto_onchain.nota) + ': ' + [v.cripto_onchain.tvl ? 'TVL ' + esc(v.cripto_onchain.tvl) : '', v.cripto_onchain.stablecoin ? 'stablecoins ' + esc(v.cripto_onchain.stablecoin) : '', v.cripto_onchain.ssr != null ? 'SSR ' + esc(v.cripto_onchain.ssr) : ''].filter(Boolean).join(' · ') + '</div>' : '') + '<div class="tk">' +
       v.cripto.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.simbolo).toLowerCase()) + '" data-cls="cripto"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w" : "% da faixa 52s") + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("extras")) { var ex = [];
@@ -1730,11 +1830,9 @@
       if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
-        if (ev.target && ev.target.classList && ev.target.classList.contains("rp-explore")) { ev.stopPropagation(); rpOpenExplorar(lang, "mercados"); return; }  // Fase 1B: porta "Explorar →" → drawer
-        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, cmpb = null, estb = null;
-        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!cmpb && ("" + (t.className || "")).indexOf("rp-cmpbtn") >= 0) cmpb = t; if (!estb && ("" + (t.className || "")).indexOf("rp-estbtn") >= 0) estb = t; } t = t.parentNode; }
-        if (estb) { ev.stopPropagation(); openEstudo(estb.getAttribute("data-key"), estb.getAttribute("data-nome"), lang); return; }  // ★ P3.3 biblioteca de estudos
-        if (cmpb) { ev.stopPropagation(); compareTwo({ cod: cmpb.getAttribute("data-a"), cls: cmpb.getAttribute("data-acls"), nome: cmpb.getAttribute("data-an") }, { cod: cmpb.getAttribute("data-b"), cls: cmpb.getAttribute("data-bcls"), nome: cmpb.getAttribute("data-bn") }, lang); return; }  // ★ P3.1 comparar lado a lado
+        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, xpl = null;
+        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!xpl && ("" + (t.className || "")).indexOf("rp-explore") >= 0) xpl = t; } t = t.parentNode; }
+        if (xpl) { ev.stopPropagation(); rpOpenExplorar(lang, xpl.getAttribute("data-tab") || "mercados"); return; }  // Fase 1B/1C/1D: portas → drawer na aba certa; sobe a árvore (o clique pode cair no <span> da seta). Os branches .rp-cmpbtn/.rp-estbtn saíram com os muros da home — os botões agora vivem nas abas (listeners próprios do pane).
         if (mtog) { ev.stopPropagation(); var ovv = mtog.previousElementSibling; if (ovv && ("" + (ovv.className || "")).indexOf("rp-ov") >= 0) { ovv.removeAttribute("hidden"); mtog.style.display = "none"; } return; }  // ★ "+N mais" → revela os itens recolhidos (one-way)
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
           ev.stopPropagation();
