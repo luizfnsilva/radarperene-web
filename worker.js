@@ -725,7 +725,7 @@ async function _route(request, env, ctx) {
       //   PARALELO → o TTFB do worker = MAX(narr, ultimas, digest), não a soma (antes eram await sequencial).
       //   Todas DEFENSIVAS (falha → null, home intacta).
       const _narrP = _cachedJson(NARR_API + "?lang=" + _lk, "narr-" + _lk, 3600);
-      const _ultP = _cachedJson(SNAPS_API + "?lang=" + _lk, "ult-" + _lk, 14400);
+      const _ultP = _cachedJson(SNAPS_API + "?lang=" + _lk, "ult-" + _lk, 3600);  // 1h (era 4h): na era DIÁRIA a home defasava do /diario (3600) em até 4h — dia novo aparecia no índice e não na vitrine
       let narr = null;
       try { narr = await _narrP; } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
       const _gdt = narr && narr.data_referencia ? String(narr.data_referencia).slice(0, 10) : null;  // data da leitura → dateModified do @graph
@@ -776,9 +776,17 @@ async function _route(request, env, ctx) {
         }
       }
       if (ultimas && ultimas.length) {
+        // ★ 30b TAMBÉM na home (dono 2026-06-11 noite): a vitrine seguia no formato antigo — 28,8 repetido em todo
+        //   dia lia como "sistema parado", enquanto o índice /diario já pulsava. MESMA linha do _renderDiarioIndex:
+        //   Perene/Ânima (mudam todo dia útil) lideram; o regime BR — mensal por construção — vira cauda ROTULADA.
+        //   Entrada da era mensal (sem perene/anima) degrada p/ a linha antiga, sem quebrar.
         const uh = ultimas.map(function (s) {
           const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
-          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><b>' + s.data + '</b>' + _esc(rg) + (s.global ? " · " + (isEN ? "global " : "global ") + _esc(s.global) : "") + " →</a>";
+          const dia = [s.perene != null ? (isEN ? "Perene Risk " : "Perene ") + s.perene : null,
+            s.anima != null ? "Ânima " + s.anima : null,
+            s.global ? "global " + _esc(s.global) : null].filter(Boolean).join(" · ");
+          const mes = (isEN ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg);
+          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><b>' + s.data + '</b>' + (dia ? dia + ' · <span style="color:var(--dim)">' + mes + "</span>" : _esc(rg) + (s.global ? " · global " + _esc(s.global) : "")) + " →</a>";
         }).join("");
         rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }

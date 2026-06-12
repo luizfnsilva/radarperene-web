@@ -1868,6 +1868,18 @@
     if (lazy.length) lazy.forEach(rpLazyChart);
     rpIdleWarm();  // engine quente p/ cliques/modais (inclusive em página só-teaser), sem bloquear o paint
   }
+  // ★ primeiro clique SUTIL (decisão do dono 2026-06-11): o inline do chip abre nos últimos 12 MESES —
+  //   menos "riscadão" e render leve; o histórico COMPLETO segue 1 clique adiante (⤢ ampliar → openBig
+  //   recebe o MESMO s intacto, períodos 3M…MAX). Janela por DATA (s.datas alinhado ao hist — vale p/
+  //   cadência diária e mensal); sem datas confiáveis ou janela rasa (<8 pts) cai no completo (não inventa recorte).
+  function winIdx12m(s) {
+    if (!s || !s.datas || !s.hist || s.datas.length !== s.hist.length || s.hist.length < 2) return 0;
+    var cut = new Date(s.datas[s.datas.length - 1]); if (!isFinite(cut.getTime())) return 0;
+    cut.setFullYear(cut.getFullYear() - 1);
+    var cs = cut.toISOString().slice(0, 10), i = 0;
+    while (i < s.datas.length && s.datas[i] < cs) i++;
+    return (s.hist.length - i >= 8) ? i : 0;
+  }
   function bootNodes(nodes) {
     nodes.forEach(function (node) {
       var lang = node.getAttribute("data-lang") === "en" ? "en" : "pt";
@@ -1909,14 +1921,16 @@
             if (s && s.hist && s.hist.length > 1) {
               var _gp = rpIsPro();  // linha de valor-justo = Founder (free vê só texto)
               var _wS = (serieDiff(s) || (s.stats && s.stats.is_asset === false)) ? (lang === "en" ? "series" : "série") : (lang === "en" ? "price" : "preço");  // 1E p2: subtítulo honesto
-              inner += '<span class="mt" style="display:block">' + (lang === "en" ? _wS + " · history → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : _wS + " · histórico → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist, proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair) ? s.fair.serie : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
+              var _i0 = winIdx12m(s);  // janela 12m do 1º clique (0 = sem recorte); fair.serie é alinhada ao hist → mesma fatia
+              var _wH = _i0 ? (lang === "en" ? "last 12 months" : "últimos 12 meses") : (lang === "en" ? "history" : "histórico");
+              inner += '<span class="mt" style="display:block">' + (lang === "en" ? _wS + " · " + _wH + " → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : _wS + " · " + _wH + " → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist.slice(_i0), proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair && s.fair.serie) ? s.fair.serie.slice(_i0) : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
               if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (s.mercado_br === false ? (lang === "en" ? "Global risk-on/off (ticks = past extremes)" : "Risco global · risk-on/off (traços = extremos passados)") : (lang === "en" ? "Perene Risk Index · risk-on/off (ticks = past extremes)" : "Índice de Risco Perene · risk-on/off (traços = extremos passados)")) + '</span>' + riskPane(s.risco);
               inner += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);  // domínio (FnG/TVL/volume) → texto; stack completo no "ampliar"
             }
             var canBig = s && s.hist && s.hist.length > 1;
-            if (canBig) inner += '<button class="rp-zoom" type="button">⤢ ' + (lang === "en" ? "expand chart" : "ampliar gráfico") + '</button>';
+            if (canBig) inner += '<button class="rp-zoom" type="button">⤢ ' + (lang === "en" ? "expand chart · full history" : "ampliar gráfico · histórico completo") + '</button>';
             inner += '<span class="mt" style="display:block;margin-top:4px">' + (meta ? esc(meta) + ' · ' : '') + (lang === "en" ? "full in the app →" : "completo no app →") + '</span>';
             box.innerHTML = inner; chip.appendChild(box);
             if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang, fund); }); }
