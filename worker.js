@@ -713,7 +713,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v1/" + host + "/" + _lk; // /v1/ versiona a chave (busta poison antigo)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v2/" + host + "/" + _lk; // /v2/ versiona a chave (v1→v2: canonical por host no HTML cru; busta stale antigo)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
@@ -734,6 +734,12 @@ async function _route(request, env, ctx) {
 
       let rw = new HTMLRewriter();
       rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
+      // canonical/og:url da home POR HOST no HTML cru: o index.html estático nasce com ".com" fixo e só o JS
+      //   corrigia em runtime — crawler sem JS (Bing 1ª passada, bots de IA) via o .com.br se declarar duplicata
+      //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
+      rw = rw
+        .on("link#rp-canonical", { element(e) { e.setAttribute("href", url.origin + "/"); } })
+        .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", url.origin + "/"); } });
       if (isEN) {
         rw = rw
           .on("html", { element(e) { e.setAttribute("lang", "en"); } })
