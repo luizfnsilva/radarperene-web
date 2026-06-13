@@ -10,11 +10,11 @@
 <meta property="og:site_name" content="Radar Perene">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://radarperene.com.br/termos/">
-<meta property="og:image" content="https://radarperene.com.br/og.png">
+<meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta property="og:title" content="Termos de Uso — Radar Perene">
 <meta property="og:description" content="Termos de uso do Radar Perene: serviço, camadas Free e Founder, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://radarperene.com.br/og.png">
+<meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta name="twitter:title" content="Termos de Uso — Radar Perene">
 <meta name="twitter:description" content="Termos de uso do Radar Perene: serviço, camadas Free e Founder, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade.">
 <link rel="canonical" href="https://radarperene.com.br/termos/">
@@ -22,6 +22,7 @@
 <link rel="alternate" hreflang="en" href="https://radarperene.com/terms/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/termos/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com","https://brazilcomplexity.com","https://aformadopatrimonio.com.br"],"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
+<link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -46,6 +47,9 @@
   /* topbar */
   .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 22px;max-width:var(--max);margin:0 auto}
   .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.3px}
+  .brand .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   .brand svg{display:block}
   .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
   .brand .nm b{color:var(--gold)}
@@ -197,7 +201,7 @@
 <p><strong>8.1</strong> O Radar Perene é fornecido &quot;como está&quot;, com base nas fontes públicas e na metodologia declarada em <a href="/metodologia/">/metodologia</a>. O Usuário reconhece que o serviço é descritivo e contextual, não prescritivo.</p>
 <p><strong>8.2</strong> A Radar Perene não se responsabiliza por decisões patrimoniais, jurídicas, contábeis ou de investimento tomadas pelo Usuário com base no conteúdo da plataforma. Conforme cláusula 2, profissional habilitado deve ser consultado.</p>
 <p><strong>8.3</strong> A Radar Perene não garante disponibilidade ininterrupta do serviço, embora empregue esforços razoáveis para mantê-lo operacional. Interrupções programadas são comunicadas quando possível.</p>
-<p><strong>8.4</strong> A Radar Perene não se responsabiliza por dados oriundos de fontes públicas terceiras (BCB, CVM, Tesouro, Yahoo Finance, etc.) — embora declare a fonte primária de cada métrica e prefira admitir calibração a apresentar dado de qualidade insuficiente.</p>
+<p><strong>8.4</strong> A Radar Perene não se responsabiliza por dados oriundos de fontes públicas terceiras (BCB, CVM, Tesouro, FRED, provedores licenciados de dados de mercado, etc.) — embora declare a fonte primária de cada métrica e prefira admitir calibração a apresentar dado de qualidade insuficiente.</p>
 <h2 class="sec">9. Modificação dos Termos</h2>
 <p>A Radar Perene pode atualizar estes Termos a qualquer tempo. Alterações materiais serão comunicadas aos Fundadores com antecedência razoável (mínimo 15 dias) via e-mail cadastrado e aviso visível no site. O uso continuado após a comunicação implica aceitação da nova versão. Versões anteriores ficam arquivadas e linkadas a partir desta página.</p>
 <h2 class="sec">10. Foro e legislação aplicável</h2>

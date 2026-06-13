@@ -10,11 +10,11 @@
 <meta property="og:site_name" content="Radar Perene">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://radarperene.com.br/widgets/">
-<meta property="og:image" content="https://radarperene.com.br/og.png">
+<meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta property="og:title" content="Widgets do Radar Perene — embeds de uma linha">
 <meta property="og:description" content="Catálogo dos widgets embedáveis do Radar Perene. Uma linha de HTML coloca o regime do Brasil, as cinco lentes ou um ativo no seu site. Sem chave de">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://radarperene.com.br/og.png">
+<meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta name="twitter:title" content="Widgets do Radar Perene — embeds de uma linha">
 <meta name="twitter:description" content="Catálogo dos widgets embedáveis do Radar Perene. Uma linha de HTML coloca o regime do Brasil, as cinco lentes ou um ativo no seu site. Sem chave de">
 <link rel="canonical" href="https://radarperene.com.br/widgets/">
@@ -23,6 +23,7 @@
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/widgets/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com","https://brazilcomplexity.com","https://aformadopatrimonio.com.br"],"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"Widgets embedáveis","description":"Catálogo dos widgets embedáveis do Radar Perene. Uma linha de HTML coloca o regime do Brasil, as cinco lentes ou um ativo no seu site. Sem chave de","url":"https://radarperene.com.br/widgets/","documentation":"https://radarperene.com.br/widgets/","provider":{"@type":"Organization","name":"Radar Perene"}}</script>
+<link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -47,6 +48,9 @@
   /* topbar */
   .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 22px;max-width:var(--max);margin:0 auto}
   .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.3px}
+  .brand .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   .brand svg{display:block}
   .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
   .brand .nm b{color:var(--gold)}
@@ -169,7 +173,7 @@
 &lt;radar-perene widget=&quot;regime-br&quot;&gt;&lt;/radar-perene&gt;</code></pre>
 <p>O atributo `widget` escolhe um preset de seções. Omita-o e use `symbol` para fixar um ativo. O elemento renderiza HTML legível por crawler — o conteúdo não depende de JavaScript para ser indexado.</p>
 <h2 class="sec">2. Catálogo de presets</h2>
-<table class="tb"><thead><tr><th>`widget=`</th><th>O que mostra</th></tr></thead><tbody><tr><td>`editorial`</td><td>Camada editorial completa: regime, lentes, tese viva, análogos, termômetros, lead-lag, divergências e cruzamento — o que importa hoje, sem catálogos.</td></tr><tr><td>`exploracao`</td><td>Camada de exploração: índices, intermercado, fiscal, cripto, amplitude e as portas Explorar (mercados, comparações, estudos).</td></tr><tr><td>`regime-br`</td><td>Regime Brasil: as cinco lentes, macro, intermercado e ações. O painel-âncora.</td></tr><tr><td>`panorama`</td><td>Lentes, intermercado e divergências do dia — leitura de superfície.</td></tr><tr><td>`lentes`</td><td>As cinco lentes do Radar, isoladas.</td></tr><tr><td>`termometros`</td><td>Termômetros globais (índices, câmbio, commodities).</td></tr><tr><td>`global`</td><td>Visão externa: termômetros, cripto, lead-lag, análogo e divergências.</td></tr><tr><td>`cripto`</td><td>Painel de cripto (Fear &amp; Greed, liquidez).</td></tr></tbody></table>
+<table class="tb"><thead><tr><th>`widget=`</th><th>O que mostra</th></tr></thead><tbody><tr><td>`regime-br`</td><td>Regime Brasil: as cinco lentes, macro, intermercado e ações. O painel-âncora.</td></tr><tr><td>`panorama`</td><td>Lentes, intermercado e divergências do dia — leitura de superfície.</td></tr><tr><td>`lentes`</td><td>As cinco lentes do Radar, isoladas.</td></tr><tr><td>`termometros`</td><td>Termômetros globais (índices, câmbio, commodities).</td></tr><tr><td>`global`</td><td>Visão externa: termômetros, cripto, lead-lag, análogo e divergências.</td></tr><tr><td>`cripto`</td><td>Painel de cripto (Fear &amp; Greed, liquidez).</td></tr></tbody></table>
 <pre class="api"><code>&lt;radar-perene widget=&quot;panorama&quot;&gt;&lt;/radar-perene&gt;
 &lt;radar-perene widget=&quot;global&quot;&gt;&lt;/radar-perene&gt;</code></pre>
 <h2 class="sec">3. Um ativo específico</h2>

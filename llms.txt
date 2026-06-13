@@ -61,5 +61,9 @@ O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) �
 ## Princípios
 Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Educacional/informativo. Linguagem honesta sobre incerteza (amostra, janela, confiança categórica). Sem cálculo sobre data sintética; calibração visível. Bilíngue PT/EN.
 
+## Dados de mercado (integridade e procedência)
+Os dados de mercado usados pelo Radar são exclusivamente valores de **fechamento (end-of-day)**, obtidos por **APIs públicas ou licenciadas** (ex.: BCB/PTAX, FRED, market-data público de bolsas, provedores licenciados de EOD) — **sem extração ou scraping** de páginas de terceiros. O histórico é armazenado uma vez; apenas o fechamento diário é atualizado. As séries alimentam **indicadores derivados** (regime, percentis, Índice Ânima, Índice de Risco Perene), não a redistribuição de cotações brutas.
+Market data used by Radar Perene is **end-of-day closing values only**, obtained via **public or licensed APIs** (e.g., BCB/PTAX, FRED, public exchange market-data, licensed EOD providers) — **no scraping or page extraction** from third parties. History is stored once; only the daily close is updated. Series feed **derived indicators** (regime, percentiles, proprietary indices), not redistribution of raw quotes.
+
 ## Contato
 contato@radarperene.com.br (PT) · hello@radarperene.com (EN)

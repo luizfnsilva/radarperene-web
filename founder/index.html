@@ -10,11 +10,11 @@
 <meta property="og:site_name" content="Radar Perene">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://radarperene.com.br/founder/">
-<meta property="og:image" content="https://radarperene.com.br/og.png">
+<meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta property="og:title" content="Founder Access — 100 contas · R$ 149/mês · Radar Perene">
 <meta property="og:description" content="Founder Access do Radar Perene: 100 contas, R$ 149/mês travado, cinco lentes + Vértice, 7 dias de reembolso via Stripe. A fase fundadora.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://radarperene.com.br/og.png">
+<meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta name="twitter:title" content="Founder Access — 100 contas · R$ 149/mês · Radar Perene">
 <meta name="twitter:description" content="Founder Access do Radar Perene: 100 contas, R$ 149/mês travado, cinco lentes + Vértice, 7 dias de reembolso via Stripe. A fase fundadora.">
 <link rel="canonical" href="https://radarperene.com.br/founder/">
@@ -23,6 +23,7 @@
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/founder/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com","https://brazilcomplexity.com","https://aformadopatrimonio.com.br"],"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Radar Perene — Founder Access","description":"Founder Access do Radar Perene: 100 contas, R$ 149/mês travado, cinco lentes + Vértice, 7 dias de reembolso via Stripe. A fase fundadora.","url":"https://radarperene.com.br/founder/","brand":{"@type":"Brand","name":"Radar Perene"},"offers":{"@type":"Offer","price":"149","priceCurrency":"BRL","availability":"https://schema.org/LimitedAvailability","url":"https://radarperene.com.br/founder/"}}</script>
+<link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -47,6 +48,9 @@
   /* topbar */
   .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 22px;max-width:var(--max);margin:0 auto}
   .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.3px}
+  .brand .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   .brand svg{display:block}
   .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
   .brand .nm b{color:var(--gold)}

@@ -10,11 +10,11 @@
 <meta property="og:site_name" content="Radar Perene">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://radarperene.com.br/lentes/patrimonial/">
-<meta property="og:image" content="https://radarperene.com.br/og.png">
+<meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta property="og:title" content="Lente Patrimonial — regime tributário e sucessório do Brasil">
 <meta property="og:description" content="Trajetória regulatória do ITCMD, holding familiar, Lei 14.754, sucessão e proteção patrimonial — em código probabilístico, com convergência de fontes.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://radarperene.com.br/og.png">
+<meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta name="twitter:title" content="Lente Patrimonial — regime tributário e sucessório do Brasil">
 <meta name="twitter:description" content="Trajetória regulatória do ITCMD, holding familiar, Lei 14.754, sucessão e proteção patrimonial — em código probabilístico, com convergência de fontes.">
 <link rel="canonical" href="https://radarperene.com.br/lentes/patrimonial/">
@@ -24,6 +24,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com","https://brazilcomplexity.com","https://aformadopatrimonio.com.br"],"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://radarperene.com.br/"},{"@type":"ListItem","position":2,"name":"Lentes","item":"https://radarperene.com.br/lentes/"},{"@type":"ListItem","position":3,"name":"Lente Patrimonial","item":"https://radarperene.com.br/lentes/patrimonial/"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Lente Patrimonial","description":"Trajetória regulatória do ITCMD, holding familiar, Lei 14.754, sucessão e proteção patrimonial — em código probabilístico, com convergência de fontes.","url":"https://radarperene.com.br/lentes/patrimonial/","provider":{"@type":"Organization","name":"Radar Perene"},"areaServed":"BR","serviceType":"Regulatory & market intelligence"}</script>
+<link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -48,6 +49,9 @@
   /* topbar */
   .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 22px;max-width:var(--max);margin:0 auto}
   .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.3px}
+  .brand .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   .brand svg{display:block}
   .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
   .brand .nm b{color:var(--gold)}
