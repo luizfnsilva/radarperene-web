@@ -48,7 +48,7 @@
     var old = document.getElementById("me-menu"); if (old) { old.remove(); return; }
     var m = document.createElement("div"); m.id = "me-menu";
     m.style.cssText = "position:absolute;top:46px;right:14px;z-index:10000;background:#13171c;border:1px solid #222a31;border-radius:10px;padding:7px;box-shadow:0 12px 40px rgba(0,0,0,.55);min-width:200px";
-    var prov = function (p) { return function () { sb.auth.signInWithOAuth({ provider: p, options: { redirectTo: location.href } }); }; };
+    var prov = function (p) { return function () { sb.auth.signInWithOAuth({ provider: p, options: { redirectTo: location.origin + location.pathname + location.search } }); }; };/* ★ sem location.hash: fragmento (ex.: /#radar) gera hash duplo no retorno (/#radar#access_token=…) e o detectSessionInUrl não lê o token → "volta deslogado" */
     var GSVG = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.5 29.3 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 18.9 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.5 29.3 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 43.5c5.2 0 9.8-2 13.3-5.2l-6.2-5.2C29.1 34.7 26.7 35.5 24 35.5c-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.6 39 16.2 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.4l6.2 5.2C40.9 36.8 43.5 31 43.5 24c0-1.3-.1-2.3-.4-3.5z"/></svg>';
     var gb = document.createElement("button");
     gb.innerHTML = GSVG + '<span>' + (EN ? "Continue with Google" : "Continuar com Google") + '</span>';
@@ -64,7 +64,7 @@
       var em = (prompt(EN ? "Your email:" : "Seu e-mail:") || "").trim().toLowerCase();
       if (!em) return;
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { alert(EN ? "Invalid email format." : "Formato de e-mail inválido."); return; }
-      var res = await sb.auth.signInWithOtp({ email: em, options: { emailRedirectTo: location.href, shouldCreateUser: true } });
+      var res = await sb.auth.signInWithOtp({ email: em, options: { emailRedirectTo: location.origin + location.pathname + location.search, shouldCreateUser: true } });
       alert(res.error ? ("Erro: " + res.error.message) : (EN ? "Check your email for the link (and spam)." : "Verifique seu e-mail — enviamos o link (veja o spam também)."));
     };
     m.appendChild(ml);
