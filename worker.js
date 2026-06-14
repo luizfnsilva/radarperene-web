@@ -395,42 +395,36 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const desc = _esc((en
     ? "Daily reading " + date + (_pulse ? ": " + _pulse : "") + (_rl ? " · month regime: " + _rl + (_rs ? " (" + _rs + ", monthly)" : "") : "") + ". Archived by Radar Perene."
     : "Leitura de " + date + (_pulse ? ": " + _pulse : "") + (_rl ? " · regime do mês: " + _rl + (_rs ? " (" + _rs + ", mensal)" : "") : "") + ". Arquivo diário do Radar Perene.")).slice(0, 155);
-  let verHtml = "";
-  if (ver && ver.horizontes && ver.horizontes.length) {
-    const lines = ver.horizontes.map(function (h) {
-      if (h.status !== "ok") return h.horizonte.toUpperCase() + ": " + (en ? "awaiting " : "aguardando ") + h.alvo;
-      let base = h.horizonte.toUpperCase() + ": IBOV " + (h.realizado_pct >= 0 ? "+" : "") + h.realizado_pct + "% (" + _fmtVal(h.ibov_inicio, "pts") + " → " + _fmtVal(h.ibov_fim, "pts") + ")";
-      if (h.analogo_previa_pct != null) base += " · " + (en ? "analog predicted " : "análogo previa ") + (h.analogo_previa_pct >= 0 ? "+" : "") + h.analogo_previa_pct + "% → " + (h.direcao_confirmou ? (en ? "direction confirmed" : "direção confirmou") : (en ? "direction did not confirm" : "direção não confirmou"));
-      return base;
-    });
-    verHtml = "<div class=\"ver\"><b>" + (en ? "Verification — outcome vs. the reading" : "Verificação — desfecho vs. a leitura") + "</b><ul>" + lines.map(function (l) { return "<li>" + _esc(l) + "</li>"; }).join("") + "</ul></div>";
-  }
+  // Verificação (desfecho vs leitura) REMOVIDA do snapshot público — 2ª compressão editorial 2026-06-14:
+  //   abria o dia com algo secundário (densidade visual). O dado segue intacto no /v1/snapshot.verificacao;
+  //   vai para uma futura página dedicada de track record (/historico). Aqui o dia abre pelo PULSO.
+  void ver;
   // ── Casos análogos — "o que veio depois" (olha pra FRENTE): distribuição de desfechos após leituras semelhantes,
   //    pareada com a Verificação (que olha pra trás). Frequência observada, NUNCA previsão. Consome /v1/snapshot.casos_analogos. ──
   const cas = snap.casos_analogos || null;
   let casHtml = "";
   if (cas && cas.horizontes && (cas.horizontes["3m"] || cas.horizontes["6m"] || cas.horizontes["12m"])) {
     const sgn = function (v) { return (v >= 0 ? "+" : "") + v + "%"; };
+    // 2ª compressão editorial (2026-06-14): no público, só hit% + mediana. A "cozinha" (faixa p25-p75, n,
+    //   n_episodios, k-NN/método) sai → vira moat Founder + link de metodologia. "esconde a escala, não o método".
     const casLines = ["3m", "6m", "12m"].filter(function (k) { return cas.horizontes[k]; }).map(function (k) {
       const h = cas.horizontes[k];
       return k.toUpperCase() + ": " + (en ? "higher " : "em alta ") + h.alta_pct + "%" +
-        (h.mediana != null ? " · " + (en ? "median " : "mediana ") + sgn(h.mediana) : "") +
-        (h.p25 != null && h.p75 != null ? " · " + (en ? "central range " : "faixa central ") + sgn(h.p25) + "…" + sgn(h.p75) : "") +
-        (h.n != null ? " (n=" + h.n + ")" : "");
+        (h.mediana != null ? " · " + (en ? "median " : "mediana ") + sgn(h.mediana) : "");
     });
     const casTitle = cas.titulo || (en ? "Analogous cases — what came next" : "Casos análogos — o que veio depois");
-    const casMeta = (cas.n_episodios != null ? (en ? cas.n_episodios + " independent episodes" : cas.n_episodios + " episódios independentes") : "") +
-      (cas.exemplos && cas.exemplos.length ? " · " + (en ? "e.g. " : "ex. ") + cas.exemplos.slice(0, 5).join(", ") : "") +
-      (cas.metodo ? " · " + cas.metodo : "");
+    const casEx = (cas.exemplos && cas.exemplos.length ? (en ? "e.g. " : "ex. ") + _esc(cas.exemplos.slice(0, 3).join(", ")) : "");
+    const casFoot = (en ? "Observed distribution, not a forecast" : "Distribuição observada, não previsão") +
+      (casEx ? " · " + casEx : "") +
+      " · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "how the analogs are built →" : "como os análogos são construídos →") + "</a>";
     casHtml = "<div class=\"cas\"><b>" + _esc(casTitle) + "</b>" +
       (cas.leitura ? "<p class=\"casl\">" + _esc(cas.leitura) + "</p>" : "") +
       "<ul>" + casLines.map(function (l) { return "<li>" + _esc(l) + "</li>"; }).join("") + "</ul>" +
-      (casMeta ? "<p class=\"casm\">" + _esc(casMeta) + "</p>" : "") +
-      (!cas.leitura && cas.disclaimer ? "<p class=\"casm\">" + _esc(cas.disclaimer) + "</p>" : "") +
+      "<p class=\"casm\">" + casFoot + "</p>" +
       "</div>";
   }
-  // passado × futuro lado a lado (empilha no mobile): Verificação (trás) + Casos análogos (frente)
-  const pfHtml = (verHtml || casHtml) ? "<div class=\"pf\">" + verHtml + casHtml + "</div>" : "";
+  // Só "o que veio depois" (casos análogos) no público; a Verificação (olhar pra trás) foi p/ /historico.
+  const pfHtml = casHtml || "";
   const IND_OK = { "regime-br": 1, "erp-br": 1, "valuation-br": 1, "ciclicas-defensivas": 1, "ibovespa": 1, "analogo-br": 1 };  // slugs com página /indicador real
   const CONC_MAP = { "regime-global": "regime-global", "intermercado-br": "intermercado-br" };  // reconstruídos → página de conceito (não /indicador, que 404ava)
   const _indLi = function (i) {
@@ -451,16 +445,16 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
-    _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.manch{font-size:15px;color:var(--txt);margin:.6rem 0 0}.manch b{color:var(--gold)}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.btn2{display:inline-block;background:var(--gold);color:#0a0c0f;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;text-decoration:none}.memogate .lg{font-size:13px;color:var(--dim)}") +
+    _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.manch{font-family:var(--serif);font-size:21px;line-height:1.45;color:var(--txt);margin:.7rem 0 1.1rem}.manch b{color:var(--gold)}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.btn2{display:inline-block;background:var(--gold);color:#0a0c0f;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;text-decoration:none}.memogate .lg{font-size:13px;color:var(--dim)}") +
     "</head><body>" + _header() + "<div class=\"wrap\">" +
     "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
     "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     mancheteHtml +
-    _memoGate(date) +
-    pfHtml +
     (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
-    "<ul>" + indHtml + "</ul>" +
+    (indHtml ? "<p class=\"panh\">" + (en ? "Today’s snapshot" : "O panorama do dia") + "</p><ul>" + indHtml + "</ul>" : "") +
+    pfHtml +
     ctxHtml +
+    _memoGate(date) +
     "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a></p>" +
     ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
     "</div><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
