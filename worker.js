@@ -417,8 +417,10 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     const casFoot = (en ? "Observed distribution, not a forecast" : "Distribuição observada, não previsão") +
       (casEx ? " · " + casEx : "") +
       " · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "how the analogs are built →" : "como os análogos são construídos →") + "</a>";
+    // NÃO renderiza cas.leitura cru no público: a prosa do motor traz a "cozinha" inline
+    //   ("N episódios independentes (Ânima/Risco/Regime…), faixa central p25-p75"). Os casLines (hit%+mediana)
+    //   + casFoot (disclaimer + exemplos + link de método) já entregam a versão limpa. leitura/faixa = Founder.
     casHtml = "<div class=\"cas\"><b>" + _esc(casTitle) + "</b>" +
-      (cas.leitura ? "<p class=\"casl\">" + _esc(cas.leitura) + "</p>" : "") +
       "<ul>" + casLines.map(function (l) { return "<li>" + _esc(l) + "</li>"; }).join("") + "</ul>" +
       "<p class=\"casm\">" + casFoot + "</p>" +
       "</div>";
