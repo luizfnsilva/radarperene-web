@@ -348,6 +348,30 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
 function _diarioFetch(url) {
   return _fetchT(url, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
 }
+// ── Bloco do ASSINANTE na página /diario/<data> (client-side): para Founder logado, busca
+//    /v1/biblioteca/item?tipo=diario&data=<date> com o Bearer da sessão e revela a prosa abaixo
+//    dos números (server-rendered). Anon/free → gancho + CTA. DEFENSIVO: try/catch — se o script
+//    falhar, a página numérica (já no HTML) fica intacta. A página é edge-cacheada; o conteúdo
+//    gateado vem por fetch per-user (não cacheado), casando com o Vary:Authorization do edge.
+function _memoGate(date) {
+  const J = JSON.stringify;
+  return '<div id="rp-memo" class="memo"></div>' +
+    '<script src="/vendor/supabase-js/supabase.min.js"></script>' +
+    '<script>(function(){if(!window.supabase)return;' +
+    'var box=document.getElementById("rp-memo");if(!box)return;' +
+    'var EN=/radarperene\\.com$/i.test(location.hostname)&&!/\\.com\\.br$/i.test(location.hostname);' +
+    'var ANON=' + J(NARR_ANON) + ',DATE=' + J(date) + ';' +
+    'var sb=window.supabase.createClient("https://zcjtkgltrxdnlacezpny.supabase.co",ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});' +
+    'function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}' +
+    'function inl(s){return esc(s).replace(/\\*\\*([^*]+)\\*\\*/g,"<strong>$1</strong>").replace(/(^|[^*])\\*([^*]+)\\*/g,"$1<em>$2</em>").replace(/&lt;sub&gt;/g,"<span class=\\"selo\\">").replace(/&lt;\\/sub&gt;/g,"</span>");}' +
+    'function md(t){var bs=String(t||"").replace(/\\r/g,"").split(/\\n{2,}/),o=[];bs.forEach(function(b){b=b.trim();if(!b)return;if(/^#{1,3}\\s/.test(b)){var h=b.match(/^#+/)[0].length;o.push("<h"+h+">"+inl(b.replace(/^#+\\s/,""))+"</h"+h+">");return;}if(/^---+$/.test(b)){o.push("<hr>");return;}var ls=b.split("\\n");if(ls.every(function(l){return /^[-*]\\s/.test(l.trim());})){o.push("<ul>"+ls.map(function(l){return "<li>"+inl(l.replace(/^[-*]\\s/,""))+"</li>";}).join("")+"</ul>");return;}o.push("<p>"+ls.map(inl).join("<br>")+"</p>");});return o.join("");}' +
+    'function gancho(){box.innerHTML=\'<div class="memogate"><div class="gh">\'+(EN?"The full reading is for subscribers":"A leitura completa \\u00e9 para assinantes")+\'</div><p>\'+(EN?"Daily, weekly and monthly reports \\u2014 subscribers only.":"Relat\\u00f3rios di\\u00e1rios, semanais e mensais \\u2014 exclusivos para assinantes.")+\'</p><div class="ghb"><a class="btn2" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">\'+(EN?"Founder \\u00b7 US$149/mo":"Founder \\u00b7 R$149/m\\u00eas")+\'</a> <a href="#" id="rp-login" class="lg">\'+(EN?"Already a subscriber? Sign in":"J\\u00e1 \\u00e9 assinante? Entrar")+\'</a></div></div>\';var lg=document.getElementById("rp-login");if(lg)lg.onclick=function(e){e.preventDefault();sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});};}' +
+    'async function run(){try{var sess=(await sb.auth.getSession()).data.session;var tok=sess?sess.access_token:ANON;' +
+    'var r=await fetch(location.origin+"/api/v1/biblioteca/item?tipo=diario&data="+DATE+(EN?"&lang=en":""),{headers:{apikey:ANON,Authorization:"Bearer "+tok}});' +
+    'if(r.ok){var d=await r.json();if(d&&d.corpo_md){box.innerHTML=\'<div class="memohd">\'+(EN?"Subscriber report":"Relat\\u00f3rio do assinante")+\'</div><div class="memobody">\'+md(d.corpo_md)+\'</div>\';return;}}gancho();}catch(e){gancho();}}' +
+    'sb.auth.onAuthStateChange(function(){run();});run();' +
+    '})();<\/script>';
+}
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
   const en = lang === "en";
@@ -427,11 +451,12 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
-    _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.manch{font-size:15px;color:var(--txt);margin:.6rem 0 0}.manch b{color:var(--gold)}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}") +
+    _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.manch{font-size:15px;color:var(--txt);margin:.6rem 0 0}.manch b{color:var(--gold)}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.btn2{display:inline-block;background:var(--gold);color:#0a0c0f;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;text-decoration:none}.memogate .lg{font-size:13px;color:var(--dim)}") +
     "</head><body>" + _header() + "<div class=\"wrap\">" +
     "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
     "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     mancheteHtml +
+    _memoGate(date) +
     pfHtml +
     (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
     "<ul>" + indHtml + "</ul>" +

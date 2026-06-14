@@ -91,7 +91,10 @@
     if(!itens){ elLista.innerHTML='<p class="muted">'+(EN?"Loading…":"Carregando…")+'</p>'; return; }
     if(!itens.length){ elLista.innerHTML='<p class="muted">'+(EN?"Nothing here yet.":"Ainda não há itens.")+'</p>'; return; }
     elLista.innerHTML = '<ul class="lista">'+itens.map(function(it){
-      var href=(EN?"/daily/":"/diario/")+"?tipo="+tipo+"&data="+it.data_referencia+(EN?"&lang=en":"");
+      // diário: URL limpa /diario|daily/<data> (worker serve público+prosa). mensal/semanal: página estática por query.
+      var base=EN?"/daily":"/diario";
+      var href = (tipo==="diario") ? (base+"/"+it.data_referencia)
+                                   : (base+"/?tipo="+tipo+"&data="+it.data_referencia+(EN?"&lang=en":""));
       return '<li><a href="'+href+'"><span class="tt">'+esc(it.titulo||it.data_referencia)+'</span><span class="dt">'+esc(it.data_referencia)+'</span></a></li>';
     }).join("")+'</ul>';
   }
