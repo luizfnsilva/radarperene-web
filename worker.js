@@ -783,7 +783,7 @@ async function _route(request, env, ctx) {
       if (!ct.includes("text/html")) return res; // não-HTML: intacto
       // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
       const cob = await _fetchCobertura();
-      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); if (isEN) rw = _enDailyRw(rw); return rw.transform(res); } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com)
+      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); if (isEN) rw = _enDailyRw(rw); const _t = rw.transform(res); const _h = new Headers(_t.headers); _h.set("content-type", "text/html; charset=utf-8"); return new Response(_t.body, { status: _t.status, headers: _h }); } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com). charset EXPLÍCITO: o ASSETS serve "text/html" pelado e webviews (X/LinkedIn in-app) BAIXAM html sem charset em vez de abrir.
 
       // ★ digest do dia (home payload) inlinado no HTML → o teaser/radar pintam SEM o round-trip cliente (~2-4s, o
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
