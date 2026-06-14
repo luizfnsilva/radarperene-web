@@ -744,7 +744,8 @@
     // ★ OURO (2026-06-14, hierarquia Ouro/Prata/Bronze): a home CURADA — menos cards, só o que "chamou atenção".
     //   regime (pulso/scores) · 5 lentes · divergências (o que chamou atenção) · análogos (o que veio depois) ·
     //   termômetros (top-3). Prata/Bronze (scatter, lead-lag, comparações, componentes/eixos) ficam no "radar
-    //   completo" (sections=null) + no drawer — "profundidade no clique". Home embeda com data-rp-widget="ouro".
+    //   completo" (sections=null) + no drawer — "profundidade no clique". Home liga com o atributo widget="ouro"
+    //   (o embed lê `widget`→RP_WIDGETS→data-sections, ver l.1963), ou data-sections="regime,lentes,divergencias,analogo_br,analogo,termometros".
     "ouro": "regime,lentes,divergencias,analogo_br,analogo,termometros", "gold": "regime,lentes,divergencias,analogo_br,analogo,termometros",
     "exploracao": "indices,intermercado,fiscal,cripto,extras,portas", "exploration": "indices,intermercado,fiscal,cripto,extras,portas" };
   // leitura TEXTUAL de um indicador de domínio (cripto: Fear&Greed/TVL; ações: volume). Substitui o gráfico cru — a pilha
