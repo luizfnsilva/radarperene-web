@@ -557,10 +557,11 @@
   // gráfico "de verdade" (parâmetros): faixa min/máx, "hoje", projeção tracejada destacada, último valor rotulado
   function bigChart(s, opt) {
     if (!s || !s.hist || s.hist.length < 2) return "";
-    opt = opt || {}; var big = !!opt.big, pro = !!opt.pro;  // pro=assinante: vê o cone completo; free vê só a mediana (gancho)
+    opt = opt || {}; var big = !!opt.big, pro = !!opt.pro, noFut = !!opt.noFuture;  // pro=assinante: vê o cone completo; free vê só a mediana (gancho). noFut: não desenha futuro (free) — só histórico + marcador "hoje"
     var hist = s.hist;
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;       // cone de quantis (assimétrico, estilo Cowen)
     var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : [];                   // fallback: projeção linear
+    if (noFut) { cone = null; proj = []; }  // ★ free: suprime a projeção FUTURA (lê como previsão, P7); o marcador "hoje" segue (linha 629)
     var futN = cone ? (cone.mid.length - 1) : (proj.length ? proj.length - 1 : 0);
     var all = hist.slice();
     if (cone) { if (pro && (cone.lo2 || cone.lo)) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free/gateado: range só até a mediana; pro c/ bandas: até p10–p90
@@ -626,10 +627,10 @@
     }
     // ── camadas-PLUGIN (Strategy): cada indicador drop-in desenha aqui, no foreground (já computado p/ o range) ──
     for (var _di = 0; _di < _plug.length; _di++) { try { o += _plug[_di].d.draw({ X: X, Y: Y }, _plug[_di].c); } catch (_e) { /* plugin isolado: nunca derruba o gráfico */ } }
-    if (cone || proj.length) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';
+    if (cone || proj.length || noFut) o += '<line x1="' + nx.toFixed(1) + '" y1="' + pT + '" x2="' + nx.toFixed(1) + '" y2="' + (H - pB) + '" stroke="var(--_dim)" stroke-width="0.8" stroke-dasharray="1 2"/>';  // marcador "hoje" (também no free sem futuro)
     if (cone && opt.cone !== false) o += '<polyline points="' + path(cone.mid, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.6) + '" stroke-dasharray="4 2"/>';
     else if (proj.length) o += '<polyline points="' + path(proj, bi) + '" fill="none" stroke="var(--_warm)" stroke-width="' + (big ? 1.4 : 1.8) + '" stroke-dasharray="4 2"/>';
-    var tail = cone ? (pro ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (' · <span class="pj">⤳ ' + esc(fmtNum(cone.mid[cone.mid.length - 1])) + '</span>')) : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');
+    var tail = cone ? ((pro && cone.lo && cone.hi) ? (' · <span class="pj">⤳ ' + esc(fmtNum(cone.lo[cone.lo.length - 1])) + '–' + esc(fmtNum(cone.hi[cone.hi.length - 1])) + '</span>') : (' · <span class="pj">⤳ ' + esc(fmtNum(cone.mid[cone.mid.length - 1])) + '</span>')) : (proj.length ? ' · <span class="pj">⤳ ' + esc(fmtNum(proj[proj.length - 1])) + '</span>' : '');  // guard: pro c/ bandas null (UI pro sem token) cai p/ a mediana — não quebra
     return o + '</svg><span class="bcx"><b>' + esc(fmtNum(hist[hist.length - 1])) + '</b> · ↑' + esc(fmtNum(mx)) + ' · ↓' + esc(fmtNum(mn)) + tail + '</span>';
   }
   // scatter (Lead-Lag): cada ponto = um mês; X=score do regime, Y=retorno do IBOV em 6m. Didático: faixa "hoje" (cur±8)
@@ -1030,7 +1031,7 @@
     // gate embed-friendly: o widget só LINKA pro fluxo hospedado (login Google/Apple + Stripe vivem no domínio) — funciona de qualquer site (backlink)
     var checkout = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));  // Stripe Founder: EN=US$149 · PT=R$149
     var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
-      return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid }); };
+      return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid, noFuture: !gpaid }); };
     var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Manipulate & project the future — Founder" : "🔒 Manipular & projetar o futuro — Founder") + '</b><small>' + (L ? "Free range (drag-zoom), compare A×B and toggle overlays — plus the full asymmetric cone (p10–p90) with the past analogs overlaid. The history is here; with Founder you actually work it. Lock it all for US$149/mo while active — first 100 only." : "Período livre (arrasta-zoom), comparar A×B e ligar/desligar overlays — e o cone assimétrico completo (p10–p90) com os análogos passados sobrepostos. O histórico está aqui; com o Founder você trabalha ele. Trave tudo por R$149/mês enquanto ativo — só os 100 primeiros.") + '</small><em class="rp-anchor">' + (L ? "After the first 100, Vértice alone is US$290/mo. Right now both — Radar + Vértice — for US$149." : "Depois dos 100, o Vértice sozinho sai R$500/mês. Agora os dois — Radar + Vértice — por R$149.") + '</em><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
@@ -1062,7 +1063,7 @@
       depth += '<div class="rp-ml" style="margin-top:6px"><b>' + (L ? "Volatility " : "Volatilidade ") + st.vol + '%</b> ' + (L ? "(annualized)" : "(anualizada)") + (st.dd_top != null ? ' · ' + (L ? "drawdown from peak " : "queda do topo ") + '<b style="color:var(--_cool)">' + st.dd_top + '%</b>' : '') + '</div>';
       if (st.sharpe != null) depth += '<div class="rp-ml" style="opacity:.6"><b>Sharpe ' + st.sharpe + '</b> · ' + (L ? "risk-adjusted vs Selic " : "risco-ajustado vs Selic ") + st.rf + '% — ' + (st.sharpe >= 0.3 ? (L ? "beats the risk-free" : "supera a renda fixa") : st.sharpe <= -0.3 ? (L ? "below the risk-free" : "abaixo da renda fixa") : (L ? "statistically indistinguishable from the risk-free" : "estatisticamente indistinguível da renda fixa")) + '</div>'; } }  // ★ Sharpe demovido (briefing: baixa prioridade, não compete com os precedentes)
     var wSerie = (isDiff || (s.stats && s.stats.is_asset === false)) ? (L ? "series" : "série") : (L ? "price" : "preço");  // 1E p2: subtítulo "preço" genérico era mentira p/ IPCA/curva
-    h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (cone ? wSerie + (L ? " · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : " · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : wSerie + (L ? " · history → today → projection (dashed)" : " · histórico → hoje → projeção (tracejada)"))) + '</div>';
+    h += '<div class="rp-ml">' + (imx ? (L ? "two ends + their ratio (the lead-lag signal) → today" : "as duas pontas + a razão (o sinal lead-lag) → hoje") : (!gpaid ? wSerie + (L ? " · history → today" : " · histórico → hoje") : (cone ? wSerie + (L ? " · history → today → fan of outcomes from analogous cases (median case · range of the 50% and 80% of cases)" : " · histórico → hoje → leque de desfechos de casos análogos (caso mediano · faixa dos 50% e dos 80% dos casos)") : wSerie + (L ? " · history → today → projection (dashed)" : " · histórico → hoje → projeção (tracejada)")))) + '</div>';  // free: só histórico → hoje (sem projeção desenhada — o leque/projeção é gancho de texto + Founder)
     // default = 3M: períodos longos comprimem anos num modal estreito ("tudo espremido"); abrir curto deixa o cone/preço legíveis.
     // ★ P1 2026-06-10 (rodada 50 personas): TODOS os períodos do gráfico de PREÇO são free — histórico de preço é commodity ("travar é incoerente com o pitch de memória", ~20 personas); o moat real (cone/faixas/hit-rate) segue gateado no SERVIDOR. Fecha também o furo B3 (lock era só client-side).
     h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", L ? "1Y" : "1A"], ["36", L ? "3Y" : "3A"], ["0", "MAX"]].map(function (p) {
@@ -1135,8 +1136,8 @@
     // mesmo range que o bigChart (inclui cone/proj); posições alinhadas às linhas mín/centro/máx (pT/pB=6 de H=120 → banda 5%–95%).
     function buildYax(hist, wf) { wf = wf !== false;
       var all = hist.slice();
-      if (wf && s.cone && s.cone.mid && s.cone.mid.length > 1) { if (gpaid && (s.cone.lo2 || s.cone.lo)) all = all.concat((s.cone.lo2 || s.cone.lo).slice(1), (s.cone.hi2 || s.cone.hi).slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart (free/gateado=só mediana; pro c/ bandas=p10–p90)
-      else if (wf && s.proj && s.proj.length > 1) all = all.concat(s.proj.slice(1));
+      if (wf && gpaid && s.cone && s.cone.mid && s.cone.mid.length > 1) { if (s.cone.lo2 || s.cone.lo) all = all.concat((s.cone.lo2 || s.cone.lo).slice(1), (s.cone.hi2 || s.cone.hi).slice(1)); else all = all.concat(s.cone.mid.slice(1)); }  // casa com o range do bigChart; free não tem futuro desenhado → range só do histórico
+      else if (wf && gpaid && s.proj && s.proj.length > 1) all = all.concat(s.proj.slice(1));
       var mn = Math.min.apply(null, all), mx = Math.max.apply(null, all), rg = (mx - mn) || 1;
       return [[5, mx], [27.5, mn + 0.75 * rg], [50, mn + 0.5 * rg], [72.5, mn + 0.25 * rg], [95, mn]].map(function (p) {  // 5 níveis alinhados às gridlines (eixo mais legível p/ análise precisa)
         return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(fmtNum(p[1])) + '</span>'; }).join("");
@@ -1207,7 +1208,7 @@
       sv._plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); })
         .map(function (l) { return { id: l.id, data: l.compute(s.hist) }; });
       if (_upInst && _upInst.destroy) { try { _upInst.destroy(); } catch (e) {} }
-      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, height: 200, nav: true, clamp: function () { return _navClamp; }, sinais: s.sinais, onReset: function () { var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 3; setChart(isFinite(fr) ? fr : 3); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · sinais: pinos do buy signal · onReset: dblclick volta ao período ATIVO (default 3M)
+      _upInst = window.RPUplot.upPrice(el, sv, { big: true, pro: gpaid, noFuture: !gpaid, sync: SYNC, lang: lang, hideX: hasStack, axisW: 52, height: 200, nav: true, clamp: function () { return _navClamp; }, sinais: s.sinais, onReset: function () { var on = mw.querySelector(".rp-per button.on"); var fr = (on && on.getAttribute("data-m") != null) ? parseFloat(on.getAttribute("data-m")) : 3; setChart(isFinite(fr) ? fr : 3); } });  // sync: crosshair+janela com Ânima/risk · hideX: datas só no painel de baixo · sinais: pinos do buy signal · onReset: dblclick volta ao período ATIVO (default 3M)
       return _upInst;
     }
     function tsAt(idx) {  // timestamp (epoch-s) da data no índice idx de s.hist; fallback null
@@ -1222,7 +1223,7 @@
       var ma2Sl = (ov.ma200 && s.ma200) ? s.ma200.slice(ws, we) : null, ma5Sl = (ov.ma50 && s.ma50) ? s.ma50.slice(ws, we) : null;
       var fairSl = (ov.fair && s.fair && s.fair.serie) ? s.fair.serie.slice(ws, we) : null;  // valor-justo fatiado pela MESMA janela → não some mais no zoom (bug 2)
       var plugins = RP_LAYERS.filter(function (l) { return l.kind === "plugin" && ov[l.id] && l.available(s); });  // camadas-plugin habilitadas (drop-in)
-      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands ? s.bands : null) }, { big: true, pro: gpaid, fair: fairSl, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl, plugins: plugins, futFair: (wf && ov.fair && s.fair && s.fair.serie_fut) ? s.fair.serie_fut : null });  // overlays + sombra + MMs + plugins + valor-justo futuro (bug 3)
+      chartEl.innerHTML = bigChart({ hist: histArr, proj: (wf ? s.proj : null), cone: (wf ? s.cone : null), bands: (wf && ov.bands ? s.bands : null) }, { big: true, pro: gpaid, noFuture: !gpaid, fair: fairSl, cone: ov.cone, shadow: (wf ? shSl : null), ma200: ma2Sl, ma50: ma5Sl, plugins: plugins, futFair: (wf && ov.fair && s.fair && s.fair.serie_fut) ? s.fair.serie_fut : null });  // overlays + sombra + MMs + plugins + valor-justo futuro (bug 3)
       yax.innerHTML = buildYax(histArr, wf);
       chartEl.appendChild(yax); chartEl.appendChild(xh); chartEl.appendChild(xt); chartEl.appendChild(bsel);
     }
@@ -1793,7 +1794,7 @@
           var pEl = node.querySelector(".rp-ativo-price");
           if (pEl) {
             var _navClampA = null;  // janela navegável permitida (~3a → fim do cone) p/ FREE e Founder (BUG C)
-            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, nav: true, clamp: function () { return _navClampA; }, sinais: s.sinais };  // free navega COM zoom mas clampado ao tempo permitido; Founder = livre. pinos do buy signal (Índice de Risco Perene)
+            var pOpt = { big: true, pro: gpaid, noFuture: !gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, nav: true, clamp: function () { return _navClampA; }, sinais: s.sinais };  // free navega COM zoom mas clampado ao tempo permitido; Founder = livre. free sem projeção futura (só hist + "hoje"). pinos do buy signal (Índice de Risco Perene)
             var up = window.RPUplot.upPrice(pEl, gateSerie(s, gpaid), pOpt);
             if (up) {
               _upMounted.push({ el: pEl, draw: function (el) { window.RPUplot.upPrice(el, gateSerie(s, gpaid), pOpt); } });  // re-tema
@@ -1944,7 +1945,7 @@
               var _wS = (serieDiff(s) || (s.stats && s.stats.is_asset === false)) ? (lang === "en" ? "series" : "série") : (lang === "en" ? "price" : "preço");  // 1E p2: subtítulo honesto
               var _i0 = winIdx12m(s);  // janela 12m do 1º clique (0 = sem recorte); fair.serie é alinhada ao hist → mesma fatia
               var _wH = _i0 ? (lang === "en" ? "last 12 months" : "últimos 12 meses") : (lang === "en" ? "history" : "histórico");
-              inner += '<span class="mt" style="display:block">' + (lang === "en" ? _wS + " · " + _wH + " → today → projection (dashed)" + (_gp && s.fair ? " · gold = fair value" : "") : _wS + " · " + _wH + " → hoje → projeção (tracejada)" + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist.slice(_i0), proj: s.proj, cone: s.cone }, { fair: (_gp && s.fair && s.fair.serie) ? s.fair.serie.slice(_i0) : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder)
+              inner += '<span class="mt" style="display:block">' + (lang === "en" ? _wS + " · " + _wH + (_gp ? " → today → projection (dashed)" : " → today") + (_gp && s.fair ? " · gold = fair value" : "") : _wS + " · " + _wH + (_gp ? " → hoje → projeção (tracejada)" : " → hoje") + (_gp && s.fair ? " · ouro = valor-justo" : "")) + '</span>' + bigChart({ hist: s.hist.slice(_i0), proj: s.proj, cone: s.cone }, { noFuture: !_gp, fair: (_gp && s.fair && s.fair.serie) ? s.fair.serie.slice(_i0) : null, futFair: (_gp && s.fair) ? s.fair.serie_fut : null });  // bug 5: SÉRIE do fair + cone; fair gated (Founder); free sem projeção futura (preview = mediana, sem pro p/ não exigir bandas)
               if (s.fair && s.fair.premio_pct != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "fair value " : "valor-justo ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (lang === "en" ? "vs price · P/E now " : "vs preço · P/L hoje ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (lang === "en" ? " normal" : " normal") + '</span>';
               if (s.dcf && s.dcf.iv != null) inner += '<span class="mt" style="display:block">' + (lang === "en" ? "DCF intrinsic R$ " : "DCF intrínseco R$ ") + esc(s.dcf.iv) + ' · ' + (lang === "en" ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b> · ' + (lang === "en" ? "model, not a forecast" : "modelo, não previsão") + '</span>';
               if (s.risco && s.risco.serie && s.risco.serie.length > 1) inner += '<span class="mt" style="display:block;margin-top:5px">' + (s.mercado_br === false ? (lang === "en" ? "Global risk-on/off (ticks = past extremes)" : "Risco global · risk-on/off (traços = extremos passados)") : (lang === "en" ? "Perene Risk Index · risk-on/off (ticks = past extremes)" : "Índice de Risco Perene · risk-on/off (traços = extremos passados)")) + '</span>' + riskPane(s.risco);

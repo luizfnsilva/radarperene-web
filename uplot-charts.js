@@ -253,6 +253,7 @@
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;
     var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : null;
     var futN = cone ? (cone.mid.length - 1) : (proj ? proj.length - 1 : 0);
+    if (opt.noFuture) { cone = null; proj = null; futN = 0; }  // ★ free: sem projeção FUTURA desenhada (a linha tracejada subindo lê como "previsão", fere P7) — só histórico + âncora "hoje"; o número/projeção é gancho de TEXTO no Founder
 
     var xsHist = buildPriceXs(s);
     var xs = extendXs(xsHist, futN);
