@@ -741,6 +741,11 @@
   //   editorial ∪ exploracao = o radar completo (sections=null). "tese" e "portas" são chaves novas de seção.
   var RP_WIDGETS = { "regime-br": "lentes,tese,macro,intermercado,acoes", "panorama": "lentes,intermercado,divergencias", "lentes": "lentes", "lenses": "lentes", "termometros": "termometros", "thermometers": "termometros", "global": "termometros,cripto,extras,leadlag,analogo,divergencias", "cripto": "cripto", "crypto": "cripto",
     "editorial": "regime,lentes,tese,analogo_br,scatter,termometros,leadlag,analogo,divergencias,par",
+    // ★ OURO (2026-06-14, hierarquia Ouro/Prata/Bronze): a home CURADA — menos cards, só o que "chamou atenção".
+    //   regime (pulso/scores) · 5 lentes · divergências (o que chamou atenção) · análogos (o que veio depois) ·
+    //   termômetros (top-3). Prata/Bronze (scatter, lead-lag, comparações, componentes/eixos) ficam no "radar
+    //   completo" (sections=null) + no drawer — "profundidade no clique". Home embeda com data-rp-widget="ouro".
+    "ouro": "regime,lentes,divergencias,analogo_br,analogo,termometros", "gold": "regime,lentes,divergencias,analogo_br,analogo,termometros",
     "exploracao": "indices,intermercado,fiscal,cripto,extras,portas", "exploration": "indices,intermercado,fiscal,cripto,extras,portas" };
   // leitura TEXTUAL de um indicador de domínio (cripto: Fear&Greed/TVL; ações: volume). Substitui o gráfico cru — a pilha
   // empilhada (preço·Ânima·risk) é o gráfico padrão de TODO ticker; o resto vira linha de texto (último valor + faixa).
