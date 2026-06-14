@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biblioteca do Assinante — Radar Perene</title>
+<meta name="description" content="Biblioteca do Assinante do Radar Perene — relatórios diários, semanais e mensais. Leitura completa exclusiva para assinantes.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#6e6e78;
+    --gold:#a8651a; --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  html[data-theme=dark]{
+    --bg:#0e1217; --surface:#161b22; --surface2:#1c222b; --line:#28303a; --txt:#eceef1; --txt2:#c2c8d0; --dim:#8a929e; --gold:#d9a441;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--gold);text-decoration:none} a:hover{text-decoration:underline}
+  .top{display:flex;align-items:center;justify-content:space-between;max-width:880px;margin:0 auto;padding:16px 22px;gap:12px}
+  .brand{display:flex;align-items:center;gap:6px}
+  .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--txt)} .brand .nm b{color:var(--gold)}
+  #me-seal{display:none;font-size:11px;background:#b8801f;color:#0a0c0f;padding:2px 9px;border-radius:20px;font-weight:700}
+  #me-biblioteca{display:none}
+  .lang{font-size:12px;color:var(--dim)}
+  main{max-width:880px;margin:0 auto;padding:10px 22px 80px}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(24px,4vw,32px);margin:0 0 6px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 22px;max-width:60ch}
+  .tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);margin:0 0 18px;flex-wrap:wrap}
+  .tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--dim);font:600 14px var(--sans);padding:9px 12px;cursor:pointer}
+  .tabs button.on{color:var(--gold);border-bottom-color:var(--gold)}
+  ul.lista{list-style:none;margin:0;padding:0}
+  ul.lista li{border-bottom:1px solid var(--line)}
+  ul.lista a{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:13px 4px;color:var(--txt)}
+  ul.lista a:hover{text-decoration:none;color:var(--gold)}
+  ul.lista .tt{font-size:15.5px} ul.lista .dt{font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .muted{color:var(--dim);font-size:14px;padding:18px 0}
+  footer{max-width:880px;margin:0 auto;padding:24px 22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--dim)}
+</style>
+<script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
+</head>
+<body>
+<div class="top">
+  <div class="brand">
+    <a class="nm" href="/">Radar <b>Perene</b></a>
+    <span id="me-seal"></span>
+    <a id="me-biblioteca" href="/biblioteca/">Biblioteca</a>
+  </div>
+  <div class="lang"><a href="/">início</a> · <a href="#" id="me-login">Entrar</a></div>
+</div>
+
+<main>
+  <h1 id="h1">Biblioteca do Assinante</h1>
+  <p class="lead" id="lead">Relatórios diários, semanais e mensais — a leitura completa, exclusiva para assinantes. O público vê o snapshot numérico de cada dia.</p>
+  <div class="tabs" id="tabs"></div>
+  <div id="lista"><p class="muted">Carregando…</p></div>
+</main>
+
+<footer>Radar Perene · <a href="/">início</a> · leitura descritiva sobre fonte pública, nunca recomendação.</footer>
+
+<script src="/vendor/supabase-js/supabase.min.js"></script>
+<script src="/auth.js"></script>
+<script>
+(function(){
+  var EN = location.search.indexOf("lang=en")>=0 || location.hostname==="radarperene.com";
+  var API = location.origin + "/api/v1";
+  var ANON = (window.RP_AUTH && window.RP_AUTH.ANON) || "";
+  var TIPOS = [
+    {k:"diario",  pt:"Diário",  en:"Daily"},
+    {k:"semanal", pt:"Semanal", en:"Weekly"},
+    {k:"mensal",  pt:"Mensal",  en:"Monthly"}
+  ];
+  if(EN){ document.documentElement.lang="en";
+    document.getElementById("h1").textContent="Subscriber Library";
+    document.getElementById("lead").textContent="Daily, weekly and monthly reports — the full reading, subscribers only. The public sees each day's numeric snapshot.";
+    document.getElementById("me-login").textContent="Sign in";
+  }
+  var elTabs=document.getElementById("tabs"), elLista=document.getElementById("lista");
+  var atual = (new URLSearchParams(location.search).get("tipo")||"diario");
+  if(["diario","semanal","mensal"].indexOf(atual)<0) atual="diario";
+  var cache={};
+
+  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function render(tipo){
+    var itens=cache[tipo];
+    if(!itens){ elLista.innerHTML='<p class="muted">'+(EN?"Loading…":"Carregando…")+'</p>'; return; }
+    if(!itens.length){ elLista.innerHTML='<p class="muted">'+(EN?"Nothing here yet.":"Ainda não há itens.")+'</p>'; return; }
+    elLista.innerHTML = '<ul class="lista">'+itens.map(function(it){
+      var href="/diario/?tipo="+tipo+"&data="+it.data_referencia+(EN?"&lang=en":"");
+      return '<li><a href="'+href+'"><span class="tt">'+esc(it.titulo||it.data_referencia)+'</span><span class="dt">'+esc(it.data_referencia)+'</span></a></li>';
+    }).join("")+'</ul>';
+  }
+  function carregar(tipo){
+    if(cache[tipo]){ render(tipo); return; }
+    fetch(API+"/biblioteca?tipo="+tipo+(EN?"&lang=en":""),{headers:{apikey:ANON,Authorization:"Bearer "+ANON}})
+      .then(function(r){return r.json();})
+      .then(function(d){ cache[tipo]=(d&&d.itens)||[]; if(tipo===atual) render(tipo); })
+      .catch(function(){ elLista.innerHTML='<p class="muted">'+(EN?"Could not load.":"Não foi possível carregar.")+'</p>'; });
+  }
+  function selecionar(tipo){
+    atual=tipo;
+    [].forEach.call(elTabs.children,function(b){ b.classList.toggle("on", b.dataset.k===tipo); });
+    try{ history.replaceState(null,"","/biblioteca/?tipo="+tipo+(EN?"&lang=en":"")); }catch(e){}
+    render(tipo); carregar(tipo);
+  }
+  elTabs.innerHTML = TIPOS.map(function(t){ return '<button data-k="'+t.k+'">'+(EN?t.en:t.pt)+'</button>'; }).join("");
+  [].forEach.call(elTabs.children,function(b){ b.addEventListener("click",function(){ selecionar(b.dataset.k); }); });
+  selecionar(atual);
+})();
+</script>
+</body>
+</html>
