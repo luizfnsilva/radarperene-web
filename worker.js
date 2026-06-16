@@ -745,7 +745,7 @@ async function _route(request, env, ctx) {
           "<link rel=\"canonical\" href=\"" + canon + "\">" +
           "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
-          "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/ativos\">" +
+          "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/ativos\">" +
           "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + _url.origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
           "<script type=\"application/ld+json\">" + ld + "</script>" +
           _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}") +
@@ -792,7 +792,7 @@ async function _route(request, env, ctx) {
           // hreflang self-referente (Ahrefs #4/5): senão herda os do index apontando p/ a home "/"
           .on('link[rel="alternate"][hreflang="pt-br"]', { element(e) { e.setAttribute("href", "https://radarperene.com.br/ativo/" + tk.toLowerCase()); } })
           .on('link[rel="alternate"][hreflang="en"]', { element(e) { e.setAttribute("href", "https://radarperene.com/ativo/" + tk.toLowerCase()); } })
-          .on('link[rel="alternate"][hreflang="x-default"]', { element(e) { e.setAttribute("href", "https://radarperene.com/ativo/" + tk.toLowerCase()); } })
+          .on('link[rel="alternate"][hreflang="x-default"]', { element(e) { e.setAttribute("href", "https://radarperene.com.br/ativo/" + tk.toLowerCase()); } })
           .on("#radar-teaser", { element(e) { e.remove(); } })  // teaser da home não faz sentido na página de um ticker → remove (limpo p/ crawler e usuário)
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
@@ -811,6 +811,11 @@ async function _route(request, env, ctx) {
       } catch (e) { /* falha → segue normal */ }
     }
     const res = await env.ASSETS.fetch(request); // serve o asset estático
+    // ★ SEO 2026-06-16: o ASSETS redireciona /path → /path/ com 307 (temporário) — Google/Ahrefs preferem 308
+    //   (permanente) p/ consolidar autoridade no canônico com barra. Promove o 307 do trailing-slash a 308.
+    if (res.status === 307 && res.headers.get("location")) {
+      return new Response(null, { status: 308, headers: { "Location": res.headers.get("location"), "Cache-Control": "public, max-age=86400" } });
+    }
     try {
       const url = new URL(request.url);
       const host = url.hostname.toLowerCase();
