@@ -1638,7 +1638,7 @@
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     h += brain(L ? "Brazil Radar" : "Radar do Brasil", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);  // "Radar do Brasil": "Radar" sozinho soava genérico/componente interno; rótulo do Cérebro 1 (diferencia do "Vértice")
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
-    if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Unlock · US$149/mo →" : "Destravar · R$149/mês →") + '</a></div>';
+    if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
     if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
@@ -1686,9 +1686,9 @@
     //   Contagem VIVA na porta de Mercados (d.cobertura, cresce com o banco) — comunica que os tickers moram aqui.
     if (!sections || show("portas")) h += (!sections ? '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>' : '')  // Fase 2: preset "exploracao" recebe as portas (chave "portas"); o divisor de camada segue só no radar completo
       + '<div class="rp-portas">'
-      + '<button type="button" class="rp-explore" data-tab="mercados">' + (L ? "Explore " : "Explorar ") + (_cob.ativos ? (L ? "all " + _cob.ativos + " assets" : "os " + _cob.ativos + " ativos") : (L ? "all assets" : "todos os ativos")) + ' <span class="a">→</span></button>'
-      + '<button type="button" class="rp-explore" data-tab="comparacoes">⚗ ' + (L ? "Compare two assets" : "Comparar dois ativos") + ' <span class="a">→</span></button>'
-      + '<button type="button" class="rp-explore" data-tab="estudos">📚 ' + (L ? "Study library" : "Biblioteca de estudos") + ' <span class="a">→</span></button>'
+      + '<button type="button" class="rp-explore" data-tab="mercados">' + (L ? "See full coverage" : "Ver toda a cobertura") + ' <span class="a">→</span></button>'
+      + '<button type="button" class="rp-explore" data-tab="comparacoes">' + (L ? "Comparative study" : "Estudo comparativo") + ' <span class="a">→</span></button>'
+      + '<button type="button" class="rp-explore" data-tab="estudos">' + (L ? "Archive of precedents" : "Arquivo de precedentes") + ' <span class="a">→</span></button>'
       + '</div>';
     // Fase 1B: macro · ações 1/setor · imóveis SAÍRAM da home → aba "Mercados" do drawer (porta "Explorar →"), p/ tirar o aspecto de screener.
     //   Intermercado, fiscal, análogo e scatter (editoriais) PERMANECEM. As séries do macro/ações/imóveis seguem no catálogo /v1/catalog (Mercados).

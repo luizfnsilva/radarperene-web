@@ -38,7 +38,7 @@ const EN_BODY = (function () {
   const C = {
     h1: 'Brazil, observed — and <span class="g">remembered</span>.',
     lead: "Five lenses, historical analogs and a library of precedents built on public data. Descriptive, not prediction.",
-    cta1: "Join the 100 founders", cta2: "See the live radar", micro: "Educational content, public sources. Descriptive — never a recommendation.",
+    cta1: "Subscribe — Founder edition", cta2: "Read today&rsquo;s edition →", micro: "Educational content, public sources. Descriptive — never a recommendation.",
     eyb7: "Who it&rsquo;s for", s7: "Investors, analysts, managers — and serious newcomers.", s7s: "For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
     eyb5: "Depth", s5: "You choose the depth", s5s: "Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",

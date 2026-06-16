@@ -229,8 +229,8 @@
       document.addEventListener("click",function(e){ if(!box.contains(e.target)&&e.target!==q) box.style.display="none"; });
     })();
     </script>
-    <a class="btn" href="#fundadores" id="cta1">Entrar para os 100 fundadores</a>
-    <a class="herolink" href="#radar-teaser" id="cta2">Ver o radar ao vivo →</a>
+    <a class="btn" href="#fundadores" id="cta1">Assinar a edição Founder</a>
+    <a class="herolink" href="#radar-teaser" id="cta2">Ler a edição de hoje →</a>
     <div class="micro" id="micro1">Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.</div>
   </div>
 </div>
@@ -376,7 +376,7 @@
   var C=LANG==="en"?{
     h1:'Brazil, observed — and <span class="g">remembered</span>.',
     lead:"Five lenses, historical analogs and a library of precedents built on public data. Descriptive, not prediction.",
-    cta1:"Join the 100 founders",cta2:"See the live radar →",micro:"Educational content, public sources. Descriptive — never a recommendation.",
+    cta1:"Subscribe — Founder edition",cta2:"Read today&rsquo;s edition →",micro:"Educational content, public sources. Descriptive — never a recommendation.",
     eyb7:"Who it&rsquo;s for",s7:"Investors, analysts, managers — and serious newcomers.",s7s:"For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2:"What it is",s2:"Five Lenses on Brazil — and one Experiment",s2s:"Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
     eyb5:"Depth",s5:"You choose the depth",s5s:"Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
@@ -408,7 +408,7 @@
   }:{
     h1:'O Brasil observado — e <span class="g">lembrado</span>.',
     lead:"Cinco lentes, casos análogos e uma biblioteca de precedentes construída sobre dados públicos. Descritivo, não previsão.",
-    cta1:"Entrar para os 100 fundadores",cta2:"Ver o radar ao vivo →",micro:"Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.",
+    cta1:"Assinar a edição Founder",cta2:"Ler a edição de hoje →",micro:"Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.",
     eyb7:"Para quem é",s7:"Investidores, analistas, gestores — e curiosos sérios.",s7s:"Para quem quer ler o mercado brasileiro sem ruído e sem palpite — não a previsão, mas o precedente: regimes, casos análogos e uma biblioteca de estudos do &ldquo;o que aconteceu depois&rdquo;. Memória desde 2000.",
     eyb2:"O que é",s2:"Cinco Lentes do Brasil — e um Experimento",s2s:"Não é newsletter. É um instrumento que lê o regime de cada domínio regulatório do país, em camadas. Veja a estrutura das cinco Lentes.",
     eyb5:"Profundidade",s5:"Você escolhe a profundidade",s5s:"Cada lente abre em camadas — da manchete do regime à matemática visível: <b>cone de quantis</b> (distribuição de desfechos, nunca previsão), <b>Trend Score</b> 0&ndash;10, <b>breadth</b> real (% das ações acima da média de 200 dias), o <b>estudo de análogo</b> (isto ocorreu N vezes → o que se seguiu) e <b>lead-lag</b>. Sem teto para quem quer ir fundo.",
@@ -484,7 +484,7 @@
   // Stripe Founder (lang-aware) nos CTAs + FAQ JSON-LD (IA-SEO: ChatGPT Search / Perplexity)
   var STRIPE=LANG==="en"?"https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03":"https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01";
   var c1=document.getElementById("cta1");if(c1){c1.href=STRIPE;c1.target="_blank";c1.rel="noopener"}
-  var fb=document.getElementById("founder-buy");if(fb){fb.href=STRIPE;fb.textContent=(LANG==="en"?"Join →":"Entrar →")}  // 1 botão discreto; preço fica na linha acima (editorial, não SaaS)
+  var fb=document.getElementById("founder-buy");if(fb){fb.href=STRIPE;fb.textContent=(LANG==="en"?"Subscribe →":"Assinar →")}  // "Assinar" = linguagem de revista (editorial), não "Entrar"/SaaS; preço na linha acima
   var STRIPEY=LANG==="en"?"https://buy.stripe.com/3cIdR85QC40bgufgQTb3q04":"https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05";
   var fby=document.getElementById("founder-buy-year");if(fby){fby.href=STRIPEY;fby.textContent=(LANG==="en"?"Annual · US$ 1,490 (2 months free) →":"Anual · R$ 1.490 (2 meses grátis) →")}  // anual = link, não botão
   var pt=document.getElementById("portal");if(pt)pt.textContent=(LANG==="en"?"Manage subscription":"Gerenciar assinatura");
