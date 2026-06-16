@@ -22,13 +22,14 @@
   var API = RP_ORIGIN + "/api/v1/digest";
   var ESTUDOS_API = RP_ORIGIN + "/api/estudos";  // P3.3 Biblioteca de Estudos (via proxy /api)
   // ★ dedupe do digest: teaser + radar completo (mesma página/idioma) compartilham UMA busca → ~metade do time-to-insight.
-  var _digestP = {};
+  var _digestP = {}, _rpForceFresh = false;
   // ★ time-to-insight: se o worker já inlinou o digest do dia no HTML (window.__RP_DIGEST[lang]), usa-o direto
-  //   (0 round-trip ~2-4s — o gargalo real do paint). O /v1/digest é token-agnóstico (o handler ignora o
-  //   Authorization), então serve anon e Founder idêntico; o moat segue no /v1/serie (per-token). Sem inline → fetch.
+  //   (0 round-trip ~2-4s — o gargalo real do paint). DESDE o gate server-side (§2.8) o /v1/digest é GATED por
+  //   token: o inline e o 1º fetch (pré-login, sem RP_TOKEN) vêm TRAVADOS (teaser). No login (rp-premium-change)
+  //   o token chega → precisamos RE-BUSCAR com Authorization (não reusar o cache/inline gated) → _rpForceFresh.
   function _getDigest(lang) {
-    if (!_digestP[lang]) {
-      var pre = (typeof window !== "undefined" && window.__RP_DIGEST && window.__RP_DIGEST[lang]) ? window.__RP_DIGEST[lang] : null;
+    if (!_digestP[lang]) {  // cache é bustado no login (rpOnPremiumChange) → aqui só (re)cria a promise
+      var pre = (!_rpForceFresh && typeof window !== "undefined" && window.__RP_DIGEST && window.__RP_DIGEST[lang]) ? window.__RP_DIGEST[lang] : null;  // pós-login ignora o inline gated e busca autenticado
       _digestP[lang] = pre ? Promise.resolve(pre) : fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); });
     }
     return _digestP[lang];
@@ -1854,7 +1855,7 @@
       _getDigest(b.lang).then(function (d) { render(b.node, d, b.lang, b.sections, b.chrome, b.skin); }).catch(function () {});  // delegação no nó sobrevive ao innerHTML (não re-amarra)
     });
   }
-  function rpOnPremiumChange() { var sig = rpRenderSig(); if (sig === _rpLastSig) return; _rpLastSig = sig; rpRerenderAll(); }  // repinta na mudança de plano OU quando o token destrava os dados
+  function rpOnPremiumChange() { var sig = rpRenderSig(); if (sig === _rpLastSig) return; _rpLastSig = sig; _digestP = {}; _rpForceFresh = (typeof window !== "undefined" && !!window.RP_TOKEN); rpRerenderAll(); }  // login destrava o token → BUSTA o cache/inline gated e re-busca o digest autenticado (§2.8: digest é gated por token)
   if (typeof window !== "undefined" && window.addEventListener) window.addEventListener("rp-premium-change", rpOnPremiumChange);
   // ── lazy-load do uPlot p/ o radar completo abaixo da dobra: IntersectionObserver carrega a engine +
   //    boota o nó SÓ quando ele se aproxima do viewport (rootMargin 800px = pronto quando chega). Fallback
