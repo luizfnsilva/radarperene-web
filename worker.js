@@ -45,7 +45,7 @@ const EN_BODY = (function () {
     eyb6: "What&rsquo;s underneath",
     eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s pulse right now — risk, mood and regime, free and conclusions only. The numbers, the 50+ year history, the analogs and the alerts are in Founder. The full radar is right below.", tzMore: "See the full radar ↓",
     eyb1: "Live · full radar", s1: "The full radar", s1s: "The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
-    fbadge: "Launch · seats limited to the first 100 founders", fh: "The 100 founders unlock", fp: "Unlocks: all five Lenses · daily, weekly and monthly reports · library since 2010 · historical analogs · the Vértice Experiment · the full manipulable cone. Locked while your subscription stays active · 7-day refund · cancel in one click.",
+    fbadge: "Launch · seats limited to the first 100 founders", fh: "The 100 founders unlock", fp: "Unlocks: all five Lenses · daily, weekly and monthly reports · library of precedents since 2010 · historical analogs and their outcomes · the Vértice Experiment · the full cone and its horizons. Locked while your subscription stays active · 7-day refund · cancel in one click.",
     fdisc: "⚠ Work in progress: today about <b>90% of the functions and tickers aren&rsquo;t available yet</b> — they roll out gradually, at no extra cost, with your founder price locked. You secure everything as it ships; you&rsquo;re not paying for a complete product today.",
     wlbtn: "Get my invite",
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
