@@ -1574,6 +1574,8 @@
     var mkt = (node && node.getAttribute) ? (node.getAttribute("data-market") || "") : "";  // ★ embed domain-aware: backlinks p/ .com.br (BR) ou .com (US)
     function show(k){ return !sections || sections.indexOf(k) >= 0; }  // data-sections escolhe o que mostrar
     var rr = d.radar || {}, v = d.vertice || {}, h = '<div class="rp' + (skin === "editorial" ? " skin-editorial" : "") + '">';
+    var GATED = !!d.gated;  // free (edge gated): conclusões sem números → valores viram 🔒 + banner CTA (régua dono 2026-06-15)
+    var glock = function () { return lockA(L, '🔒'); };  // valor travado → cadeado clicável (→ checkout Founder)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
@@ -1596,7 +1598,7 @@
     if (chrome) h += '<div class="hd"><a class="brand" href="' + rpBacklink(mkt, lang) + '" target="_blank" rel="noopener" aria-label="Radar Perene">' +
       '<svg width="19" height="19" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1.3"/><circle cx="16" cy="16" r="7" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1.3"/><line x1="16" y1="16" x2="16" y2="3" stroke="var(--_accent)" stroke-width="1.8"/><circle cx="16" cy="16" r="2.2" fill="var(--_accent)"/></svg>' +
       '<span>Radar <b>Perene</b></span></a><span class="sub">' + (L ? "as of " : "ref. ") + esc(d.data_referencia || "-") + '</span></div>';
-    function card(k, sc, r) { return '<div class="c"><div class="k">' + esc(k) + '</div><div class="b">' + (sc == null ? "—" : esc(sc)) + '</div><div class="r">' + esc(r) + '</div></div>'; }
+    function card(k, sc, r) { return '<div class="c"><div class="k">' + esc(k) + '</div><div class="b">' + (sc == null ? (GATED ? glock() : "—") : esc(sc)) + '</div><div class="r">' + esc(r) + '</div></div>'; }
     function brain(n, t, exp, first) { return '<div class="brain' + (first ? ' first' : '') + '"><span class="bn">' + n + '</span><span class="bt">' + t + '</span>' + (exp ? '<span class="bx">' + (L ? "experiment" : "experimento") + '</span>' : '') + '</div>'; }
     // selo de vida honesta: frescor + cobertura VIVA — vem do digest (fn SQL cobertura_radar); cresceu no banco → aparece
     // sozinho, sem hardcode (GRAPH §13.5). Fallback = números reais atuais, nunca os antigos inflados.
@@ -1612,6 +1614,7 @@
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     h += brain("Radar", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);
+    if (GATED) h += '<div class="teaser" style="margin-bottom:14px"><b>' + (L ? "Free reading — conclusions only" : "Leitura grátis — só as conclusões") + '</b><div style="margin-top:4px;opacity:.85;font-size:12px">' + (L ? "The numbers, the 50+ year history, the full analogs, lead-lag and alerts are in the Founder plan." : "Os números, o histórico de 50+ anos, os análogos completos, o lead-lag e os alertas estão no plano Founder.") + '</div><a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Unlock with Founder · US$149/mo →" : "Destravar com o Founder · R$149/mês →") + '</a></div>';
     if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + '</h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
@@ -1690,7 +1693,7 @@
     //   drawer (porta abaixo, só no radar completo — embeds filtrados ficam como estão).
     if (show("termometros") && v.termometros) { var tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
       var tCards = tms.slice(0, 6).map(function (t) { var more = (t.desc || t.comp) ? '<div class="more">' + (t.desc ? '<div class="mi">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="mi"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>' : '';
-        return '<div class="t ' + cls(t.valor) + '"' + (more ? ' data-exp="1"' : '') + '><div class="n">' + esc(t.nome) + (more ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
+        return '<div class="t ' + cls(t.valor) + '"' + (more ? ' data-exp="1"' : '') + '><div class="n">' + esc(t.nome) + (more ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
         (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + more + '</div>'; });
       h += '<h4>' + (L ? "Thermometers · loudest today" : "Termômetros · os mais ativos hoje") + '</h4>' +
       '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div>' +
@@ -1700,7 +1703,7 @@
     // (direcional) + concentração/dispersão (forma anônima do movimento). Reusa o card de termômetro.
     if (show("observatorio") && v.observatorio && (v.observatorio.fuga || v.observatorio.concentracao)) { var ob = v.observatorio;
       var obCard = function (t, extra) { if (!t) return "";
-        return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? "—" : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
+        return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
           (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') +
           (t.desc ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + (extra || '') + '</div>'; };
       var fluxo = (ob.fuga && ob.fuga.fluxo && ob.fuga.fluxo.de && ob.fuga.fluxo.de.length)
@@ -1719,12 +1722,23 @@
       // ★ glossário no ponto de uso (rodada 50 personas, rec. 6: FDR 49 menções · lead-lag 48 — desistência nº 1 inclusive de quants)
       '<div class="legend">' + (L ? "lead-lag = one series tends to move BEFORE the other (observed lead, in days) · FDR = statistical filter that discards lucky correlations (false-discovery control)" : "lead-lag = uma série costuma se mover ANTES da outra (antecedência observada, em dias) · FDR = filtro estatístico que descarta correlações de sorte (controle de descobertas falsas)") + '</div><ul class="ll">' +
       v.lead_lag.map(function (x) { return '<li><b>' + esc(x.leitura) + '</b> <span class="tag">· ' + esc(x.sentido) + ' · corr ' + esc(x.corr) + ' · ' + esc(x.janela_dias) + 'd · FDR ✓</span></li>'; }).join("") + '</ul>'; }
-    if (show("analogo") && v.estudo_analogo) { var a = v.estudo_analogo; h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div>' + (a.datas_analogas && a.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(a.datas_analogas.join(" · ")) + '</div>' : '') + '<div class="stat">' +
-      '<div><div class="v">' + esc(a.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median" : "mediana") + '</div></div>' +
-      '<div><div class="v">' + (a.delta_pp >= 0 ? "+" : "") + esc(a.delta_pp) + 'pp</div><div class="r">vs base ' + esc(a.base_rate_pct) + '%</div></div>' +
-      '<div><div class="v">' + esc(a.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(a.n_analogos) + '</div></div></div>' + (a.n_analogos && a.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(a.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((a.hit_rate_pct / 100) * (1 - a.hit_rate_pct / 100) / a.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>'; }
-    if (show("divergencias") && v.divergencias && v.divergencias.length) { h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
-      v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; }
+    if (show("analogo") && v.estudo_analogo) { var a = v.estudo_analogo;
+      var aDatas = (a.datas_analogas && a.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(a.datas_analogas.join(" · ")) + '</div>' : '');
+      if (a.locked || GATED) {  // free: mostra a PERGUNTA + as datas-análogas; tranca o RESULTADO (mediana/hit-rate)
+        h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta || "") + '</div>' + aDatas +
+          '<div class="stat"><div><div class="v">' + glock() + '</div><div class="r">' + (L ? "median · hit-rate" : "mediana · hit-rate") + (a.n_analogos ? ' · n=' + esc(a.n_analogos) : '') + '</div></div></div>' +
+          '<div class="rp-ml" style="opacity:.82;margin-top:5px">' + (L ? "full analog outcomes (median, hit-rate, all horizons) in Founder" : "resultados completos do análogo (mediana, hit-rate, todos os horizontes) no Founder") + '</div></div>';
+      } else {
+        h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div>' + aDatas + '<div class="stat">' +
+          '<div><div class="v">' + esc(a.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median" : "mediana") + '</div></div>' +
+          '<div><div class="v">' + (a.delta_pp >= 0 ? "+" : "") + esc(a.delta_pp) + 'pp</div><div class="r">vs base ' + esc(a.base_rate_pct) + '%</div></div>' +
+          '<div><div class="v">' + esc(a.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(a.n_analogos) + '</div></div></div>' + (a.n_analogos && a.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(a.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((a.hit_rate_pct / 100) * (1 - a.hit_rate_pct / 100) / a.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>';
+      } }
+    if (show("divergencias") && v.divergencias) {
+      if (v.divergencias.locked) {  // free: só a CONTAGEM + cadeado (as leituras são substância → Founder)
+        if (v.divergencias.n) h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><div class="lr">' + esc(v.divergencias.n) + ' ' + (L ? "divergences flagged today " : "divergências sinalizadas hoje ") + glock() + '</div>';
+      } else if (v.divergencias.length) { h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
+        v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; } }
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
     if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; h += '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
     h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
