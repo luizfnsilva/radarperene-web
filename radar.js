@@ -740,8 +740,8 @@
   // ★ Fase 2 (camadas formais, PLANO_COMPRESSAO §1/§5): "editorial" = Camada 1 (o que importa hoje — inferência);
   //   "exploracao" = Camada 2 (de onde isso vem — dados de apoio + portas do drawer). Partição limpa:
   //   editorial ∪ exploracao = o radar completo (sections=null). "tese" e "portas" são chaves novas de seção.
-  var RP_WIDGETS = { "regime-br": "lentes,tese,macro,intermercado,acoes", "panorama": "lentes,intermercado,divergencias", "lentes": "lentes", "lenses": "lentes", "termometros": "termometros", "thermometers": "termometros", "global": "termometros,observatorio,cripto,extras,leadlag,analogo,divergencias", "cripto": "cripto", "crypto": "cripto",
-    "editorial": "regime,lentes,tese,analogo_br,scatter,termometros,observatorio,leadlag,analogo,divergencias,par",
+  var RP_WIDGETS = { "regime-br": "lentes,tese,macro,intermercado,acoes", "panorama": "lentes,intermercado,divergencias", "lentes": "lentes", "lenses": "lentes", "termometros": "termometros", "thermometers": "termometros", "global": "termometros,observatorio,razoes_geo,extras,leadlag,analogo,divergencias,cripto", "cripto": "cripto", "crypto": "cripto",
+    "editorial": "regime,lentes,tese,analogo_br,scatter,termometros,observatorio,razoes_geo,leadlag,analogo,divergencias,par",
     "exploracao": "indices,intermercado,fiscal,cripto,extras,portas", "exploration": "indices,intermercado,fiscal,cripto,extras,portas" };
   // leitura TEXTUAL de um indicador de domínio (cripto: Fear&Greed/TVL; ações: volume). Substitui o gráfico cru — a pilha
   // empilhada (preço·Ânima·risk) é o gráfico padrão de TODO ticker; o resto vira linha de texto (último valor + faixa).
@@ -1711,6 +1711,12 @@
         ? '<div class="rr" style="margin-top:5px"><b>' + (L ? "Out of — " : "Saindo de — ") + '</b>' + esc(ob.fuga.fluxo.de.join(" · ")) + ' <span style="opacity:.6">→ ' + esc(ob.fuga.fluxo.para) + '</span></div>' : '';
       h += '<h4>' + esc(ob.titulo) + '</h4><div class="legend">' + esc(ob.nota) + '</div><div class="g3">' +
         obCard(ob.fuga, fluxo) + obCard(ob.concentracao, "") + obCard(ob.dispersao, "") + '</div>'; }
+    // Razões geográficas — rotação entre geografias (ETF-país ÷ ETF-país); seção própria do Vértice. Reusa o card.
+    if (show("razoes_geo") && v.razoes_geo && v.razoes_geo.length) {
+      h += '<h4>' + (L ? "Geographic ratios · rotation" : "Razões geográficas · rotação") + '</h4><div class="legend">' + (L ? "which geography attracts capital (country-ETF ÷ country-ETF)" : "qual geografia atrai capital (ETF-país ÷ ETF-país)") + '</div><div class="g3">' +
+        v.razoes_geo.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
+          (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') +
+          (t.desc ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + '</div>'; }).join("") + '</div>'; }
     if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4>' + (v.cripto_sentimento ? '<div class="legend">Fear &amp; Greed: ' + esc(v.cripto_sentimento.fng) + ' (' + esc(v.cripto_sentimento.leitura) + ')</div>' : '') + (v.cripto_onchain ? '<div class="legend">' + esc(v.cripto_onchain.nota) + ': ' + [v.cripto_onchain.tvl ? 'TVL ' + esc(v.cripto_onchain.tvl) : '', v.cripto_onchain.stablecoin ? 'stablecoins ' + esc(v.cripto_onchain.stablecoin) : '', v.cripto_onchain.ssr != null ? 'SSR ' + esc(v.cripto_onchain.ssr) : ''].filter(Boolean).join(' · ') + '</div>' : '') + '<div class="tk">' +
       v.cripto.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.simbolo).toLowerCase()) + '" data-cls="cripto"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w" : "% da faixa 52s") + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("extras")) { var ex = [];
