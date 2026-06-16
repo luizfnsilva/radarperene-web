@@ -43,21 +43,21 @@ const EN_BODY = (function () {
     eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
     eyb5: "Depth", s5: "You choose the depth", s5s: "Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6: "What&rsquo;s underneath",
-    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s regime right now — the regime, the five Lenses, today&rsquo;s divergences, the analogs and the thermometers. The full radar — intermarket, stocks, fiscal and real estate — is further below.", tzMore: "See the full radar ↓",
+    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s pulse right now — risk, mood and regime, free and conclusions only. The numbers, the 50+ year history, the analogs and the alerts are in Founder. The full radar is right below.", tzMore: "See the full radar ↓",
     eyb1: "Live · full radar", s1: "The full radar", s1s: "The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
-    fbadge: "Launch · seats limited to the first 100 founders", fh: "The 100 founders unlock all five Lenses — and the Vértice Experiment", fp: "For US$149/mo — locked while your subscription stays active — you get the daily (~50min before the open), weekly and monthly reports by email, the library since 2010, and unlock what historically happened next: the full distribution of analogous cases per asset (probability of rising, median return and range over 3/6/12 months), the full quantile cone, a chart you can work. Plus all five Lenses and the Vértice Experiment. In the future the Lenses will be sold à la carte (Vértice alone will be US$290); together they add up to more than US$490/month. Pay upfront, 7-day full automatic refund (via Stripe), cancel in one click.",
+    fbadge: "Launch · seats limited to the first 100 founders", fh: "The 100 founders unlock", fp: "Unlocks: all five Lenses · daily, weekly and monthly reports · library since 2010 · historical analogs · the Vértice Experiment · the full manipulable cone. Locked while your subscription stays active · 7-day refund · cancel in one click.",
     fdisc: "⚠ Work in progress: today about <b>90% of the functions and tickers aren&rsquo;t available yet</b> — they roll out gradually, at no extra cost, with your founder price locked. You secure everything as it ships; you&rsquo;re not paying for a complete product today.",
     wlbtn: "Get my invite",
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4: "Principles",
     disc: "Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
     ftnav: '<a href="/daily">Daily archive</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/lenses/">Lenses</a> · <a href="/concepts/">Concepts</a> · <a href="/free/">Free</a> · <a href="/about">About</a> · <a href="/ativos">Assets</a> · <a href="/lenses/wealth/">Wealth</a> · <a href="/lenses/electoral/">Electoral</a> · <a href="/lenses/macro/">Macro</a> · <a href="/lenses/institutional/">Institutional</a> · <a href="/lenses/real-estate/">Real estate</a> · <a href="/lenses/vertice/">Vértice</a> · <a href="/concepts/regime-brazil/">Brazil Regime</a> · <a href="/concepts/regime-global/">Global Regime</a> · <a href="/concepts/intermarket-br/">Intermarket BR</a> · <a href="/concepts/erp-br/">ERP_BR</a> · <a href="/concepts/logarithmic-regression-cone/">Regression Cone</a> · <a href="/concepts/anima-index/">Ânima</a> · <a href="/concepts/risk-on-risk-off/">Perene Risk Index</a> · <a href="/concepts/historical-analogs/">Historical analogs</a> · <a href="/concepts/vertice/">Vértice (concept)</a> · <a href="/founder/">Founder</a> · <a href="/api/docs/">API</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>',
-    lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings and structures — pressure on wealth." },
-      { n: "Electoral", d: "Electoral courts, eligibility, campaign finance and digital enforcement." },
-      { n: "Macro / Rates", d: "Rates, inflation, fiscal and debt — the country&rsquo;s macro regime." },
-      { n: "Institutional", d: "Laws, taxes and rulings in the making that touch wealth and succession." },
-      { n: "Real estate", d: "REITs, real-estate credit, registries and sector regulation." },
-      { n: "Vértice", d: "The experiment: cross-asset thermometers, breadth and historical analogs.", v: 1, m: "Contextual hypothesis, not a forecast." }],
+    lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings." },
+      { n: "Electoral", d: "Electoral courts, eligibility, finance." },
+      { n: "Macro / Rates", d: "Rates, inflation, fiscal, debt." },
+      { n: "Institutional", d: "Laws, taxes and rulings in the making." },
+      { n: "Real estate", d: "REITs, real-estate credit, regulation." },
+      { n: "Vértice", d: "Cross-asset thermometers, breadth, analogs — hypothesis, not a forecast.", v: 1 }],
     ladder: [{ t: "Briefing", d: "the essentials in 5 seconds" }, { t: "Lens", d: "stress by domain" }, { t: "Scenarios", d: "trajectories and windows" }, { t: "War Room", d: "proof and propagation" }, { t: "Modeling", d: "cross everything · 50+ yrs · k-NN" }],
     scale: [["26", "years of BR market data"], ["70", "stocks in deep series"], ["8", "Risk-BR sub-scores"], ["187", "months in the analog study"], ["FDR", "statistically-significant correlations"]],
     princ: [["Descriptive", "We read and contextualize the regime — we never recommend or predict a price."],
@@ -96,7 +96,7 @@ const EN_BODY = (function () {
     "eyb8": C.eyb8, "s8": C.s8, "s8s": C.s8s,
     "eyb-tz": C.eybTz, "s-tz": C.sTz, "s-tz-s": C.sTzS, "tz-more": C.tzMore,
     "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
-    "fbadge": C.fbadge, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn, "assine-link": "See everything that lands in your inbox — and the plans →",
+    "fbadge": C.fbadge, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn, "assine-link": "view plans →",
     "eyb-ult": "Latest readings", "s-ult": "The day's regime — archived and auditable", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.", "ult-cta": "See the full Diary →",
     "eyb3": C.eyb3, "s3": C.s3, "s3s": C.s3s, "eyb4": C.eyb4, "disc": C.disc,
     "eyb9": C.eyb9, "s9": C.s9, "qtag-txt": "CURRENT SIGNAL · REGIME BR",
@@ -415,8 +415,11 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const refMes = (regime && regime.ref_mes) || null;  // congelados pré-rótulo não trazem ref_mes → rotula só a cadência (não inventa mês)
   const title = "Radar Perene — " + date + (en ? " · Brazil market regime" : " · regime do mercado BR");
   const _rl = regime ? (regime.classificacao || regime.leitura || "") : "", _rs = (regime && regime.valor != null) ? regime.valor + "/100" : "";
-  const _pulse = [perene && perene.valor != null ? (en ? "Perene Risk " : "Risco Perene ") + perene.valor + "/100" : null,
-    anima && anima.valor != null ? "Ânima " + anima.valor + "/100" : null].filter(Boolean).join(" · ");
+  const _hum = function (s) { return _esc(String(s || "").replace(/_/g, " ").trim()); };  // classificacao "pessimismo_extremo" → "pessimismo extremo" (humor legível, sem jargão)
+  const _pcls = perene && perene.classificacao ? " (" + _hum(perene.classificacao) + ")" : "";
+  const _acls = anima && anima.classificacao ? " (" + _hum(anima.classificacao) + ")" : "";
+  const _pulse = [perene && perene.valor != null ? (en ? "Perene Risk " : "Risco Perene ") + perene.valor + "/100" + _pcls : null,
+    anima && anima.valor != null ? "Ânima " + anima.valor + "/100" + _acls : null].filter(Boolean).join(" · ");
   const desc = _esc((en
     ? "Daily reading " + date + (_pulse ? ": " + _pulse : "") + (_rl ? " · month regime: " + _rl + (_rs ? " (" + _rs + ", monthly)" : "") : "") + ". Archived by Radar Perene."
     : "Leitura de " + date + (_pulse ? ": " + _pulse : "") + (_rl ? " · regime do mês: " + _rl + (_rs ? " (" + _rs + ", mensal)" : "") : "") + ". Arquivo diário do Radar Perene.")).slice(0, 155);
@@ -451,17 +454,34 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
       "</div>";
   }
   // Só "o que veio depois" (casos análogos) no público; a Verificação (olhar pra trás) foi p/ /historico.
-  const pfHtml = casHtml || "";
+  // ★ UX 2026-06-16: "Casos semelhantes" (passado→futuro) é o coração do Radar e deve ter DESTAQUE. Em snapshots
+  //   congelados o objeto casos_analogos vem vazio, mas o indicador analogo-br carrega datas+mediana+hit% na leitura
+  //   → reconstrói o bloco a partir dele p/ a página nunca perder o "o que veio depois".
+  const analogoInd = inds.find(function (i) { return i.slug === "analogo-br"; });
+  let casFromInd = "";
+  if (!casHtml && analogoInd && analogoInd.leitura) {
+    casFromInd = "<div class=\"cas\"><b>" + _esc(en ? "Similar cases — what came next" : "Casos semelhantes — o que veio depois") + "</b>" +
+      "<p class=\"casl\">" + _esc(analogoInd.leitura) + "</p>" +
+      "<p class=\"casm\">" + (en ? "Observed distribution, not a forecast" : "Distribuição observada, não previsão") +
+      " · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "how the analogs are built →" : "como os análogos são construídos →") + "</a></p></div>";
+  }
+  const pfHtml = casHtml || casFromInd || "";
   const IND_OK = { "regime-br": 1, "erp-br": 1, "valuation-br": 1, "ciclicas-defensivas": 1, "ibovespa": 1, "analogo-br": 1 };  // slugs com página /indicador real
   const CONC_MAP = { "regime-global": "regime-global", "intermercado-br": "intermercado-br" };  // reconstruídos → página de conceito (não /indicador, que 404ava)
   const _indLi = function (i) {
-    const v = i.valor != null ? " <b>" + _esc(_fmtVal(i.valor, i.unidade)) + "</b>" : "";
     const nm = IND_OK[i.slug] ? "<a href=\"/indicador/" + _esc(i.slug) + "\">" + _esc(i.nome) + "</a>" : (CONC_MAP[i.slug] ? "<a href=\"/conceitos/" + CONC_MAP[i.slug] + "/\">" + _esc(i.nome) + "</a>" : _esc(i.nome));
-    return "<li>" + nm + v + (i.leitura ? " — " + _esc(i.leitura) : "") + "</li>";
+    // a leitura já é auto-contida (traz o número) → não repetir o valor em <b> (eliminava "nome valor — leitura valor")
+    const body = i.leitura ? _esc(i.leitura) : (i.valor != null ? "<b>" + _esc(_fmtVal(i.valor, i.unidade)) + "</b>" : "");
+    return "<li><b>" + nm + "</b>" + (body ? " — " + body : "") + "</li>";
   };
   // item 30: o regime SAI da lista diária → bloco próprio "Contexto do mês", rotulado mensal (+ ref. quando o snapshot traz)
-  const indHtml = inds.filter(function (i) { return i.slug !== "regime-br"; }).map(_indLi).join("");
-  const mancheteHtml = _pulse ? "<p class=\"manch\">" + (en ? "Today’s pulse — " : "O pulso do dia — ") + "<b>" + _esc(_pulse) + "</b>" + (en ? " · proprietary daily indices (change every business day)" : " · índices proprietários diários (mudam a cada dia útil)") + "</p>" : "";
+  // ★ UX 2026-06-16: hierarquia em blocos. "O que chama atenção" = indicadores do dia MENOS os que têm bloco próprio
+  //   (Pulso: Ânima/Perene/Ibovespa · Casos: analogo-br · Contexto mensal: regime-br) → 3-4 itens em vez de 8.
+  const _NO_ATENCAO = { "regime-br": 1, "analogo-br": 1, "indice-anima": 1, "indice-risco-perene": 1, "ibovespa": 1 };
+  const indHtml = inds.filter(function (i) { return !_NO_ATENCAO[i.slug]; }).map(_indLi).join("");
+  const ibov = inds.find(function (i) { return i.slug === "ibovespa"; });
+  const ibovHtml = ibov && ibov.leitura ? "<p class=\"casl\">Ibovespa — " + _esc(ibov.leitura) + "</p>" : "";
+  const mancheteHtml = _pulse ? "<p class=\"manch\">" + (en ? "Today’s pulse — " : "O pulso do dia — ") + "<b>" + _esc(_pulse) + "</b></p>" : "";
   const ctxHtml = regime ? "<div class=\"mctx\"><b>" + (en ? "Month context — BR regime (monthly" : "Contexto do mês — regime BR (mensal") + (refMes ? " · ref. " + _esc(refMes) : "") + ")</b><ul>" + _indLi(regime) + "</ul><p class=\"casm\">" + (en ? "Monthly by construction — the score only moves at month-end; the daily variation lives in the indices above." : "Mensal por construção — o score só se move no fecho do mês; a variação diária está nos índices acima.") + "</p></div>" : "";
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "dateModified": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
@@ -478,8 +498,9 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
     "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     mancheteHtml +
+    ibovHtml +
     (narr.resumo && snap.frozen === false ? "<p>" + _esc(narr.resumo) + "</p>" : "") +
-    (indHtml ? "<p class=\"panh\">" + (en ? "Today’s snapshot" : "O panorama do dia") + "</p><ul>" + indHtml + "</ul>" : "") +
+    (indHtml ? "<p class=\"panh\">" + (en ? "What stands out today" : "O que chama atenção") + "</p><ul>" + indHtml + "</ul>" : "") +
     pfHtml +
     ctxHtml +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0) +
@@ -917,7 +938,7 @@ async function _route(request, env, ctx) {
             s.anima != null ? "Ânima " + s.anima : null,
             s.global ? "global " + _esc(s.global) : null].filter(Boolean).join(" · ");
           const mes = (isEN ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg);
-          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><b>' + s.data + '</b>' + (dia ? dia + ' · <span style="color:var(--dim)">' + mes + "</span>" : _esc(rg) + (s.global ? " · global " + _esc(s.global) : "")) + " →</a>";
+          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><b>' + s.data + '</b>' + (dia ? dia + ' · <span style="color:var(--dim)">' + mes + "</span>" : _esc(rg) + (s.global ? " · global " + _esc(s.global) : "")) + "</a>";  // sem "→" por linha: a row inteira já é link (hover dourado) → tira N setas redundantes, sobra só o "Ver Diário completo →"
         }).join("");
         rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }

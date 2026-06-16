@@ -185,7 +185,8 @@
       ".rp *{box-sizing:border-box}" +
       ".rp h4{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--_dim);margin:16px 0 7px;font-weight:600}" +
       ".rp .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:8px}" +
-      ".rp .c{background:var(--_card);border:1px solid var(--_cardb);border-radius:9px;padding:11px;min-height:74px}" +  // P2#7: piso de altura → linhas uniformes mesmo quando quebram p/ a 2ª fileira
+      ".rp .c{background:var(--_card2);border:0;border-radius:7px;padding:11px;min-height:74px}" +  // P2#7: piso de altura → linhas uniformes mesmo quando quebram p/ a 2ª fileira
+      ".rp-teaser .c{padding:8px 9px;min-height:0}" +  // teaser: cards de regime mais baixos/compactos (respiro p/ o análogo)
       ".rp .rp-mtog{margin-top:8px;font-size:11px;background:transparent;border:1px solid var(--_line);color:var(--_dim);border-radius:7px;padding:5px 11px;cursor:pointer}.rp .rp-mtog:hover{color:var(--_txt);border-color:var(--_cardb)}.rp .rp-ov{margin-top:8px}" +
       ".rp .rp-tier2{display:flex;align-items:center;gap:11px;margin:30px 0 6px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim);font-weight:600}.rp .rp-tier2::before,.rp .rp-tier2::after{content:'';flex:1;height:1px;background:var(--_line)}" +  // camada 2: separa o primário (regime/lentes/tese) dos indicadores de apoio
       ".rp .rp-cmpbtn{font-size:11.5px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:8px;padding:6px 11px;cursor:pointer;margin:0 6px 6px 0;white-space:nowrap}.rp .rp-cmpbtn:hover{border-color:var(--_accent);color:var(--_accent)}" +  // P3.1 → 1C: pares-preset, agora na aba Comparações do drawer (.rp-cmprow saiu com o muro da home)
@@ -211,11 +212,11 @@
       ".rp.skin-editorial .tk .i{border-radius:0;background:transparent;border:0;border-bottom:1px solid var(--_line);padding:6px 10px 6px 0}" +
       ".rp.skin-editorial .valstrip{border-radius:0;border:0;border-left:2px solid var(--gold,#c8a24a);background:transparent;padding:12px 4px 12px 14px}" +
       ".rp.skin-editorial .sub{letter-spacing:.02em}" +
-      ".rp .t{background:var(--_card2);border:1px solid var(--_line);border-left:3px solid var(--_neu);border-radius:8px;padding:9px}" +
+      ".rp .t{background:none;border:0;border-left:3px solid var(--_neu);border-radius:0;padding:4px 0 6px 11px}" +
       ".rp .t.hot{border-left-color:var(--_hot)}.rp .t.warm{border-left-color:var(--_warm)}.rp .t.cool{border-left-color:var(--_cool)}" +
       ".rp .t .n{font-size:11.5px;font-weight:600}.rp .t .v{font-size:17px;font-weight:var(--_numw);font-family:var(--_numf)}.rp .t .rr{font-size:10px;color:var(--_dim)}" +
       ".rp .chip{display:inline-flex;gap:5px;background:var(--_chip);border:1px solid var(--_line);border-radius:999px;padding:4px 10px;font-size:12px;margin:0 5px 6px 0}.rp .chip b{font-weight:var(--_numw)}.rp .chip .u{color:var(--_dim);font-size:10px}" +
-      ".rp .hl{background:var(--_card2);border:1px solid var(--_accent);border-radius:11px;padding:15px}.rp .hl .q{font-size:12.5px;color:var(--_dim);margin-bottom:8px}.rp .hl .v{font-size:24px;font-weight:800;color:var(--_accent)}.rp .stat{display:flex;gap:18px;flex-wrap:wrap}.rp .stat .r{font-size:11px;color:var(--_dim)}" +
+      ".rp .hl{background:none;border:0;border-top:1px solid var(--_line);border-radius:0;padding:14px 0 2px}.rp .hl .q{font-size:12.5px;color:var(--_dim);margin-bottom:8px}.rp .hl .v{font-size:24px;font-weight:800;color:var(--_accent)}.rp .stat{display:flex;gap:18px;flex-wrap:wrap}.rp .stat .r{font-size:11px;color:var(--_dim)}" +
       ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent)}" +
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
       ".rp .brand{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--_txt);font-size:14px;font-weight:600;opacity:.92}.rp .brand b{color:var(--_accent);font-weight:700}.rp .brand svg{flex:none;opacity:.9}" +
@@ -226,7 +227,7 @@
       ".rp .teaser{margin-top:16px;background:var(--_card2);border:1px dashed var(--_accent);border-radius:10px;padding:13px 15px;font-size:13px;color:var(--_txt)}.rp .teaser b{color:var(--_accent)}.rp .teaser a{display:inline-block;margin-top:6px;color:var(--_accent);text-decoration:none;font-weight:700}" +
       ".rp .brain{display:flex;align-items:baseline;gap:8px;margin:20px 0 2px;padding-top:15px;border-top:1px solid var(--_line)}" +
       ".rp .brain.first{border-top:0;padding-top:2px;margin-top:6px}.rp .brain .bn{font-size:13px;font-weight:700;letter-spacing:.02em}.rp .brain .bt{font-size:10.5px;color:var(--_dim)}" +
-      ".rp .brain .bx{margin-left:auto;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--_accent);border:1px solid var(--_accent);border-radius:999px;padding:1px 7px}" +
+      ".rp .brain .bx{margin-left:auto;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .lns{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:7px}" +
       ".rp .ln{background:var(--_card2);border:1px solid var(--_line);border-left:3px solid var(--_neu);border-radius:8px;padding:9px;min-height:78px}" +  // P2#7: piso de altura das lentes
       ".rp .ln.hot{border-left-color:var(--_hot);background:linear-gradient(160deg,color-mix(in srgb,var(--_hot) 7%,var(--_card2)),var(--_card2) 72%)}.rp .ln.warm{border-left-color:var(--_warm);background:linear-gradient(160deg,color-mix(in srgb,var(--_warm) 7%,var(--_card2)),var(--_card2) 72%)}.rp .ln.cool{border-left-color:var(--_cool);background:linear-gradient(160deg,color-mix(in srgb,var(--_cool) 7%,var(--_card2)),var(--_card2) 72%)}" +
@@ -252,7 +253,7 @@
       ".rp-mw{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,10,14,.55)}" +
       ".rp-mc{position:relative;max-width:560px!important;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px!important;box-shadow:0 18px 60px rgba(0,0,0,.4);cursor:default}" +
       ".rp-mc .rp-x{position:absolute;top:9px;right:12px;border:0;background:transparent;color:var(--_dim);font-size:23px;line-height:1;cursor:pointer;padding:2px 6px}.rp-mc .rp-x:hover{color:var(--_accent)}" +
-      ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}@media(max-width:600px){.rp-mw{padding:5px}.rp-mc{padding:13px 13px 12px!important;max-height:94vh}.rp-mc .rp-mt{font-size:13.5px;margin-right:26px}.rp-mc .rp-ml{font-size:9.8px;margin-top:4px}.rp-mc .bc.big{height:124px}.rp-mc .rp-per{gap:6px}.rp-mc .rp-per button{padding:11px 13px;font-size:11px}.rp-mc .rp-x,.rp-dc .rp-x{padding:12px 14px;top:0;right:0}.rp-mc .rp-ob,.rp-mc .rp-asel{padding:10px 12px!important}.rp .rp-explore{padding:12px 16px;font-size:13.5px}}" +  // B4 (QA mobile): alvos de toque ≥40px no celular (chips 25px / × 27px / toggles 19px reprovaram); desktop intacto
+      ".rp-mc .rp-mt{font-weight:700;font-size:15px;margin:0 28px 2px 0}.rp-mc .rp-ml{font-size:10.5px;color:var(--_dim);margin:5px 0 0;line-height:1.4}.rp-mc .bc.big{height:150px}@media(max-width:600px){.rp-mw{padding:5px}.rp-mc{padding:13px 13px 12px!important;max-height:94vh}.rp-mc .rp-mt{font-size:13.5px;margin-right:26px}.rp-mc .rp-ml{font-size:9.8px;margin-top:4px}.rp-mc .bc.big{height:124px}.rp-mc .rp-per{gap:6px}.rp-mc .rp-per button{padding:11px 13px;font-size:11px}.rp-mc .rp-x,.rp-dc .rp-x{padding:12px 14px;top:0;right:0}.rp-mc .rp-ob,.rp-mc .rp-asel{padding:10px 12px!important}.rp .rp-explore{padding:7px 0;font-size:13.5px}}" +  // B4 (QA mobile): alvos de toque ≥40px no celular (chips 25px / × 27px / toggles 19px reprovaram); desktop intacto
       ".rp-mc .rp-strip{display:flex;gap:9px 20px;flex-wrap:wrap;margin-top:4px}.rp-mc .rp-st{display:flex;flex-direction:column;min-width:34px;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-st b{font-size:13px;line-height:1.15;white-space:nowrap}.rp-mc .rp-st span{font-size:9px;color:var(--_dim);margin-top:1px}" +
       ".rp-mc .rp-rc{display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:6px;margin-top:5px}.rp-mc .rp-rcard{background:var(--_card2);border:1px solid var(--_line);border-radius:8px;padding:8px 5px;text-align:center;min-height:46px;display:flex;flex-direction:column;justify-content:center}.rp-mc .rp-rcard b{display:block;font-size:13.5px;line-height:1.1;white-space:nowrap;font-family:var(--rp-mono,ui-monospace,monospace)}.rp-mc .rp-rcard span{display:block;font-size:8.5px;color:var(--_dim);margin-top:3px;letter-spacing:.02em;text-transform:uppercase}" +
       ".rp-mc .rp-52{position:relative;height:6px;background:var(--_card2);border:1px solid var(--_line);border-radius:4px;margin-top:4px}.rp-mc .rp-52 i{position:absolute;top:-2px;width:3px;height:10px;background:var(--_accent);border-radius:2px;transform:translateX(-50%)}" +
@@ -273,7 +274,7 @@
       ".rp-dc .rp-dbody{font-size:12px;color:var(--_txt)}" +
       "@media(max-width:600px){.rp-dw{justify-content:stretch;align-items:flex-end}.rp-dc{width:100%;max-width:100%;height:auto;max-height:90vh;border-left:0;border-top:1px solid var(--_line);transform:translateY(100%);box-shadow:0 -18px 60px rgba(0,0,0,.32)}.rp-dw.rp-open .rp-dc{transform:translateY(0)}}" +
       // Fase 1B: porta discreta "Explorar →" (não é menu) + grade da aba Mercados dentro do drawer
-      ".rp .rp-explore{display:inline-flex;align-items:center;gap:6px;margin:4px 0 10px;font-size:12.5px;font-weight:600;color:var(--_txt);background:var(--_card2);border:1px solid var(--_line);border-radius:8px;cursor:pointer;padding:8px 14px;font-family:var(--_font)}.rp .rp-explore .a{color:var(--_accent);transition:transform .15s}.rp .rp-explore:hover{border-color:var(--_accent);color:var(--_accent)}.rp .rp-explore:hover .a{transform:translateX(3px)}" +  // 2026-06-11: porta deixou de parecer texto (dono demorou a achar) — botão delicado, seta em destaque
+      ".rp .rp-explore{display:inline-flex;align-items:center;gap:5px;margin:4px 18px 8px 0;font-size:12.5px;font-weight:600;color:var(--_accent);background:none;border:0;border-radius:0;cursor:pointer;padding:2px 0;font-family:var(--_font)}.rp .rp-explore .a{color:var(--_accent);transition:transform .15s}.rp .rp-explore:hover{text-decoration:underline}.rp .rp-explore:hover .a{transform:translateX(3px)}" +  // 2026-06-16: botão→link (princípio menos-botões); dourado+negrito+seta = descobrível sem virar caixa (efeito SaaS)
       ".rp-dc .rp-mks{display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:9px 12px;font:12.5px var(--_font);color:var(--_txt);background:var(--_card2);border:1px solid var(--_line);border-radius:8px;outline:none}.rp-dc .rp-mks:focus{border-color:var(--_accent)}.rp-dc .rp-mks::placeholder{color:var(--_dim)}" +  // busca da aba Mercados (fricção nº 11 da rodada)
       ".rp-dc .rp-mkix{display:flex;flex-wrap:wrap;gap:4px 6px;margin:0 0 12px}.rp-dc .rp-mki{font-family:var(--_mono);font-size:10px;color:var(--_dim);background:transparent;border:1px solid var(--_line);border-radius:6px;padding:4px 8px;cursor:pointer}.rp-dc .rp-mki b{color:var(--_txt);font-weight:600}.rp-dc .rp-mki:hover{border-color:var(--_accent);color:var(--_accent)}.rp-dc .rp-mki:hover b{color:var(--_accent)}" +  // counts-forward: índice nome·contagem → ancora no grupo (sem accordion)
       ".rp-dc .rp-mkg{margin-bottom:13px}.rp-dc .rp-mkh{font-size:11px;color:var(--_dim);font-weight:700;margin-bottom:5px}.rp-dc .rp-mkt-row{display:flex;gap:5px;flex-wrap:wrap}" +
@@ -835,7 +836,7 @@
     var L = lang === "en", chips = [{ on: true, lock: false, lbl: serieDiff(s) || (s.stats && s.stats.is_asset === false) ? (L ? "Series" : "Série") : (L ? "Price" : "Preço") }];  // 1E p2: IPCA/curva não é "preço"
     if (s.ma200 && s.ma200.length) chips.push({ on: true, lock: false, lbl: "MM200" });
     if (s.cone) chips.push({ on: true, lock: false, lbl: L ? "Analog median" : "Mediana análoga" });
-    if (s.cone && (s.cone.lo || s.cone.lo2)) { chips.push({ on: pro, lock: !pro, lbl: "P25–P75" }); chips.push({ on: pro, lock: !pro, lbl: "P10–P90" }); }
+    if (s.cone && (s.cone.lo || s.cone.lo2)) { chips.push({ on: pro, lock: !pro, lbl: L ? "50% of cases" : "50% dos casos" }); chips.push({ on: pro, lock: !pro, lbl: L ? "80% of cases" : "80% dos casos" }); }  // humaniza p25–p75/p10–p90 → casa com o tooltip ("50%/80% dos casos")
     chips.push({ on: false, lock: !pro, lbl: "Bollinger" });
     if (s.fair) chips.push({ on: pro, lock: !pro, lbl: "Valuation" });
     return '<div class="rp-obar" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px">' + chips.map(function (c) {
@@ -1594,9 +1595,10 @@
     var L = lang === "en";
     var mkt = (node && node.getAttribute) ? (node.getAttribute("data-market") || "") : "";  // ★ embed domain-aware: backlinks p/ .com.br (BR) ou .com (US)
     function show(k){ return !sections || sections.indexOf(k) >= 0; }  // data-sections escolhe o que mostrar
-    var rr = d.radar || {}, v = d.vertice || {}, h = '<div class="rp' + (skin === "editorial" ? " skin-editorial" : "") + '">';
+    var rr = d.radar || {}, v = d.vertice || {}, h = '<div class="rp' + (skin === "editorial" ? " skin-editorial" : "") + (sections && !chrome ? " rp-teaser" : "") + '">';  // rp-teaser = mini-radar da home → cards de regime mais compactos (CSS), dá respiro ao análogo
     var GATED = !!d.gated;  // free (edge gated): conclusões sem números → valores viram 🔒 + banner CTA (régua dono 2026-06-15)
-    var glock = function () { return lockA(L, '🔒'); };  // valor travado → cadeado clicável (→ checkout Founder)
+    var TEASER = !!sections && !chrome;  // mini-radar da home (data-sections + chrome off): Vértice compacto = 1 termômetro + 1 fuga, sem método/jargão. Radar completo (sections=null) e embeds (chrome) seguem cheios.
+    var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
@@ -1631,12 +1633,13 @@
       (_humN(_cob.linhas) || (L ? "490K" : "490 mil")) + (L ? " rows · " : " linhas · ") +
       (_cob.tribunais != null ? _cob.tribunais : "15") + (L ? " courts · since " : " tribunais · desde ") +
       (_cob.desde != null ? _cob.desde : "1970");
-    h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") + ' · ' + esc(covTxt) + '</div>';
+    if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") + ' · ' + esc(covTxt) + '</div>';  // cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual (a seção já tem título)
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
-    h += brain("Radar", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);
-    if (GATED) h += '<div class="teaser" style="margin-bottom:14px"><b>' + (L ? "Free reading — conclusions only" : "Leitura grátis — só as conclusões") + '</b><div style="margin-top:4px;opacity:.85;font-size:12px">' + (L ? "The numbers, the 50+ year history, the full analogs, lead-lag and alerts are in the Founder plan." : "Os números, o histórico de 50+ anos, os análogos completos, o lead-lag e os alertas estão no plano Founder.") + '</div><a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Unlock with Founder · US$149/mo →" : "Destravar com o Founder · R$149/mês →") + '</a></div>';
-    if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + '</h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão") + '</div><div class="g3">' +
+    h += brain(L ? "Brazil Radar" : "Radar do Brasil", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);  // "Radar do Brasil": "Radar" sozinho soava genérico/componente interno; rótulo do Cérebro 1 (diferencia do "Vértice")
+    // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
+    if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Unlock · US$149/mo →" : "Destravar · R$149/mês →") + '</a></div>';
+    if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
       card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
       card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
       // ★ item 10 pós-B6 (2 grandezas): o clique abre a SÉRIE do número exibido — a breadth (% abaixo do valor-justo,
@@ -1710,23 +1713,30 @@
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
     h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
+    if (TEASER) {  // mini-radar: Vértice compacto = 1 termômetro (o mais ativo) + 1 fuga de capital, lado a lado, sem método/jargão → bloco com altura ~ do Radar
+      var _vc = function (t) { if (!t) return ""; return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' + (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + '</div>'; };
+      var _t1 = (v.termometros && v.termometros.length) ? v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); })[0] : null;
+      var _fg = (v.observatorio && v.observatorio.fuga) ? v.observatorio.fuga : null;
+      var _cs = [_vc(_t1), _vc(_fg)].filter(Boolean).join("");
+      if (_cs) h += '<div class="g3">' + _cs + '</div>';
+    }
     // ★ Fase 1D — home mantém top-3 (+3 recolhidos via collapseList); a lista COMPLETA mora na aba Termômetros do
     //   drawer (porta abaixo, só no radar completo — embeds filtrados ficam como estão).
-    if (show("termometros") && v.termometros) { var tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
+    if (!TEASER && show("termometros") && v.termometros) { var tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
       var tCards = tms.slice(0, 6).map(function (t) { var more = (t.desc || t.comp) ? '<div class="more">' + (t.desc ? '<div class="mi">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="mi"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>' : '';
         return '<div class="t ' + cls(t.valor) + '"' + (more ? ' data-exp="1"' : '') + '><div class="n">' + esc(t.nome) + (more ? ' <span class="rr" style="opacity:.55">＋</span>' : '') + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
         (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + more + '</div>'; });
       h += '<h4>' + (L ? "Thermometers · loudest today" : "Termômetros · os mais ativos hoje") + '</h4>' +
       '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div>' +
-      collapseList(tCards, 3, "g3", L ? "more thermometers" : "termômetros") +
+      '<div class="g3">' + tCards.slice(0, 3).join("") + '</div>' +  // só 3 visíveis; sem o "+3 ⌄" inline — o botão "Todos os N" abaixo abre a aba completa
       (!sections ? '<button type="button" class="rp-explore" data-tab="termometros" style="margin-top:8px">' + (L ? "All " + tms.length + " thermometers" : "Todos os " + tms.length + " termômetros") + ' <span class="a">→</span></button>' : ''); }
     // Observatório de fluxo & concentração — par CO-HEADLINE (§13.21/§13.25): fuga "de onde→para onde"
     // (direcional) + concentração/dispersão (forma anônima do movimento). Reusa o card de termômetro.
-    if (show("observatorio") && v.observatorio && (v.observatorio.fuga || v.observatorio.concentracao)) { var ob = v.observatorio;
+    if (!TEASER && show("observatorio") && v.observatorio && (v.observatorio.fuga || v.observatorio.concentracao)) { var ob = v.observatorio;
       var obCard = function (t, extra) { if (!t) return "";
         return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
           (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') +
-          (t.desc ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + (extra || '') + '</div>'; };
+          (t.desc && !GATED ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + (extra || '') + '</div>'; };  // método/jargão (Gini/Wasserstein/correlação) só p/ Founder — não vaza pro free
       var fluxo = (ob.fuga && ob.fuga.fluxo && ob.fuga.fluxo.de && ob.fuga.fluxo.de.length)
         ? '<div class="rr" style="margin-top:5px"><b>' + (L ? "Out of — " : "Saindo de — ") + '</b>' + esc(ob.fuga.fluxo.de.join(" · ")) + ' <span style="opacity:.6">→ ' + esc(ob.fuga.fluxo.para) + '</span></div>' : '';
       h += '<h4>' + esc(ob.titulo) + '</h4><div class="legend">' + esc(ob.nota) + '</div><div class="g3">' +
@@ -1736,11 +1746,11 @@
       h += '<h4>' + (L ? "Geographic ratios · rotation" : "Razões geográficas · rotação") + '</h4><div class="legend">' + (L ? "which geography attracts capital (country-ETF ÷ country-ETF)" : "qual geografia atrai capital (ETF-país ÷ ETF-país)") + '</div><div class="g3">' +
         v.razoes_geo.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
           (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') +
-          (t.desc ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + '</div>'; }).join("") + '</div>'; }
+          (t.desc && !GATED ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + '</div>'; }).join("") + '</div>'; }  // método só p/ Founder
     if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4>' + (v.cripto_sentimento ? '<div class="legend">Fear &amp; Greed: ' + esc(v.cripto_sentimento.fng) + ' (' + esc(v.cripto_sentimento.leitura) + ')</div>' : '') + (v.cripto_onchain ? '<div class="legend">' + esc(v.cripto_onchain.nota) + ': ' + [v.cripto_onchain.tvl ? 'TVL ' + esc(v.cripto_onchain.tvl) : '', v.cripto_onchain.stablecoin ? 'stablecoins ' + esc(v.cripto_onchain.stablecoin) : '', v.cripto_onchain.ssr != null ? 'SSR ' + esc(v.cripto_onchain.ssr) : ''].filter(Boolean).join(' · ') + '</div>' : '') + '<div class="tk">' +
       v.cripto.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.simbolo).toLowerCase()) + '" data-cls="cripto"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w" : "% da faixa 52s") + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
     if (show("extras")) { var ex = [];
-      if (v.breadth) { if (v.breadth.us) ex.push(card(L ? "US breadth" : "Breadth US", v.breadth.us.valor + "%", v.breadth.us.regime)); if (v.breadth.br) { var br = v.breadth.br; ex.push(card(L ? "BR breadth · % > 200-day MA" : "Breadth BR · % > média 200d", br.valor + "%", (br.leitura || br.regime) + (br.n ? " · " + br.n + (L ? " names" : " papéis") : ""))); } }
+      if (v.breadth) { if (v.breadth.us && v.breadth.us.valor != null) ex.push(card(L ? "US breadth" : "Breadth US", v.breadth.us.valor + "%", v.breadth.us.regime)); if (v.breadth.br) { var br = v.breadth.br; ex.push(card(L ? "BR breadth · % > 200-day MA" : "Breadth BR · % > média 200d", br.valor != null ? br.valor + "%" : null, (br.leitura || br.regime) + (br.n ? " · " + br.n + (L ? " names" : " papéis") : ""))); } }  // guarda valor null → card() mostra "—"/🔒, nunca "null%"
       if (v.geo_riskon) ex.push(card(L ? "Geographic risk-on" : "Risk-on geográfico", v.geo_riskon.valor, v.geo_riskon.regime));
       if (ex.length) h += '<h4>' + (L ? "Market breadth / geographic" : "Amplitude de mercado / geográfico") + '</h4>' +
         '<div class="legend">' + (L ? "% of stocks above their 200-day average · geographic = emerging vs developed rotation" : "% de ações acima da média de 200 dias · geográfico = rotação emergentes vs desenvolvidos") + '</div><div class="g3">' + ex.join("") + '</div>' +
@@ -1753,7 +1763,7 @@
       var aDatas = (a.datas_analogas && a.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(a.datas_analogas.join(" · ")) + '</div>' : '');
       if (a.locked || GATED) {  // free: mostra a PERGUNTA + as datas-análogas; tranca o RESULTADO (mediana/hit-rate)
         h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta || "") + '</div>' + aDatas +
-          '<div class="stat"><div><div class="v">' + glock() + '</div><div class="r">' + (L ? "median · hit-rate" : "mediana · hit-rate") + (a.n_analogos ? ' · n=' + esc(a.n_analogos) : '') + '</div></div></div>' +
+          '<div class="stat"><div><div class="v">' + glock() + '</div><div class="r">' + (L ? "median · hit-rate" : "mediana · hit-rate") + '</div></div></div>' +  // free: sem "n=" (não vaza a escala da amostra no teaser travado)
           '<div class="rp-ml" style="opacity:.82;margin-top:5px">' + (L ? "full analog outcomes (median, hit-rate, all horizons) in Founder" : "resultados completos do análogo (mediana, hit-rate, todos os horizontes) no Founder") + '</div></div>';
       } else {
         h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div>' + aDatas + '<div class="stat">' +
@@ -1768,7 +1778,7 @@
         v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; } }
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
     if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; h += '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
-    h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
+    if (chrome || !sections) h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +  // só no radar completo (sections=null) ou em embeds (chrome) — NÃO no teaser/pulso da home
       (L ? ("The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across " + (_ca100 ? "over " + _ca100 + " assets" : "over 100 assets") + " and 50+ years of history.")
          : ("O plano completo acrescenta a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção — sobre " + (_ca100 ? "mais de " + _ca100 + " ativos" : "mais de 100 ativos") + " e 50+ anos de histórico.")) +
       (chrome ? '<br><a href="' + rpBacklink(mkt, lang) + '?utm_source=embed&utm_medium=widget" target="_blank" rel="noopener">' + (L ? "See the full app →" : "Ver o app completo →") + '</a>' : '') + '</div>';
