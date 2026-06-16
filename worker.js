@@ -10,6 +10,7 @@
 const WEEKLY_SAMPLE_DATES = ["2026-06-12"];
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
 const EN_DESC = "Brazil, observed — and remembered: five lenses, historical analogs and a library of precedents on public data — regimes, intermarket, valuation and studies of “what happened next”. A daily report ~50min before the Brazil market opens, plus weekly and monthly. Descriptive, not prediction; never advice.";
+const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, equity risk premium, fair value, Brazil valuation, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, FipeZap, inflation, IPCA, study library, historical analogs, regulatory intelligence"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
 const EN_FAQ = JSON.stringify({
   "@context": "https://schema.org", "@type": "FAQPage", "inLanguage": "en", "mainEntity": [
     { "@type": "Question", "name": "What time does the daily report arrive?", "acceptedAnswer": { "@type": "Answer", "text": "In your inbox ~50 minutes before the Brazilian market opens, with the prior day's close, and the summary is posted to X/LinkedIn right after. The weekly ships on Friday and the monthly on the last day of the month." } },
@@ -338,7 +339,7 @@ function _renderIndicador(ind, dataRef, origin, lang, slug) {
     "<meta property=\"og:title\" content=\"" + _esc(title) + "\">" +
     "<meta property=\"og:description\" content=\"" + desc + "\">" +
     "<meta property=\"og:url\" content=\"" + canon + "\">" +
-    "<meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ldStr + "</script>" +
     _chromeCss("h1{font-size:clamp(24px,4vw,32px)}b{color:var(--gold)}p{margin:.5rem 0}.upd{color:var(--dim);font-size:.85rem;margin-top:1.4rem}") +
     "</head><body>" + _header() + "<div class=\"wrap\">" +
@@ -469,8 +470,9 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/daily/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
-    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
+    "<script type=\"application/ld+json\">" + JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": en ? "Home" : "Início", "item": origin + "/" }, { "@type": "ListItem", "position": 2, "name": en ? "Daily archive" : "Arquivo diário", "item": origin + dpath }, { "@type": "ListItem", "position": 3, "name": date, "item": canon } ] }).replace(/</g, "\\u003c") + "</script>" +
     _chromeCss(".ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.manch{font-family:var(--serif);font-size:21px;line-height:1.45;color:var(--txt);margin:.7rem 0 1.1rem}.manch b{color:var(--gold)}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.btn2{display:inline-block;background:var(--gold);color:#0a0c0f;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;text-decoration:none}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:8px;margin:.2rem 0 1rem}.memotab{background:var(--surface2);border:1px solid var(--line);color:var(--txt2);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{border-color:var(--gold)}.memotab.on{background:var(--gold);color:#0a0c0f;border-color:var(--gold)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}") +
     "</head><body>" + _header() + "<div class=\"wrap\">" +
     "<h1>" + (en ? "Brazil market regime — " : "Regime do mercado BR — ") + date + "</h1>" +
@@ -513,7 +515,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/daily\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario\">" +
-    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}ul.dlist .mn{color:var(--dim)}") +
     "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
@@ -553,7 +555,7 @@ function _renderHistorico(data, origin, lang) {
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
     "<link rel=\"canonical\" href=\"" + canon + "\">" +
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/historico\"><link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/track-record\"><link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/historico\">" +
-    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.hl{font-family:var(--serif);font-size:20px;line-height:1.45;color:var(--txt);margin:.6rem 0 1.1rem}.hl b{color:var(--gold)}table.trk{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}table.trk th{text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);padding:6px 8px}table.trk td{padding:7px 8px;border-bottom:1px solid var(--line)}table.trk td.n,table.trk th.n{text-align:right}.ok{color:#15a05a;font-weight:600}.no{color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:18px}") +
     "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title.replace(" — Radar Perene", "")) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
@@ -744,7 +746,7 @@ async function _route(request, env, ctx) {
           "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
           "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com/ativos\">" +
-          "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:image\" content=\"https://radarperene.com.br/og-image-1200x630.png\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+          "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + _url.origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
           "<script type=\"application/ld+json\">" + ld + "</script>" +
           _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}") +
           "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p class=\"alist\">" + links + "</p></div>" +
@@ -772,6 +774,12 @@ async function _route(request, env, ctx) {
           .on('meta[name="description"]', { element(e) { e.setAttribute("content", desc); } })
           .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", titulo); } })
           .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", desc); } })
+          // ★ i18n/social (2026-06-16): a shell PT estática deixava twitter:title/description = título da HOME (PT) e
+          //   og:locale=pt_BR herdados → no .com vazava PT e em ambos o card social mostrava a home, não o ticker.
+          .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", titulo); } })
+          .on('meta[name="twitter:description"]', { element(e) { e.setAttribute("content", desc); } })
+          .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", _isEN ? "en_US" : "pt_BR"); } })
+          .on('meta[property="og:image"]', { element(e) { e.setAttribute("content", _url.origin + (_isEN ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png")); } })  // origin + idioma (era fixo .com.br PT)
           // ★ PÁGINA FOCADA no ticker: esconde as seções de PITCH da home (paraquem/oque/lentes/Free×Founder/…) → mata o conteúdo
           //   quase-duplicado das 252 páginas /ativo. Mantém hero(ticker+busca) + #radar(widget+narrativa) + #faq (contexto+schema).
           //   Conversão segue pelo 🔒 dentro do widget + a FAQ. (.hero não é <section> → permanece.)
@@ -793,6 +801,12 @@ async function _route(request, env, ctx) {
           rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
           if (narr.jsonld) { const ld = JSON.stringify(narr.jsonld).replace(/</g, "\\u003c"); rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } }); }
         }
+        // ★ BreadcrumbList (AEO/rich results 2026-06-16): Início › Ativos › TICKER — as 252 /ativo não tinham trilha
+        const _bc = JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": _isEN ? "Home" : "Início", "item": _url.origin + "/" },
+          { "@type": "ListItem", "position": 2, "name": _isEN ? "Assets" : "Ativos", "item": _url.origin + "/ativos" },
+          { "@type": "ListItem", "position": 3, "name": nomeAtivo, "item": _url.origin + "/ativo/" + tkLower } ] }).replace(/</g, "\\u003c");
+        rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + _bc + '</script>', { html: true }); } });
         return rw.transform(shell);
       } catch (e) { /* falha → segue normal */ }
     }
@@ -848,12 +862,15 @@ async function _route(request, env, ctx) {
           .on("html", { element(e) { e.setAttribute("lang", "en"); } })
           .on("title", { element(e) { e.setInnerContent(EN_TITLE); } })
           .on('meta[name="description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
+          .on('meta[name="keywords"]', { element(e) { e.setAttribute("content", EN_KEYWORDS); } })
           .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
           .on('meta[name="twitter:description"]', { element(e) { e.setAttribute("content", EN_DESC); } })
           .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
           .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
           .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
           .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
+          .on('meta[property="og:image"]', { element(e) { e.setAttribute("content", "https://radarperene.com/og-image-1200x630-en.png"); } })  // OG em inglês no .com (era a PT herdada do index)
+          .on('meta[name="twitter:image"]', { element(e) { e.setAttribute("content", "https://radarperene.com/og-image-1200x630-en.png"); } })
           .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } })
           .on("#rp-graph-ld", { element(e) { e.setInnerContent(_graphDated(EN_GRAPH, _gdt), { html: true }); } });
         // SSR-EN do BODY: traduz/preenche cada nó estático PT com o EN do catálogo (idêntico ao que o JS faz em-browser)
