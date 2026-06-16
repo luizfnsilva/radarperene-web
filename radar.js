@@ -27,10 +27,30 @@
   //   (0 round-trip ~2-4s — o gargalo real do paint). DESDE o gate server-side (§2.8) o /v1/digest é GATED por
   //   token: o inline e o 1º fetch (pré-login, sem RP_TOKEN) vêm TRAVADOS (teaser). No login (rp-premium-change)
   //   o token chega → precisamos RE-BUSCAR com Authorization (não reusar o cache/inline gated) → _rpForceFresh.
+  // ★ fetch ROBUSTO do digest (corrige "às vezes não abre / demora demais"): timeout (edge cold-start não pode
+  //   travar o paint pra sempre) + retry em falha transitória + r.ok obrigatório (5xx/429 não é JSON do digest →
+  //   não envenena a UI com lixo). NUNCA cacheia rejeição (ver _getDigest): uma falha passageira não condena a
+  //   página até o reload — era a causa do teaser+radar caírem juntos e ficarem "indisponível".
+  function _fetchDigest(lang, tries) {
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var to = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 12000) : null;
+    var o = fopt(); if (ctrl) o.signal = ctrl.signal;
+    return fetch(API + "?lang=" + lang, o).then(function (r) {
+      if (to) { clearTimeout(to); to = null; }
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).catch(function (e) {
+      if (to) { clearTimeout(to); to = null; }
+      if (tries > 0) return new Promise(function (res) { setTimeout(res, 900); }).then(function () { return _fetchDigest(lang, tries - 1); });
+      throw e;
+    });
+  }
   function _getDigest(lang) {
     if (!_digestP[lang]) {  // cache é bustado no login (rpOnPremiumChange) → aqui só (re)cria a promise
       var pre = (!_rpForceFresh && typeof window !== "undefined" && window.__RP_DIGEST && window.__RP_DIGEST[lang]) ? window.__RP_DIGEST[lang] : null;  // pós-login ignora o inline gated e busca autenticado
-      _digestP[lang] = pre ? Promise.resolve(pre) : fetch(API + "?lang=" + lang, fopt()).then(function (r) { return r.json(); });
+      var p = pre ? Promise.resolve(pre) : _fetchDigest(lang, 1);  // 1 retry de REDE aqui; o _paintNode dá +2 tentativas (camadas não se multiplicam demais)
+      if (!pre) p = p.catch(function (e) { delete _digestP[lang]; throw e; });  // falhou → SOLTA o cache p/ a próxima tentativa (scroll/reconcile) re-buscar limpo
+      _digestP[lang] = p;
     }
     return _digestP[lang];
   }
@@ -1858,11 +1878,25 @@
     _rpBooted.forEach(function (b) {
       if (!b.node || !b.node.isConnected) return;
       if (b.asset) { renderAtivo(b.node, b.asset, b.classe, b.lang, b.skin); return; }  // listener próprio (rp-ob) é re-amarrado no innerHTML novo
-      _getDigest(b.lang).then(function (d) { render(b.node, d, b.lang, b.sections, b.chrome, b.skin); }).catch(function () {});  // delegação no nó sobrevive ao innerHTML (não re-amarra)
+      _getDigest(b.lang).then(function (d) { render(b.node, d, b.lang, b.sections, b.chrome, b.skin); })  // delegação no nó sobrevive ao innerHTML (não re-amarra)
+        .catch(function () { var pre = (typeof window !== "undefined" && window.__RP_DIGEST && window.__RP_DIGEST[b.lang]) ? window.__RP_DIGEST[b.lang] : null; if (pre) { try { render(b.node, pre, b.lang, b.sections, b.chrome, b.skin); } catch (e) {} } });  // ★ re-fetch pós-login falhou → repinta com o inline (digest é token-agnóstico): o cadeado some mesmo se a rede cair
     });
   }
   function rpOnPremiumChange() { var sig = rpRenderSig(); if (sig === _rpLastSig) return; _rpLastSig = sig; _digestP = {}; _rpForceFresh = (typeof window !== "undefined" && !!window.RP_TOKEN); rpRerenderAll(); }  // login destrava o token → BUSTA o cache/inline gated e re-busca o digest autenticado (§2.8: digest é gated por token)
   if (typeof window !== "undefined" && window.addEventListener) window.addEventListener("rp-premium-change", rpOnPremiumChange);
+  // ★ P0#1 REFORÇO (cadeado fantasma do Founder logado): o evento 'rp-premium-change' é one-shot e pode ser PERDIDO —
+  //   o host (inline /v1/me) dispara antes do radar.js (256KB) anexar o listener acima, sobretudo em rede lenta
+  //   ("no trabalho não abriu / em casa abriu na 1ª e não na 2ª"). Reconciliação por polling curto e limitado:
+  //   re-checa a assinatura do plano e repinta quando ela muda (rpOnPremiumChange é no-op se nada mudou). Cobre
+  //   evento perdido, /v1/me lento e localStorage tardio — sem custo perceptível (para ao resolver ou após ~12s).
+  function rpReconcilePlan() {
+    if (typeof window === "undefined" || !window.setInterval) return;
+    var n = 0, iv = setInterval(function () {
+      rpOnPremiumChange();  // repinta SÓ na mudança real de assinatura
+      if (++n >= 30 || window.RP_TOKEN) clearInterval(iv);  // para ao ver o token (estado já resolvido) ou após ~12s
+    }, 400);
+  }
+  if (typeof window !== "undefined" && window.addEventListener) window.addEventListener("storage", function (e) { if (!e || e.key === "rp_premium" || e.key === null) rpOnPremiumChange(); });  // login em outra aba → repinta esta
   // ── lazy-load do uPlot p/ o radar completo abaixo da dobra: IntersectionObserver carrega a engine +
   //    boota o nó SÓ quando ele se aproxima do viewport (rootMargin 800px = pronto quando chega). Fallback
   //    sem IO = comportamento de hoje (carrega já). NÃO se aplica a /ativo (gráfico-herói = eager).
@@ -1888,6 +1922,7 @@
     _rpLastSig = rpRenderSig();  // estado de render no 1º paint → o evento depois só repinta se a assinatura mudar
     var nodes = document.querySelectorAll("#radar-perene,[data-radar-perene]");
     if (!nodes.length) return;
+    rpReconcilePlan();  // ★ rede de segurança contra o 'rp-premium-change' perdido (cadeado do Founder logado)
     // teaser (sem-gráfico) pinta JÁ; /ativo (data-asset = herói acima da dobra) carrega a engine eager;
     // radar completo (com-gráfico, sem asset = abaixo da dobra) entra no lazy-load (IO). idle-warm cobre os modais.
     var eager = [], lazy = [], chartless = [];
@@ -1968,10 +2003,20 @@
             if (canBig) { var zb = box.querySelector(".rp-zoom"); if (zb) zb.addEventListener("click", function (e) { e.stopPropagation(); var syn = chip.querySelector(".sy"); openBig(s, syn ? syn.textContent : (chip.getAttribute("data-cod") || "").toUpperCase(), meta, lang, fund); }); }
           }).catch(function () { chip.style.opacity = ""; chip.removeAttribute("data-open"); });
       });
-      _getDigest(lang)  // ★ promise compartilhada (teaser + completo não duplicam o fetch)
-        .then(function (d) { render(node, d, lang, sections, chrome, skin); })
-        .catch(function () { node.innerHTML = '<div class="rp"><div class="sub">Radar Perene — indisponível.</div></div>'; });
+      _paintNode(node, lang, sections, chrome, skin, 2);  // ★ promise compartilhada (teaser + completo não duplicam o fetch) + auto-retry (digest pôde falhar transitório)
     });
+  }
+  // ★ paint com auto-retry: o _getDigest já solta o cache na falha → cada tentativa re-busca limpo. Só após esgotar
+  //   mostra "indisponível" — agora COM um "tentar de novo" clicável (recarrega), em vez de uma tela morta.
+  function _paintNode(node, lang, sections, chrome, skin, left) {
+    _getDigest(lang)
+      .then(function (d) { render(node, d, lang, sections, chrome, skin); })
+      .catch(function () {
+        if (left > 0) { setTimeout(function () { if (node.isConnected) _paintNode(node, lang, sections, chrome, skin, left - 1); }, 1500); return; }
+        var L = lang === "en";
+        node.innerHTML = '<div class="rp"><div class="sub">' + (L ? "Radar Perene — momentarily unavailable. " : "Radar Perene — indisponível no momento. ") + '<a href="#" class="rp-retry" style="color:var(--gold,#caa24a);text-decoration:underline">' + (L ? "try again" : "tentar de novo") + '</a></div></div>';
+        var rb = node.querySelector(".rp-retry"); if (rb) rb.addEventListener("click", function (e) { e.preventDefault(); delete _digestP[lang]; _paintNode(node, lang, sections, chrome, skin, 2); });
+      });
   }
   // ★ Custom element <radar-perene> — embed de 1 linha (briefing). RETROCOMPATÍVEL: div#radar-perene + iframe radar-embed.html seguem idênticos. Reusa o MESMO render (não duplica lógica).
   //   <radar-perene></radar-perene>                     → digest completo (mercado/idioma pela origem do radar.js)
