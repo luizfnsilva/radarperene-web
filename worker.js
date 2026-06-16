@@ -9,7 +9,7 @@
 // Na /diario/<data> dessas datas, visitante FREE vê um link p/ a amostra; ASSINANTE não (já recebe o semanal completo → sem duplicar).
 const WEEKLY_SAMPLE_DATES = ["2026-06-12"];
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
-const EN_DESC = "Brazil, observed — and remembered: five lenses, historical analogs and a library of precedents on public data — regimes, intermarket, valuation and studies of “what happened next”. A daily report ~50min before the Brazil market opens, plus weekly and monthly. Descriptive, not prediction; never advice.";
+const EN_DESC = "Brazil's market regime in 5 lenses, historical analogs and a library of precedents on public data. Today's reading, live. Descriptive, never advice.";
 const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, equity risk premium, fair value, Brazil valuation, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, FipeZap, inflation, IPCA, study library, historical analogs, regulatory intelligence"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
 const EN_FAQ = JSON.stringify({
   "@context": "https://schema.org", "@type": "FAQPage", "inLanguage": "en", "mainEntity": [
