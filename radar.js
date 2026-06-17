@@ -1723,7 +1723,7 @@
         h += '<div class="rp-hl">' +
           '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
           (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
-          '<div class="hl-n"><div><b>' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</b><span>' + (L ? "median in 6 months" : "mediana em 6 meses") + '</span></div>' +
+          '<div class="hl-n"><div><b>' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</b><span>' + (L ? "median Ibovespa · 6 months" : "mediana do Ibovespa · 6 meses") + '</span></div>' +
           '<div><b>' + esc(ab.hit_rate_pct) + '%</b><span>' + (L ? "positive episodes" : "episódios positivos") + (ab.n_analogos ? " · n=" + esc(ab.n_analogos) : "") + '</span></div></div>' +
           '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div></div>';
       } else {
