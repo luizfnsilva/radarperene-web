@@ -67,5 +67,8 @@ Descritivo, nunca recomendação nem previsão de preço. Fonte pública. Educac
 Os dados de mercado usados pelo Radar são exclusivamente valores de **fechamento (end-of-day)**, obtidos por **APIs públicas ou licenciadas** (ex.: BCB/PTAX, FRED, market-data público de bolsas, provedores licenciados de EOD) — **sem extração ou scraping** de páginas de terceiros. O histórico é armazenado uma vez; apenas o fechamento diário é atualizado. As séries alimentam **indicadores derivados** (regime, percentis, Índice Ânima, Índice de Risco Perene), não a redistribuição de cotações brutas.
 Market data used by Radar Perene is **end-of-day closing values only**, obtained via **public or licensed APIs** (e.g., BCB/PTAX, FRED, public exchange market-data, licensed EOD providers) — **no scraping or page extraction** from third parties. History is stored once; only the daily close is updated. Series feed **derived indicators** (regime, percentiles, proprietary indices), not redistribution of raw quotes.
 
+## Enciclopedia dos regimes (bilingue, novo)
+- /artigos (PT) e /articles (EN): episodios "o que o Radar dizia -> o que aconteceu depois" (2011, taper 2013, crise 2015, fundo 2016, caminhoneiros 2018, COVID 2020, eleicoes 2022, fiscal 2024, febre 2025), conceitos (verbetes) e comparativos. Memoria de 15 anos, descritiva, citavel; espelho PT<->EN (hreflang).
+
 ## Contato
 contato@radarperene.com.br (PT) · hello@radarperene.com (EN)
