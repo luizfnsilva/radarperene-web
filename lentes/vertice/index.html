@@ -21,8 +21,7 @@
 <link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/lentes/vertice/">
 <link rel="alternate" hreflang="en" href="https://radarperene.com/lenses/vertice/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/lentes/vertice/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://radarperene.com.br/#org","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com"],"founder":{"@id":"https://radarperene.com.br/#founder"},"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://radarperene.com.br/#founder","name":"Luiz F. Nunes da Silva","url":"https://brazilcomplexity.com/about.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://radarperene.com.br/#org","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com"],"founder":{"@id":"https://brazilcomplexity.com/about.html#person"},"description":"Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto."}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://radarperene.com.br/"},{"@type":"ListItem","position":2,"name":"Lentes","item":"https://radarperene.com.br/lentes/"},{"@type":"ListItem","position":3,"name":"Lente Vértice","item":"https://radarperene.com.br/lentes/vertice/"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Lente Vértice","description":"Sistema bayesiano de hipóteses cross-domínio. Cripto, on-chain, sentimento e fragilidade lidos contra o regime regulatório e o intermercado","url":"https://radarperene.com.br/lentes/vertice/","provider":{"@type":"Organization","name":"Radar Perene"},"areaServed":"BR","serviceType":"Regulatory & market intelligence"}</script>
 <link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
@@ -101,10 +100,12 @@
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
   h2.sec{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,32px);margin:0 0 8px}
   .secsub{color:var(--dim);max-width:64ch;margin:0 0 22px;font-size:15px}
-  .rp-narr{max-width:74ch;margin:18px auto 0;font-size:13.5px;line-height:1.65;color:var(--dim)}
+  /* "Resumo" — o resumo editorial do radar de cima (a voz do motor): tom de nota, conclusão primeiro */
+  .rp-narr{max-width:60ch;margin:42px auto 30px;font-family:var(--serif);font-size:17px;line-height:1.72;color:var(--dim)}
   .rp-narr:empty{display:none}
-  .rp-narr p{margin:0 0 7px}.rp-narr p:first-child{color:var(--txt2);font-weight:500}
-  .rp-narr .rp-sig{color:var(--gold2);font-style:italic;font-size:12.5px;margin:-2px 0 10px;letter-spacing:.01em}
+  .rp-narr-h{font-family:var(--sans);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold2);font-weight:600;margin-bottom:14px}
+  .rp-narr p{margin:0 0 13px}.rp-narr p:first-child{color:var(--txt);font-weight:500;font-size:19.5px;line-height:1.5}
+  .rp-narr .rp-sig{color:var(--gold2);font-style:italic;font-size:13px;margin:4px 0 0;letter-spacing:.01em}
   /* live radar mount */
   /* value cards */
   .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
