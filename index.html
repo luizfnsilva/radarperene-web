@@ -258,9 +258,10 @@
       <div class="badge" id="fbadge">Lançamento · 100 fundadores</div>
       <h2 id="fh">O instrumento completo.</h2>
       <div id="fp"><ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.9"><li><span style="color:var(--gold)">✓</span> cinco Lentes completas</li><li><span style="color:var(--gold)">✓</span> uma biblioteca de precedentes desde 2010</li><li><span style="color:var(--gold)">✓</span> relatórios diário, semanal e mensal</li><li><span style="color:var(--gold)">✓</span> casos análogos e seus desfechos</li><li><span style="color:var(--gold)">✓</span> o experimento Vértice</li><li><span style="color:var(--gold)">✓</span> o cone completo e seus horizontes</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div></div>
-      <div style="margin:20px 0 6px;font-family:var(--serif);font-size:19px;color:var(--txt)">Founder · <b style="color:var(--gold)">R$ 149/mês</b></div>
-      <a class="btn" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Entrar →</a>
-      <p style="margin:16px auto 0;font-size:13.5px"><a id="founder-buy-year" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Anual · R$ 1.490 (2 meses grátis) →</a></p>
+      <div style="margin:22px 0 1px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:600">Edição Founder</div>
+      <div style="margin:0 0 10px;font-family:var(--serif);font-size:23px;color:var(--txt)"><b style="color:var(--gold)">R$ 149/mês</b></div>
+      <a class="btn" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Assinar →</a>
+      <p style="margin:16px auto 0;font-size:13.5px"><a id="founder-buy-year" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Plano anual · dois meses de cortesia →</a></p>
       <p style="margin:10px auto 0;font-size:13px"><a href="#wl" id="wl-toggle" style="color:var(--dim);text-decoration:none">Receber aviso de novas vagas →</a><span style="color:var(--line)"> · </span><a href="/assine" id="assine-link" style="color:var(--dim);text-decoration:none">ver planos →</a></p>
       <form class="wl" id="wl" autocomplete="on" style="display:none;margin-top:14px">
         <input type="text" class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -486,7 +487,7 @@
   var c1=document.getElementById("cta1");if(c1){c1.href=STRIPE;c1.target="_blank";c1.rel="noopener"}
   var fb=document.getElementById("founder-buy");if(fb){fb.href=STRIPE;fb.textContent=(LANG==="en"?"Subscribe →":"Assinar →")}  // "Assinar" = linguagem de revista (editorial), não "Entrar"/SaaS; preço na linha acima
   var STRIPEY=LANG==="en"?"https://buy.stripe.com/3cIdR85QC40bgufgQTb3q04":"https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05";
-  var fby=document.getElementById("founder-buy-year");if(fby){fby.href=STRIPEY;fby.textContent=(LANG==="en"?"Annual · US$ 1,490 (2 months free) →":"Anual · R$ 1.490 (2 meses grátis) →")}  // anual = link, não botão
+  var fby=document.getElementById("founder-buy-year");if(fby){fby.href=STRIPEY;fby.textContent=(LANG==="en"?"Annual plan · two months' courtesy →":"Plano anual · dois meses de cortesia →")}  // "cortesia" = editorial; anual = link
   var pt=document.getElementById("portal");if(pt)pt.textContent=(LANG==="en"?"Manage subscription":"Gerenciar assinatura");
   try{var _of=document.getElementById("rp-faq-ld");if(_of)_of.remove();var ld={"@context":"https://schema.org","@type":"FAQPage","inLanguage":LANG==="en"?"en":"pt-BR","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.id="rp-faq-ld";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
   // contador X/100 REMOVIDO da vitrine (rodada 50 personas 2026-06-10, ~28 leituras como prova social NEGATIVA —
