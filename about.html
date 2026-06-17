@@ -19,7 +19,14 @@
 <link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br/sobre">
 <link rel="alternate" hreflang="en" href="https://radarperene.com/about">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/sobre">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0c0f'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%232a3340' stroke-width='1.4'/%3E%3Cline x1='16' y1='16' x2='16' y2='5' stroke='%23c9a227' stroke-width='1.6'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23c9a227'/%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/svg+xml" href="/icon-light.svg" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/svg+xml" href="/icon-dark.svg" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#131521">
+<link rel="manifest" href="/site.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#faf9f6;--surface:#fff;--surface2:#f3f1ec;--line:#e6e3dc;--txt:#1a1a2e;--txt2:#3a3a45;--dim:#6e6e78;--gold:#a8651a;--serif:'Fraunces',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
@@ -28,8 +35,13 @@
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.65;font-size:17px}
   .wrap{max-width:760px;margin:0 auto;padding:34px 22px 60px}
   a{color:var(--gold)}
-  header nav{font-size:14px;color:var(--dim);margin-bottom:30px}
+  header.top{display:flex;align-items:center;gap:18px;margin-bottom:30px}
+  header nav{font-size:14px;color:var(--dim)}
   header nav a{color:var(--dim);text-decoration:none;margin-right:16px}
+  .brand{display:flex;align-items:center;text-decoration:none}
+  .brand .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,5vw,42px);line-height:1.15;margin:0 0 8px}
   h2{font-family:var(--serif);font-weight:500;font-size:clamp(21px,3.4vw,28px);margin:36px 0 10px;border-top:1px solid var(--line);padding-top:28px}
   .lead{font-size:20px;color:var(--dim);margin:0 0 8px}
@@ -60,7 +72,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header><nav><a href="/">Radar Perene</a> · <a href="/about.html">About</a> · <a href="/sobre.html">PT</a></nav></header>
+  <header class="top"><a class="brand" href="/" aria-label="Radar Perene"><img class="logo-w logo-w-light" src="/logo-light.svg" alt="Radar Perene" width="139" height="35"><img class="logo-w logo-w-dark" src="/logo-dark.svg" alt="Radar Perene" width="139" height="35"></a><nav><a href="/about.html">About</a> · <a href="/sobre.html">PT</a></nav></header>
 
   <span class="badge">About</span>
   <h1>Radar Perene: Brazil's market regime, read as data.</h1>

@@ -187,7 +187,7 @@ function deriveDesc(body) {
 }
 
 // ─── chrome estático (copiado verbatim de gen_pages.mjs p/ paridade visual total) ───
-const PG_CSS = '<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold)}.brand .logo-w{display:block;height:30px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>';
+const PG_CSS = '<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>';
 const BRAND_SVG = '<svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true" style="color:var(--dim)"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><path d="M16 16 L16 2 A14 14 0 0 1 29 13 Z" fill="#b8801f" fill-opacity="0.2"/><line x1="16" y1="16" x2="16" y2="2" stroke="#b8801f" stroke-width="1.6"/><circle cx="16" cy="16" r="2" fill="#b8801f"/></svg>';
 // site-kit (favicons/ícones/manifest) + logo real (wordmark light/dark) — paridade total com a home; antes só BRAND_SVG genérico
 const SITE_KIT = '<link rel="icon" href="/favicon.ico" sizes="48x48">\n<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n<link rel="icon" type="image/svg+xml" href="/icon-light.svg" media="(prefers-color-scheme: light)">\n<link rel="icon" type="image/svg+xml" href="/icon-dark.svg" media="(prefers-color-scheme: dark)">\n<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">\n<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#131521">\n<link rel="manifest" href="/site.webmanifest">';
@@ -195,6 +195,9 @@ const LOGO_IMG = '<img class="logo-w logo-w-light" src="/logo-light.svg" alt="Ra
 const THEME_JS = '<script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>';
 const FOOT_PT = '<a href="/artigos/">Artigos</a> · <a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Versão grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Founder</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a>';
 const FOOT_EN = '<a href="/articles/">Articles</a> · <a href="/methodology/">Methodology</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/concepts/">Concepts</a> · <a href="/lenses/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Founder</a> · <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>';
+// CTA de conversão no fim de cada página de conteúdo (episódio/comparativo/conceito) → landing por idioma (/assine·/subscribe)
+const CTA_PT = '<div class="ctarow" style="border-top:1px solid var(--line);margin-top:32px;padding-top:22px"><p class="closing" style="font-style:normal;margin:0 0 14px">Isto é a memória do Radar. A leitura de hoje — regime, 5 lentes e os análogos do dia — está no ar, de graça.</p><a class="btn" href="/">Ver a leitura de hoje</a><a class="btn ghost" href="/assine">Conhecer a Edição Founder →</a></div>';
+const CTA_EN = '<div class="ctarow" style="border-top:1px solid var(--line);margin-top:32px;padding-top:22px"><p class="closing" style="font-style:normal;margin:0 0 14px">This is the Radar&rsquo;s memory. Today&rsquo;s reading — regime, 5 lenses and the day&rsquo;s analogs — is live, free.</p><a class="btn" href="/">See today&rsquo;s reading</a><a class="btn ghost" href="/subscribe">Explore the Founder Edition →</a></div>';
 const DISC = "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.";
 const DISC_EN = "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice.";
 const ORIGIN = "https://radarperene.com.br";       // gêmeo PT
@@ -317,6 +320,7 @@ for (const a of ARTS) {
     const plinks = pers.map((p) => `<a href="/artigos/personagem/${p}/">${esc(PERSONAGEM_NOME[p])}</a>`).join(" · ");
     bodyHtml += `\n<p class="rel">Personagens: ${plinks}</p>`;
   }
+  bodyHtml += `\n${CTA_PT}`;
   const crumb = `<a href="/">Radar Perene</a> / <a href="/artigos/">Artigos</a> / ${esc(camada.toLowerCase())}`;
   const breadcrumb = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
     { "@type": "ListItem", position: 1, name: "Início", item: ORIGIN + "/" },
@@ -350,6 +354,7 @@ for (const a of ARTS) {
       const plinks = pers.map((p) => `<a href="/articles/character/${PERSONAGEM_SLUG_EN[p]}/">${esc(PERSONAGEM_NOME_EN[p])}</a>`).join(" · ");
       bodyHtmlEn += `\n<p class="rel">Characters: ${plinks}</p>`;
     }
+    bodyHtmlEn += `\n${CTA_EN}`;
     const crumbEn = `<a href="/">Radar Perene</a> / <a href="/articles/">Articles</a> / ${esc(camadaEn.toLowerCase())}`;
     const breadcrumbEn = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
       { "@type": "ListItem", position: 1, name: "Home", item: ORIGIN_EN + "/" },
@@ -403,6 +408,7 @@ function hubHtml() {
   }
   b += `</ul>\n<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
   b += `<p class="rel" style="margin-top:24px">O Radar lê esses regimes todos os dias. <a href="/diario">Veja a leitura de hoje →</a> · <a href="/metodologia/">Como o método funciona →</a></p>`;
+  b += `\n${CTA_PT}`;
   return b;
 }
 const hubTitle = "A enciclopédia dos regimes — Radar Perene";
@@ -446,6 +452,7 @@ function hubHtmlEn() {
   }
   b += `<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
   b += `<p class="rel" style="margin-top:24px">The Radar reads these regimes every day. <a href="/diario">See today's reading →</a> · <a href="/methodology/">How the method works →</a></p>`;
+  b += `\n${CTA_EN}`;
   return b;
 }
 const hubTitleEn = "The encyclopedia of regimes — Radar Perene";
@@ -487,6 +494,7 @@ for (const p of Object.keys(PERSONAGEM_NOME)) {
   }
   b += `</ul>\n<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
   b += `<p class="rel" style="margin-top:22px"><a href="/artigos/">← Voltar à enciclopédia</a> · <a href="/diario">A leitura de hoje →</a></p>`;
+  b += `\n${CTA_PT}`;
   const title = `Personagem: ${nome} — Radar Perene`;
   const desc = `Todos os episódios e conceitos do arquivo do Radar em que ${nome} é protagonista do regime de mercado.`;
   const breadcrumb = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
@@ -518,6 +526,7 @@ for (const p of Object.keys(PERSONAGEM_NOME)) {
     }
     be += `</ul>\n<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
     be += `<p class="rel" style="margin-top:22px"><a href="/articles/">← Back to the encyclopedia</a> · <a href="/diario">Today's reading →</a></p>`;
+    be += `\n${CTA_EN}`;
     const titleEn = `Character: ${nomeEn} — Radar Perene`;
     const descEn = `Every episode and concept in the Radar's archive in which ${nomeEn} is the protagonist of the market regime.`;
     const breadcrumbEn = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [

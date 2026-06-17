@@ -281,7 +281,7 @@ function _chromeCss(extra) {
     ':root[data-theme="dark"]{--bg:#0e1217;--surface:#161b22;--surface2:#1c222b;--line:#28303a;--txt:#eceef1;--txt2:#c2c8d0;--dim:#8a929e;--gold:#d9a441}' +
     '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}' +
     '.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 22px;max-width:var(--max);margin:0 auto}' +
-    '.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt)}.brand .nm{font-family:var(--serif);font-size:17px;font-weight:600}.brand .nm b{color:var(--gold)}.brand .logo-w{display:block;height:31px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}' +
+    '.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt)}.brand .nm{font-family:var(--serif);font-size:17px;font-weight:600}.brand .nm b{color:var(--gold)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}' +
     '.tg{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:13px}' +
     '.wrap{max-width:var(--max);margin:0 auto;padding:6px 22px 30px}' +
     'h1{font-family:var(--serif);font-weight:500;font-size:clamp(23px,4vw,33px);line-height:1.16;letter-spacing:-.01em;margin:14px 0 4px}' +
@@ -293,7 +293,7 @@ function _chromeCss(extra) {
     (extra || "") + '</style>';
 }
 function _header() {
-  return '<div class="top"><a class="brand" href="/"><img class="logo-w logo-w-light" src="/logo-light.svg" alt="Radar Perene" width="123" height="31"><img class="logo-w logo-w-dark" src="/logo-dark.svg" alt="Radar Perene" width="123" height="31"></a><button class="tg" id="rp-tg" type="button" aria-label="tema">☾</button></div>';
+  return '<div class="top"><a class="brand" href="/"><img class="logo-w logo-w-light" src="/logo-light.svg" alt="Radar Perene" width="139" height="35"><img class="logo-w logo-w-dark" src="/logo-dark.svg" alt="Radar Perene" width="139" height="35"></a><button class="tg" id="rp-tg" type="button" aria-label="tema">☾</button></div>';
 }
 function _themeScript() {
   return '<script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var b=document.getElementById("rp-tg");if(b)b.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>';

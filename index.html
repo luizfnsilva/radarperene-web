@@ -192,6 +192,22 @@
   .scale .st{flex:1;min-width:118px;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:12px;padding:16px 12px}
   .scale .st b{display:block;font-family:var(--mono);font-size:26px;font-weight:600;color:var(--gold);line-height:1.1}
   .scale .st span{font-size:11.5px;color:var(--dim)}
+  /* faixa institucional — entre o hero e a leitura de hoje (memória, não instrumento) */
+  .instband{display:block;text-align:center;font-family:var(--serif);font-size:clamp(13.5px,2vw,16px);color:var(--dim);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;margin:4px 0 2px;letter-spacing:.01em;text-decoration:none;transition:color .15s}
+  .instband:hover{color:var(--txt)}
+  .instband b{color:var(--txt);font-weight:600}
+  /* "Do arquivo" — cartões de episódios marquee (memória); reusa o grid .cards */
+  .arcard{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none;transition:border-color .15s,transform .15s}
+  .arcard:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .arcard .arcyr{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--gold);font-weight:700}
+  .arcard .arct{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--txt);line-height:1.25}
+  .arcard .arcd{font-size:14px;color:var(--dim);line-height:1.5;flex:1}
+  .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px}
+  /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
+  .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
+  .arcmerch b{color:var(--txt);font-weight:600}
+  .arcmerch .n{font-family:var(--mono);color:var(--gold);font-weight:700}
+  .arcmerch a{color:var(--gold);font-weight:600;text-decoration:none;white-space:nowrap}
 </style>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 </head>
@@ -238,6 +254,10 @@
 </div>
 
 <div class="wrap">
+  <a class="instband" id="instband" href="/artigos"></a>
+</div>
+
+<div class="wrap">
   <section id="radar-teaser">
     <div class="eyebrow" id="eyb-tz">Ao vivo · agora</div>
     <h2 class="sec" id="s-tz">A leitura de hoje</h2>
@@ -279,6 +299,15 @@
     <div id="radar-perene" data-chrome="off" style="--rp-max:100%"></div>
     <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). Mesma leitura honesta, em prosa. -->
     <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
+  </section>
+
+  <section id="arquivo">
+    <div class="eyebrow" id="eyb-arq"></div>
+    <h2 class="sec" id="s-arq"></h2>
+    <p class="secsub" id="s-arq-s"></p>
+    <div class="cards" id="arc-cards"></div>
+    <p class="micro" style="margin-top:16px"><a id="arc-cta" href="/artigos" style="color:var(--gold)"></a></p>
+    <p class="arcmerch" id="arc-merch"></p>
   </section>
 
   <section id="ultimas">
@@ -472,6 +501,51 @@
   //    Metodologia/Como ler/Versão grátis descem pro rodapé (sem ads → menos prioridade de clique). ──
   set("topnav",'<a href="'+U_ART+'">'+NAV.art+'</a><a href="'+U_CON+'">'+NAV.con+'</a><a href="'+U_DIA+'">'+NAV.dia+'</a><span class="dd"><a href="'+U_LEN+'" tabindex="0">'+NAV.len+' ▾</a><div class="ddm">'+lenDD+'</div></span>');
   void conDD;  // dropdown de Conceitos saiu do topo (vira link simples); CN segue no grid "linguagem do Radar"
+  // ── faixa institucional + "Do arquivo" (memória): texto/links por idioma; cartões linkam ao portal editorial ──
+  set("instband",_en
+    ? 'Fifteen years of memory · Seven regimes · Five lenses · One experiment · <b>Descriptive, never predictive</b>'
+    : 'Quinze anos de memória · Sete regimes · Cinco lentes · Um experimento · <b>Descritivo, nunca preditivo</b>');
+  set("eyb-arq",_en?"From the archive":"Do arquivo");
+  set("s-arq",_en?"The present, in conversation with memory":"O presente, em conversa com a memória");
+  set("s-arq-s",_en?"Fifteen years of regimes read honestly — what the Radar saw, and what came next.":"Quinze anos de regimes lidos com honestidade — o que o Radar viu, e o que veio depois.");
+  // pool de 7 regimes (um por ano); mostramos 3, rotacionando por DIA → a home "envelhece bem", mas é estável p/ SEO/cache no mesmo dia
+  var ARC=[
+    {pt:"crise-europeia-2011-discordia",en:"the-2011-european-crisis-as-discord",yr:"2011",
+     tp:"A crise europeia de 2011",te:"The 2011 European crisis",
+     dp:"Chegou ao Brasil como discórdia, não como colapso.",de:"Reached Brazil as discord, not collapse."},
+    {pt:"taper-tantrum-2013-susto-importado",en:"the-2013-taper-tantrum-imported-shock",yr:"2013",
+     tp:"O taper tantrum de 2013",te:"The 2013 taper tantrum",
+     dp:"O susto importado que o regime brasileiro absorveu.",de:"The imported shock the Brazilian regime absorbed."},
+    {pt:"os-tres-alarmes-de-agosto-2015",en:"the-three-alarms-of-august-2015",yr:"2015",
+     tp:"Os três alarmes de agosto de 2015",te:"The three alarms of August 2015",
+     dp:"Três sinais dispararam — e o fundo que parecia fundo não era.",de:"Three signals fired — and the bottom that looked like the bottom wasn't."},
+    {pt:"fundo-de-2016-estrutura-antes-do-humor",en:"the-2016-bottom-structure-before-mood",yr:"2016",
+     tp:"O fundo de 2016",te:"The 2016 bottom",
+     dp:"A estrutura virou antes do humor — e muito antes dos juros.",de:"Structure turned before mood — and long before rates."},
+    {pt:"caminhoneiros-2018-dinheiro-antes-da-fe",en:"the-2018-truckers-strike-money-before-faith",yr:"2018",
+     tp:"A greve dos caminhoneiros de 2018",te:"The 2018 truckers' strike",
+     dp:"O dinheiro voltou antes da fé — e antes da manchete.",de:"Money came back before faith — and before the headline."},
+    {pt:"o-que-aconteceu-depois-medo-precificou-tudo",en:"what-happened-after-fear-priced-everything",yr:"2020",
+     tp:"Quando o medo precificou tudo (2020)",te:"When fear priced everything (2020)",
+     dp:"O que aconteceu depois do pânico.",de:"What happened after the panic."},
+    {pt:"a-casa-as-escuras-2022",en:"the-house-in-the-dark-2022",yr:"2022",
+     tp:"A casa às escuras, fim de 2022",te:"The house in the dark, late 2022",
+     dp:"O fundo da estrutura precedeu um ano de discordância.",de:"The structure's floor preceded a year of discord."}
+  ];
+  var _now=new Date(), _doy=Math.floor((_now-new Date(_now.getFullYear(),0,0))/864e5), _st=_doy%ARC.length;
+  var _pick=[ARC[_st],ARC[(_st+1)%ARC.length],ARC[(_st+2)%ARC.length]];
+  set("arc-cards",_pick.map(function(a){var slug=_en?a.en:a.pt,t=_en?a.te:a.tp,d=_en?a.de:a.dp;
+    return '<a class="arcard" href="'+U_ART+'/'+slug+'/"><span class="arcyr">'+a.yr+'</span><span class="arct">'+t+'</span><span class="arcd">'+d+'</span><span class="arcmore">'+(_en?"What happened next →":"O que aconteceu depois →")+'</span></a>';}).join(""));
+  // merchan da biblioteca do assinante: TOTAL real de relatórios publicados (mensal+diário+semanal), buscado do
+  // radar-api (cresce sozinho conforme o pipeline gera). Fallback = nº de meses desde abr/2010 (piso honesto ≤ total).
+  function _nf(n){return n.toLocaleString(_en?"en-US":"pt-BR");}
+  var _libFallback=(_now.getFullYear()-2010)*12+(_now.getMonth()-3);  // ≈194 mensais; piso enquanto a contagem real não chega
+  set("arc-merch",_en
+    ? '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> reports</b> in the subscriber library — monthly since April 2010, now daily and weekly too. Growing with every new report. <a href="/subscribe">Explore the Founder Edition →</a>'
+    : '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> relatórios</b> na biblioteca do assinante — mensais desde abril de 2010, agora também diários e semanais. Cresce a cada novo relatório. <a href="/assine">Conhecer a Edição Founder →</a>');
+  fetch(location.origin+"/api/v1/biblioteca/contagem").then(function(r){return r.json();}).then(function(j){var el=document.getElementById("lib-n");if(el&&j&&j.total)el.textContent=_nf(j.total);}).catch(function(){});
+  (function(){var ib=document.getElementById("instband");if(ib)ib.setAttribute("href",U_ART);
+    var ac=document.getElementById("arc-cta");if(ac){ac.textContent=_en?"See all episodes →":"Ver todos os episódios →";ac.setAttribute("href",U_ART);}})();
   // ── grid "A linguagem do Radar" (9 conceitos, descoberta na home) ──
   var CD=_en?["Brazil's prevailing market state","the external environment pressing on Brazil","cross-reading of Brazilian wealth-sector ratios","Brazilian equity risk premium in historical percentile","frames price against the long-term trajectory","proprietary reading of Brazilian market mood","Brazil's risk-appetite gauge (0–100), stacked with Ânima","past windows with a similar profile","cross-domain hypotheses under Bayesian discipline"]:["o estado predominante do mercado brasileiro","o ambiente externo que pressiona o Brasil","leitura cruzada de razões patrimoniais brasileiras","prêmio de risco brasileiro em percentil histórico","enquadra preço contra a trajetória de longo prazo","adaptação proprietária do humor do mercado BR","apetite ao risco do mercado BR (0–100), empilhado com o Ânima","janelas do passado com perfil semelhante","hipóteses cross-domínio sob disciplina bayesiana"];
   set("conceitos-grid",CN.map(function(c,i){return '<a href="'+CP(c[0])+'"><span class="cn">'+c[1]+'</span><span class="cd">'+CD[i]+'</span></a>'}).join(""));
