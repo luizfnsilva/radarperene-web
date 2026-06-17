@@ -199,18 +199,18 @@ const ORIGIN_EN = "https://radarperene.com";       // gêmeo EN
 const LASTMOD = "2026-06-17";
 
 const ldScript = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
-// Entidade (invariante §10): Org sameAs = SÓ o gêmeo de locale. founder Person @id no próprio origin, url→brazilcomplexity.
-const orgLd = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN + "/#org", "name": "Radar Perene", "url": ORIGIN, "logo": ORIGIN + "/og.png", "sameAs": ["https://radarperene.com"], "founder": { "@id": ORIGIN + "/#founder" }, "description": "Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto." };
-const founderLd = { "@context": "https://schema.org", "@type": "Person", "@id": ORIGIN + "/#founder", "name": "Luiz F. Nunes da Silva", "url": "https://brazilcomplexity.com/about.html" };
-const orgLdEn = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN_EN + "/#org", "name": "Radar Perene", "url": ORIGIN_EN, "logo": ORIGIN_EN + "/og.png", "sameAs": ["https://radarperene.com.br"], "founder": { "@id": ORIGIN_EN + "/#founder" }, "description": "Brazilian regulatory intelligence read as data — regime, intermarket and context." };
-const founderLdEn = { "@context": "https://schema.org", "@type": "Person", "@id": ORIGIN_EN + "/#founder", "name": "Luiz F. Nunes da Silva", "url": "https://brazilcomplexity.com/about.html" };
+// Entidade (invariante §10): Org sameAs = SÓ o gêmeo de locale. founder = @id da Pessoa CANÔNICA
+// no brazilcomplexity (consolidação cross-site; não redefine a Person localmente).
+const FOUNDER_REF = { "@id": "https://brazilcomplexity.com/about.html#person" };
+const orgLd = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN + "/#org", "name": "Radar Perene", "url": ORIGIN, "logo": ORIGIN + "/og.png", "sameAs": ["https://radarperene.com"], "founder": FOUNDER_REF, "description": "Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto." };
+const orgLdEn = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN_EN + "/#org", "name": "Radar Perene", "url": ORIGIN_EN, "logo": ORIGIN_EN + "/og.png", "sameAs": ["https://radarperene.com.br"], "founder": FOUNDER_REF, "description": "Brazilian regulatory intelligence read as data — regime, intermarket and context." };
 
 // shell de página, lang-aware. `alt` = { pt, en } com paths absolutos p/ hreflang (en só presente quando há espelho).
 // canonical = próprio origin/idioma; x-default = PT (mercado primário/gêmeo PT).
 function pageHtml({ lang = "pt", path, title, desc, crumb, h1, bodyHtml, schemas, alt }) {
   const en = lang === "en";
   const origin = en ? ORIGIN_EN : ORIGIN, canon = origin + path;
-  const ld = [ldScript(en ? orgLdEn : orgLd), ldScript(en ? founderLdEn : founderLd), ...schemas.map(ldScript)].join("\n");
+  const ld = [ldScript(en ? orgLdEn : orgLd), ...schemas.map(ldScript)].join("\n");
   const hreflang = [];
   if (alt && alt.pt) hreflang.push(`<link rel="alternate" hreflang="pt-br" href="${alt.pt}">`);
   if (alt && alt.en) hreflang.push(`<link rel="alternate" hreflang="en" href="${alt.en}">`);
