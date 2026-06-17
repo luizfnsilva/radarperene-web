@@ -1647,7 +1647,7 @@
       (_humN(_cob.linhas) || (L ? "490K" : "490 mil")) + (L ? " rows · " : " linhas · ") +
       (_cob.tribunais != null ? _cob.tribunais : "15") + (L ? " courts · since " : " tribunais · desde ") +
       (_cob.desde != null ? _cob.desde : "1970");
-    if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") + ' · ' + esc(covTxt) + '</div>';  // cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual (a seção já tem título)
+    if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "updated " : "atualizado em ") + esc(d.data_referencia || "-") + ' · ' + (L ? "latest available daily close" : "último fechamento diário disponível") + ' · ' + esc(covTxt) + '</div>';  // transparência: o pulso é sempre o ÚLTIMO fechamento diário (D-1 enquanto o pregão de hoje não fecha) — alinhado com o relatório do assinante (pré-abertura, fechamento anterior). cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     h += brain(L ? "Brazil Radar" : "Radar do Brasil", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);  // "Radar do Brasil": "Radar" sozinho soava genérico/componente interno; rótulo do Cérebro 1 (diferencia do "Vértice")
