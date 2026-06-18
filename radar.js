@@ -238,7 +238,7 @@
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
-      ".rp .rp-present{margin:8px 0 2px}.rp .rp-present div{font-family:Georgia,'Fraunces',serif;font-size:16px;line-height:1.55;color:var(--_txt)}.rp .rp-present b{font-weight:600}" +
+      ".rp .rp-present{margin:8px 0 2px}.rp .rp-present div{font-family:Georgia,'Fraunces',serif;font-size:16px;line-height:1.55;color:var(--_txt)}.rp .rp-present b{font-weight:600}.rp .rp-present .rp-mtag{display:inline-block;margin-top:7px;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--_accent);font-weight:700}" +
       ".rp .rp-signals{border-top:1px solid var(--_line);margin-top:16px;padding-top:14px}.rp .rp-signals div{font-size:13.5px;line-height:1.7;color:var(--_dim)}.rp .rp-signals b{font-weight:600;color:var(--_txt)}" +
       ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent)}" +
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
@@ -1670,7 +1670,7 @@
     if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "latest available daily close" : "último fechamento diário disponível") + ' · ' + esc(covTxt) + '</div>';  // sem a data crua "updated {hoje}" (confundia: o pulso é o último fechamento, não "hoje"); a frase já diz tudo  // transparência: o pulso é sempre o ÚLTIMO fechamento diário (D-1 enquanto o pregão de hoje não fecha) — alinhado com o relatório do assinante (pré-abertura, fechamento anterior). cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
-    h += brain("Radar Perene", (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro"), false, true);  // ★ 2026-06-17: título = só "Radar Perene" (era "Radar do Brasil · 5 lentes · regime regulatório" — descrição do MOTOR, não do produto)
+    h += brain("Radar Perene", (TEASER ? "" : (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro")), false, true);  // ★ 2026-06-18: no mini SEM tagline ("leitura diária" contradiz o regime MENSAL e pesava); só "Radar Perene". Radar completo mantém.
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
     if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
     if (show("regime") && rr.regime) { var g = rr.regime;
@@ -1678,6 +1678,7 @@
         h += '<div class="rp-present">' +
           ((g.brasil || {}).regime ? '<div>' + (L ? "Brazil " : "Brasil ") + '<b>' + esc(g.brasil.regime) + '</b></div>' : '') +
           ((g.global || {}).regime ? '<div>' + (L ? "global " : "ambiente global ") + '<b>' + esc(g.global.regime) + '</b></div>' : '') +
+          (((g.brasil || {}).regime || (g.global || {}).regime) ? '<span class="rp-mtag">' + (L ? "monthly" : "mensal") + '</span>' : '') +  // ★ tag mensal (cor accent): o regime é MENSAL, não diário — esclarece sem o tagline pesado lá em cima
           '</div>';
       } else { h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
         card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
@@ -1782,9 +1783,11 @@
     var _vTeaser = '';
     if (TEASER) {  // ★ mini editorial: 2 sinais como 2 LINHAS DE TEXTO (sem cabeçalho Vértice, sem cards, sem escala 0–100 — só contexto qualitativo)
       var _sig = function (t) { if (!t || !t.nome) return ""; return '<div>' + esc(t.nome) + (t.regime ? ' <b>' + esc(t.regime) + '</b>' : '') + '</div>'; };
-      var _t1 = (v.termometros && v.termometros.length) ? v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); })[0] : null;
+      // ★ 2026-06-18: NÃO usar o termômetro mais ativo (hoje "Risco global" → contradizia o "ambiente global" do presente).
+      //   Sinais DISTINTIVOS do observatório (fuga + concentração/dispersão) — sempre distintos do regime macro.
       var _fg = (v.observatorio && v.observatorio.fuga) ? v.observatorio.fuga : null;
-      var _ss = [_sig(_t1), _sig(_fg)].filter(Boolean).join("");
+      var _cc = (v.observatorio && (v.observatorio.concentracao || v.observatorio.dispersao)) ? (v.observatorio.concentracao || v.observatorio.dispersao) : null;
+      var _ss = [_sig(_fg), _sig(_cc)].filter(Boolean).join("");
       if (_ss) _vTeaser += '<div class="rp-signals">' + _ss + '</div>';
     }
     // ★ Termômetros — núcleo (FOLD) = os 2 mais ativos + Capital Flight; o resto desce p/ a dobra. Plano (!FOLD) = top-3 + porta "Todos N".
