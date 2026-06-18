@@ -873,7 +873,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v2/" + host + "/" + _lk; // /v2/ versiona a chave (v1→v2: canonical por host no HTML cru; busta stale antigo)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v3/" + host + "/" + _lk; // versiona a chave (v3 2026-06-18: Onda 1 — Hoje lembra herói + Resumo sobe + metodologia desce; busta o cache da ordem antiga)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
