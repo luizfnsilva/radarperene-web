@@ -1690,7 +1690,7 @@
         var _arr = function (t) { return (t && t.valor != null) ? (t.valor >= 55 ? "↑ " : (t.valor <= 45 ? "↓ " : "")) : ""; };  // direção do extremo (só Founder tem valor; free fica sem seta, com o descritor)
         var _stt = function (lbl, t, arrow) { return (t && t.regime) ? '<div class="st"><span class="sl">' + lbl + '</span><span class="sv">' + (arrow || "") + esc(t.regime) + '</span></div>' : ''; };
         var _mensal = _stt(L ? "Brazil" : "Brasil", g.brasil, "") + _stt("Global", g.global, "");
-        var _diario = _stt(L ? "Capital" : "Capital", _ob.fuga, _arr(_ob.fuga)) + _stt(L ? "Concentration" : "Concentração", _ob.concentracao, _arr(_ob.concentracao));
+        var _diario = _stt(L ? "Capital flight" : "Fuga de capital", _ob.fuga, _arr(_ob.fuga)) + _stt(L ? "Concentration" : "Concentração", _ob.concentracao, _arr(_ob.concentracao));
         h += '<div class="rp-present">' +  // ★ 2026-06-18: headline "Brasil defensivo" suprimido (redundante com a célula Brasil do grupo mensal abaixo)
           '<div class="rp-states">' +
             (_mensal ? '<div class="rp-grp"><div class="rp-cad rp-cad-m">' + (L ? "monthly" : "mensal") + '</div><div class="rp-pair">' + _mensal + '</div></div>' : '') +
