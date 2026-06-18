@@ -265,6 +265,7 @@ ${PG_CSS}
   <p>© Radar Perene · <a href="/" style="color:var(--gold)">${en ? "radarperene.com" : "radarperene.com.br"}</a></p>
 </footer>
 ${THEME_JS}
+<script src="/ads.js" defer></script>
 </body>
 </html>`;
 }

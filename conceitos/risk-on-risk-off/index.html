@@ -84,8 +84,12 @@
   .cgrid a .cd{display:block;font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.45}
   @media(max-width:760px){.cgrid{grid-template-columns:1fr 1fr}}
   @media(max-width:480px){.cgrid{grid-template-columns:1fr}}
-  #rp-ultimas .ult{display:block;text-decoration:none;color:var(--txt2);font-size:14px;padding:9px 0;border-bottom:1px solid var(--line)}
-  #rp-ultimas .ult:hover{color:var(--gold)} #rp-ultimas .ult b{color:var(--txt);font-variant-numeric:tabular-nums;margin-right:8px}
+  /* ★ P3 — Diário humanizado: cada entrada é uma nota datada (data serif · prosa do regime · índices mono discretos), não um CSV */
+  #rp-ultimas .ult{display:block;text-decoration:none;padding:13px 0;border-bottom:1px solid var(--line)}
+  #rp-ultimas .ult:hover .ultd{color:var(--gold)}
+  #rp-ultimas .ultd{display:block;font-family:var(--serif);font-size:15px;color:var(--txt);margin-bottom:3px;transition:color .15s}
+  #rp-ultimas .ultp{display:block;font-size:13.5px;color:var(--txt2);line-height:1.5}
+  #rp-ultimas .ulti{display:block;font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:4px;letter-spacing:.02em}
   .tg{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;padding:2px 8px;cursor:pointer;font-size:12px;line-height:1.3;font-family:var(--sans);margin-left:6px}
   .tg:hover{color:var(--gold);border-color:var(--gold)}
   /* hero */
@@ -98,9 +102,9 @@
   .qtag .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;animation:qpulse 2.4s ease-out infinite}
   @keyframes qpulse{0%{box-shadow:0 0 0 0 rgba(168,101,26,.45)}70%{box-shadow:0 0 0 7px rgba(168,101,26,0)}100%{box-shadow:0 0 0 0 rgba(168,101,26,0)}}
   @media(prefers-reduced-motion:reduce){.qtag .dot{animation:none}}
-  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.015em;
-    padding:12px 36px;border-radius:6px;font-size:14.5px;transition:transform .1s,background .15s}
-  .btn:hover{background:var(--gold2);transform:translateY(-1px)}
+  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;
+    padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
+  .btn:hover{background:var(--gold2)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
@@ -168,6 +172,33 @@
   .scale .st{flex:1;min-width:118px;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:12px;padding:16px 12px}
   .scale .st b{display:block;font-family:var(--mono);font-size:26px;font-weight:600;color:var(--gold);line-height:1.1}
   .scale .st span{font-size:11.5px;color:var(--dim)}
+  /* faixa institucional — entre o hero e a leitura de hoje (memória, não instrumento) */
+  .instband{display:block;text-align:center;font-family:var(--serif);font-size:clamp(13.5px,2vw,16px);color:var(--dim);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;margin:4px 0 2px;letter-spacing:.01em;text-decoration:none;transition:color .15s}
+  .instband:hover{color:var(--txt)}
+  .instband b{color:var(--txt);font-weight:600}
+  /* ★ P6 — painel de números "uau" (screenshot-able): gravidade editorial (serif) + escopo SentimenTrader */
+  .statband{text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0 24px;margin:4px 0 2px}
+  .statband .eyebrow{font-family:var(--serif);font-style:italic;font-size:clamp(14px,2vw,17px);color:var(--txt2);text-transform:none;letter-spacing:0;margin-bottom:18px}
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+  @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr);gap:26px 14px}}
+  @media(max-width:430px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{display:flex;flex-direction:column;gap:5px}
+  .stat .n{font-family:var(--serif);font-size:clamp(26px,3.4vw,34px);font-weight:600;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:11.5px;color:var(--dim);letter-spacing:.02em;line-height:1.35}
+  /* "Do arquivo" — cartões de episódios marquee (memória); reusa o grid .cards */
+  /* ★ P2 — episódios viram CAPÍTULOS de biblioteca (ensaio Economist/Grant's): ano · título serif · subtítulo itálico · gancho · "o que aconteceu depois" */
+  .arcard{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 20px;text-decoration:none;transition:border-color .15s,transform .15s}
+  .arcard:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .arcard .arcyr{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--gold);font-weight:700}
+  .arcard .arct{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--txt);line-height:1.25;margin-top:-2px}
+  .arcard .arcd{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--txt2);line-height:1.4}
+  .arcard .archook{font-size:13px;color:var(--dim);line-height:1.6;flex:1}
+  .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:6px}
+  /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
+  .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
+  .arcmerch b{color:var(--txt);font-weight:600}
+  .arcmerch .n{font-family:var(--mono);color:var(--gold);font-weight:700}
+  .arcmerch a{color:var(--gold);font-weight:600;text-decoration:none;white-space:nowrap}
 </style>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 
@@ -183,6 +214,8 @@
     <p class="crumb"><a href="/">Radar Perene</a> / conceito</p>
     <h1>Índice de Risco Perene</h1>
     <p>O Índice de Risco Perene é a leitura proprietária de <strong>apetite ao risco</strong> do mercado brasileiro — quanto o capital está inclinado a buscar risco ou proteção (o que o jargão internacional chama de <em>risk-on / risk-off</em>) — numa escala única e didática de 0 a 100.</p>
+<div class="ad-slot" data-ad-type="in-article" style="min-height:90px;margin:18px 0"></div>
+
 <h2 class="sec">O que é</h2>
 <p>Um composto de <strong>amplitude de mercado</strong> (quantas ações brasileiras sustentam tendência) e <strong>apetite a risco cross-asset</strong> (small caps vs large caps, cíclicos vs defensivos), normalizado por <strong>range-rank de 84 dias</strong> — a posição do valor entre o mínimo e o máximo da janela recente, não um z-score. Acima de ~68 indica apetite a risco; abaixo de ~30, proteção. A construção é inspirada em <strong>leituras compostas de apetite a risco de mercado</strong>, <strong>adaptada ao Brasil</strong> (volume de negociação menor, câmbio volátil, inflação distinta) — sem copiar metodologia estrangeira. Acompanha qualquer ativo aberto, empilhado sob o preço junto ao Índice Ânima.</p>
 <h2 class="sec">Por que existe</h2>
@@ -201,6 +234,7 @@
 <p>A leitura é diária e usa range-rank de 84 dias — transições podem levar dias a semanas para confirmar. A amplitude do mercado brasileiro é mais esparsa que a americana (o componente de breadth ganha robustez de 2009 em diante, quando as small caps passam a ter histórico). A medida é descritiva da distribuição histórica, nunca previsão.</p>
 <h2 class="sec">Exemplo de uso</h2>
 <blockquote class="ex"><em>PETR4 — preço -2,1% no dia · Índice Ânima 38 (pessimismo) · Índice de Risco Perene: 28 (risk-off). A queda do ativo é parcialmente atribuível ao ambiente; o humor já reflete a leitura defensiva agregada.</em></blockquote><p class="rel" style="margin-top:26px">Conceitos relacionados: <a href="/conceitos/indice-anima/">Índice Ânima</a> · <a href="/conceitos/regime-global/">Regime Global</a> · <a href="/conceitos/regime-brasil/">Regime Brasil</a> · <a href="/metodologia/">ver no método completo</a></p>
+    <div class="ad-slot" data-ad-type="multiplex" style="min-height:90px;margin:26px 0 0"></div>
   </article>
 </div>
 <footer>
@@ -209,5 +243,6 @@
   <p>© Radar Perene · <a href="/" style="color:var(--gold)">radarperene.com.br</a></p>
 </footer>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>
+<script src="/ads.js" defer></script>
 </body>
 </html>

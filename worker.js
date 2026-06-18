@@ -490,6 +490,11 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   //   primeiro, estilo nota editorial. Substitui o antigo "O que chama atenção" (dump) + "Contexto do mês".
   const vozHtml = narr.texto_html ? "<div class=\"voz\">" + narr.texto_html + "</div>" : "";
   void indHtml; void ibovHtml; void ctxHtml; // subsumidos pela voz (mantidos calculados p/ fallback futuro)
+  // Anúncios (gateados pelo /ads.js — Founder não vê): igual aos capítulos. In-article entre a prosa e os
+  //   "casos semelhantes" (só quando há prosa, p/ não anunciar em snapshot magro); Multiplex DEPOIS dos casos
+  //   e ANTES do _memoGate (mantém o anúncio longe do CTA de conversão). SEO alto + leitor do Google = quase sempre free.
+  const inArticleSlot = vozHtml ? "<div class=\"ad-slot\" data-ad-type=\"in-article\" style=\"margin:18px 0\"></div>" : "";
+  const multiplexSlot = "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 4px\"></div>";
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "dateModified": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">" +
@@ -506,12 +511,14 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<p class=\"dt\">" + (en ? "Radar Perene daily snapshot" : "Snapshot diário do Radar Perene") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     mancheteHtml +
     vozHtml +
+    inArticleSlot +
     pfHtml +
+    multiplexSlot +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0) +
     "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a></p>" +
     ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
     "</div><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
-    _themeScript() + _CONSENT + "</body></html>";
+    "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 function _renderDiarioIndex(data, origin, lang) {
@@ -525,13 +532,15 @@ function _renderDiarioIndex(data, origin, lang) {
   //   construção — vem rotulado "(mensal)" p/ o número repetido dentro do mês não ler como "sistema parado".
   //   (Perene/Ânima por dia ainda não vêm neste payload de índice — pedido registrado p/ o backend; dentro de cada
   //   dia a manchete diária já existe.)
-  const rows = itens.map(function (s) {
+  const AD_AT = 4;  // In-feed (gateado pelo /ads.js — Founder não vê) após o 4º registro do arquivo
+  const rows = itens.map(function (s, i) {
     const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
     // 30b: a linha PULSA — Perene/Ânima mudam todo dia útil (vêm do /v1/snapshots); regime mensal fica como cauda rotulada
     const dia = [s.perene != null ? (en ? "Perene Risk " : "Perene ") + "<b>" + s.perene + "</b>" : null,
       s.anima != null ? "Ânima <b>" + s.anima + "</b>" : null,
       s.global ? (en ? "global " : "global ") + _esc(s.global) : null].filter(Boolean).join(" · ");
-    return "<li><a href=\"" + dpath + "/" + s.data + "\">" + s.data + "</a>" + (dia ? " — " + dia : "") + " · <span class=\"mn\">" + (en ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg) + "</span></li>";
+    const li = "<li><a href=\"" + dpath + "/" + s.data + "\">" + s.data + "</a>" + (dia ? " — " + dia : "") + " · <span class=\"mn\">" + (en ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg) + "</span></li>";
+    return li + (i === AD_AT - 1 && itens.length > AD_AT ? "<li class=\"ad-slot\" data-ad-type=\"in-feed\" style=\"list-style:none\"></li>" : "");
   }).join("");
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
@@ -546,7 +555,9 @@ function _renderDiarioIndex(data, origin, lang) {
     "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
     "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on. The BR regime score is monthly by construction — it only moves at month-end, so it repeats within a month; the daily variation (Perene Risk Index, Ânima, intermarket) lives inside each day’s page." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí. O score do regime BR é mensal por construção — só se move no fecho do mês, então repete dentro do mês; a variação diária (Índice de Risco Perene, Ânima, intermercado) está dentro da página de cada dia.") + "</p>" +
     "<ul class=\"dlist\">" + rows + "</ul>" +
-    "</div><footer><a href=\"/\">" + (en ? "← Full radar" : "← Radar completo") + "</a></footer>" + _themeScript() + _CONSENT + "</body></html>";
+    "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 0\"></div>" +
+    "</div><footer><a href=\"/\">" + (en ? "← Full radar" : "← Radar completo") + "</a></footer>" +
+    "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 
@@ -789,6 +800,7 @@ async function _route(request, env, ctx) {
         "</div>" +
         "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" +
         "<script>(function(){var q=document.getElementById('aq');if(!q)return;var a=[].slice.call(document.querySelectorAll('.alist a'));q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();for(var i=0;i<a.length;i++){a[i].style.display=(!v||a[i].textContent.toLowerCase().indexOf(v)>=0)?'':'none';}});})();</script>" +
+        "<script src=\"/ads.js\" defer></script>" +
         _themeScript() + _CONSENT + "</body></html>";
       // fresh = 6h; stale/vazio = 2min (re-tenta quando o DB voltar). NUNCA 404 → footer/SEO sempre navegáveis.
       return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": fresh ? "public, max-age=21600" : "public, max-age=120" } });

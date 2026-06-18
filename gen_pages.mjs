@@ -395,6 +395,17 @@ function renderFile(p, lg, block, raw, title, desc) {
   const origin = en ? "https://radarperene.com" : "https://radarperene.com.br", canon = origin + path;
   const ld = buildSchemas(p, raw, block, lg, title, desc);
   const disc = block.disclaimer || (en ? "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice." : "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.");
+  // Anúncios SÓ em conceitos e metodologia (plano do dono); guia/lentes/free/legal/founder/api ficam limpos.
+  // 1 In-article após a introdução + 1 Multiplex no fim. Gateados pelo /ads.js (Founder não vê).
+  const adOn = (p.type === "conceito" || p.type === "metodo");
+  let bodyOut = block.bodyHtml;
+  if (adOn) {
+    const inArt = '<div class="ad-slot" data-ad-type="in-article" style="min-height:90px;margin:18px 0"></div>';
+    const k = bodyOut.indexOf("</p>");   // logo após o 1º parágrafo (introdução)
+    bodyOut = k >= 0 ? bodyOut.slice(0, k + 4) + "\n" + inArt + "\n" + bodyOut.slice(k + 4) : inArt + "\n" + bodyOut;
+  }
+  const multiplexSlot = adOn ? '\n    <div class="ad-slot" data-ad-type="multiplex" style="min-height:90px;margin:26px 0 0"></div>' : "";
+  const adsScript = adOn ? '\n<script src="/ads.js" defer></script>' : "";
   const html = `<!doctype html>
 <html lang="${en ? "en" : "pt-BR"}">
 <head>
@@ -432,7 +443,7 @@ ${PG_CSS}
   <article class="pg">
     <p class="crumb"><a href="/">Radar Perene</a> / ${esc(crumbLabel(p.slug, en))}</p>
     <h1>${esc(block.h1)}</h1>
-    ${block.bodyHtml}
+    ${bodyOut}${multiplexSlot}
   </article>
 </div>
 <footer>
@@ -440,7 +451,7 @@ ${PG_CSS}
   <p class="disc">${esc(disc)}</p>
   <p>© Radar Perene · <a href="/" style="color:var(--gold)">${en ? "radarperene.com" : "radarperene.com.br"}</a></p>
 </footer>
-${THEME_JS}
+${THEME_JS}${adsScript}
 </body>
 </html>`;
   const dir = join(ROOT, slug);
