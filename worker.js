@@ -97,7 +97,7 @@ const EN_BODY = (function () {
     "eyb-tz": C.eybTz, "s-tz": C.sTz, "s-tz-s": C.sTzS, "tz-more": C.tzMore,
     "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
     "fbadge": C.fbadge, "fed": C.fed, "fprice": C.fprice, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn, "assine-link": "view plans →",
-    "eyb-ult": "Latest readings", "s-ult": "The regime diary", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.", "ult-cta": "See the full Diary →",
+    "eyb-ult": "Latest readings", "s-ult": "The regime diary", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.", "ult-cta": "See the full Diaries →",
     "sb-eyb": "A living library of precedents", "sl-desde": "the oldest record", "sl-ativos": "assets covered", "sl-linhas": "rows of data", "sl-reports": "reports in the library", "sl-tribunais": "courts monitored", "sl-snap": "years of daily history", "sb-cta": "Explore the archive →",
     "eyb3": C.eyb3, "s3": C.s3, "s3s": C.s3s, "eyb4": C.eyb4, "disc": C.disc,
     "eyb9": C.eyb9, "s9": C.s9, "qtag-txt": "CURRENT SIGNAL · REGIME BR",
@@ -532,7 +532,7 @@ function _renderDiarioIndex(data, origin, lang) {
   //   construção — vem rotulado "(mensal)" p/ o número repetido dentro do mês não ler como "sistema parado".
   //   (Perene/Ânima por dia ainda não vêm neste payload de índice — pedido registrado p/ o backend; dentro de cada
   //   dia a manchete diária já existe.)
-  const AD_AT = 4;  // In-feed (gateado pelo /ads.js — Founder não vê) após o 4º registro do arquivo
+  const AD_EVERY = 12;  // In-feed (gateado pelo /ads.js — Founder não vê) a CADA 12 registros (página longa: ~329 datas)
   const rows = itens.map(function (s, i) {
     const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
     // 30b: a linha PULSA — Perene/Ânima mudam todo dia útil (vêm do /v1/snapshots); regime mensal fica como cauda rotulada
@@ -540,7 +540,7 @@ function _renderDiarioIndex(data, origin, lang) {
       s.anima != null ? "Ânima <b>" + s.anima + "</b>" : null,
       s.global ? (en ? "global " : "global ") + _esc(s.global) : null].filter(Boolean).join(" · ");
     const li = "<li><a href=\"" + dpath + "/" + s.data + "\">" + s.data + "</a>" + (dia ? " — " + dia : "") + " · <span class=\"mn\">" + (en ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg) + "</span></li>";
-    return li + (i === AD_AT - 1 && itens.length > AD_AT ? "<li class=\"ad-slot\" data-ad-type=\"in-feed\" style=\"list-style:none\"></li>" : "");
+    return li + ((i + 1) % AD_EVERY === 0 && i < itens.length - 1 ? "<li class=\"ad-slot\" data-ad-type=\"in-feed\" style=\"list-style:none\"></li>" : "");
   }).join("");
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
@@ -895,7 +895,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v11/" + host + "/" + _lk; // versiona a chave (v11 2026-06-18: RESUMO + seção Metodologia REMOVIDOS da home por pedido da diretoria)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v12/" + host + "/" + _lk; // versiona a chave (v12 2026-06-18: copy 'Ler todos os episódios' + 'Ver Diários completos')
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
