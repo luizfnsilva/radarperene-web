@@ -1,0 +1,12 @@
+{
+  "_doc": "Registro central ano→episódio marquee p/ a ligação 'Hoje lembra → capítulo' da home/radar (P4 / teia). Fonte única, versionada. SEED MANUAL dos marquee atuais; quando o portal expandir, gen_artigos.mjs REGENERA este arquivo a partir do corpus (1 entrada por ano, preferindo o episódio marquee). radar.js lê este índice no boot e cai no mapa inline (fallback) se faltar. Adicionar episódio = adicionar aqui (ou deixar o pipeline gerar).",
+  "anos": {
+    "2011": { "pt": "crise-europeia-2011-discordia", "en": "the-2011-european-crisis-as-discord", "tp": "A crise europeia de 2011", "te": "The 2011 European crisis" },
+    "2013": { "pt": "taper-tantrum-2013-susto-importado", "en": "the-2013-taper-tantrum-imported-shock", "tp": "O taper tantrum de 2013", "te": "The 2013 taper tantrum" },
+    "2015": { "pt": "os-tres-alarmes-de-agosto-2015", "en": "the-three-alarms-of-august-2015", "tp": "Os três alarmes de agosto de 2015", "te": "The three alarms of August 2015" },
+    "2016": { "pt": "fundo-de-2016-estrutura-antes-do-humor", "en": "the-2016-bottom-structure-before-mood", "tp": "O fundo de 2016", "te": "The 2016 bottom" },
+    "2018": { "pt": "caminhoneiros-2018-dinheiro-antes-da-fe", "en": "the-2018-truckers-strike-money-before-faith", "tp": "A greve dos caminhoneiros de 2018", "te": "The 2018 truckers' strike" },
+    "2020": { "pt": "o-que-aconteceu-depois-medo-precificou-tudo", "en": "what-happened-after-fear-priced-everything", "tp": "Quando o medo precificou tudo", "te": "When fear priced everything" },
+    "2022": { "pt": "a-casa-as-escuras-2022", "en": "the-house-in-the-dark-2022", "tp": "A casa às escuras, fim de 2022", "te": "The house in the dark, late 2022" }
+  }
+}

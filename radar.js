@@ -60,6 +60,10 @@
   // headers da API: anon por padrão; se a página-host expôs o token do assinante (window.RP_TOKEN), manda-o no Authorization →
   // o /v1/serie devolve a DISTRIBUIÇÃO completa dos análogos (Founder). Sem token (free/embed) = teaser. Apikey segue anon (gateway).
   function fopt() { var tk = (typeof window !== "undefined" && window.RP_TOKEN) ? window.RP_TOKEN : ANON; return { headers: { apikey: ANON, Authorization: "Bearer " + tk } }; }
+  // ★ P4/teia (2026-06-18): registro ano→episódio buscado UMA vez (estático, cacheado) → "Hoje lembra" liga ao capítulo DINAMICAMENTE.
+  //   Absorve os 140 capítulos sem tocar no código: gen_artigos regenera /artigos/episodes-index.json; aqui só lemos. Fallback = mapa inline (7 marquee).
+  var RP_EP_DYN = null;
+  try { fetch(RP_ORIGIN + "/artigos/episodes-index.json", { cache: "force-cache" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j && j.anos) RP_EP_DYN = j.anos; }).catch(function () { }); } catch (e) { }
   // ★ LEITOR CANÔNICO do plano (P0#1 single-source-of-truth): TODO gating de UI lê daqui — login (window.RP_PREMIUM, setado pelo
   //   /v1/me no host) OU flag local rp_premium. A página-host também expõe window.RP_TOKEN (= access_token Supabase) p/ o fopt()
   //   destravar os DADOS no /v1/serie. UI (rpIsPro) e dados (RP_TOKEN) saem da MESMA sessão → não divergem mais.
@@ -1775,13 +1779,13 @@
       var _lead = L
         ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
         : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
-      // ★ P4 2026-06-18: máquina de precedentes — Hoje lembra → episódio NOMEADO. Se um ano-análogo tem capítulo curado,
-      //   o "Hoje lembra" nomeia o episódio e linka DIRETO pra ele ("o presente conversando com a memória"); senão, o hub.
-      var RP_EP = { "2011": ["crise-europeia-2011-discordia", "the-2011-european-crisis-as-discord", "A crise europeia de 2011", "The 2011 European crisis"], "2013": ["taper-tantrum-2013-susto-importado", "the-2013-taper-tantrum-imported-shock", "O taper tantrum de 2013", "The 2013 taper tantrum"], "2015": ["os-tres-alarmes-de-agosto-2015", "the-three-alarms-of-august-2015", "Os três alarmes de agosto de 2015", "The three alarms of August 2015"], "2016": ["fundo-de-2016-estrutura-antes-do-humor", "the-2016-bottom-structure-before-mood", "O fundo de 2016", "The 2016 bottom"], "2018": ["caminhoneiros-2018-dinheiro-antes-da-fe", "the-2018-truckers-strike-money-before-faith", "A greve dos caminhoneiros de 2018", "The 2018 truckers' strike"], "2020": ["o-que-aconteceu-depois-medo-precificou-tudo", "what-happened-after-fear-priced-everything", "Quando o medo precificou tudo", "When fear priced everything"], "2022": ["a-casa-as-escuras-2022", "the-house-in-the-dark-2022", "A casa às escuras, fim de 2022", "The house in the dark, late 2022"] };
+      // ★ P4/teia 2026-06-18: máquina de precedentes — Hoje lembra → episódio NOMEADO. Lê o registro DINÂMICO (RP_EP_DYN, de
+      //   /artigos/episodes-index.json, que o pipeline regenera com os 140) e cai no mapa inline (7 marquee) como fallback.
+      var RP_EP = { "2011": { pt: "crise-europeia-2011-discordia", en: "the-2011-european-crisis-as-discord", tp: "A crise europeia de 2011", te: "The 2011 European crisis" }, "2013": { pt: "taper-tantrum-2013-susto-importado", en: "the-2013-taper-tantrum-imported-shock", tp: "O taper tantrum de 2013", te: "The 2013 taper tantrum" }, "2015": { pt: "os-tres-alarmes-de-agosto-2015", en: "the-three-alarms-of-august-2015", tp: "Os três alarmes de agosto de 2015", te: "The three alarms of August 2015" }, "2016": { pt: "fundo-de-2016-estrutura-antes-do-humor", en: "the-2016-bottom-structure-before-mood", tp: "O fundo de 2016", te: "The 2016 bottom" }, "2018": { pt: "caminhoneiros-2018-dinheiro-antes-da-fe", en: "the-2018-truckers-strike-money-before-faith", tp: "A greve dos caminhoneiros de 2018", te: "The 2018 truckers' strike" }, "2020": { pt: "o-que-aconteceu-depois-medo-precificou-tudo", en: "what-happened-after-fear-priced-everything", tp: "Quando o medo precificou tudo", te: "When fear priced everything" }, "2022": { pt: "a-casa-as-escuras-2022", en: "the-house-in-the-dark-2022", tp: "A casa às escuras, fim de 2022", te: "The house in the dark, late 2022" } };
       var _epM = null, _epYr = "";
-      if (ab.datas_analogas) { for (var _di = 0; _di < ab.datas_analogas.length; _di++) { var _y = String(ab.datas_analogas[_di]).slice(0, 4); if (RP_EP[_y]) { _epM = RP_EP[_y]; _epYr = _y; break; } } }
-      var _epHref = _epM ? ("/" + (L ? "articles" : "artigos") + "/" + _epM[L ? 1 : 0] + "/") : (L ? "/articles" : "/artigos");
-      var _epTtl = _epM ? _epM[L ? 3 : 2] : "";
+      if (ab.datas_analogas) { for (var _di = 0; _di < ab.datas_analogas.length; _di++) { var _y = String(ab.datas_analogas[_di]).slice(0, 4); var _e = (RP_EP_DYN && RP_EP_DYN[_y]) || RP_EP[_y]; if (_e) { _epM = _e; _epYr = _y; break; } } }
+      var _epHref = _epM ? ("/" + (L ? "articles" : "artigos") + "/" + (L ? _epM.en : _epM.pt) + "/") : (L ? "/articles" : "/artigos");
+      var _epTtl = _epM ? (L ? _epM.te : _epM.tp) : "";
       var _epLine = _epM ? ('<div class="hl-ep-name">' + (L ? "One of those moments: " : "Um desses momentos: ") + '<b>' + esc(_epTtl) + '</b> (' + _epYr + ').</div>') : "";
       var _epTxt = _epM ? (L ? "Read the full chapter →" : "Ver o capítulo completo →") : (L ? "See the full episodes →" : "Ver episódios completos →");
       _hojelembra += '<div class="rp-hle">' +
