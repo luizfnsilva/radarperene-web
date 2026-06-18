@@ -206,12 +206,14 @@
   .stat .n{font-family:var(--serif);font-size:clamp(26px,3.4vw,34px);font-weight:600;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
   .stat .l{font-size:11.5px;color:var(--dim);letter-spacing:.02em;line-height:1.35}
   /* "Do arquivo" — cartões de episódios marquee (memória); reusa o grid .cards */
-  .arcard{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none;transition:border-color .15s,transform .15s}
+  /* ★ P2 — episódios viram CAPÍTULOS de biblioteca (ensaio Economist/Grant's): ano · título serif · subtítulo itálico · gancho · "o que aconteceu depois" */
+  .arcard{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 20px;text-decoration:none;transition:border-color .15s,transform .15s}
   .arcard:hover{border-color:var(--gold);transform:translateY(-2px)}
   .arcard .arcyr{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--gold);font-weight:700}
-  .arcard .arct{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--txt);line-height:1.25}
-  .arcard .arcd{font-size:14px;color:var(--dim);line-height:1.5;flex:1}
-  .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:4px}
+  .arcard .arct{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--txt);line-height:1.25;margin-top:-2px}
+  .arcard .arcd{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--txt2);line-height:1.4}
+  .arcard .archook{font-size:13px;color:var(--dim);line-height:1.6;flex:1}
+  .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:6px}
   /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
   .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
   .arcmerch b{color:var(--txt);font-weight:600}
@@ -530,30 +532,37 @@
   var ARC=[
     {pt:"crise-europeia-2011-discordia",en:"the-2011-european-crisis-as-discord",yr:"2011",
      tp:"A crise europeia de 2011",te:"The 2011 European crisis",
-     dp:"Chegou ao Brasil como discórdia, não como colapso.",de:"Reached Brazil as discord, not collapse."},
+     dp:"Chegou ao Brasil como discórdia, não como colapso.",de:"Reached Brazil as discord, not collapse.",
+     gp:"Quando Atenas e Roma viraram manchete, o mundo tratou o euro como pavio. No Brasil, o Radar leu discórdia nos preços — não a estrutura de um colapso.",ge:"When Athens and Rome hit the front page, the world treated the euro as a fuse. In Brazil, the Radar read discord in prices — not the structure of a collapse."},
     {pt:"taper-tantrum-2013-susto-importado",en:"the-2013-taper-tantrum-imported-shock",yr:"2013",
      tp:"O taper tantrum de 2013",te:"The 2013 taper tantrum",
-     dp:"O susto importado que o regime brasileiro absorveu.",de:"The imported shock the Brazilian regime absorbed."},
+     dp:"O susto importado que o regime brasileiro absorveu.",de:"The imported shock the Brazilian regime absorbed.",
+     gp:"Bastou o Fed sugerir o fim dos estímulos para o mundo reagir como se o aperto já tivesse chegado. O Brasil sentiu o choque, mas a estrutura doméstica ainda não apontava ruptura.",ge:"The Fed merely hinted at ending stimulus, and the world reacted as if tightening had already arrived. Brazil felt the shock, but its domestic structure pointed to no rupture."},
     {pt:"os-tres-alarmes-de-agosto-2015",en:"the-three-alarms-of-august-2015",yr:"2015",
      tp:"Os três alarmes de agosto de 2015",te:"The three alarms of August 2015",
-     dp:"Três sinais dispararam — e o fundo que parecia fundo não era.",de:"Three signals fired — and the bottom that looked like the bottom wasn't."},
+     dp:"Três sinais dispararam — e o fundo que parecia fundo não era.",de:"Three signals fired — and the bottom that looked like the bottom wasn't.",
+     gp:"Em agosto, três sinais dispararam quase ao mesmo tempo. O que parecia fundo era só o começo da descida — e o Radar mostrava por quê.",ge:"In August, three signals fired almost at once. What looked like the bottom was only the start of the descent — and the Radar showed why."},
     {pt:"fundo-de-2016-estrutura-antes-do-humor",en:"the-2016-bottom-structure-before-mood",yr:"2016",
      tp:"O fundo de 2016",te:"The 2016 bottom",
-     dp:"A estrutura virou antes do humor — e muito antes dos juros.",de:"Structure turned before mood — and long before rates."},
+     dp:"A estrutura virou antes do humor — e muito antes dos juros.",de:"Structure turned before mood — and long before rates.",
+     gp:"Enquanto o noticiário ainda falava em recessão, a estrutura do mercado já havia virado. O humor — e os juros — só perceberam meses depois.",ge:"While the headlines still spoke of recession, the market's structure had already turned. Mood — and rates — caught on only months later."},
     {pt:"caminhoneiros-2018-dinheiro-antes-da-fe",en:"the-2018-truckers-strike-money-before-faith",yr:"2018",
      tp:"A greve dos caminhoneiros de 2018",te:"The 2018 truckers' strike",
-     dp:"O dinheiro voltou antes da fé — e antes da manchete.",de:"Money came back before faith — and before the headline."},
+     dp:"O dinheiro voltou antes da fé — e antes da manchete.",de:"Money came back before faith — and before the headline.",
+     gp:"O país parou, as manchetes gritaram e o medo tomou conta. Mas o dinheiro voltou aos ativos antes de a fé voltar ao Brasil.",ge:"The country stopped, headlines screamed, fear took over. But money returned to assets before faith returned to Brazil."},
     {pt:"o-que-aconteceu-depois-medo-precificou-tudo",en:"what-happened-after-fear-priced-everything",yr:"2020",
      tp:"Quando o medo precificou tudo (2020)",te:"When fear priced everything (2020)",
-     dp:"O que aconteceu depois do pânico.",de:"What happened after the panic."},
+     dp:"O que aconteceu depois do pânico.",de:"What happened after the panic.",
+     gp:"Em março, o pânico precificou o fim do mundo em poucos dias. O Radar registrou o extremo — e o que historicamente se segue a extremos assim.",ge:"In March, panic priced the end of the world in days. The Radar logged the extreme — and what historically follows extremes like it."},
     {pt:"a-casa-as-escuras-2022",en:"the-house-in-the-dark-2022",yr:"2022",
      tp:"A casa às escuras, fim de 2022",te:"The house in the dark, late 2022",
-     dp:"O fundo da estrutura precedeu um ano de discordância.",de:"The structure's floor preceded a year of discord."}
+     dp:"O fundo da estrutura precedeu um ano de discordância.",de:"The structure's floor preceded a year of discord.",
+     gp:"No fim de 2022, a estrutura tocou o piso enquanto a narrativa seguia sombria. O assoalho veio antes — e precedeu um ano inteiro de discordância.",ge:"In late 2022, structure touched its floor while the narrative stayed grim. The floor came first — and preceded a full year of discord."}
   ];
   var _now=new Date(), _doy=Math.floor((_now-new Date(_now.getFullYear(),0,0))/864e5), _st=_doy%ARC.length;
   var _pick=[ARC[_st],ARC[(_st+1)%ARC.length],ARC[(_st+2)%ARC.length]];
-  set("arc-cards",_pick.map(function(a){var slug=_en?a.en:a.pt,t=_en?a.te:a.tp,d=_en?a.de:a.dp;
-    return '<a class="arcard" href="'+U_ART+'/'+slug+'/"><span class="arcyr">'+a.yr+'</span><span class="arct">'+t+'</span><span class="arcd">'+d+'</span><span class="arcmore">'+(_en?"What happened next →":"O que aconteceu depois →")+'</span></a>';}).join(""));
+  set("arc-cards",_pick.map(function(a){var slug=_en?a.en:a.pt,t=_en?a.te:a.tp,d=_en?a.de:a.dp,g=_en?a.ge:a.gp;
+    return '<a class="arcard" href="'+U_ART+'/'+slug+'/"><span class="arcyr">'+a.yr+'</span><span class="arct">'+t+'</span><span class="arcd">'+d+'</span><span class="archook">'+g+'</span><span class="arcmore">'+(_en?"What happened next →":"O que aconteceu depois →")+'</span></a>';}).join(""));
   // merchan da biblioteca do assinante: TOTAL real de relatórios publicados (mensal+diário+semanal), buscado do
   // radar-api (cresce sozinho conforme o pipeline gera). Fallback = nº de meses desde abr/2010 (piso honesto ≤ total).
   function _nf(n){return n.toLocaleString(_en?"en-US":"pt-BR");}
