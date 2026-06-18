@@ -308,7 +308,7 @@
   <section id="ultimas">
     <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
     <h2 class="sec" id="s-ult">Diário do regime</h2>
-    <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — o histórico completo cruza passado e futuro.</p>
+    <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — inserida em uma série histórica construída ao longo do tempo.</p>
     <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diário completo →</a></p>
   </section>
@@ -583,7 +583,7 @@
   var _lc=document.getElementById("lng-cta");if(_lc)_lc.href=U_CON;  // CTA "ver toda a linguagem" → /concepts/ no .com
   var _uc=document.getElementById("ult-cta");if(_uc)_uc.href=U_DIA;  // CTA "ver Diário completo" → /daily no .com (evita 301)
   if(_en){set("eyb-lng","The Radar's language");set("s-lng","The concepts behind the reading");set("s-lng-s","Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.");set("lng-cta","See the full Radar language →");
-    set("eyb-ult","Latest readings");set("s-ult","The regime diary");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.");set("ult-cta","See the full Diary →");
+    set("eyb-ult","Latest readings");set("s-ult","The regime diary");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.");set("ult-cta","See the full Diary →");
     set("assine-link","view plans →");}
   var _alk=document.getElementById("assine-link");if(_alk&&_en)_alk.href="/subscribe";  // slug EN da landing de assinatura
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));

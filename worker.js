@@ -97,7 +97,7 @@ const EN_BODY = (function () {
     "eyb-tz": C.eybTz, "s-tz": C.sTz, "s-tz-s": C.sTzS, "tz-more": C.tzMore,
     "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
     "fbadge": C.fbadge, "fed": C.fed, "fprice": C.fprice, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn, "assine-link": "view plans →",
-    "eyb-ult": "Latest readings", "s-ult": "The regime diary", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.", "ult-cta": "See the full Diary →",
+    "eyb-ult": "Latest readings", "s-ult": "The regime diary", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.", "ult-cta": "See the full Diary →",
     "sb-eyb": "A living library of precedents", "sl-desde": "the oldest record", "sl-ativos": "assets covered", "sl-linhas": "rows of data", "sl-reports": "reports in the library", "sl-tribunais": "courts monitored", "sl-snap": "years of daily history", "sb-cta": "Explore the archive →",
     "eyb3": C.eyb3, "s3": C.s3, "s3s": C.s3s, "eyb4": C.eyb4, "disc": C.disc,
     "eyb9": C.eyb9, "s9": C.s9, "qtag-txt": "CURRENT SIGNAL · REGIME BR",
@@ -874,7 +874,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v9/" + host + "/" + _lk; // versiona a chave (v9 2026-06-18: Hero sem redundância 'arquivo vivo'×'cresce todo dia')
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v10/" + host + "/" + _lk; // versiona a chave (v10 2026-06-18: subtítulo do Diário do regime — 'série histórica construída ao longo do tempo')
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
