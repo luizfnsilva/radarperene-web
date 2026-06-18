@@ -232,7 +232,7 @@
       ".rp .rp-hle .hl-k{font-family:Georgia,'Fraunces',serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .rp-hle .hl-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:1px}" +
       ".rp .rp-hle .hl-lead{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.55;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +
-      ".rp .rp-hle .hl-d{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.03em}" +
+      ".rp .rp-hle .hl-d{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.03em;margin:5px 0 0}" +
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
@@ -1745,28 +1745,20 @@
     // ★ "Hoje lembra" (analogo_br) — SOBE para o núcleo (clímax do Cérebro 1: onde estamos → por quê → com o que se parece)
     var _hojelembra = '';
     if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br;
-      if (TEASER) {  // ── capa editorial "Hoje lembra": datas como estrela + 2 números grandes + assinatura. Sem rótulo "Análogo BR", sem "passado→futuro", sem método (nome da máquina não importa) — os números contam a história. ──
-        _hojelembra += '<div class="rp-hl">' +
-          '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
-          (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
-          '<div class="hl-n"><div><b>' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</b><span>' + (L ? "median Ibovespa · 6 months" : "mediana do Ibovespa · 6 meses") + '</span></div>' +
-          '<div><b>' + esc(ab.hit_rate_pct) + '%</b><span>' + (L ? "positive episodes" : "episódios positivos") + (ab.n_analogos ? " · n=" + esc(ab.n_analogos) : "") + '</span></div></div>' +
-          '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div></div>';
-      } else {  // ★ radar completo: "Hoje lembra" como PEÇA EDITORIAL — frase-líder com os números subordinados (memória institucional, não caixa estatística)
-        var _med = (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + "%";
-        var _lead = L
-          ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
-          : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
-        _hojelembra += '<div class="rp-hle">' +
-          '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
-          '<div class="hl-sub">' + (L ? "past → future" : "passado → futuro") + '</div>' +
-          '<p class="hl-lead">' + _lead + '</p>' +
-          (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
-          (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
-          '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div>' +
-          '<a class="hl-ep" href="' + (L ? "/articles" : "/artigos") + '">' + (L ? "See the full episodes →" : "Ver episódios completos →") + '</a>' +
-          '</div>';
-      }
+      // ★ P1 (2026-06-18): "Hoje lembra" UNIFICADO como herói editorial — em TODO contexto (mini + radar completo).
+      //   Ordem do mock do dono: HOJE LEMBRA → datas → frase-líder (números em destaque, subordinados) → assinatura → "Ver episódios →".
+      var _med = (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + "%";
+      var _lead = L
+        ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
+        : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
+      _hojelembra += '<div class="rp-hle">' +
+        '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
+        (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
+        '<p class="hl-lead">' + _lead + '</p>' +
+        (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
+        '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div>' +
+        '<a class="hl-ep" href="' + (L ? "/articles" : "/artigos") + '">' + (L ? "See the full episodes →" : "Ver episódios completos →") + '</a>' +
+        '</div>';
     }
     var _scatter = '';
     if (show("scatter") && rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);
