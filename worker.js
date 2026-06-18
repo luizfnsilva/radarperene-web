@@ -848,6 +848,15 @@ async function _route(request, env, ctx) {
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
         if (_isEN) rw = _enDailyRw(rw); // /ativo herda a nav da home shell → /diario→/daily no .com
+        // ★ Anúncios (2026-06-18) — APENAS nesta rota /ativo (NÃO na home, que serve o mesmo shell direto sem este rewriter).
+        //   /ativo é SEO programático de ALTO tráfego, leitor quase sempre free. in-article após a leitura do ativo
+        //   (antes da FAQ) + multiplex depois da FAQ. Gateados pelo /ads.js → Founder não vê (mesmo sinal rp_premium do shell).
+        rw = rw
+          .on("#faq", { element(e) {
+            e.before('<div class="ad-slot" data-ad-type="in-article" style="margin:20px auto;max-width:760px"></div>', { html: true });
+            e.after('<div class="ad-slot" data-ad-type="multiplex" style="margin:28px auto 0;max-width:760px"></div>', { html: true });
+          } })
+          .on("body", { element(e) { e.append('<script src="/ads.js" defer></script>', { html: true }); } });
         if (narr && narr.texto_html) {
           rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(narr.texto_html, { html: true }); } });
           if (narr.jsonld) { const ld = JSON.stringify(narr.jsonld).replace(/</g, "\\u003c"); rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } }); }
