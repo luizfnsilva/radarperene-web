@@ -1761,13 +1761,19 @@
       var _lead = L
         ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
         : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
+      // ★ P4 2026-06-18: ligação Hoje lembra → episódio. Se algum ano-análogo tem episódio curado, o link vai DIRETO pra ele (senão, o hub).
+      var RP_EP = { "2011": ["crise-europeia-2011-discordia", "the-2011-european-crisis-as-discord"], "2013": ["taper-tantrum-2013-susto-importado", "the-2013-taper-tantrum-imported-shock"], "2015": ["os-tres-alarmes-de-agosto-2015", "the-three-alarms-of-august-2015"], "2016": ["fundo-de-2016-estrutura-antes-do-humor", "the-2016-bottom-structure-before-mood"], "2018": ["caminhoneiros-2018-dinheiro-antes-da-fe", "the-2018-truckers-strike-money-before-faith"], "2020": ["o-que-aconteceu-depois-medo-precificou-tudo", "what-happened-after-fear-priced-everything"], "2022": ["a-casa-as-escuras-2022", "the-house-in-the-dark-2022"] };
+      var _epM = null, _epYr = "";
+      if (ab.datas_analogas) { for (var _di = 0; _di < ab.datas_analogas.length; _di++) { var _y = String(ab.datas_analogas[_di]).slice(0, 4); if (RP_EP[_y]) { _epM = RP_EP[_y]; _epYr = _y; break; } } }
+      var _epHref = _epM ? ("/" + (L ? "articles" : "artigos") + "/" + _epM[L ? 1 : 0] + "/") : (L ? "/articles" : "/artigos");
+      var _epTxt = _epM ? (L ? ("Read the " + _epYr + " episode →") : ("Ver o episódio de " + _epYr + " →")) : (L ? "See the full episodes →" : "Ver episódios completos →");
       _hojelembra += '<div class="rp-hle">' +
         '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
         (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
         '<p class="hl-lead">' + _lead + '</p>' +
         (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
         '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div>' +
-        '<a class="hl-ep" href="' + (L ? "/articles" : "/artigos") + '">' + (L ? "See the full episodes →" : "Ver episódios completos →") + '</a>' +
+        '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
         '</div>';
     }
     var _scatter = '';

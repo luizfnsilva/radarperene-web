@@ -874,7 +874,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v6/" + host + "/" + _lk; // versiona a chave (v6 2026-06-18: P2 — episódios viram capítulos com gancho editorial)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v7/" + host + "/" + _lk; // versiona a chave (v7 2026-06-18: P3 — Diário humanizado)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
@@ -955,13 +955,21 @@ async function _route(request, env, ctx) {
         //   dia lia como "sistema parado", enquanto o índice /diario já pulsava. MESMA linha do _renderDiarioIndex:
         //   Perene/Ânima (mudam todo dia útil) lideram; o regime BR — mensal por construção — vira cauda ROTULADA.
         //   Entrada da era mensal (sem perene/anima) degrada p/ a linha antiga, sem quebrar.
+        // ★ P3 2026-06-18: Diário HUMANIZADO (sai do CSV). Data por extenso → prosa do regime → índices discretos (mono).
+        const _MES = isEN ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+          : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        const _humDate = function (ds) { const p = String(ds).split("-"); if (p.length !== 3) return _esc(ds); const d = parseInt(p[2], 10), m = _MES[parseInt(p[1], 10) - 1] || p[1], y = p[0]; return isEN ? (m + " " + d + ", " + y) : (d + " de " + m + " de " + y); };
+        const _num = function (n) { return isEN ? String(n) : String(n).replace(".", ","); };
         const uh = ultimas.map(function (s) {
-          const rg = s.regime_score != null ? (s.regime_score + "/100" + (s.regime_label ? " · " + s.regime_label : "")) : "—";
-          const dia = [s.perene != null ? (isEN ? "Perene Risk " : "Perene ") + s.perene : null,
-            s.anima != null ? "Ânima " + s.anima : null,
-            s.global ? "global " + _esc(s.global) : null].filter(Boolean).join(" · ");
-          const mes = (isEN ? "month regime (monthly): " : "regime do mês (mensal): ") + _esc(rg);
-          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><b>' + s.data + '</b>' + (dia ? dia + ' · <span style="color:var(--dim)">' + mes + "</span>" : _esc(rg) + (s.global ? " · global " + _esc(s.global) : "")) + "</a>";  // sem "→" por linha: a row inteira já é link (hover dourado) → tira N setas redundantes, sobra só o "Ver Diário completo →"
+          // prosa: "Brasil em regime defensivo, ambiente global em risk-off moderado."
+          const _pr = [];
+          if (s.regime_label) _pr.push((isEN ? "Brazil in a " : "Brasil em regime ") + _esc(s.regime_label) + (isEN ? " regime" : ""));
+          if (s.global) _pr.push((isEN ? "global backdrop in " : "ambiente global em ") + _esc(s.global));
+          let prose = _pr.length ? (_pr.join(", ") + ".") : ((isEN ? "Month regime " : "Regime do mês ") + (s.regime_score != null ? s.regime_score + "/100" : "—") + ".");
+          // índices do dia (mudam todo pregão) — discretos, em mono
+          const idx = [s.perene != null ? (isEN ? "Perene Risk " : "Perene ") + _num(s.perene) : null,
+            s.anima != null ? "Ânima " + _num(s.anima) : null].filter(Boolean).join(" · ");
+          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><span class="ultd">' + _humDate(s.data) + '</span><span class="ultp">' + prose + '</span>' + (idx ? '<span class="ulti">' + idx + '</span>' : '') + "</a>";
         }).join("");
         rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }
