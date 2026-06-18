@@ -874,7 +874,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v7/" + host + "/" + _lk; // versiona a chave (v7 2026-06-18: P3 — Diário humanizado)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v8/" + host + "/" + _lk; // versiona a chave (v8 2026-06-18: P3 Diário em prosa com continuidade + P4 episódio nomeado)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
@@ -891,7 +891,7 @@ async function _route(request, env, ctx) {
       try { narr = await _narrP; } catch (e) { /* narrativa é opcional — nunca quebra a home */ }
       const _gdt = narr && narr.data_referencia ? String(narr.data_referencia).slice(0, 10) : null;  // data da leitura → dateModified do @graph
       let ultimas = null;
-      try { const uj = await _ultP; if (uj) ultimas = (uj.itens || []).slice(0, 3); } catch (e) { /* opcional */ }
+      try { const uj = await _ultP; if (uj) ultimas = (uj.itens || []).slice(0, 4); } catch (e) { /* opcional */ }  // 4: renderiza 3, mas o 3º ainda compara com o dia anterior (continuidade)
 
       let rw = new HTMLRewriter();
       rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
@@ -955,21 +955,38 @@ async function _route(request, env, ctx) {
         //   dia lia como "sistema parado", enquanto o índice /diario já pulsava. MESMA linha do _renderDiarioIndex:
         //   Perene/Ânima (mudam todo dia útil) lideram; o regime BR — mensal por construção — vira cauda ROTULADA.
         //   Entrada da era mensal (sem perene/anima) degrada p/ a linha antiga, sem quebrar.
-        // ★ P3 2026-06-18: Diário HUMANIZADO (sai do CSV). Data por extenso → prosa do regime → índices discretos (mono).
+        // ★ P3 2026-06-18: Diário HUMANIZADO em PROSA (não CSV). Data por extenso → nota do regime com CONTINUIDADE (permaneceu/passou a) +
+        //   avaliação de mudança vs o dia anterior (delta do Perene). Vira ativo cumulativo: milhares de notas escritas com o tempo.
         const _MES = isEN ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
           : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
         const _humDate = function (ds) { const p = String(ds).split("-"); if (p.length !== 3) return _esc(ds); const d = parseInt(p[2], 10), m = _MES[parseInt(p[1], 10) - 1] || p[1], y = p[0]; return isEN ? (m + " " + d + ", " + y) : (d + " de " + m + " de " + y); };
-        const _num = function (n) { return isEN ? String(n) : String(n).replace(".", ","); };
-        const uh = ultimas.map(function (s) {
-          // prosa: "Brasil em regime defensivo, ambiente global em risk-off moderado."
-          const _pr = [];
-          if (s.regime_label) _pr.push((isEN ? "Brazil in a " : "Brasil em regime ") + _esc(s.regime_label) + (isEN ? " regime" : ""));
-          if (s.global) _pr.push((isEN ? "global backdrop in " : "ambiente global em ") + _esc(s.global));
-          let prose = _pr.length ? (_pr.join(", ") + ".") : ((isEN ? "Month regime " : "Regime do mês ") + (s.regime_score != null ? s.regime_score + "/100" : "—") + ".");
-          // índices do dia (mudam todo pregão) — discretos, em mono
-          const idx = [s.perene != null ? (isEN ? "Perene Risk " : "Perene ") + _num(s.perene) : null,
-            s.anima != null ? "Ânima " + _num(s.anima) : null].filter(Boolean).join(" · ");
-          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><span class="ultd">' + _humDate(s.data) + '</span><span class="ultp">' + prose + '</span>' + (idx ? '<span class="ulti">' + idx + '</span>' : '') + "</a>";
+        const uh = ultimas.slice(0, 3).map(function (s, i) {
+          const prev = ultimas[i + 1] || null;  // dia anterior — base da continuidade
+          const _sent = [];
+          // regime BR (continuidade)
+          if (s.regime_label) {
+            if (prev && prev.regime_label === s.regime_label) _sent.push((isEN ? "Brazil's regime stayed " : "O regime brasileiro permaneceu ") + _esc(s.regime_label));
+            else if (prev && prev.regime_label) _sent.push((isEN ? "Brazil's regime turned " : "O regime brasileiro passou a ") + _esc(s.regime_label));
+            else _sent.push((isEN ? "Brazil's regime: " : "O regime brasileiro: ") + _esc(s.regime_label));
+          }
+          // ambiente global (continuidade)
+          if (s.global) {
+            if (prev && prev.global === s.global) _sent.push((isEN ? "the global backdrop held at " : "o ambiente global seguiu em ") + _esc(s.global));
+            else if (prev && prev.global) _sent.push((isEN ? "the global backdrop shifted to " : "o ambiente global passou a ") + _esc(s.global));
+            else _sent.push((isEN ? "global backdrop in " : "ambiente global em ") + _esc(s.global));
+          }
+          let prose = _sent.length ? (_sent.join(", ") + ".") : ((isEN ? "Monthly regime " : "Regime do mês ") + (s.regime_score != null ? s.regime_score + "/100" : "—") + ".");
+          // avaliação de mudança vs dia anterior (delta do Perene → 5 faixas; dá variação diária sem mostrar número cru)
+          if (prev && s.perene != null && prev.perene != null) {
+            const d = s.perene - prev.perene;
+            let chg = d < 2 && d > -2 ? (isEN ? "Little changed from the day before." : "Pouca mudança em relação ao dia anterior.")
+              : d >= 5 ? (isEN ? "Risk rose from the day before." : "O risco subiu ante o dia anterior.")
+              : d >= 2 ? (isEN ? "Risk edged up from the day before." : "Leve elevação do risco ante o dia anterior.")
+              : d <= -5 ? (isEN ? "Risk receded from the day before." : "O risco recuou ante o dia anterior.")
+              : (isEN ? "Risk eased slightly from the day before." : "Leve alívio do risco ante o dia anterior.");
+            prose += " " + chg;
+          }
+          return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><span class="ultd">' + _humDate(s.data) + '</span><span class="ultp">' + prose + "</span></a>";
         }).join("");
         rw = rw.on("#rp-ultimas", { element(e) { e.setInnerContent(uh, { html: true }); } });
       }

@@ -233,6 +233,7 @@
       ".rp .rp-hle .hl-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:1px}" +
       ".rp .rp-hle .hl-lead{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.55;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +
       ".rp .rp-hle .hl-d{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.03em;margin:5px 0 0}" +
+      ".rp .rp-hle .hl-ep-name{font-size:13px;color:var(--_txt);line-height:1.5;margin:2px 0 0}.rp .rp-hle .hl-ep-name b{font-weight:600}" +
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
@@ -1761,16 +1762,20 @@
       var _lead = L
         ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
         : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
-      // ★ P4 2026-06-18: ligação Hoje lembra → episódio. Se algum ano-análogo tem episódio curado, o link vai DIRETO pra ele (senão, o hub).
-      var RP_EP = { "2011": ["crise-europeia-2011-discordia", "the-2011-european-crisis-as-discord"], "2013": ["taper-tantrum-2013-susto-importado", "the-2013-taper-tantrum-imported-shock"], "2015": ["os-tres-alarmes-de-agosto-2015", "the-three-alarms-of-august-2015"], "2016": ["fundo-de-2016-estrutura-antes-do-humor", "the-2016-bottom-structure-before-mood"], "2018": ["caminhoneiros-2018-dinheiro-antes-da-fe", "the-2018-truckers-strike-money-before-faith"], "2020": ["o-que-aconteceu-depois-medo-precificou-tudo", "what-happened-after-fear-priced-everything"], "2022": ["a-casa-as-escuras-2022", "the-house-in-the-dark-2022"] };
+      // ★ P4 2026-06-18: máquina de precedentes — Hoje lembra → episódio NOMEADO. Se um ano-análogo tem capítulo curado,
+      //   o "Hoje lembra" nomeia o episódio e linka DIRETO pra ele ("o presente conversando com a memória"); senão, o hub.
+      var RP_EP = { "2011": ["crise-europeia-2011-discordia", "the-2011-european-crisis-as-discord", "A crise europeia de 2011", "The 2011 European crisis"], "2013": ["taper-tantrum-2013-susto-importado", "the-2013-taper-tantrum-imported-shock", "O taper tantrum de 2013", "The 2013 taper tantrum"], "2015": ["os-tres-alarmes-de-agosto-2015", "the-three-alarms-of-august-2015", "Os três alarmes de agosto de 2015", "The three alarms of August 2015"], "2016": ["fundo-de-2016-estrutura-antes-do-humor", "the-2016-bottom-structure-before-mood", "O fundo de 2016", "The 2016 bottom"], "2018": ["caminhoneiros-2018-dinheiro-antes-da-fe", "the-2018-truckers-strike-money-before-faith", "A greve dos caminhoneiros de 2018", "The 2018 truckers' strike"], "2020": ["o-que-aconteceu-depois-medo-precificou-tudo", "what-happened-after-fear-priced-everything", "Quando o medo precificou tudo", "When fear priced everything"], "2022": ["a-casa-as-escuras-2022", "the-house-in-the-dark-2022", "A casa às escuras, fim de 2022", "The house in the dark, late 2022"] };
       var _epM = null, _epYr = "";
       if (ab.datas_analogas) { for (var _di = 0; _di < ab.datas_analogas.length; _di++) { var _y = String(ab.datas_analogas[_di]).slice(0, 4); if (RP_EP[_y]) { _epM = RP_EP[_y]; _epYr = _y; break; } } }
       var _epHref = _epM ? ("/" + (L ? "articles" : "artigos") + "/" + _epM[L ? 1 : 0] + "/") : (L ? "/articles" : "/artigos");
-      var _epTxt = _epM ? (L ? ("Read the " + _epYr + " episode →") : ("Ver o episódio de " + _epYr + " →")) : (L ? "See the full episodes →" : "Ver episódios completos →");
+      var _epTtl = _epM ? _epM[L ? 3 : 2] : "";
+      var _epLine = _epM ? ('<div class="hl-ep-name">' + (L ? "One of those moments: " : "Um desses momentos: ") + '<b>' + esc(_epTtl) + '</b> (' + _epYr + ').</div>') : "";
+      var _epTxt = _epM ? (L ? "Read the full chapter →" : "Ver o capítulo completo →") : (L ? "See the full episodes →" : "Ver episódios completos →");
       _hojelembra += '<div class="rp-hle">' +
         '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
         (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
         '<p class="hl-lead">' + _lead + '</p>' +
+        _epLine +
         (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
         '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div>' +
         '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
