@@ -1786,7 +1786,7 @@
       var _epHref = _epM ? ("/" + (L ? "articles" : "artigos") + "/" + (L ? _epM.en : _epM.pt) + "/") : (L ? "/articles" : "/artigos");
       var _epTtl = _epM ? (L ? _epM.te : _epM.tp) : "";
       var _epLine = _epM ? ('<div class="hl-ep-name">' + (L ? "One of those moments: " : "Um desses momentos: ") + '<b>' + esc(_epTtl) + '</b> (' + _epYr + ').</div>') : "";
-      var _epTxt = _epM ? (L ? "Read the full chapter →" : "Ver o capítulo completo →") : (L ? "See the full episodes →" : "Ver episódios completos →");
+      var _epTxt = _epM ? (L ? "Read the full chapter →" : "Ler o capítulo completo →") : (L ? "Read the full episodes →" : "Ler episódios completos →");
       _hojelembra += '<div class="rp-hle">' +
         '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
         (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
