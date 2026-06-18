@@ -122,9 +122,9 @@
   .qtag .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;animation:qpulse 2.4s ease-out infinite}
   @keyframes qpulse{0%{box-shadow:0 0 0 0 rgba(168,101,26,.45)}70%{box-shadow:0 0 0 7px rgba(168,101,26,0)}100%{box-shadow:0 0 0 0 rgba(168,101,26,0)}}
   @media(prefers-reduced-motion:reduce){.qtag .dot{animation:none}}
-  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.015em;
-    padding:12px 36px;border-radius:6px;font-size:14.5px;transition:transform .1s,background .15s}
-  .btn:hover{background:var(--gold2);transform:translateY(-1px)}
+  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;
+    padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
+  .btn:hover{background:var(--gold2)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
@@ -227,7 +227,7 @@
   <div class="hero">
     <a class="qtag" id="qtag" href="#radar-teaser" aria-label="regime ao vivo"><span class="dot"></span><span id="qtag-txt">SINAL ATUAL · REGIME BR</span></a>
     <h1 id="h1">O Brasil observado — e <span class="g">lembrado</span>.</h1>
-    <p class="lead" id="lead">Cinco lentes, casos análogos e uma biblioteca de precedentes construída sobre dados públicos. Descritivo, não previsão.</p>
+    <p class="lead" id="lead">Um arquivo vivo do mercado brasileiro: relatórios diários, semanais e mensais e uma biblioteca de precedentes que cresce todo dia — para ler o presente à luz do passado.</p>
     <!-- busca removida do hero (2026-06-16): competia com a mensagem editorial; descoberta de ativos vive no radar (Explorar ativos →) e em /ativos. Script abaixo auto-sai (guard #rp-q ausente). -->
     <script>
     (function(){
@@ -249,7 +249,7 @@
     </script>
     <a class="btn" href="#fundadores" id="cta1">Assinar a edição Founder</a>
     <a class="herolink" href="#radar-teaser" id="cta2">Ler a edição de hoje →</a>
-    <div class="micro" id="micro1">Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.</div>
+    <div class="micro" id="micro1">Conteúdo educacional de fontes públicas — nunca recomendação.</div>
   </div>
 </div>
 
@@ -261,7 +261,7 @@
   <section id="radar-teaser">
     <div class="eyebrow" id="eyb-tz">Ao vivo · agora</div>
     <h2 class="sec" id="s-tz">A leitura de hoje</h2>
-    <p class="secsub" id="s-tz-s">O pulso do Brasil agora — risco, humor e regime, de graça e só as conclusões. Os números, o histórico de 50+ anos, os análogos e os alertas ficam no Founder. O radar completo vem logo abaixo.</p>
+    <p class="secsub" id="s-tz-s">O regime do Brasil agora — só as conclusões, de graça. Os números, o histórico de 50+ anos e os análogos completos ficam no Founder.</p>
     <div data-radar-perene data-chrome="off" data-sections="regime,analogo_br,termometros,observatorio" style="--rp-max:100%"></div>
     <p class="micro" style="margin-top:14px"><a href="#radar" id="tz-more" style="color:var(--gold)">Ver o radar completo ↓</a></p>
   </section>
@@ -269,10 +269,9 @@
 
 <div class="wrap">
   <section id="oque">
-    <div class="eyebrow" id="eyb2">O que é</div>
-    <h2 class="sec" id="s2">Cinco lentes do Brasil — e um experimento</h2>
-    <p class="secsub" id="s2s">Não é newsletter. É um instrumento que lê o regime de cada domínio regulatório do país, em camadas. Veja a estrutura das cinco Lentes.</p>
-    <div class="lenses" id="lenses"></div>
+    <div class="eyebrow" id="eyb2">Metodologia</div>
+    <h2 class="sec" id="s2">Como o Radar lê o Brasil</h2>
+    <p class="secsub" id="s2s">Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href="/metodologia/">Conheça a metodologia →</a></p>
   </section>
 
   <section id="fundadores">
@@ -312,7 +311,7 @@
 
   <section id="ultimas">
     <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
-    <h2 class="sec" id="s-ult">O regime do dia — arquivado e auditável</h2>
+    <h2 class="sec" id="s-ult">Diário do regime</h2>
     <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — o histórico completo cruza passado e futuro.</p>
     <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diário completo →</a></p>
@@ -407,13 +406,13 @@
 
   var C=LANG==="en"?{
     h1:'Brazil, observed — and <span class="g">remembered</span>.',
-    lead:"Five lenses, historical analogs and a library of precedents built on public data. Descriptive, not prediction.",
-    cta1:"Subscribe — Founder edition",cta2:"Read today&rsquo;s edition →",micro:"Educational content, public sources. Descriptive — never a recommendation.",
+    lead:"A living archive of Brazil&rsquo;s markets: daily, weekly and monthly reports and a precedent library that grows every day — to read the present in light of the past.",
+    cta1:"Explore the Founder edition",cta2:"Read today&rsquo;s edition →",micro:"Educational content from public sources — never a recommendation.",
     eyb7:"Who it&rsquo;s for",s7:"Investors, analysts, managers — and serious newcomers.",s7s:"For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
-    eyb2:"What it is",s2:"Five Lenses on Brazil — and one Experiment",s2s:"Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
+    eyb2:"Methodology",s2:"How the Radar reads Brazil",s2s:"Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb5:"Depth",s5:"You choose the depth",s5s:"Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6:"What&rsquo;s underneath",
-    eybTz:"Live · now",sTz:"Today&rsquo;s reading",sTzS:"Brazil&rsquo;s pulse right now — risk, mood and regime, free and conclusions only. The numbers, the 50+ year history, the analogs and the alerts are in Founder. The full radar is right below.",tzMore:"See the full radar ↓",
+    eybTz:"Live · now",sTz:"Today&rsquo;s reading",sTzS:"Brazil&rsquo;s regime right now — conclusions only, free. The numbers, 50+ years of history and the full analogs live in Founder.",tzMore:"See the full radar ↓",
     eyb1:"Live · full radar",s1:"The full radar",s1s:"The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge:"Launch · seats limited to the first 100 founders",fed:"Founder Edition",fprice:'<b style="color:var(--gold)">US$ 149/mo</b>',fh:"The complete instrument.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.9"><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> the full analog outcomes — 3/6/12 months</li><li><span style="color:var(--gold)">✓</span> all horizons and distributions (median · p10–p90 bands)</li><li><span style="color:var(--gold)">✓</span> 16 years of precedents (since 2010), 26 of snapshots</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the 5 Lenses + the Vértice experiment</li><li><span style="color:var(--gold)">✓</span> the widget for your site + the app</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
     wlph:"you@email.com",wlbtn:"Get my invite",
@@ -439,13 +438,13 @@
     ok:"You&rsquo;re on the list — we&rsquo;ll be in touch.",err:"Couldn&rsquo;t register. Try again.",inv:"Enter a valid email."
   }:{
     h1:'O Brasil observado — e <span class="g">lembrado</span>.',
-    lead:"Cinco lentes, casos análogos e uma biblioteca de precedentes construída sobre dados públicos. Descritivo, não previsão.",
-    cta1:"Assinar a edição Founder",cta2:"Ler a edição de hoje →",micro:"Conteúdo educacional, de fontes públicas. Descritivo — nunca recomendação.",
+    lead:"Um arquivo vivo do mercado brasileiro: relatórios diários, semanais e mensais e uma biblioteca de precedentes que cresce todo dia — para ler o presente à luz do passado.",
+    cta1:"Ler a edição Founder",cta2:"Ler a edição de hoje →",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
     eyb7:"Para quem é",s7:"Investidores, analistas, gestores — e curiosos sérios.",s7s:"Para quem quer ler o mercado brasileiro sem ruído e sem palpite — não a previsão, mas o precedente: regimes, casos análogos e uma biblioteca de estudos do &ldquo;o que aconteceu depois&rdquo;. Memória desde 2000.",
-    eyb2:"O que é",s2:"Cinco Lentes do Brasil — e um Experimento",s2s:"Não é newsletter. É um instrumento que lê o regime de cada domínio regulatório do país, em camadas. Veja a estrutura das cinco Lentes.",
+    eyb2:"Metodologia",s2:"Como o Radar lê o Brasil",s2s:"Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href=\"/metodologia/\">Conheça a metodologia →</a>",
     eyb5:"Profundidade",s5:"Você escolhe a profundidade",s5s:"Cada lente abre em camadas — da manchete do regime à matemática visível: <b>cone de quantis</b> (distribuição de desfechos, nunca previsão), <b>Trend Score</b> 0&ndash;10, <b>breadth</b> real (% das ações acima da média de 200 dias), o <b>estudo de análogo</b> (isto ocorreu N vezes → o que se seguiu) e <b>lead-lag</b>. Sem teto para quem quer ir fundo.",
     eyb6:"O que está por trás",
-    eybTz:"Ao vivo · agora",sTz:"A leitura de hoje",sTzS:"O pulso do Brasil agora — risco, humor e regime, de graça e só as conclusões. Os números, o histórico de 50+ anos, os análogos e os alertas ficam no Founder. O radar completo vem logo abaixo.",tzMore:"Ver o radar completo ↓",
+    eybTz:"Ao vivo · agora",sTz:"A leitura de hoje",sTzS:"O regime do Brasil agora — só as conclusões, de graça. Os números, o histórico de 50+ anos e os análogos completos ficam no Founder.",tzMore:"Ver o radar completo ↓",
     eyb1:"Ao vivo · completo",s1:"O radar completo",s1s:"O motor completo sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.",
     fbadge:"Lançamento · vagas limitadas aos 100 primeiros fundadores",fed:"Edição Founder",fprice:'<b style="color:var(--gold)">R$ 149/mês</b>',fh:"O instrumento completo.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.9"><li><span style="color:var(--gold)">✓</span> relatórios diário, semanal e mensal no e-mail</li><li><span style="color:var(--gold)">✓</span> o desfecho completo dos análogos — 3/6/12 meses</li><li><span style="color:var(--gold)">✓</span> todos os horizontes e distribuições (mediana · faixas p10–p90)</li><li><span style="color:var(--gold)">✓</span> 16 anos de precedentes (desde 2010), 26 de snapshots</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> as 5 Lentes + o experimento Vértice</li><li><span style="color:var(--gold)">✓</span> o mini-radar pro seu site + o app</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div>',
     wlph:"seu@email.com",wlbtn:"Quero meu convite",
@@ -503,8 +502,8 @@
   void conDD;  // dropdown de Conceitos saiu do topo (vira link simples); CN segue no grid "linguagem do Radar"
   // ── faixa institucional + "Do arquivo" (memória): texto/links por idioma; cartões linkam ao portal editorial ──
   set("instband",_en
-    ? 'Fifteen years of memory · Seven regimes · Five lenses · One experiment · <b>Descriptive, never predictive</b>'
-    : 'Quinze anos de memória · Sete regimes · Cinco lentes · Um experimento · <b>Descritivo, nunca preditivo</b>');
+    ? 'Fifteen years of memory · Seven regimes · One experiment · <b>A living library of precedents</b>'
+    : 'Quinze anos de memória · Sete regimes · Um experimento · <b>Uma biblioteca viva de precedentes</b>');
   set("eyb-arq",_en?"From the archive":"Do arquivo");
   set("s-arq",_en?"The present, in conversation with memory":"O presente, em conversa com a memória");
   set("s-arq-s",_en?"Fifteen years of regimes read honestly — what the Radar saw, and what came next.":"Quinze anos de regimes lidos com honestidade — o que o Radar viu, e o que veio depois.");
@@ -543,7 +542,7 @@
   set("arc-merch",_en
     ? '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> reports</b> in the subscriber library — monthly since April 2010, now daily and weekly too. Growing with every new report. <a href="/subscribe">Explore the Founder Edition →</a>'
     : '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> relatórios</b> na biblioteca do assinante — mensais desde abril de 2010, agora também diários e semanais. Cresce a cada novo relatório. <a href="/assine">Conhecer a Edição Founder →</a>');
-  fetch(location.origin+"/api/v1/biblioteca/contagem").then(function(r){return r.json();}).then(function(j){var el=document.getElementById("lib-n");if(el&&j&&j.total)el.textContent=_nf(j.total);}).catch(function(){});
+  fetch(location.origin+"/api/v1/biblioteca/contagem").then(function(r){return r.json();}).then(function(j){var el=document.getElementById("lib-n");if(el&&j&&j.total)el.textContent=_nf(j.total);}).catch(function(){});  // TOTAL real (mensal+diário+semanal); cresce sozinho. Fallback ≈194 enquanto o endpoint /v1/biblioteca/contagem não estiver no ar (rota f28fb6e ainda não deployada no radar-api)
   (function(){var ib=document.getElementById("instband");if(ib)ib.setAttribute("href",U_ART);
     var ac=document.getElementById("arc-cta");if(ac){ac.textContent=_en?"See all episodes →":"Ver todos os episódios →";ac.setAttribute("href",U_ART);}})();
   // ── grid "A linguagem do Radar" (9 conceitos, descoberta na home) ──
@@ -552,7 +551,7 @@
   var _lc=document.getElementById("lng-cta");if(_lc)_lc.href=U_CON;  // CTA "ver toda a linguagem" → /concepts/ no .com
   var _uc=document.getElementById("ult-cta");if(_uc)_uc.href=U_DIA;  // CTA "ver Diário completo" → /daily no .com (evita 301)
   if(_en){set("eyb-lng","The Radar's language");set("s-lng","The concepts behind the reading");set("s-lng-s","Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.");set("lng-cta","See the full Radar language →");
-    set("eyb-ult","Latest readings");set("s-ult","The day's regime — archived and auditable");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.");set("ult-cta","See the full Diary →");
+    set("eyb-ult","Latest readings");set("s-ult","The regime diary");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.");set("ult-cta","See the full Diary →");
     set("assine-link","view plans →");}
   var _alk=document.getElementById("assine-link");if(_alk&&_en)_alk.href="/subscribe";  // slug EN da landing de assinatura
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));

@@ -37,13 +37,13 @@ const EN_FAQ = JSON.stringify({
 const EN_BODY = (function () {
   const C = {
     h1: 'Brazil, observed — and <span class="g">remembered</span>.',
-    lead: "Five lenses, historical analogs and a library of precedents built on public data. Descriptive, not prediction.",
-    cta1: "Subscribe — Founder edition", cta2: "Read today&rsquo;s edition →", micro: "Educational content, public sources. Descriptive — never a recommendation.",
+    lead: "A living archive of Brazil&rsquo;s markets: daily, weekly and monthly reports and a precedent library that grows every day — to read the present in light of the past.",
+    cta1: "Explore the Founder edition", cta2: "Read today&rsquo;s edition →", micro: "Educational content from public sources — never a recommendation.",
     eyb7: "Who it&rsquo;s for", s7: "Investors, analysts, managers — and serious newcomers.", s7s: "For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
-    eyb2: "What it is", s2: "Five Lenses on Brazil — and one Experiment", s2s: "Not a newsletter. An instrument that reads the regime of each regulatory domain, in layers. See the structure of the five Lenses.",
+    eyb2: "Methodology", s2: "How the Radar reads Brazil", s2s: "Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb5: "Depth", s5: "You choose the depth", s5s: "Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6: "What&rsquo;s underneath",
-    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s pulse right now — risk, mood and regime, free and conclusions only. The numbers, the 50+ year history, the analogs and the alerts are in Founder. The full radar is right below.", tzMore: "See the full radar ↓",
+    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s regime right now — conclusions only, free. The numbers, 50+ years of history and the full analogs live in Founder.", tzMore: "See the full radar ↓",
     eyb1: "Live · full radar", s1: "The full radar", s1s: "The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge: "Launch · seats limited to the first 100 founders", fed: "Founder Edition", fprice: '<b style="color:var(--gold)">US$ 149/mo</b>', fh: "The complete instrument.", fp: "Access includes: daily, weekly and monthly reports · the full analog outcomes (3/6/12 months) · all horizons and distributions (median · p10–p90 bands) · 16 years of precedents (since 2010) · the provenance of every reading · the 5 Lenses + the Vértice experiment · the widget and the app. Locked while your subscription stays active · 7-day refund · cancel in one click.",
     fdisc: "⚠ Work in progress: today about <b>90% of the functions and tickers aren&rsquo;t available yet</b> — they roll out gradually, at no extra cost, with your founder price locked. You secure everything as it ships; you&rsquo;re not paying for a complete product today.",
@@ -755,7 +755,7 @@ async function _route(request, env, ctx) {
     if (_url.pathname === "/ativos") {
       try {
         const en = _isEN;
-        const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } });
+        const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } }, 20000);  // ★ /v1/tickers cold ~9,2s > _UPSTREAM_TIMEOUT_MS (9s) → abortava → catch → ASSETS → 404 (hub /ativos morto). 20s cobre o cold; resultado cacheado 6h (cf + cache-control), então 1x lento só.
         const tj = tr.ok ? await tr.json() : { ativos: [] };
         const ativos = (tj.ativos || []).map(function (t) { return String(t).toUpperCase(); }).sort();
         const canon = _url.origin + "/ativos";
@@ -771,9 +771,16 @@ async function _route(request, env, ctx) {
           "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/ativos\">" +
           "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + _url.origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
           "<script type=\"application/ld+json\">" + ld + "</script>" +
-          _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}") +
-          "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p><p class=\"alist\">" + links + "</p></div>" +
-          "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" + _themeScript() + _CONSENT + "</body></html>";
+          _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}input#aq{width:100%;max-width:440px;padding:11px 14px;margin:2px 0 18px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--txt);font-size:15px;font-family:inherit}.cta-row{margin:26px 0 6px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}.cta-row a.go{color:var(--gold);text-decoration:none;font-weight:600}.adslot{margin:24px 0;min-height:96px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:4px}.adslot span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);opacity:.55}") +
+          "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
+          "<input id=\"aq\" type=\"search\" autocomplete=\"off\" placeholder=\"" + (en ? "Search an asset — PETR4, CDI, NVDA…" : "Buscar ativo — PETR4, CDI, NVDA…") + "\">" +
+          "<p class=\"alist\">" + links + "</p>" +
+          "<div class=\"cta-row\"><a class=\"btn\" href=\"/\">" + (en ? "See today&rsquo;s reading" : "Ver a leitura de hoje") + "</a> <a class=\"go\" href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Explore the Founder edition →" : "Conhecer a edição Founder →") + "</a></div>" +
+          "<div class=\"adslot\"><span>" + (en ? "Advertisement" : "Publicidade") + "</span></div>" +
+          "</div>" +
+          "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" +
+          "<script>(function(){var q=document.getElementById('aq');if(!q)return;var a=[].slice.call(document.querySelectorAll('.alist a'));q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();for(var i=0;i<a.length;i++){a[i].style.display=(!v||a[i].textContent.toLowerCase().indexOf(v)>=0)?'':'none';}});})();</script>" +
+          _themeScript() + _CONSENT + "</body></html>";
         return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=21600" } });
       } catch (e) { return env.ASSETS.fetch(request); }
     }

@@ -189,6 +189,7 @@
       ".rp-teaser .c{padding:8px 9px;min-height:0}" +  // teaser: cards de regime mais baixos/compactos (respiro p/ o análogo)
       ".rp .rp-mtog{margin-top:8px;font-size:11px;background:transparent;border:1px solid var(--_line);color:var(--_dim);border-radius:7px;padding:5px 11px;cursor:pointer}.rp .rp-mtog:hover{color:var(--_txt);border-color:var(--_cardb)}.rp .rp-ov{margin-top:8px}" +
       ".rp .rp-tier2{display:flex;align-items:center;gap:11px;margin:30px 0 6px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim);font-weight:600}.rp .rp-tier2::before,.rp .rp-tier2::after{content:'';flex:1;height:1px;background:var(--_line)}" +  // camada 2: separa o primário (regime/lentes/tese) dos indicadores de apoio
+      ".rp .rp-fold{margin:22px 0 0;border-top:1px solid var(--_line)}.rp .rp-fold>summary{cursor:pointer;list-style:none;display:block;font-size:13.5px;font-weight:600;letter-spacing:.01em;color:var(--_accent);padding:13px 0 12px}.rp .rp-fold>summary::-webkit-details-marker{display:none}.rp .rp-fold>summary:hover{text-decoration:underline}.rp .rp-fold[open]>summary{color:var(--_dim)}.rp .rp-foldbody{padding-top:2px}" +  // progressive disclosure: dobra editorial nativa (história primeiro, profundidade depois)
       ".rp .rp-cmpbtn{font-size:11.5px;background:var(--_card2);border:1px solid var(--_line);color:var(--_txt);border-radius:8px;padding:6px 11px;cursor:pointer;margin:0 6px 6px 0;white-space:nowrap}.rp .rp-cmpbtn:hover{border-color:var(--_accent);color:var(--_accent)}" +  // P3.1 → 1C: pares-preset, agora na aba Comparações do drawer (.rp-cmprow saiu com o muro da home)
       ".rp-cmp2{max-width:940px}.rp-cmp2 .rp-cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.rp-cmp2 .rp-cmpcol{min-width:0}.rp-cmp2 .rp-mt2{font-family:var(--rp-serif,Georgia,serif);font-size:16px;font-weight:600;margin-bottom:5px;color:var(--_txt)}.rp-cmp2 .rp-cmpchart{margin:4px 0 2px}" +
       ".rp-cmptbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}.rp-cmptbl th,.rp-cmptbl td{padding:6px 9px;border-bottom:1px solid var(--_line);text-align:right}.rp-cmptbl th:first-child,.rp-cmptbl td:first-child{text-align:left;color:var(--_dim)}.rp-cmptbl td.win{color:var(--_warm);font-weight:700}" +
@@ -226,6 +227,16 @@
       ".rp .rp-hl .hl-n b{display:block;font-family:var(--_mono);font-size:30px;line-height:1;font-weight:700;color:var(--_txt);font-feature-settings:'tnum'}" +
       ".rp .rp-hl .hl-n span{display:block;font-size:11px;color:var(--_dim);margin-top:4px}" +
       ".rp .rp-hl .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85}" +
+      // ★ "Hoje lembra" editorial (radar completo): frase-líder serif, números subordinados em destaque + porta p/ episódios
+      ".rp .rp-hle{border-top:1px solid var(--_line);padding:16px 0 4px;margin-top:8px}" +
+      ".rp .rp-hle .hl-k{font-family:Georgia,'Fraunces',serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--_dim)}" +
+      ".rp .rp-hle .hl-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:1px}" +
+      ".rp .rp-hle .hl-lead{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.55;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +
+      ".rp .rp-hle .hl-d{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.03em}" +
+      ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
+      ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
+      ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
+      ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent)}" +
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
       ".rp .brand{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--_txt);font-size:14px;font-weight:600;opacity:.92}.rp .brand b{color:var(--_accent);font-weight:700}.rp .brand svg{flex:none;opacity:.9}" +
@@ -234,7 +245,7 @@
       ".rp .t.hot .bar i{background:var(--_hot)}.rp .t.warm .bar i{background:var(--_warm)}.rp .t.cool .bar i{background:var(--_cool)}" +
       ".rp .legend{font-size:10.5px;color:var(--_dim);margin:2px 0 4px}" +
       ".rp .teaser{margin-top:16px;background:none;border:0;border-left:2px solid var(--_accent);border-radius:0;padding:4px 0 4px 14px;font-size:13px;color:var(--_dim)}.rp .teaser b{color:var(--_accent)}.rp .teaser a{display:inline-block;margin-top:6px;color:var(--_accent);text-decoration:none;font-weight:700}" +
-      ".rp .brain{display:flex;align-items:baseline;gap:8px;margin:20px 0 2px;padding-top:15px;border-top:1px solid var(--_line)}" +
+      ".rp .brain{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin:20px 0 2px;padding-top:15px;border-top:1px solid var(--_line)}" +
       ".rp .brain.first{border-top:0;padding-top:2px;margin-top:6px}.rp .brain .bn{font-size:13px;font-weight:700;letter-spacing:.02em}.rp .brain .bt{font-size:10.5px;color:var(--_dim)}" +
       ".rp .brain .bx{margin-left:auto;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .lns{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:7px}" +
@@ -1612,6 +1623,12 @@
     var rr = d.radar || {}, v = d.vertice || {}, h = '<div class="rp' + (skin === "editorial" ? " skin-editorial" : "") + (sections && !chrome ? " rp-teaser" : "") + '">';  // rp-teaser = mini-radar da home → cards de regime mais compactos (CSS), dá respiro ao análogo
     var GATED = !!d.gated;  // free (edge gated): conclusões sem números → valores viram 🔒 + banner CTA (régua dono 2026-06-15)
     var TEASER = !!sections && !chrome;  // mini-radar da home (data-sections + chrome off): Vértice compacto = 1 termômetro + 1 fuga, sem método/jargão. Radar completo (sections=null) e embeds (chrome) seguem cheios.
+    // ★ Progressive disclosure (handoff 2026-06-17): "história primeiro, profundidade depois". FOLD = radar COMPLETO da
+    //   nossa página (#radar-perene: chrome off, sem data-sections) → núcleo conta a história e o denso recolhe atrás de
+    //   <details> nativo (SEO ok · zero JS · Founder ABERTO / free fechado). Embeds (chrome) e mini-radar (TEASER) seguem planos.
+    var FOLD = !sections && !chrome;
+    var _foldLbl1 = L ? "Explore the full landscape →" : "Explorar o panorama completo →";
+    var _foldLbl2 = L ? "What else is moving? →" : "O que mais está se movendo? →";
     var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
@@ -1636,7 +1653,7 @@
       '<svg width="19" height="19" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1.3"/><circle cx="16" cy="16" r="7" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1.3"/><line x1="16" y1="16" x2="16" y2="3" stroke="var(--_accent)" stroke-width="1.8"/><circle cx="16" cy="16" r="2.2" fill="var(--_accent)"/></svg>' +
       '<span>Radar <b>Perene</b></span></a><span class="sub">' + (L ? "as of " : "ref. ") + esc(d.data_referencia || "-") + '</span></div>';
     function card(k, sc, r) { return '<div class="c"><div class="k">' + esc(k) + '</div><div class="b">' + (sc == null ? (GATED ? glock() : "—") : esc(sc)) + '</div><div class="r">' + esc(r) + '</div></div>'; }
-    function brain(n, t, exp, first) { return '<div class="brain' + (first ? ' first' : '') + '"><span class="bn">' + n + '</span><span class="bt">' + t + '</span>' + (exp ? '<span class="bx">' + (L ? "experiment" : "experimento") + '</span>' : '') + '</div>'; }
+    function brain(n, t, exp, first, sub) { return '<div class="brain' + (first ? ' first' : '') + '"><span class="bn">' + n + '</span>' + (t ? '<span class="bt">' + t + '</span>' : '') + (exp ? '<span class="bx">' + (L ? "experiment" : "experimento") + '</span>' : '') + (sub ? '<div class="bsub">' + sub + '</div>' : '') + '</div>'; }
     // selo de vida honesta: frescor + cobertura VIVA — vem do digest (fn SQL cobertura_radar); cresceu no banco → aparece
     // sozinho, sem hardcode (GRAPH §13.5). Fallback = números reais atuais, nunca os antigos inflados.
     var _cob = d.cobertura || {};
@@ -1650,7 +1667,7 @@
     if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "latest available daily close" : "último fechamento diário disponível") + ' · ' + esc(covTxt) + '</div>';  // sem a data crua "updated {hoje}" (confundia: o pulso é o último fechamento, não "hoje"); a frase já diz tudo  // transparência: o pulso é sempre o ÚLTIMO fechamento diário (D-1 enquanto o pregão de hoje não fecha) — alinhado com o relatório do assinante (pré-abertura, fechamento anterior). cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
-    h += brain(L ? "Brazil Radar" : "Radar do Brasil", (L ? "5 lenses · regulatory regime" : "5 lentes · regime regulatório"), false, true);  // "Radar do Brasil": "Radar" sozinho soava genérico/componente interno; rótulo do Cérebro 1 (diferencia do "Vértice")
+    h += brain("Radar Perene", (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro"), false, true);  // ★ 2026-06-17: título = só "Radar Perene" (era "Radar do Brasil · 5 lentes · regime regulatório" — descrição do MOTOR, não do produto)
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
     if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
     if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
@@ -1659,10 +1676,16 @@
       // ★ item 10 pós-B6 (2 grandezas): o clique abre a SÉRIE do número exibido — a breadth (% abaixo do valor-justo,
       //   187 meses em series_historicas_macro) — e não mais o z do ERP (que segue citado no texto como secundário).
       if (g.valuation && !TEASER) { var vl = g.valuation; var erpTxt = vl.erp == null ? "" : ((vl.erp >= 0 ? "+" : "") + vl.erp + "pp"); h += '<div class="i valstrip" data-cod="valuation_breadth_br" data-cls="macro" data-nome="' + esc(L ? "BR valuation breadth (% below fair value)" : "Breadth de valuation BR (% abaixo do valor-justo)") + '"><div class="vl-l"><span class="vl-t">' + (L ? "Valuation BR" : "Valuation BR") + '</span><span class="vl-r">' + esc(vl.regime) + '</span></div><div class="vl-b"><span class="vl-s">' + esc(vl.score) + '%</span> <span class="vl-x">' + (L ? "below fair value" : "abaixo do valor-justo") + (vl.n ? " · " + vl.n + (L ? " stocks" : " ações") : "") + (erpTxt ? " · ERP " + erpTxt : "") + '</span></div></div>'; } }
-    if (show("regime") && rr.cambio && !TEASER) { h += '<div class="tk" style="margin-top:8px"><span class="i" data-cod="' + esc(rr.cambio.codigo) + '" data-cls="pulso"><span class="sy">' + esc(rr.cambio.nome) + '</span><span class="pr">R$ ' + esc(rr.cambio.valor) + '</span>' + (rr.cambio.var30 != null ? '<span class="mt">' + (rr.cambio.var30 >= 0 ? "+" : "") + esc(rr.cambio.var30) + '% 30d</span>' : '') + '</span></div>'; }
-    if (show("indices") && rr.indices && rr.indices.length) { h += '<h4>' + (L ? "Indices · overview" : "Índices · panorama") + '</h4><div class="legend">' + (L ? "click to chart · + more in the app" : "clique pra ver o gráfico · + outros no app") + '</div><div class="tk">' +
+    // ★ dólar: SAIU do radar público → vai p/ a dobra, só Founder (embeds seguem inline)
+    var _cambioChip = (show("regime") && rr.cambio) ? ('<div class="tk" style="margin-top:8px"><span class="i" data-cod="' + esc(rr.cambio.codigo) + '" data-cls="pulso"><span class="sy">' + esc(rr.cambio.nome) + '</span><span class="pr">R$ ' + esc(rr.cambio.valor) + '</span>' + (rr.cambio.var30 != null ? '<span class="mt">' + (rr.cambio.var30 >= 0 ? "+" : "") + esc(rr.cambio.var30) + '% 30d</span>' : '') + '</span></div>') : '';
+    if (!FOLD && !TEASER) h += _cambioChip;
+    var _indices = '';  // ★ anexo (price strip): no radar completo DESCE p/ a dobra; em embeds/teaser fica na posição original (antes das lentes)
+    if (show("indices") && rr.indices && rr.indices.length) { _indices = '<h4>' + (L ? "Indices · overview" : "Índices · panorama") + '</h4><div class="legend">' + (L ? "click to chart · + more in the app" : "clique pra ver o gráfico · + outros no app") + '</div><div class="tk">' +
       rr.indices.map(function (ix) { return '<span class="i" data-cod="' + esc(ix.codigo) + '" data-cls="' + esc(ix.classe) + '"><span class="sy">' + esc(ix.nome) + '</span><span class="pr">' + esc(ix.valor) + '</span>' + (ix.var12m != null ? '<span class="mt">' + (ix.var12m >= 0 ? "+" : "") + esc(ix.var12m) + '% 12m</span>' : '') + '</span>'; }).join("") + '</div>'; }
-    if (show("lentes") && rr.lentes && rr.lentes.length) { h += '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="legend">' + (L ? "each lens = a domain of Brazil’s regime; color = intensity · dashed line = projection under current conditions, not a forecast" : "cada lente = um domínio do regime; a cor = intensidade · linha tracejada = projeção sob condições atuais, não previsão") + '</div><div class="lns">' +
+    if (!FOLD) h += _indices;
+    // ★ 5 lentes: SAÍRAM do palco público (são a "transmissão do carro" — motor, não narrativa) → dobra, só Founder. Embeds que pedem "lentes" seguem inline.
+    var _lentes = '';
+    if (show("lentes") && rr.lentes && rr.lentes.length) { _lentes = '<h4>' + (L ? "The 5 lenses · today" : "As 5 lentes · hoje") + '</h4><div class="legend">' + (L ? "each lens = a domain of Brazil’s regime; color = intensity · dashed line = projection under current conditions, not a forecast" : "cada lente = um domínio do regime; a cor = intensidade · linha tracejada = projeção sob condições atuais, não previsão") + '</div><div class="lns">' +
       rr.lentes.map(function (l) {
         var buildAm = function (a) {
           if (!a || !a.itens || !a.itens.length) return '';
@@ -1692,71 +1715,91 @@
         return '<div class="ln ' + esc(l.tom) + '"' + (more ? ' data-exp="1"' : '') + '><div class="lk">' + esc(l.nome) + (more ? ' <span class="lr" style="opacity:.55">→</span>' : '') + '</div><div class="li">' + esc(l.indicador) + '</div>' +
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
         '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + more + '</div>'; }).join("") + '</div>'; }
-    if (show("tese")) h += rpTeseHTML(rr, L);  // ★ Tese viva — protagonismo (briefing): logo após as 5 lentes. Fase 2: chave própria ("tese") — preset/embed filtrado só a recebe se pedir (o teaser da home pede; um embed "termometros" não carrega a tese regulatória junto)
-    // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese) dos indicadores/dados de APOIO.
-    //   Só no radar COMPLETO (!sections) — o teaser (regime,lentes) e embeds filtrados não recebem o divisor órfão.
+    if (!FOLD) h += _lentes;
+    if (show("tese") && !FOLD) h += rpTeseHTML(rr, L);  // ★ 2026-06-17: tese REMOVIDA do Live (interrompia a narrativa Sinal→lentes→"Hoje lembra"; o "Hoje lembra" é o clímax mais forte). Mantida só p/ embed que peça "tese" explicitamente (nenhum pede hoje).
+    // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese · "Hoje lembra") dos indicadores/dados de APOIO.
+    //   Blocos do Cérebro 1 (apoio) viram strings; a POSIÇÃO depende de FOLD (dobra no radar completo · ordem plana em embeds/teaser).
     // ★ Fase 1C — comparar e estudos SAÍRAM da home (2 muros de chips a menos) → abas do drawer. As 3 portas
     //   delicadas mantêm a descoberta (fricção das personas: "ferramentas 6 telas abaixo"); data-tab abre a aba certa.
-    //   Contagem VIVA na porta de Mercados (d.cobertura, cresce com o banco) — comunica que os tickers moram aqui.
-    if (!sections || show("portas")) h += (!sections ? '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>' : '')  // Fase 2: preset "exploracao" recebe as portas (chave "portas"); o divisor de camada segue só no radar completo
-      + '<div class="rp-portas">'
+    var _tier2HTML = '<div class="rp-tier2">' + (L ? "Supporting indicators &amp; data" : "Indicadores e dados de apoio") + '</div>';  // divisor: só na ordem plana (no FOLD o <summary> o substitui)
+    var _portasBtns = '<div class="rp-portas">'
       + '<button type="button" class="rp-explore" data-tab="mercados">' + (L ? "See full coverage" : "Ver toda a cobertura") + ' <span class="a">→</span></button>'
       + '<button type="button" class="rp-explore" data-tab="comparacoes">' + (L ? "Comparative study" : "Estudo comparativo") + ' <span class="a">→</span></button>'
       + '<button type="button" class="rp-explore" data-tab="estudos">' + (L ? "Archive of precedents" : "Arquivo de precedentes") + ' <span class="a">→</span></button>'
       + '</div>';
     // Fase 1B: macro · ações 1/setor · imóveis SAÍRAM da home → aba "Mercados" do drawer (porta "Explorar →"), p/ tirar o aspecto de screener.
     //   Intermercado, fiscal, análogo e scatter (editoriais) PERMANECEM. As séries do macro/ações/imóveis seguem no catálogo /v1/catalog (Mercados).
-    if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { h += '<h4>' + (L ? "Indicators ⇒ BR intermarket" : "Indicadores ⇒ intermercado BR") + '</h4>' +
+    var _interm = '';
+    if (show("intermercado") && rr.intermercado_br && rr.intermercado_br.length) { _interm = '<h4>' + (L ? "Indicators ⇒ BR intermarket" : "Indicadores ⇒ intermercado BR") + '</h4>' +
       collapseList(rr.intermercado_br.map(function (x) { var hasTk = x.tickers && x.tickers.length, xp = x.fonte || hasTk || (x.leadlag && x.leadlag.txt); return '<div class="t ' + esc(x.tom) + '"' + (xp ? ' data-exp="1"' : '') + '><div class="n">' + esc(x.nome) + (xp ? ' <span class="rr" style="opacity:.55">→</span>' : '') + '</div><div class="rr" style="margin-top:4px">' + esc(x.leitura) + '</div>' + (x.spark2 && x.spark2.a ? '<div class="legend" style="margin-top:5px"><span style="color:var(--_accent)">▬</span> ' + esc(x.spark2.an) + ' <span style="color:var(--_cool)">▬</span> ' + esc(x.spark2.bn) + (x.spark2.c ? ' <span style="color:var(--_warm)">▦</span> ' + esc(x.spark2.cn) : '') + (x.spark2.ar && !GATED ? '<span style="opacity:.6;display:block;margin-top:1px">' + (L ? "left axis " : "eixo esq ") + esc(fmtNum(x.spark2.ar[0])) + '–' + esc(fmtNum(x.spark2.ar[1])) + ' · ' + (L ? "right axis " : "eixo dir ") + esc(fmtNum(x.spark2.br[0])) + '–' + esc(fmtNum(x.spark2.br[1])) + '</span>' : '') + '</div>' + dualSpark(x.spark2.a, x.spark2.b, x.spark2.c) : '') + (xp ? '<div class="more">' + (x.fonte ? '<div class="mi">' + (L ? "What it is — " : "O que é — ") + esc(x.fonte) + '</div>' : '') + (x.leadlag && x.leadlag.txt ? '<div class="mi"><b>Lead-lag</b> — ' + esc(x.leadlag.txt) + '</div>' : '') + (hasTk ? '<div class="mi" style="margin-bottom:3px">' + (L ? "components (click):" : "componentes (clique):") + '</div><div class="tk">' + x.tickers.map(function (tk) { return '<span class="i" data-cod="' + esc(String(tk.ticker).toLowerCase()) + '" data-cls="' + esc(tk.cls || "equity_br") + '"><span class="sy">' + esc(tk.ticker) + '</span>' + (tk.dy != null ? '<span class="mt">DY ' + esc(tk.dy) + '%</span>' : '') + '</span>'; }).join("") + '</div>' : '') + (x.cod ? '<button class="rp-imxp" data-cod="' + esc(x.cod) + '" data-nome="' + esc(x.numn || x.nome) + '" data-denn="' + esc(x.denn || "IBOV") + '" data-ll="' + esc((x.leadlag && x.leadlag.txt) || x.fonte || "") + '">⤢ ' + (L ? "compare (lead-lag overlay)" : "comparar (overlay lead-lag)") + '</button>' : '') + '</div>' : '') + '</div>'; }), 3, "g3", L ? "more pairs" : "mais pares"); }
+    var _fiscal = '';
     if (show("fiscal") && rr.fiscal && ((rr.fiscal.series && rr.fiscal.series.length) || (rr.fiscal.composicao && rr.fiscal.composicao.length))) {
-      h += '<h4>' + (L ? "Fiscal & monetary" : "Fiscal & monetário") + '</h4><div class="legend">' + (L ? "the public accounts behind the regime — debt/GDP, fiscal stress, real rate, Selic; click for the long history" : "as contas públicas por trás do regime — dívida/PIB, stress fiscal, juro real, Selic; clique pra ver a história longa") + '</div>';
-      if (rr.fiscal.series && rr.fiscal.series.length) h += '<div class="tk">' + rr.fiscal.series.map(function (x) { return '<span class="i" data-cod="' + esc(x.cod) + '" data-cls="' + esc(x.cls || "macro") + '"><span class="sy">' + esc(x.nome) + '</span><span class="pr">' + esc(x.valor) + (x.unidade ? ' ' + esc(x.unidade) : '') + '</span></span>'; }).join("") + '</div>';
+      _fiscal += '<h4>' + (L ? "Fiscal & monetary" : "Fiscal & monetário") + '</h4><div class="legend">' + (L ? "the public accounts behind the regime — debt/GDP, fiscal stress, real rate, Selic; click for the long history" : "as contas públicas por trás do regime — dívida/PIB, stress fiscal, juro real, Selic; clique pra ver a história longa") + '</div>';
+      if (rr.fiscal.series && rr.fiscal.series.length) _fiscal += '<div class="tk">' + rr.fiscal.series.map(function (x) { return '<span class="i" data-cod="' + esc(x.cod) + '" data-cls="' + esc(x.cls || "macro") + '"><span class="sy">' + esc(x.nome) + '</span><span class="pr">' + esc(x.valor) + (x.unidade ? ' ' + esc(x.unidade) : '') + '</span></span>'; }).join("") + '</div>';
       if (rr.fiscal.composicao && rr.fiscal.composicao.length) {
-        h += '<div class="legend" style="margin-top:7px">' + (L ? "Federal public debt by indexer (DPF)" : "Dívida Pública Federal por indexador (DPF)") + '</div><div class="comp">' +
+        _fiscal += '<div class="legend" style="margin-top:7px">' + (L ? "Federal public debt by indexer (DPF)" : "Dívida Pública Federal por indexador (DPF)") + '</div><div class="comp">' +
           rr.fiscal.composicao.map(function (c) { return '<span class="seg ' + esc(c.tom || 'neu') + '" style="width:' + c.pct + '%" title="' + esc(c.nome) + ' ' + c.pct + '%"></span>'; }).join("") + '</div><div class="legend">' +
           rr.fiscal.composicao.map(function (c) { return '<span style="white-space:nowrap"><b style="color:var(--_' + esc(c.tom || 'neu') + ')">▮</b> ' + esc(c.nome) + ' ' + c.pct + '%</span>'; }).join(" · ") + '</div>';
       }
     }
-    // Tese viva movida p/ logo após as 5 lentes (rpTeseHTML) — protagonismo (briefing)
+    // ★ "Hoje lembra" (analogo_br) — SOBE para o núcleo (clímax do Cérebro 1: onde estamos → por quê → com o que se parece)
+    var _hojelembra = '';
     if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br;
       if (TEASER) {  // ── capa editorial "Hoje lembra": datas como estrela + 2 números grandes + assinatura. Sem rótulo "Análogo BR", sem "passado→futuro", sem método (nome da máquina não importa) — os números contam a história. ──
-        h += '<div class="rp-hl">' +
+        _hojelembra += '<div class="rp-hl">' +
           '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
           (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
           '<div class="hl-n"><div><b>' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</b><span>' + (L ? "median Ibovespa · 6 months" : "mediana do Ibovespa · 6 meses") + '</span></div>' +
           '<div><b>' + esc(ab.hit_rate_pct) + '%</b><span>' + (L ? "positive episodes" : "episódios positivos") + (ab.n_analogos ? " · n=" + esc(ab.n_analogos) : "") + '</span></div></div>' +
           '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div></div>';
-      } else {
-        h += '<h4>' + (L ? "BR analog · past → future" : "Análogo BR · passado → futuro") + '</h4><div class="hl hero"><div class="q">' + esc(ab.pergunta) + '</div>' + (ab.datas_analogas && ab.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') + '<div class="stat"><div><div class="v">' + (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median (IBOV)" : "mediana (IBOV)") + '</div></div><div><div class="v">' + esc(ab.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(ab.n_analogos) + '</div></div></div>' + (ab.n_analogos && ab.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>';
+      } else {  // ★ radar completo: "Hoje lembra" como PEÇA EDITORIAL — frase-líder com os números subordinados (memória institucional, não caixa estatística)
+        var _med = (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + "%";
+        var _lead = L
+          ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
+          : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
+        _hojelembra += '<div class="rp-hle">' +
+          '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
+          '<div class="hl-sub">' + (L ? "past → future" : "passado → futuro") + '</div>' +
+          '<p class="hl-lead">' + _lead + '</p>' +
+          (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
+          (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
+          '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div>' +
+          '<a class="hl-ep" href="' + (L ? "/articles" : "/artigos") + '">' + (L ? "See the full episodes →" : "Ver episódios completos →") + '</a>' +
+          '</div>';
       }
     }
+    var _scatter = '';
     if (show("scatter") && rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);
-      h += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "today's regime band" : "faixa do regime de hoje") + ' · <span style="color:var(--_warm)">●</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">●</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' +
+      _scatter += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "today's regime band" : "faixa do regime de hoje") + ' · <span style="color:var(--_warm)">●</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">●</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' +
         '<div style="display:flex;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:230px">' + scatterChart(sct) + '<div class="legend" style="margin-top:3px">' + (L ? "the cloud · today highlighted" : "a nuvem · hoje em destaque") + '</div></div>' +
         (dist ? '<div style="flex:1;min-width:230px">' + dist.svg + '<div class="legend" style="margin-top:3px">' + (L ? "outcomes within today's band (scatter cut — a different method from the k-NN analog above) · most between " : "desfechos na faixa de hoje (recorte do scatter — método distinto do análogo k-NN acima) · maioria entre ") + (dist.p25 >= 0 ? "+" : "") + dist.p25 + '% ' + (L ? "and " : "e ") + (dist.p75 >= 0 ? "+" : "") + dist.p75 + '% (' + (L ? "median " : "mediana ") + (dist.p50 >= 0 ? "+" : "") + dist.p50 + '%, n=' + dist.n + ')</div></div>' : '') +
         '</div>' + (sct.leitura ? '<div class="legend" style="margin-top:4px">' + esc(sct.leitura) + '</div>' : ''); }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
-    h += brain("Vértice", (L ? "cross-asset · contextual hypothesis" : "cross-asset · hipótese contextual"), true, false);
+    // ★ Vértice: tagline "cross-asset · hipótese contextual" escondida (jargão do motor); fica nome + "os sinais mais ativos" + EXPERIMENTO. No mini-radar, SEM cabeçalho (o dono pediu retirar o "Vértice" lá).
+    var _vHead = TEASER ? '' : brain("Vértice", "", true, false, (L ? "the loudest signals across markets today" : "os sinais mais ativos nos mercados hoje"));
+    var _vTeaser = '';
     if (TEASER) {  // mini-radar: Vértice compacto = 1 termômetro (o mais ativo) + 1 fuga de capital, lado a lado, sem método/jargão → bloco com altura ~ do Radar
       var _vc = function (t) { if (!t) return ""; return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' + (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + '</div>'; };
       var _t1 = (v.termometros && v.termometros.length) ? v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); })[0] : null;
       var _fg = (v.observatorio && v.observatorio.fuga) ? v.observatorio.fuga : null;
       var _cs = [_vc(_t1), _vc(_fg)].filter(Boolean).join("");
-      if (_cs) h += '<div class="g3">' + _cs + '</div>';
+      if (_cs) _vTeaser += '<div class="g3">' + _cs + '</div>';
     }
-    // ★ Fase 1D — home mantém top-3 (+3 recolhidos via collapseList); a lista COMPLETA mora na aba Termômetros do
-    //   drawer (porta abaixo, só no radar completo — embeds filtrados ficam como estão).
-    if (!TEASER && show("termometros") && v.termometros) { var tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
-      var tCards = tms.slice(0, 6).map(function (t) { var more = (t.desc || t.comp) ? '<div class="more">' + (t.desc ? '<div class="mi">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="mi"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>' : '';
+    // ★ Termômetros — núcleo (FOLD) = os 2 mais ativos + Capital Flight; o resto desce p/ a dobra. Plano (!FOLD) = top-3 + porta "Todos N".
+    var tms = null, tCards = [];
+    if (!TEASER && show("termometros") && v.termometros) { tms = v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); });
+      tCards = tms.slice(0, 6).map(function (t) { var more = (t.desc || t.comp) ? '<div class="more">' + (t.desc ? '<div class="mi">' + esc(t.desc) + '</div>' : '') + (t.comp ? '<div class="mi"><b>' + (L ? "Composed of — " : "Composto por — ") + '</b>' + esc(t.comp) + '</div>' : '') + '</div>' : '';
         return '<div class="t ' + cls(t.valor) + '"' + (more ? ' data-exp="1"' : '') + '><div class="n">' + esc(t.nome) + (more ? ' <span class="rr" style="opacity:.55">→</span>' : '') + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
-        (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + more + '</div>'; });
-      h += '<h4>' + (L ? "Thermometers · loudest today" : "Termômetros · os mais ativos hoje") + '</h4>' +
-      '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div>' +
-      '<div class="g3">' + tCards.slice(0, 3).join("") + '</div>' +  // só 3 visíveis; sem o "+3 ⌄" inline — o botão "Todos os N" abaixo abre a aba completa
-      (!sections ? '<button type="button" class="rp-explore" data-tab="termometros" style="margin-top:8px">' + (L ? "All " + tms.length + " thermometers" : "Todos os " + tms.length + " termômetros") + ' <span class="a">→</span></button>' : ''); }
-    // Observatório de fluxo & concentração — par CO-HEADLINE (§13.21/§13.25): fuga "de onde→para onde"
-    // (direcional) + concentração/dispersão (forma anônima do movimento). Reusa o card de termômetro.
+        (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + more + '</div>'; }); }
+    var _termoHead = '<h4>' + (L ? "Thermometers · loudest today" : "Termômetros · os mais ativos hoje") + '</h4>' +
+      '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div>';
+    var _termoFull = '';  // plano: top-3 + porta "Todos os N"
+    if (tms) _termoFull = _termoHead + '<div class="g3">' + tCards.slice(0, 3).join("") + '</div>' +
+      (!sections ? '<button type="button" class="rp-explore" data-tab="termometros" style="margin-top:8px">' + (L ? "All " + tms.length + " thermometers" : "Todos os " + tms.length + " termômetros") + ' <span class="a">→</span></button>' : '');
+    // Observatório de fluxo & concentração — par CO-HEADLINE (§13.21/§13.25): fuga "de onde→para onde" (direcional, NÚCLEO no FOLD)
+    // + concentração/dispersão (forma anônima do movimento, dobra). Reusa o card de termômetro.
+    var obFugaCard = '', obRestCards = '', _obsHead = '', _obsFull = '';
     if (!TEASER && show("observatorio") && v.observatorio && (v.observatorio.fuga || v.observatorio.concentracao)) { var ob = v.observatorio;
       var obCard = function (t, extra) { if (!t) return "";
         return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
@@ -1764,45 +1807,75 @@
           (t.desc && !GATED ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + (extra || '') + '</div>'; };  // método/jargão (Gini/Wasserstein/correlação) só p/ Founder — não vaza pro free
       var fluxo = (ob.fuga && ob.fuga.fluxo && ob.fuga.fluxo.de && ob.fuga.fluxo.de.length)
         ? '<div class="rr" style="margin-top:5px"><b>' + (L ? "Out of — " : "Saindo de — ") + '</b>' + esc(ob.fuga.fluxo.de.join(" · ")) + ' <span style="opacity:.6">→ ' + esc(ob.fuga.fluxo.para) + '</span></div>' : '';
-      h += '<h4>' + esc(ob.titulo) + '</h4><div class="legend">' + esc(ob.nota) + '</div><div class="g3">' +
-        obCard(ob.fuga, fluxo) + obCard(ob.concentracao, "") + obCard(ob.dispersao, "") + '</div>'; }
+      _obsHead = '<h4>' + esc(ob.titulo) + '</h4><div class="legend">' + esc(ob.nota) + '</div>';
+      obFugaCard = obCard(ob.fuga, fluxo);
+      obRestCards = obCard(ob.concentracao, "") + obCard(ob.dispersao, "");
+      _obsFull = _obsHead + '<div class="g3">' + obFugaCard + obRestCards + '</div>'; }
     // Razões geográficas — rotação entre geografias (ETF-país ÷ ETF-país); seção própria do Vértice. Reusa o card.
+    var _razoes = '';
     if (show("razoes_geo") && v.razoes_geo && v.razoes_geo.length) {
-      h += '<h4>' + (L ? "Geographic ratios · rotation" : "Razões geográficas · rotação") + '</h4><div class="legend">' + (L ? "which geography attracts capital (country-ETF ÷ country-ETF)" : "qual geografia atrai capital (ETF-país ÷ ETF-país)") + '</div><div class="g3">' +
+      _razoes = '<h4>' + (L ? "Geographic ratios · rotation" : "Razões geográficas · rotação") + '</h4><div class="legend">' + (L ? "which geography attracts capital (country-ETF ÷ country-ETF)" : "qual geografia atrai capital (ETF-país ÷ ETF-país)") + '</div><div class="g3">' +
         v.razoes_geo.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
           (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') +
           (t.desc && !GATED ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + '</div>'; }).join("") + '</div>'; }  // método só p/ Founder
-    if (show("cripto") && v.cripto && v.cripto.length) { h += '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4>' + (v.cripto_sentimento ? '<div class="legend">Fear &amp; Greed: ' + esc(v.cripto_sentimento.fng) + ' (' + esc(v.cripto_sentimento.leitura) + ')</div>' : '') + (v.cripto_onchain ? '<div class="legend">' + esc(v.cripto_onchain.nota) + ': ' + [v.cripto_onchain.tvl ? 'TVL ' + esc(v.cripto_onchain.tvl) : '', v.cripto_onchain.stablecoin ? 'stablecoins ' + esc(v.cripto_onchain.stablecoin) : '', v.cripto_onchain.ssr != null ? 'SSR ' + esc(v.cripto_onchain.ssr) : ''].filter(Boolean).join(' · ') + '</div>' : '') + '<div class="tk">' +
+    var _cripto = '';
+    if (show("cripto") && v.cripto && v.cripto.length) { _cripto = '<h4>' + (L ? "Crypto · highlights" : "Cripto · destaques") + '</h4>' + (v.cripto_sentimento ? '<div class="legend">Fear &amp; Greed: ' + esc(v.cripto_sentimento.fng) + ' (' + esc(v.cripto_sentimento.leitura) + ')</div>' : '') + (v.cripto_onchain ? '<div class="legend">' + esc(v.cripto_onchain.nota) + ': ' + [v.cripto_onchain.tvl ? 'TVL ' + esc(v.cripto_onchain.tvl) : '', v.cripto_onchain.stablecoin ? 'stablecoins ' + esc(v.cripto_onchain.stablecoin) : '', v.cripto_onchain.ssr != null ? 'SSR ' + esc(v.cripto_onchain.ssr) : ''].filter(Boolean).join(' · ') + '</div>' : '') + '<div class="tk">' +
       v.cripto.map(function (t) { return '<span class="i" data-cod="' + esc(String(t.simbolo).toLowerCase()) + '" data-cls="cripto"><span class="sy">' + esc(t.simbolo) + '</span><span class="pr">$ ' + esc(t.preco) + '</span>' + (t.pos52 != null ? '<span class="mt">' + esc(t.pos52) + (L ? "% of 52w" : "% da faixa 52s") + '</span>' : '') + '</span>'; }).join("") + '</div>'; }
+    var _extras = '';
     if (show("extras")) { var ex = [];
       if (v.breadth) { if (v.breadth.us && v.breadth.us.valor != null) ex.push(card(L ? "US breadth" : "Breadth US", v.breadth.us.valor + "%", v.breadth.us.regime)); if (v.breadth.br) { var br = v.breadth.br; ex.push(card(L ? "BR breadth · % > 200-day MA" : "Breadth BR · % > média 200d", br.valor != null ? br.valor + "%" : null, (br.leitura || br.regime) + (br.n ? " · " + br.n + (L ? " names" : " papéis") : ""))); } }  // guarda valor null → card() mostra "—"/🔒, nunca "null%"
       if (v.geo_riskon) ex.push(card(L ? "Geographic risk-on" : "Risk-on geográfico", v.geo_riskon.valor, v.geo_riskon.regime));
-      if (ex.length) h += '<h4>' + (L ? "Market breadth / geographic" : "Amplitude de mercado / geográfico") + '</h4>' +
+      if (ex.length) _extras = '<h4>' + (L ? "Market breadth / geographic" : "Amplitude de mercado / geográfico") + '</h4>' +
         '<div class="legend">' + (L ? "% of stocks above their 200-day average · geographic = emerging vs developed rotation" : "% de ações acima da média de 200 dias · geográfico = rotação emergentes vs desenvolvidos") + '</div><div class="g3">' + ex.join("") + '</div>' +
         ((v.breadth && v.breadth.br && v.breadth.br.serie && v.breadth.br.serie.length > 1) ? '<div class="legend" style="margin-top:7px">' + (L ? "BR breadth over time · last 36 months (% > 200-day MA)" : "Breadth BR ao longo do tempo · últimos 36 meses (% > média 200d)") + '</div>' + bigChart({ hist: v.breadth.br.serie }) : ''); }
-    if (show("leadlag") && v.lead_lag && v.lead_lag.length) { h += '<h4>' + (L ? "Lead-lag · statistically significant (FDR)" : "Lead-lag · com significância (FDR)") + '</h4>' +
+    var _leadlag = '';
+    if (show("leadlag") && v.lead_lag && v.lead_lag.length) { _leadlag = '<h4>' + (L ? "Lead-lag · statistically significant (FDR)" : "Lead-lag · com significância (FDR)") + '</h4>' +
       // ★ glossário no ponto de uso (rodada 50 personas, rec. 6: FDR 49 menções · lead-lag 48 — desistência nº 1 inclusive de quants)
       '<div class="legend">' + (L ? "lead-lag = one series tends to move BEFORE the other (observed lead, in days) · FDR = statistical filter that discards lucky correlations (false-discovery control)" : "lead-lag = uma série costuma se mover ANTES da outra (antecedência observada, em dias) · FDR = filtro estatístico que descarta correlações de sorte (controle de descobertas falsas)") + '</div><ul class="ll">' +
       v.lead_lag.map(function (x) { return '<li><b>' + esc(x.leitura) + '</b> <span class="tag">· ' + esc(x.sentido) + ' · corr ' + esc(x.corr) + ' · ' + esc(x.janela_dias) + 'd · FDR ✓</span></li>'; }).join("") + '</ul>'; }
+    var _analogo = '';
     if (show("analogo") && v.estudo_analogo) { var a = v.estudo_analogo;
       var aDatas = (a.datas_analogas && a.datas_analogas.length ? '<div class="q" style="margin:-4px 0 8px;color:var(--_accent)">' + (L ? "today resembles " : "hoje lembra ") + esc(a.datas_analogas.join(" · ")) + '</div>' : '');
       if (a.locked || GATED) {  // free: mostra a PERGUNTA + as datas-análogas; tranca o RESULTADO (mediana/hit-rate)
-        h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta || "") + '</div>' + aDatas +
+        _analogo = '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta || "") + '</div>' + aDatas +
           '<div class="stat"><div><div class="v">' + glock() + '</div><div class="r">' + (L ? "median · hit-rate" : "mediana · hit-rate") + '</div></div></div>' +  // free: sem "n=" (não vaza a escala da amostra no teaser travado)
           '<div class="rp-ml" style="opacity:.82;margin-top:5px">' + (L ? "full analog outcomes (median, hit-rate, all horizons) in Founder" : "resultados completos do análogo (mediana, hit-rate, todos os horizontes) no Founder") + '</div></div>';
       } else {
-        h += '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div>' + aDatas + '<div class="stat">' +
+        _analogo = '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div>' + aDatas + '<div class="stat">' +
           '<div><div class="v">' + esc(a.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median" : "mediana") + '</div></div>' +
           '<div><div class="v">' + (a.delta_pp >= 0 ? "+" : "") + esc(a.delta_pp) + 'pp</div><div class="r">vs base ' + esc(a.base_rate_pct) + '%</div></div>' +
           '<div><div class="v">' + esc(a.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(a.n_analogos) + '</div></div></div>' + (a.n_analogos && a.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(a.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((a.hit_rate_pct / 100) * (1 - a.hit_rate_pct / 100) / a.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>';
       } }
+    var _diverg = '';
     if (show("divergencias") && v.divergencias) {
       if (v.divergencias.locked) {  // free: só a CONTAGEM + cadeado (as leituras são substância → Founder)
-        if (v.divergencias.n) h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><div class="lr">' + esc(v.divergencias.n) + ' ' + (L ? "divergences flagged today " : "divergências sinalizadas hoje ") + glock() + '</div>';
-      } else if (v.divergencias.length) { h += '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
+        if (v.divergencias.n) _diverg = '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><div class="lr">' + esc(v.divergencias.n) + ' ' + (L ? "divergences flagged today " : "divergências sinalizadas hoje ") + glock() + '</div>';
+      } else if (v.divergencias.length) { _diverg = '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
         v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; } }
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
-    if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; h += '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
+    var _par = '';
+    if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; _par = '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
+
+    // ════ MONTAGEM — progressive disclosure ════
+    function _details(lbl, body) { return body ? '<details class="rp-fold"' + (GATED ? '' : ' open') + '><summary>' + esc(lbl) + '</summary><div class="rp-foldbody">' + body + '</div></details>' : ''; }
+    if (FOLD) {
+      // ★ 2026-06-17 — radar editorial: dois clímaxes adjacentes (memória + sinais), uma só dobra para todo o denso.
+      //   Núcleo: regime (acima) → "Hoje lembra" (clímax editorial) → Vértice (os mais ativos). 5 lentes + dólar saíram
+      //   do palco público; entram na dobra SÓ p/ assinante. "Honest summary" reforçado: história primeiro, motor depois.
+      h += _hojelembra;
+      h += _vHead;
+      var _c2core = (tCards.length ? tCards.slice(0, 2).join("") : "") + obFugaCard;
+      if (_c2core) h += '<h4>' + (L ? "Thermometers" : "Termômetros") + '</h4><div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' + _c2core + '</div>';
+      var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Other thermometers" : "Outros termômetros") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
+      var _obsRest = obRestCards ? (_obsHead + '<div class="g3">' + obRestCards + '</div>') : '';
+      // dólar + 5 lentes "dentro, só p/ assinante" (pedido do dono): aparecem no topo da dobra apenas p/ Founder.
+      var _founderOnly = !GATED ? ((_cambioChip ? '<h4>' + (L ? "Currency" : "Câmbio") + '</h4>' + _cambioChip : '') + _lentes) : '';
+      h += _details(_foldLbl1, _founderOnly + _scatter + _indices + _interm + _fiscal + _termoRest + _obsRest + _razoes + _cripto + _extras + _leadlag + _analogo + _diverg + _par + _portasBtns);
+    } else {
+      // ordem plana original (embeds / mini-radar) — comportamento idêntico ao anterior
+      if (!sections || show("portas")) h += (!sections ? _tier2HTML : '') + _portasBtns;
+      h += _interm + _fiscal + _hojelembra + _scatter + _vHead + _vTeaser + _termoFull + _obsFull + _razoes + _cripto + _extras + _leadlag + _analogo + _diverg + _par;
+    }
     if (chrome || !sections) h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +  // só no radar completo (sections=null) ou em embeds (chrome) — NÃO no teaser/pulso da home
       (L ? ("The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across " + (_ca100 ? "over " + _ca100 + " assets" : "over 100 assets") + " and 50+ years of history.")
          : ("O plano completo acrescenta a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção — sobre " + (_ca100 ? "mais de " + _ca100 + " ativos" : "mais de 100 ativos") + " e 50+ anos de histórico.")) +
