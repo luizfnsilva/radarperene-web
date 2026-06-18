@@ -9,7 +9,7 @@
 // Na /diario/<data> dessas datas, visitante FREE vê um link p/ a amostra; ASSINANTE não (já recebe o semanal completo → sem duplicar).
 const WEEKLY_SAMPLE_DATES = ["2026-06-12"];
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
-const EN_DESC = "Brazil's market regime in 5 lenses, historical analogs and a library of precedents on public data. Today's reading, live. Descriptive, never advice.";
+const EN_DESC = "A living archive of Brazil's markets: daily, weekly and monthly reports and a library of precedents — to read the present in light of the past.";
 const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, equity risk premium, fair value, Brazil valuation, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, FipeZap, inflation, IPCA, study library, historical analogs, regulatory intelligence"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
 const EN_FAQ = JSON.stringify({
   "@context": "https://schema.org", "@type": "FAQPage", "inLanguage": "en", "mainEntity": [
@@ -899,7 +899,10 @@ async function _route(request, env, ctx) {
       //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
       rw = rw
         .on("link#rp-canonical", { element(e) { e.setAttribute("href", url.origin + "/"); } })
-        .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", url.origin + "/"); } });
+        .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", url.origin + "/"); } })
+        // ★ og:image/twitter:image por HOST (o index nasce fixo .com → vazava no .com.br). EN sobrescreve p/ -en abaixo.
+        .on('meta[property="og:image"]', { element(e) { e.setAttribute("content", url.origin + "/og-image-1200x630.png"); } })
+        .on('meta[name="twitter:image"]', { element(e) { e.setAttribute("content", url.origin + "/og-image-1200x630.png"); } });
       if (isEN) {
         rw = rw
           .on("html", { element(e) { e.setAttribute("lang", "en"); } })
