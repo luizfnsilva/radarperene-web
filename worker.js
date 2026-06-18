@@ -45,7 +45,7 @@ const EN_BODY = (function () {
     eyb6: "What&rsquo;s underneath",
     eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s regime right now — conclusions only, free. The numbers, 50+ years of history and the full analogs live in Founder.", tzMore: "See the full radar ↓",
     eyb1: "Live · full radar", s1: "The full radar", s1s: "The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
-    fbadge: "Launch · seats limited to the first 100 founders", fed: "Founder Edition", fprice: '<b style="color:var(--gold)">US$ 149/mo</b>', fh: "The complete instrument.", fp: "Access includes: daily, weekly and monthly reports · the full analog outcomes (3/6/12 months) · all horizons and distributions (median · p10–p90 bands) · 16 years of precedents (since 2010) · the provenance of every reading · the 5 Lenses + the Vértice experiment · the widget and the app. Locked while your subscription stays active · 7-day refund · cancel in one click.",
+    fbadge: "Launch · seats limited to the first 100 founders", fed: "Founder Edition", fprice: '<b style="color:var(--gold)">US$ 149/mo</b>', fh: "Access to the complete archive.", fp: '<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> the entire report library since April 2010</li><li><span style="color:var(--gold)">✓</span> the full outcomes of every similar episode</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the historical distribution at 3, 6 and 12 months</li><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> a living archive that grows every day</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
     fdisc: "⚠ Work in progress: today about <b>90% of the functions and tickers aren&rsquo;t available yet</b> — they roll out gradually, at no extra cost, with your founder price locked. You secure everything as it ships; you&rsquo;re not paying for a complete product today.",
     wlbtn: "Get my invite",
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
@@ -97,7 +97,8 @@ const EN_BODY = (function () {
     "eyb-tz": C.eybTz, "s-tz": C.sTz, "s-tz-s": C.sTzS, "tz-more": C.tzMore,
     "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
     "fbadge": C.fbadge, "fed": C.fed, "fprice": C.fprice, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn, "assine-link": "view plans →",
-    "eyb-ult": "Latest readings", "s-ult": "The day's regime — archived and auditable", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.", "ult-cta": "See the full Diary →",
+    "eyb-ult": "Latest readings", "s-ult": "The regime diary", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — the full history crosses past and future.", "ult-cta": "See the full Diary →",
+    "sb-eyb": "A living library of precedents", "sl-desde": "the oldest record", "sl-ativos": "assets covered", "sl-linhas": "rows of data", "sl-reports": "reports in the library", "sl-tribunais": "courts monitored", "sl-snap": "years of daily history", "sb-cta": "Explore the archive →",
     "eyb3": C.eyb3, "s3": C.s3, "s3s": C.s3s, "eyb4": C.eyb4, "disc": C.disc,
     "eyb9": C.eyb9, "s9": C.s9, "qtag-txt": "CURRENT SIGNAL · REGIME BR",
     "lenses": lenses, "topnav": topnav, "conceitos-grid": cgrid, "ladder": ladder, "scale": scale, "princ": princ, "tiers": tiers, "faqbox": faqbox, "ftnav": C.ftnav
@@ -873,7 +874,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v3/" + host + "/" + _lk; // versiona a chave (v3 2026-06-18: Onda 1 — Hoje lembra herói + Resumo sobe + metodologia desce; busta o cache da ordem antiga)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v4/" + host + "/" + _lk; // versiona a chave (v4 2026-06-18: Onda 2 — painel de números "uau" + Founder patrimônio/desceu; busta o cache anterior)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));

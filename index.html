@@ -196,6 +196,15 @@
   .instband{display:block;text-align:center;font-family:var(--serif);font-size:clamp(13.5px,2vw,16px);color:var(--dim);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;margin:4px 0 2px;letter-spacing:.01em;text-decoration:none;transition:color .15s}
   .instband:hover{color:var(--txt)}
   .instband b{color:var(--txt);font-weight:600}
+  /* ★ P6 — painel de números "uau" (screenshot-able): gravidade editorial (serif) + escopo SentimenTrader */
+  .statband{text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0 24px;margin:4px 0 2px}
+  .statband .eyebrow{font-family:var(--serif);font-style:italic;font-size:clamp(14px,2vw,17px);color:var(--txt2);text-transform:none;letter-spacing:0;margin-bottom:18px}
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+  @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr);gap:26px 14px}}
+  @media(max-width:430px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{display:flex;flex-direction:column;gap:5px}
+  .stat .n{font-family:var(--serif);font-size:clamp(26px,3.4vw,34px);font-weight:600;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:11.5px;color:var(--dim);letter-spacing:.02em;line-height:1.35}
   /* "Do arquivo" — cartões de episódios marquee (memória); reusa o grid .cards */
   .arcard{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none;transition:border-color .15s,transform .15s}
   .arcard:hover{border-color:var(--gold);transform:translateY(-2px)}
@@ -254,7 +263,18 @@
 </div>
 
 <div class="wrap">
-  <a class="instband" id="instband" href="/artigos"></a>
+  <section class="statband" id="statband">
+    <div class="eyebrow" id="sb-eyb">Uma biblioteca viva de precedentes</div>
+    <div class="stats">
+      <div class="stat"><span class="n" data-cob="desde">1913</span><span class="l" id="sl-desde">o registro mais antigo</span></div>
+      <div class="stat"><span class="n" data-cob="ativos">356</span><span class="l" id="sl-ativos">ativos cobertos</span></div>
+      <div class="stat"><span class="n" data-cob="linhas">2,1 mi</span><span class="l" id="sl-linhas">linhas de dados</span></div>
+      <div class="stat"><span class="n" id="stat-reports">206</span><span class="l" id="sl-reports">relatórios na biblioteca</span></div>
+      <div class="stat"><span class="n" data-cob="tribunais">15</span><span class="l" id="sl-tribunais">tribunais monitorados</span></div>
+      <div class="stat"><span class="n">26</span><span class="l" id="sl-snap">anos de história diária</span></div>
+    </div>
+    <p class="micro" style="margin-top:18px"><a id="sb-cta" href="/artigos" style="color:var(--gold)">Explorar o arquivo →</a></p>
+  </section>
 </div>
 
 <div class="wrap">
@@ -270,25 +290,6 @@
 </div>
 
 <div class="wrap">
-  <section id="fundadores">
-    <div class="founder">
-      <div class="badge" id="fbadge">Lançamento · 100 fundadores</div>
-      <h2 id="fh">O instrumento completo.</h2>
-      <div id="fp"><ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.9"><li><span style="color:var(--gold)">✓</span> relatórios diário, semanal e mensal no e-mail</li><li><span style="color:var(--gold)">✓</span> o desfecho completo dos análogos — 3/6/12 meses</li><li><span style="color:var(--gold)">✓</span> todos os horizontes e distribuições (mediana · faixas p10–p90)</li><li><span style="color:var(--gold)">✓</span> 16 anos de precedentes (desde 2010), 26 de snapshots</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> as 5 Lentes + o experimento Vértice</li><li><span style="color:var(--gold)">✓</span> o mini-radar pro seu site + o app</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div></div>
-      <div id="fed" style="margin:22px 0 1px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:600">Edição Founder</div>
-      <div id="fprice" style="margin:0 0 10px;font-family:var(--serif);font-size:23px;color:var(--txt)"><b style="color:var(--gold)">R$ 149/mês</b></div>
-      <a class="btn" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Assinar →</a>
-      <p style="margin:16px auto 0;font-size:13.5px"><a id="founder-buy-year" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Plano anual · dois meses de cortesia →</a></p>
-      <p style="margin:10px auto 0;font-size:13px"><a href="#wl" id="wl-toggle" style="color:var(--dim);text-decoration:none">Receber aviso de novas vagas →</a><span style="color:var(--line)"> · </span><a href="/assine" id="assine-link" style="color:var(--dim);text-decoration:none">ver planos →</a></p>
-      <form class="wl" id="wl" autocomplete="on" style="display:none;margin-top:14px">
-        <input type="text" class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="email" id="wl-email" placeholder="seu@email.com" required>
-        <button class="btn ghost" type="submit" id="wl-btn" style="padding:9px 16px;font-size:13px;margin:0">Quero meu convite</button>
-      </form>
-      <div class="wl-msg" id="wl-msg"></div>
-    </div>
-  </section>
-
   <section id="radar">
     <div class="eyebrow" id="eyb1">Ao vivo · completo</div>
     <div id="radar-perene" data-chrome="off" style="--rp-max:100%"></div>
@@ -309,6 +310,25 @@
     <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — o histórico completo cruza passado e futuro.</p>
     <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diário completo →</a></p>
+  </section>
+
+  <section id="fundadores">
+    <div class="founder">
+      <div class="badge" id="fbadge">Lançamento · 100 fundadores</div>
+      <h2 id="fh">Acesso ao acervo completo.</h2>
+      <div id="fp"><ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> toda a biblioteca de relatórios desde abril de 2010</li><li><span style="color:var(--gold)">✓</span> os desfechos completos de cada episódio semelhante</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> a distribuição histórica em 3, 6 e 12 meses</li><li><span style="color:var(--gold)">✓</span> relatórios diários, semanais e mensais no e-mail</li><li><span style="color:var(--gold)">✓</span> um arquivo vivo que cresce todos os dias</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div></div>
+      <div id="fed" style="margin:22px 0 1px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:600">Edição Founder</div>
+      <div id="fprice" style="margin:0 0 10px;font-family:var(--serif);font-size:23px;color:var(--txt)"><b style="color:var(--gold)">R$ 149/mês</b></div>
+      <a class="btn" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Assinar →</a>
+      <p style="margin:16px auto 0;font-size:13.5px"><a id="founder-buy-year" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Plano anual · dois meses de cortesia →</a></p>
+      <p style="margin:10px auto 0;font-size:13px"><a href="#wl" id="wl-toggle" style="color:var(--dim);text-decoration:none">Receber aviso de novas vagas →</a><span style="color:var(--line)"> · </span><a href="/assine" id="assine-link" style="color:var(--dim);text-decoration:none">ver planos →</a></p>
+      <form class="wl" id="wl" autocomplete="on" style="display:none;margin-top:14px">
+        <input type="text" class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="email" id="wl-email" placeholder="seu@email.com" required>
+        <button class="btn ghost" type="submit" id="wl-btn" style="padding:9px 16px;font-size:13px;margin:0">Quero meu convite</button>
+      </form>
+      <div class="wl-msg" id="wl-msg"></div>
+    </div>
   </section>
 
   <section id="oque">
@@ -414,7 +434,7 @@
     eyb6:"What&rsquo;s underneath",
     eybTz:"Live · now",sTz:"Today&rsquo;s reading",sTzS:"Brazil&rsquo;s regime right now — conclusions only, free. The numbers, 50+ years of history and the full analogs live in Founder.",tzMore:"See the full radar ↓",
     eyb1:"Live · full radar",s1:"The full radar",s1s:"The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
-    fbadge:"Launch · seats limited to the first 100 founders",fed:"Founder Edition",fprice:'<b style="color:var(--gold)">US$ 149/mo</b>',fh:"The complete instrument.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.9"><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> the full analog outcomes — 3/6/12 months</li><li><span style="color:var(--gold)">✓</span> all horizons and distributions (median · p10–p90 bands)</li><li><span style="color:var(--gold)">✓</span> 16 years of precedents (since 2010), 26 of snapshots</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the 5 Lenses + the Vértice experiment</li><li><span style="color:var(--gold)">✓</span> the widget for your site + the app</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
+    fbadge:"Launch · seats limited to the first 100 founders",fed:"Founder Edition",fprice:'<b style="color:var(--gold)">US$ 149/mo</b>',fh:"Access to the complete archive.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> the entire report library since April 2010</li><li><span style="color:var(--gold)">✓</span> the full outcomes of every similar episode</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the historical distribution at 3, 6 and 12 months</li><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> a living archive that grows every day</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
     wlph:"you@email.com",wlbtn:"Get my invite",
     eyb3:"For your site · free",s3:"Use our mini-radar anywhere",s3s:"A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4:"Principles",
@@ -446,7 +466,7 @@
     eyb6:"O que está por trás",
     eybTz:"Ao vivo · agora",sTz:"A leitura de hoje",sTzS:"O regime do Brasil agora — só as conclusões, de graça. Os números, o histórico de 50+ anos e os análogos completos ficam no Founder.",tzMore:"Ver o radar completo ↓",
     eyb1:"Ao vivo · completo",s1:"O radar completo",s1s:"O motor completo sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.",
-    fbadge:"Lançamento · vagas limitadas aos 100 primeiros fundadores",fed:"Edição Founder",fprice:'<b style="color:var(--gold)">R$ 149/mês</b>',fh:"O instrumento completo.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.9"><li><span style="color:var(--gold)">✓</span> relatórios diário, semanal e mensal no e-mail</li><li><span style="color:var(--gold)">✓</span> o desfecho completo dos análogos — 3/6/12 meses</li><li><span style="color:var(--gold)">✓</span> todos os horizontes e distribuições (mediana · faixas p10–p90)</li><li><span style="color:var(--gold)">✓</span> 16 anos de precedentes (desde 2010), 26 de snapshots</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> as 5 Lentes + o experimento Vértice</li><li><span style="color:var(--gold)">✓</span> o mini-radar pro seu site + o app</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div>',
+    fbadge:"Lançamento · vagas limitadas aos 100 primeiros fundadores",fed:"Edição Founder",fprice:'<b style="color:var(--gold)">R$ 149/mês</b>',fh:"Acesso ao acervo completo.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> toda a biblioteca de relatórios desde abril de 2010</li><li><span style="color:var(--gold)">✓</span> os desfechos completos de cada episódio semelhante</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> a distribuição histórica em 3, 6 e 12 meses</li><li><span style="color:var(--gold)">✓</span> relatórios diários, semanais e mensais no e-mail</li><li><span style="color:var(--gold)">✓</span> um arquivo vivo que cresce todos os dias</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div>',
     wlph:"seu@email.com",wlbtn:"Quero meu convite",
     eyb3:"Para o seu site · grátis",s3:"Use nosso mini-radar onde quiser",s3s:"Um endpoint público e gratuito com a leitura de hoje (JSON). Embute no seu site, cite a fonte. Ideal para portais, newsletters e comunidades.",
     eyb4:"Princípios",
@@ -500,10 +520,9 @@
   //    Metodologia/Como ler/Versão grátis descem pro rodapé (sem ads → menos prioridade de clique). ──
   set("topnav",'<a href="'+U_ART+'">'+NAV.art+'</a><a href="'+U_CON+'">'+NAV.con+'</a><a href="'+U_DIA+'">'+NAV.dia+'</a><span class="dd"><a href="'+U_LEN+'" tabindex="0">'+NAV.len+' ▾</a><div class="ddm">'+lenDD+'</div></span>');
   void conDD;  // dropdown de Conceitos saiu do topo (vira link simples); CN segue no grid "linguagem do Radar"
-  // ── faixa institucional + "Do arquivo" (memória): texto/links por idioma; cartões linkam ao portal editorial ──
-  set("instband",_en
-    ? 'Fifteen years of memory · Seven regimes · One experiment · <b>A living library of precedents</b>'
-    : 'Quinze anos de memória · Sete regimes · Um experimento · <b>Uma biblioteca viva de precedentes</b>');
+  // ── P6: painel de números "uau" — labels EN vêm do worker (EN_BODY, server-side); só o href do CTA é por idioma aqui ──
+  var _sbc=document.getElementById("sb-cta");if(_sbc)_sbc.href=U_ART;
+  // ── "Do arquivo" (memória): texto/links por idioma; cartões linkam ao portal editorial ──
   set("eyb-arq",_en?"From the archive":"Do arquivo");
   set("s-arq",_en?"The present, in conversation with memory":"O presente, em conversa com a memória");
   set("s-arq-s",_en?"Fifteen years of regimes read honestly — what the Radar saw, and what came next.":"Quinze anos de regimes lidos com honestidade — o que o Radar viu, e o que veio depois.");
@@ -542,7 +561,7 @@
   set("arc-merch",_en
     ? '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> reports</b> in the subscriber library — monthly since April 2010, now daily and weekly too. Growing with every new report. <a href="/subscribe">Explore the Founder Edition →</a>'
     : '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> relatórios</b> na biblioteca do assinante — mensais desde abril de 2010, agora também diários e semanais. Cresce a cada novo relatório. <a href="/assine">Conhecer a Edição Founder →</a>');
-  fetch(location.origin+"/api/v1/biblioteca/contagem").then(function(r){return r.json();}).then(function(j){var el=document.getElementById("lib-n");if(el&&j&&j.total)el.textContent=_nf(j.total);}).catch(function(){});  // TOTAL real (mensal+diário+semanal); cresce sozinho. Fallback ≈194 enquanto o endpoint /v1/biblioteca/contagem não estiver no ar (rota f28fb6e ainda não deployada no radar-api)
+  fetch(location.origin+"/api/v1/biblioteca/contagem").then(function(r){return r.json();}).then(function(j){if(!j||!j.total)return;var el=document.getElementById("lib-n");if(el)el.textContent=_nf(j.total);var sr=document.getElementById("stat-reports");if(sr)sr.textContent=_nf(j.total);}).catch(function(){});  // TOTAL real (mensal+diário+semanal); alimenta a merchan E o painel "uau". Fallback ≈194 se o endpoint cair.
   (function(){var ib=document.getElementById("instband");if(ib)ib.setAttribute("href",U_ART);
     var ac=document.getElementById("arc-cta");if(ac){ac.textContent=_en?"See all episodes →":"Ver todos os episódios →";ac.setAttribute("href",U_ART);}})();
   // ── grid "A linguagem do Radar" (9 conceitos, descoberta na home) ──
