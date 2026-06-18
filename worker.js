@@ -895,7 +895,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v10/" + host + "/" + _lk; // versiona a chave (v10 2026-06-18: subtítulo do Diário do regime — 'série histórica construída ao longo do tempo')
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v11/" + host + "/" + _lk; // versiona a chave (v11 2026-06-18: RESUMO + seção Metodologia REMOVIDOS da home por pedido da diretoria)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
@@ -963,9 +963,10 @@ async function _route(request, env, ctx) {
         rw = rw.on("#rp-graph-ld", { text(t) { _gbuf += t.text; t.remove(); if (t.lastInTextNode) t.replace(_graphDated(_gbuf, _gdt), { html: true }); } });
       }
       if (narr && narr.texto_html) {
-        // título "Resumo" — deixa explícito que a prosa é o resumo editorial do radar logo acima (pedido do dono 2026-06-17)
-        const _resumoH = '<div class="rp-narr-h">' + (isEN ? "Summary" : "Resumo") + '</div>';
-        rw = rw.on("#rp-narrative", { element(e) { e.setInnerContent(_resumoH + narr.texto_html, { html: true }); } });
+        // ★ 2026-06-18 (diretoria): RESUMO visível REMOVIDO da home — o mini-radar acima já carrega o estado e os
+        //   análogos, e a prosa repetia. A div #rp-narrative fica vazia → .rp-narr:empty a esconde. NÃO injeta texto.
+        //   (O #rp-narrative segue intacto p/ as páginas /ativo, que injetam a narrativa do ticker noutro branch.)
+        //   O JSON-LD abaixo (invisível, dados estruturados) PERMANECE — preserva a leitura-por-bots/AEO.
         if (narr.jsonld) {
           const ld = JSON.stringify(narr.jsonld).replace(/</g, "\\u003c"); // emite < escapado p/ </script>-safe no inline (barra dupla; "<" sozinho era no-op)
           rw = rw.on("head", { element(e) { e.append('<script type="application/ld+json">' + ld + '</script>', { html: true }); } });
