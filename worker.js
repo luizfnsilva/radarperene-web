@@ -143,6 +143,7 @@ async function _fetchT(url, opts, ms) {
 }
 const _inflight = new Map();  // single-flight por chave (colapsa fetches concorrentes no mesmo isolate)
 let _cobLast = null;          // último cobertura bom → stale-on-error
+let _tickersLast = null;      // última lista de tickers boa → /ativos sobrevive a soluço do DB (nunca 404)
 async function _fetchCobertura() {
   try {
     const r = await _fetchT(COB_API, { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 3600, cacheEverything: true } });
@@ -753,36 +754,43 @@ async function _route(request, env, ctx) {
     }
     // ── /ativos — hub crawlável que DE-ORFANIZA as páginas /ativo (Ahrefs #3): links reais via /v1/tickers. 1 rota, língua por hostname. ──
     if (_url.pathname === "/ativos") {
+      const en = _isEN;
+      let ativos = [];
       try {
-        const en = _isEN;
-        const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } }, 20000);  // ★ /v1/tickers cold ~9,2s > _UPSTREAM_TIMEOUT_MS (9s) → abortava → catch → ASSETS → 404 (hub /ativos morto). 20s cobre o cold; resultado cacheado 6h (cf + cache-control), então 1x lento só.
+        const tr = await _fetchT(NARR_API.replace("/v1/narrative", "/v1/tickers"), { headers: { apikey: NARR_ANON, Authorization: "Bearer " + NARR_ANON }, cf: { cacheTtl: 21600, cacheEverything: true } }, 20000);  // ★ /v1/tickers cold ~9,2s > _UPSTREAM_TIMEOUT_MS (9s); 20s cobre o cold, resultado cacheado 6h
         const tj = tr.ok ? await tr.json() : { ativos: [] };
-        const ativos = (tj.ativos || []).map(function (t) { return String(t).toUpperCase(); }).sort();
-        const canon = _url.origin + "/ativos";
-        const title = en ? "Assets covered — Radar Perene" : "Ativos cobertos — Radar Perene";
-        const desc = en ? "Every Brazilian stock, REIT and index with a descriptive Radar Perene reading: price, fair value, regime and historical analogs." : "Todas as ações, FIIs e índices brasileiros com leitura descritiva do Radar Perene: preço, valor-justo, regime e análogos históricos.";
-        const links = ativos.map(function (t) { return '<a href="/ativo/' + t.toLowerCase() + '">' + _esc(t) + "</a>"; }).join(" · ");
-        const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
-        const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
-          "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
-          "<link rel=\"canonical\" href=\"" + canon + "\">" +
-          "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
-          "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
-          "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/ativos\">" +
-          "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + _url.origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
-          "<script type=\"application/ld+json\">" + ld + "</script>" +
-          _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}input#aq{width:100%;max-width:440px;padding:11px 14px;margin:2px 0 18px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--txt);font-size:15px;font-family:inherit}.cta-row{margin:26px 0 6px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}.cta-row a.go{color:var(--gold);text-decoration:none;font-weight:600}.adslot{margin:24px 0;min-height:96px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:4px}.adslot span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);opacity:.55}") +
-          "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
-          "<input id=\"aq\" type=\"search\" autocomplete=\"off\" placeholder=\"" + (en ? "Search an asset — PETR4, CDI, NVDA…" : "Buscar ativo — PETR4, CDI, NVDA…") + "\">" +
-          "<p class=\"alist\">" + links + "</p>" +
-          "<div class=\"cta-row\"><a class=\"btn\" href=\"/\">" + (en ? "See today&rsquo;s reading" : "Ver a leitura de hoje") + "</a> <a class=\"go\" href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Explore the Founder edition →" : "Conhecer a edição Founder →") + "</a></div>" +
-          "<div class=\"adslot\"><span>" + (en ? "Advertisement" : "Publicidade") + "</span></div>" +
-          "</div>" +
-          "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" +
-          "<script>(function(){var q=document.getElementById('aq');if(!q)return;var a=[].slice.call(document.querySelectorAll('.alist a'));q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();for(var i=0;i<a.length;i++){a[i].style.display=(!v||a[i].textContent.toLowerCase().indexOf(v)>=0)?'':'none';}});})();</script>" +
-          _themeScript() + _CONSENT + "</body></html>";
-        return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=21600" } });
-      } catch (e) { return env.ASSETS.fetch(request); }
+        ativos = (tj.ativos || []).map(function (t) { return String(t).toUpperCase(); }).sort();
+      } catch (e) { ativos = []; }
+      if (ativos.length) _tickersLast = ativos;                       // guarda o último bom
+      const list = ativos.length ? ativos : (_tickersLast || []);     // ★ stale-on-error: soluço do DB NÃO derruba o hub — nunca mais 404
+      const fresh = ativos.length > 0;
+      const canon = _url.origin + "/ativos";
+      const title = en ? "Assets covered — Radar Perene" : "Ativos cobertos — Radar Perene";
+      const desc = en ? "Every Brazilian stock, REIT and index with a descriptive Radar Perene reading: price, fair value, regime and historical analogs." : "Todas as ações, FIIs e índices brasileiros com leitura descritiva do Radar Perene: preço, valor-justo, regime e análogos históricos.";
+      const links = list.map(function (t) { return '<a href="/ativo/' + t.toLowerCase() + '">' + _esc(t) + "</a>"; }).join(" · ");
+      const note = list.length ? "" : ("<p class=\"lead\">" + (en ? "The asset list is loading — please try again in a moment." : "A lista de ativos está carregando — tente novamente em instantes.") + " <a href=\"" + (en ? "/daily" : "/diario") + "\">" + (en ? "Daily archive →" : "Arquivo diário →") + "</a></p>");
+      const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true }).replace(/</g, "\\u003c");
+      const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
+        "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
+        "<link rel=\"canonical\" href=\"" + canon + "\">" +
+        "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/ativos\">" +
+        "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/ativos\">" +
+        "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/ativos\">" +
+        "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + _url.origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+        (fresh ? "" : "<meta name=\"robots\" content=\"noindex\">") +  // degradado/stale: não deixa o Google indexar versão sem lista
+        "<script type=\"application/ld+json\">" + ld + "</script>" +
+        _chromeCss("p.lead{color:var(--txt2);font-size:15px}.alist a{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:13px;line-height:2.1}input#aq{width:100%;max-width:440px;padding:11px 14px;margin:2px 0 18px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--txt);font-size:15px;font-family:inherit}.cta-row{margin:26px 0 6px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}.cta-row a.go{color:var(--gold);text-decoration:none;font-weight:600}.adslot{margin:24px 0;min-height:96px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:4px}.adslot span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);opacity:.55}") +
+        "</head><body>" + _header() + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" + note +
+        (list.length ? "<input id=\"aq\" type=\"search\" autocomplete=\"off\" placeholder=\"" + (en ? "Search an asset — PETR4, CDI, NVDA…" : "Buscar ativo — PETR4, CDI, NVDA…") + "\">" : "") +
+        "<p class=\"alist\">" + links + "</p>" +
+        "<div class=\"cta-row\"><a class=\"btn\" href=\"/\">" + (en ? "See today&rsquo;s reading" : "Ver a leitura de hoje") + "</a> <a class=\"go\" href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Explore the Founder edition →" : "Conhecer a edição Founder →") + "</a></div>" +
+        "<div class=\"adslot\"><span>" + (en ? "Advertisement" : "Publicidade") + "</span></div>" +
+        "</div>" +
+        "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" +
+        "<script>(function(){var q=document.getElementById('aq');if(!q)return;var a=[].slice.call(document.querySelectorAll('.alist a'));q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();for(var i=0;i<a.length;i++){a[i].style.display=(!v||a[i].textContent.toLowerCase().indexOf(v)>=0)?'':'none';}});})();</script>" +
+        _themeScript() + _CONSENT + "</body></html>";
+      // fresh = 6h; stale/vazio = 2min (re-tenta quando o DB voltar). NUNCA 404 → footer/SEO sempre navegáveis.
+      return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": fresh ? "public, max-age=21600" : "public, max-age=120" } });
     }
     // ── /ativo/{ticker} — página por ativo (SEO programático B.1): reusa a home shell + widget em modo ativo + narrativa per-ativo ──
     const _am = _url.pathname.match(/^\/ativo\/([a-z0-9_-]{2,44})\/?$/i);  // ★ aceita underscore (us_10y) E hífen+slug longo (fipezap_sp_res_venda 20c, tesouro-prefixado-com-juros-semestrais-01012031 44c) — {2,14} barrava o catálogo total 2026-06-11
