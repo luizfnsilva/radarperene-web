@@ -237,6 +237,9 @@
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
+      // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
+      ".rp .rp-present{margin:8px 0 2px}.rp .rp-present div{font-family:Georgia,'Fraunces',serif;font-size:16px;line-height:1.55;color:var(--_txt)}.rp .rp-present b{font-weight:600}" +
+      ".rp .rp-signals{border-top:1px solid var(--_line);margin-top:16px;padding-top:14px}.rp .rp-signals div{font-size:13.5px;line-height:1.7;color:var(--_dim)}.rp .rp-signals b{font-weight:600;color:var(--_txt)}" +
       ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent)}" +
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
       ".rp .brand{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--_txt);font-size:14px;font-weight:600;opacity:.92}.rp .brand b{color:var(--_accent);font-weight:700}.rp .brand svg{flex:none;opacity:.9}" +
@@ -1670,12 +1673,18 @@
     h += brain("Radar Perene", (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro"), false, true);  // ★ 2026-06-17: título = só "Radar Perene" (era "Radar do Brasil · 5 lentes · regime regulatório" — descrição do MOTOR, não do produto)
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
     if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
-    if (show("regime") && rr.regime) { var g = rr.regime; h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
-      card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
-      card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
-      // ★ item 10 pós-B6 (2 grandezas): o clique abre a SÉRIE do número exibido — a breadth (% abaixo do valor-justo,
-      //   187 meses em series_historicas_macro) — e não mais o z do ERP (que segue citado no texto como secundário).
-      if (g.valuation && !TEASER) { var vl = g.valuation; var erpTxt = vl.erp == null ? "" : ((vl.erp >= 0 ? "+" : "") + vl.erp + "pp"); h += '<div class="i valstrip" data-cod="valuation_breadth_br" data-cls="macro" data-nome="' + esc(L ? "BR valuation breadth (% below fair value)" : "Breadth de valuation BR (% abaixo do valor-justo)") + '"><div class="vl-l"><span class="vl-t">' + (L ? "Valuation BR" : "Valuation BR") + '</span><span class="vl-r">' + esc(vl.regime) + '</span></div><div class="vl-b"><span class="vl-s">' + esc(vl.score) + '%</span> <span class="vl-x">' + (L ? "below fair value" : "abaixo do valor-justo") + (vl.n ? " · " + vl.n + (L ? " stocks" : " ações") : "") + (erpTxt ? " · ERP " + erpTxt : "") + '</span></div></div>'; } }
+    if (show("regime") && rr.regime) { var g = rr.regime;
+      if (TEASER) {  // ★ mini editorial (filosofia capa): o PRESENTE em 2 linhas de texto — sem h4/MENSAL/escala/cards (tudo isso vive no radar completo)
+        h += '<div class="rp-present">' +
+          ((g.brasil || {}).regime ? '<div>' + (L ? "Brazil " : "Brasil ") + '<b>' + esc(g.brasil.regime) + '</b></div>' : '') +
+          ((g.global || {}).regime ? '<div>' + (L ? "global " : "ambiente global ") + '<b>' + esc(g.global.regime) + '</b></div>' : '') +
+          '</div>';
+      } else { h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
+        card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
+        card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
+        // ★ item 10 pós-B6 (2 grandezas): o clique abre a SÉRIE do número exibido — a breadth (% abaixo do valor-justo, 187 meses) — não mais o z do ERP.
+        if (g.valuation) { var vl = g.valuation; var erpTxt = vl.erp == null ? "" : ((vl.erp >= 0 ? "+" : "") + vl.erp + "pp"); h += '<div class="i valstrip" data-cod="valuation_breadth_br" data-cls="macro" data-nome="' + esc(L ? "BR valuation breadth (% below fair value)" : "Breadth de valuation BR (% abaixo do valor-justo)") + '"><div class="vl-l"><span class="vl-t">' + (L ? "Valuation BR" : "Valuation BR") + '</span><span class="vl-r">' + esc(vl.regime) + '</span></div><div class="vl-b"><span class="vl-s">' + esc(vl.score) + '%</span> <span class="vl-x">' + (L ? "below fair value" : "abaixo do valor-justo") + (vl.n ? " · " + vl.n + (L ? " stocks" : " ações") : "") + (erpTxt ? " · ERP " + erpTxt : "") + '</span></div></div>'; } }
+    }
     // ★ dólar: SAIU do radar público → vai p/ a dobra, só Founder (embeds seguem inline)
     var _cambioChip = (show("regime") && rr.cambio) ? ('<div class="tk" style="margin-top:8px"><span class="i" data-cod="' + esc(rr.cambio.codigo) + '" data-cls="pulso"><span class="sy">' + esc(rr.cambio.nome) + '</span><span class="pr">R$ ' + esc(rr.cambio.valor) + '</span>' + (rr.cambio.var30 != null ? '<span class="mt">' + (rr.cambio.var30 >= 0 ? "+" : "") + esc(rr.cambio.var30) + '% 30d</span>' : '') + '</span></div>') : '';
     if (!FOLD && !TEASER) h += _cambioChip;
@@ -1771,12 +1780,12 @@
     // ★ Vértice: tagline "cross-asset · hipótese contextual" escondida (jargão do motor); fica nome + "os sinais mais ativos" + EXPERIMENTO. No mini-radar, SEM cabeçalho (o dono pediu retirar o "Vértice" lá).
     var _vHead = TEASER ? '' : brain("Vértice", "", true, false, (L ? "the loudest signals across markets today" : "os sinais mais ativos nos mercados hoje"));
     var _vTeaser = '';
-    if (TEASER) {  // mini-radar: Vértice compacto = 1 termômetro (o mais ativo) + 1 fuga de capital, lado a lado, sem método/jargão → bloco com altura ~ do Radar
-      var _vc = function (t) { if (!t) return ""; return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' + (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') + '</div>'; };
+    if (TEASER) {  // ★ mini editorial: 2 sinais como 2 LINHAS DE TEXTO (sem cabeçalho Vértice, sem cards, sem escala 0–100 — só contexto qualitativo)
+      var _sig = function (t) { if (!t || !t.nome) return ""; return '<div>' + esc(t.nome) + (t.regime ? ' <b>' + esc(t.regime) + '</b>' : '') + '</div>'; };
       var _t1 = (v.termometros && v.termometros.length) ? v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); })[0] : null;
       var _fg = (v.observatorio && v.observatorio.fuga) ? v.observatorio.fuga : null;
-      var _cs = [_vc(_t1), _vc(_fg)].filter(Boolean).join("");
-      if (_cs) _vTeaser += '<div class="g3">' + _cs + '</div>';
+      var _ss = [_sig(_t1), _sig(_fg)].filter(Boolean).join("");
+      if (_ss) _vTeaser += '<div class="rp-signals">' + _ss + '</div>';
     }
     // ★ Termômetros — núcleo (FOLD) = os 2 mais ativos + Capital Flight; o resto desce p/ a dobra. Plano (!FOLD) = top-3 + porta "Todos N".
     var tms = null, tCards = [];
