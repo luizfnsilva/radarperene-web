@@ -37,13 +37,13 @@ const EN_FAQ = JSON.stringify({
 const EN_BODY = (function () {
   const C = {
     h1: 'Brazil, observed — and <span class="g">remembered</span>.',
-    lead: "A living archive of Brazil&rsquo;s markets: daily, weekly and monthly reports and a precedent library that grows every day — to read the present in light of the past.",
+    lead: "A living archive of Brazil&rsquo;s markets: daily, weekly and monthly reports and a library of precedents to read the present in light of the past.",
     cta1: "Explore the Founder edition", cta2: "Read today&rsquo;s edition →", micro: "Educational content from public sources — never a recommendation.",
     eyb7: "Who it&rsquo;s for", s7: "Investors, analysts, managers — and serious newcomers.", s7s: "For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2: "Methodology", s2: "How the Radar reads Brazil", s2s: "Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb5: "Depth", s5: "You choose the depth", s5s: "Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6: "What&rsquo;s underneath",
-    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s regime right now — conclusions only, free. The numbers, 50+ years of history and the full analogs live in Founder.", tzMore: "See the full radar ↓",
+    eybTz: "Live · now", sTz: "Today&rsquo;s reading", sTzS: "Brazil&rsquo;s regime right now. The Founder edition adds the numbers, the full analogs and 50+ years of history.", tzMore: "See the full radar ↓",
     eyb1: "Live · full radar", s1: "The full radar", s1s: "The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge: "Launch · seats limited to the first 100 founders", fed: "Founder Edition", fprice: '<b style="color:var(--gold)">US$ 149/mo</b>', fh: "Access to the complete archive.", fp: '<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> the entire report library since April 2010</li><li><span style="color:var(--gold)">✓</span> the full outcomes of every similar episode</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the historical distribution at 3, 6 and 12 months</li><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> a living archive that grows every day</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
     fdisc: "⚠ Work in progress: today about <b>90% of the functions and tickers aren&rsquo;t available yet</b> — they roll out gradually, at no extra cost, with your founder price locked. You secure everything as it ships; you&rsquo;re not paying for a complete product today.",
@@ -874,7 +874,7 @@ async function _route(request, env, ctx) {
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
       //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v8/" + host + "/" + _lk; // versiona a chave (v8 2026-06-18: P3 Diário em prosa com continuidade + P4 episódio nomeado)
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v9/" + host + "/" + _lk; // versiona a chave (v9 2026-06-18: Hero sem redundância 'arquivo vivo'×'cresce todo dia')
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
