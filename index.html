@@ -637,7 +637,7 @@
   var SBU="https://zcjtkgltrxdnlacezpny.supabase.co";
   var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
   var sb=window.supabase.createClient(SBU,ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});
-  var EN=location.search.indexOf("lang=en")>=0;
+  var EN=(/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname))||location.search.indexOf("lang=en")>=0;  // EN por HOSTNAME (.com) — antes só via ?lang=en, então login/logout ficavam "Entrar"/"Sair" no .com (fix 2026-06-20)
   var seal=document.getElementById("me-seal"),loginEl=document.getElementById("me-login"),bibEl=document.getElementById("me-biblioteca");
   async function refresh(){
     var sess=(await sb.auth.getSession()).data.session;
