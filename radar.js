@@ -247,6 +247,10 @@
       ".rp .rp-state-h{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.4;color:var(--_txt)}.rp .rp-state-h b{font-weight:600}.rp .rp-present .rp-mtag{margin-left:7px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--_accent);font-weight:700;vertical-align:middle}" +
       // ★ 2026-06-20 — identidade editorial (consultor): títulos de SEÇÃO do núcleo em serif grande (substituem o h4 caixa-alta), hero-capa, "Radar em 2 minutos", "As cinco forças do regime".
       ".rp .rp-serif-h{font-family:Georgia,'Fraunces',serif;font-size:22px;line-height:1.25;font-weight:600;color:var(--_txt);margin:30px 0 4px;letter-spacing:-.005em}" +
+      // ★ 2026-06-20 masthead de assinatura (nameplate editorial discreto + linha fina laranja no topo = identidade)
+      ".rp .rp-masthead{border-top:2px solid var(--_accent);padding-top:10px;margin:0 0 13px}" +
+      ".rp .rp-mast-name{font-family:Georgia,'Fraunces',serif;font-size:20px;font-weight:700;letter-spacing:.01em;color:var(--_txt);line-height:1}" +
+      ".rp .rp-mast-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:4px;font-family:var(--_mono)}" +
       ".rp .rp-eyebrow{font-size:10.5px;letter-spacing:.06em;color:var(--_dim);margin:0 0 9px}" +
       // hero-capa: standfirst serif + linha de arquivo (Economist-like)
       ".rp .rp-hero{margin:4px 0 16px}" +
@@ -1709,10 +1713,12 @@
       (_humN(_cob.linhas) || (L ? "490K" : "490 mil")) + (L ? " rows · " : " linhas · ") +
       (_cob.tribunais != null ? _cob.tribunais : "15") + (L ? " courts · since " : " tribunais · desde ") +
       (_cob.desde != null ? _cob.desde : "1970");
+    // ★ 2026-06-20 masthead de assinatura (consultor): nameplate editorial discreto + linha fina laranja no topo — identidade, não informação. Só radar completo (FOLD).
+    if (FOLD) h += '<div class="rp-masthead"><div class="rp-mast-name">Radar Perene</div><div class="rp-mast-sub">' + (L ? "A daily reading of Brazil&rsquo;s regime" : "Leitura diária do regime brasileiro") + (d.data_referencia ? ' · ' + esc(d.data_referencia) : '') + '</div></div>';
     if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "latest available daily close" : "último fechamento diário disponível") + ' · ' + esc(covTxt) + '</div>';  // sem a data crua "updated {hoje}" (confundia: o pulso é o último fechamento, não "hoje"); a frase já diz tudo  // transparência: o pulso é sempre o ÚLTIMO fechamento diário (D-1 enquanto o pregão de hoje não fecha) — alinhado com o relatório do assinante (pré-abertura, fechamento anterior). cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
-    if (!TEASER) h += brain("Radar Perene", (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro"), false, true);  // ★ 2026-06-18: no MINI sem masthead "Radar Perene" — o headline "Brasil {regime}" + a seção "A leitura de hoje" já dão identidade. Radar completo mantém.
+    if (!TEASER && !FOLD) h += brain("Radar Perene", (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro"), false, true);  // ★ 2026-06-18: no MINI sem masthead. ★ 2026-06-20: no radar completo (FOLD) o `rp-masthead` o substitui; embeds/flat mantêm o brain.
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
     if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
     if (show("regime") && rr.regime) { var g = rr.regime;
@@ -1790,18 +1796,9 @@
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
         '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + more + '</div>'; }).join("") + '</div>'; }
     if (!FOLD) h += _lentes;
-    // ★ 2026-06-20 "As cinco forças do regime" — as lentes como CAPÍTULOS (título serif + prosa), não widgets (consultor).
-    //   Vive no núcleo do FOLD (só Founder, como as lentes sempre foram); embeds/flat seguem com o radar-widget (_lentes).
-    var _forcas = '';
-    if (show("lentes") && rr.lentes && rr.lentes.length) {
-      _forcas = '<h3 class="rp-serif-h">' + (L ? "The five forces of the regime" : "As cinco forças do regime") + '</h3><div class="rp-forcas">' +
-        rr.lentes.map(function (l) {
-          // ★ 2026-06-20: prosa = leitura (reading vivo) OU desc (o que a força é) — `leitura` vem VAZIA em 4/5 lentes no digest,
-          //   então sem o fallback os capítulos ficavam "títulos vazios" (bug pego no preview do consultor).
-          return '<div class="rp-forca ' + esc(l.tom || '') + '"><div class="rp-forca-k">' + esc(l.nome) + '</div><p class="rp-forca-p">' + esc(l.leitura || l.desc || '') +
-            (l.valor != null && !GATED ? ' <span class="rp-forca-n">· ' + esc(l.indicador || '') + ' ' + esc(l.valor) + (l.unidade ? ' ' + esc(l.unidade) : '') + '</span>' : '') + '</p></div>';
-        }).join("") + '</div>';
-    }
+    // ★ 2026-06-20 — "As cinco forças do regime" REMOVIDA do núcleo do radar completo (consultor + dono): era a única seção que
+    //   não respondia uma pergunta do assinante (explicava a taxonomia, não o mercado); estava ali "porque existia antes". As 5
+    //   lentes seguem vivas nos embeds (ramo flat, _lentes), nas páginas /lentes e na marca/SEO/FAQ — só saíram do palco do FOLD.
     if (show("tese") && !FOLD) h += rpTeseHTML(rr, L);  // ★ 2026-06-17: tese REMOVIDA do Live (interrompia a narrativa Sinal→lentes→"Hoje lembra"; o "Hoje lembra" é o clímax mais forte). Mantida só p/ embed que peça "tese" explicitamente (nenhum pede hoje).
     // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese · "Hoje lembra") dos indicadores/dados de APOIO.
     //   Blocos do Cérebro 1 (apoio) viram strings; a POSIÇÃO depende de FOLD (dobra no radar completo · ordem plana em embeds/teaser).
@@ -1978,8 +1975,6 @@
       if (_vcore) h += '<h3 class="rp-serif-h">' + (L ? "What stands out" : "O que chama atenção") + '</h3><div class="rp-eyebrow">' + (L ? "Vértice — the loudest signals across markets today · 0 calm · 100 extreme · experiment" : "Vértice — os sinais mais ativos nos mercados hoje · 0 calmo · 100 extremo · experimento") + '</div><div class="rp-vsigs">' + _vcore + '</div>';
       // 3) O que os arquivos dizem — "Hoje lembra" (clímax editorial / memória dos mercados)
       if (_hojelembra) h += '<h3 class="rp-serif-h">' + (L ? "What the archives say" : "O que os arquivos dizem") + '</h3>' + _hojelembra;
-      // 4) As cinco forças do regime — as lentes como capítulos (só Founder, como sempre foram)
-      if (_forcas && !GATED) h += _forcas;
       var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Other thermometers" : "Outros termômetros") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
       var _obsRest = obRestCards ? (_obsHead + '<div class="g3">' + obRestCards + '</div>') : '';
       // Mercado global — gaveta própria recolhida (commodity: dólar/índices/cripto sai do palco precioso). Câmbio só p/ Founder.
