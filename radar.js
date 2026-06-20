@@ -245,6 +245,27 @@
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
       ".rp .rp-state-h{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.4;color:var(--_txt)}.rp .rp-state-h b{font-weight:600}.rp .rp-present .rp-mtag{margin-left:7px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--_accent);font-weight:700;vertical-align:middle}" +
+      // ★ 2026-06-20 — identidade editorial (consultor): títulos de SEÇÃO do núcleo em serif grande (substituem o h4 caixa-alta), hero-capa, "Radar em 2 minutos", "As cinco forças do regime".
+      ".rp .rp-serif-h{font-family:Georgia,'Fraunces',serif;font-size:22px;line-height:1.25;font-weight:600;color:var(--_txt);margin:30px 0 4px;letter-spacing:-.005em}" +
+      ".rp .rp-eyebrow{font-size:10.5px;letter-spacing:.06em;color:var(--_dim);margin:0 0 9px}" +
+      // hero-capa: standfirst serif + linha de arquivo (Economist-like)
+      ".rp .rp-hero{margin:4px 0 16px}" +
+      ".rp .rp-hero-lead{font-family:Georgia,'Fraunces',serif;font-size:25px;line-height:1.3;font-weight:600;color:var(--_txt);letter-spacing:-.01em}.rp .rp-hero-lead b{font-weight:700;color:var(--_accent)}" +
+      ".rp .rp-hero-sub{font-size:13.5px;line-height:1.5;color:var(--_dim);margin-top:9px;max-width:54ch}.rp .rp-hero-sub b{color:var(--_txt);font-weight:600}" +
+      // Radar em 2 minutos: TL;DR escaneável (checklist) — o leitor de 2 min lê só isto
+      ".rp .rp-2min{border:1px solid var(--_line);border-radius:10px;padding:14px 16px;margin:6px 0 18px;background:var(--_card,transparent)}" +
+      ".rp.skin-editorial .rp-2min{border:0;border-left:2px solid var(--_accent);border-radius:0;padding:4px 0 4px 15px;background:transparent}" +
+      ".rp .rp-2min-k{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim);font-weight:600;margin-bottom:9px}" +
+      ".rp .rp-2min ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}" +
+      ".rp .rp-2min li{font-size:13.5px;line-height:1.4;color:var(--_txt);padding-left:21px;position:relative}" +
+      ".rp .rp-2min li::before{content:'✓';position:absolute;left:0;color:var(--_accent);font-weight:700}" +
+      ".rp .rp-2min li b{font-weight:600}" +
+      // As cinco forças do regime: capítulos (título serif + prosa), não widgets
+      ".rp .rp-forcas{margin:8px 0 2px}" +
+      ".rp .rp-forca{border-top:1px solid var(--_line);padding:13px 0 11px;border-left:2px solid transparent;padding-left:0}" +
+      ".rp .rp-forca.hot{border-left-color:var(--_hot);padding-left:13px}.rp .rp-forca.warm{border-left-color:var(--_warm);padding-left:13px}.rp .rp-forca.cool{border-left-color:var(--_cool);padding-left:13px}" +
+      ".rp .rp-forca-k{font-family:Georgia,'Fraunces',serif;font-size:16px;font-weight:600;color:var(--_txt);margin-bottom:3px}" +
+      ".rp .rp-forca-p{font-size:13.5px;line-height:1.55;color:var(--_dim);margin:0}.rp .rp-forca-p .rp-forca-n{color:var(--_txt);font-family:var(--_mono);font-size:12px}" +
       // ★ estados do presente COMPACTOS, agrupados por CADÊNCIA (mensal=accent · diário=cool) — a memória é que merece espaço (filosofia do dono 2026-06-18)
       ".rp .rp-states{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:13px 0 2px}" +
       ".rp .rp-grp .rp-cad{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:6px}.rp .rp-grp .rp-cad-m{color:var(--_accent)}.rp .rp-grp .rp-cad-d{color:var(--_cool,var(--_dim))}" +
@@ -1641,8 +1662,9 @@
     //   nossa página (#radar-perene: chrome off, sem data-sections) → núcleo conta a história e o denso recolhe atrás de
     //   <details> nativo (SEO ok · zero JS · Founder ABERTO / free fechado). Embeds (chrome) e mini-radar (TEASER) seguem planos.
     var FOLD = !sections && !chrome;
-    var _foldLbl1 = L ? "Explore the full landscape →" : "Explorar o panorama completo →";
-    var _foldLbl2 = L ? "What else is moving? →" : "O que mais está se movendo? →";
+    var _foldLbl1 = L ? "Explore the full landscape" : "Explorar o panorama completo";
+    var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
+    var _mktLbl = L ? "Global markets" : "Mercado global";
     var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
@@ -1697,7 +1719,23 @@
             (_diario ? '<div class="rp-grp"><div class="rp-cad rp-cad-d">' + (L ? "daily" : "diário") + '</div><div class="rp-pair">' + _diario + '</div></div>' : '') +
           '</div>' +
           '</div>';
-      } else { h += '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
+      } else {
+        // ★ Hero-capa editorial (só radar completo / FOLD): standfirst serif (regime + valuation) + linha de arquivo (análogo),
+        //   determinístico do próprio dado — sem prosa de backend, no espírito do motor zero-LLM. Mirror honesto do valstrip ("abaixo do valor-justo").
+        var _heroTxt = '';
+        if (FOLD && g.brasil && g.brasil.regime) {
+          var _hasVal = g.valuation && g.valuation.score != null, _ab0 = rr.analogo_br;
+          var _lead = _hasVal
+            ? (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime, with valuation <b>' + esc(g.valuation.score) + '%</b> below fair value as a counterweight to domestic stress.'
+                 : 'Regime <b>' + esc(g.brasil.regime) + '</b>, com o valuation <b>' + esc(g.valuation.score) + '%</b> abaixo do valor-justo como contrapeso ao stress doméstico.')
+            : (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime in Brazil.' : 'Regime <b>' + esc(g.brasil.regime) + '</b> no Brasil.');
+          var _sub = '';
+          if (_ab0 && _ab0.mediana_ret_pct != null) { var _m0 = (_ab0.mediana_ret_pct >= 0 ? '+' : '') + esc(_ab0.mediana_ret_pct) + '%';
+            _sub = (L ? 'Comparable regimes delivered a <b>' + _m0 + '</b> median for the Ibovespa over six months' + (_ab0.hit_rate_pct != null ? ', <b>' + esc(_ab0.hit_rate_pct) + '%</b> of them positive.' : '.')
+                      : 'Regimes semelhantes entregaram mediana de <b>' + _m0 + '</b> para o Ibovespa em seis meses' + (_ab0.hit_rate_pct != null ? ', <b>' + esc(_ab0.hit_rate_pct) + '%</b> deles positivos.' : '.')); }
+          _heroTxt = '<div class="rp-hero"><div class="rp-hero-lead">' + _lead + '</div>' + (_sub ? '<div class="rp-hero-sub">' + _sub + '</div>' : '') + '</div>';
+        }
+        h += _heroTxt + '<h4>' + (L ? "Current signal · regime" : "Sinal atual · regime") + ' <span style="font-size:10px;letter-spacing:.04em;color:var(--_dim);font-weight:600;border:1px solid var(--_line);border-radius:5px;padding:1px 6px;vertical-align:middle">' + (L ? "MONTHLY" : "MENSAL") + '</span></h4><div class="legend">' + (L ? "0–100 · 50 ≈ neutral · higher = more risk/pressure · the regime is monthly (moves at month-end)" : "0–100 · 50 ≈ neutro · quanto maior, mais risco/pressão · o regime é mensal (muda no fecho do mês)") + '</div><div class="g3">' +
         card(L ? "Brazil" : "Brasil", (g.brasil || {}).score, (g.brasil || {}).regime) + card("Global", (g.global || {}).score, (g.global || {}).regime) +
         card(L ? "BR intermarket" : "BR intermercado", (g.br_intermercado || {}).score, (g.br_intermercado || {}).regime) + '</div>';
         // ★ item 10 pós-B6 (2 grandezas): o clique abre a SÉRIE do número exibido — a breadth (% abaixo do valor-justo, 187 meses) — não mais o z do ERP.
@@ -1743,6 +1781,16 @@
         (l.valor != null ? '<div class="lv">' + esc(l.valor) + (l.unidade ? ' <span class="lr">' + esc(l.unidade) + '</span>' : '') + '</div>' : '') +
         '<div class="lr">' + esc(l.leitura || "") + '</div>' + (l.spark ? spark(l.spark) : '') + more + '</div>'; }).join("") + '</div>'; }
     if (!FOLD) h += _lentes;
+    // ★ 2026-06-20 "As cinco forças do regime" — as lentes como CAPÍTULOS (título serif + prosa), não widgets (consultor).
+    //   Vive no núcleo do FOLD (só Founder, como as lentes sempre foram); embeds/flat seguem com o radar-widget (_lentes).
+    var _forcas = '';
+    if (show("lentes") && rr.lentes && rr.lentes.length) {
+      _forcas = '<h3 class="rp-serif-h">' + (L ? "The five forces of the regime" : "As cinco forças do regime") + '</h3><div class="rp-forcas">' +
+        rr.lentes.map(function (l) {
+          return '<div class="rp-forca ' + esc(l.tom || '') + '"><div class="rp-forca-k">' + esc(l.nome) + '</div><p class="rp-forca-p">' + esc(l.leitura || '') +
+            (l.valor != null && !GATED ? ' <span class="rp-forca-n">· ' + esc(l.indicador || '') + ' ' + esc(l.valor) + (l.unidade ? ' ' + esc(l.unidade) : '') + '</span>' : '') + '</p></div>';
+        }).join("") + '</div>';
+    }
     if (show("tese") && !FOLD) h += rpTeseHTML(rr, L);  // ★ 2026-06-17: tese REMOVIDA do Live (interrompia a narrativa Sinal→lentes→"Hoje lembra"; o "Hoje lembra" é o clímax mais forte). Mantida só p/ embed que peça "tese" explicitamente (nenhum pede hoje).
     // ★ camada 2 (densidade em hierarquia): separa o PRIMÁRIO (regime · 5 lentes · tese · "Hoje lembra") dos indicadores/dados de APOIO.
     //   Blocos do Cérebro 1 (apoio) viram strings; a POSIÇÃO depende de FOLD (dobra no radar completo · ordem plana em embeds/teaser).
@@ -1869,31 +1917,58 @@
           '<div><div class="v">' + (a.delta_pp >= 0 ? "+" : "") + esc(a.delta_pp) + 'pp</div><div class="r">vs base ' + esc(a.base_rate_pct) + '%</div></div>' +
           '<div><div class="v">' + esc(a.hit_rate_pct) + '%</div><div class="r">hit-rate · n=' + esc(a.n_analogos) + '</div></div></div>' + (a.n_analogos && a.n_analogos < 20 ? '<div class="rp-ml" style="color:var(--_warm);opacity:.9;margin-top:5px">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(a.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((a.hit_rate_pct / 100) * (1 - a.hit_rate_pct / 100) / a.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') + '</div>';
       } }
-    var _diverg = '';
+    // ★ 2026-06-20: divergências = "memória dos mercados" (moat). _divergBody = conteúdo sem h4 → o núcleo (FOLD) o emoldura
+    //   como "O que está estranho hoje"; embeds/flat usam _diverg completo (com h4 próprio).
+    var _diverg = '', _divergBody = '';
     if (show("divergencias") && v.divergencias) {
       if (v.divergencias.locked) {  // free: só a CONTAGEM + cadeado (as leituras são substância → Founder)
-        if (v.divergencias.n) _diverg = '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><div class="lr">' + esc(v.divergencias.n) + ' ' + (L ? "divergences flagged today " : "divergências sinalizadas hoje ") + glock() + '</div>';
-      } else if (v.divergencias.length) { _diverg = '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4><ul class="dv">' +
-        v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; } }
+        if (v.divergencias.n) _divergBody = '<div class="lr">' + esc(v.divergencias.n) + ' ' + (L ? "divergences flagged today " : "divergências sinalizadas hoje ") + glock() + '</div>';
+      } else if (v.divergencias.length) { _divergBody = '<ul class="dv">' +
+        v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; }
+      if (_divergBody) _diverg = '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4>' + _divergBody; }
     // teaser de profundidade — o avançado SENTE que assinando cruza tudo (sem entregar o core)
     var _par = '';
     if (show("par") && d.par_curado && d.par_curado.serie_a) { var pc = d.par_curado; _par = '<h4>' + (L ? "Curated cross · " : "Cruzamento curado · ") + esc(pc.a) + ' × ' + esc(pc.b) + '</h4><div class="legend"><span style="color:var(--_accent)">▬</span> ' + esc(pc.a) + ' · <span style="color:var(--_cool)">▬</span> ' + esc(pc.b) + ' · ' + esc(pc.nota) + '</div>' + dualSpark(pc.serie_a, pc.serie_b) + '<div class="lr" style="margin-top:4px">' + esc(pc.leitura) + ' <span style="color:var(--_dim)">(corr ' + esc(pc.corr) + ')</span></div>'; }
 
     // ════ MONTAGEM — progressive disclosure ════
-    function _details(lbl, body) { return body ? '<details class="rp-fold"' + (GATED ? '' : ' open') + '><summary>' + esc(lbl) + '</summary><div class="rp-foldbody">' + body + '</div></details>' : ''; }
+    // ★ 2026-06-20: dobra RECOLHIDA por padrão para todos (consultor: "só abre quem quer" — fim do scroll infinito) + resumo opcional de 1 linha no <summary>.
+    function _details(lbl, body, sub) { return body ? '<details class="rp-fold"><summary>' + esc(lbl) + ' →' + (sub ? '<span style="color:var(--_dim);font-weight:400;letter-spacing:.01em"> · ' + esc(sub) + '</span>' : '') + '</summary><div class="rp-foldbody">' + body + '</div></details>' : ''; }
     if (FOLD) {
-      // ★ 2026-06-17 — radar editorial: dois clímaxes adjacentes (memória + sinais), uma só dobra para todo o denso.
-      //   Núcleo: regime (acima) → "Hoje lembra" (clímax editorial) → Vértice (os mais ativos). 5 lentes + dólar saíram
-      //   do palco público; entram na dobra SÓ p/ assinante. "Honest summary" reforçado: história primeiro, motor depois.
-      h += _hojelembra;
-      h += _vHead;
+      // ★ 2026-06-20 — identidade editorial (Fase 2.5, consultor): o núcleo responde, de cima p/ baixo, "o que está acontecendo /
+      //   o que está estranho / o que chama atenção / o que os arquivos dizem / as cinco forças". Títulos de SEÇÃO em serif grande
+      //   (substituem o h4 caixa-alta). Mercado (commodity) e o denso de apoio descem para DUAS gavetas RECOLHIDAS.
+      //   regime + hero-capa já estão em `h` (acima). Sequência do núcleo:
+      // 0) Radar em 2 minutos — TL;DR escaneável (o leitor de 2 min lê só isto). Determinístico do dado já calculado.
+      (function () { var b = [], gR = rr.regime || {};
+        if (gR.brasil && gR.brasil.regime) b.push('Brasil ' + (L ? '' : '') + '<b>' + esc(gR.brasil.regime) + '</b>');
+        if (gR.valuation && gR.valuation.score != null) b.push('valuation <b>' + esc(gR.valuation.score) + '%</b>' + (L ? ' below fair value' : ' abaixo do valor-justo'));
+        if (tms && tms[0]) b.push('<b>' + esc(tms[0].nome) + '</b> ' + esc(tms[0].regime));
+        if (tms && tms[1]) b.push('<b>' + esc(tms[1].nome) + '</b> ' + esc(tms[1].regime));
+        var _d0 = rr.analogo_br && rr.analogo_br.datas_analogas && rr.analogo_br.datas_analogas[0];
+        if (_d0) b.push((L ? 'today resembles ' : 'hoje lembra ') + '<b>' + esc(_d0) + '</b>');
+        if (b.length) h += '<div class="rp-2min"><div class="rp-2min-k">' + (L ? "The radar in 2 minutes" : "Radar em 2 minutos") + '</div><ul>' + b.slice(0, 5).map(function (x) { return '<li>' + x + '</li>'; }).join("") + '</ul></div>'; })();
+      // 1) O que está estranho hoje — Divergências (moat) sobem da posição ~20 para o topo do núcleo
+      if (_divergBody) h += '<h3 class="rp-serif-h">' + (L ? "What looks odd today" : "O que está estranho hoje") + '</h3>' + _divergBody;
+      // 2) O que chama atenção — Vértice (os sinais mais ativos) + 2 termômetros + fuga
       var _c2core = (tCards.length ? tCards.slice(0, 2).join("") : "") + obFugaCard;
-      if (_c2core) h += '<h4>' + (L ? "Thermometers" : "Termômetros") + '</h4><div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' + _c2core + '</div>';
+      if (_c2core) h += '<h3 class="rp-serif-h">' + (L ? "What stands out" : "O que chama atenção") + '</h3><div class="rp-eyebrow">' + (L ? "Vértice — the loudest signals across markets today · experiment" : "Vértice — os sinais mais ativos nos mercados hoje · experimento") + '</div>' +
+        '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' + _c2core + '</div>';
+      // 3) O que os arquivos dizem — "Hoje lembra" (clímax editorial / memória dos mercados)
+      if (_hojelembra) h += '<h3 class="rp-serif-h">' + (L ? "What the archives say" : "O que os arquivos dizem") + '</h3>' + _hojelembra;
+      // 4) As cinco forças do regime — as lentes como capítulos (só Founder, como sempre foram)
+      if (_forcas && !GATED) h += _forcas;
       var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Other thermometers" : "Outros termômetros") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
       var _obsRest = obRestCards ? (_obsHead + '<div class="g3">' + obRestCards + '</div>') : '';
-      // dólar + 5 lentes "dentro, só p/ assinante" (pedido do dono): aparecem no topo da dobra apenas p/ Founder.
-      var _founderOnly = !GATED ? ((_cambioChip ? '<h4>' + (L ? "Currency" : "Câmbio") + '</h4>' + _cambioChip : '') + _lentes) : '';
-      h += _details(_foldLbl1, _founderOnly + _scatter + _indices + _interm + _fiscal + _termoRest + _obsRest + _razoes + _cripto + _extras + _leadlag + _analogo + _diverg + _par + _portasBtns);
+      // Mercado global — gaveta própria recolhida (commodity: dólar/índices/cripto sai do palco precioso). Câmbio só p/ Founder.
+      var _mktSum = ''; (function () { var parts = [];
+        var _ibov = (rr.indices || []).filter(function (x) { return /ibov/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_ibov) parts.push("IBOV " + _ibov.valor);
+        if (!GATED && rr.cambio) parts.push((L ? "USD R$ " : "Dólar R$ ") + rr.cambio.valor);
+        var _sp = (rr.indices || []).filter(function (x) { return /s&?p|spx|sp500/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_sp) parts.push("S&P " + _sp.valor);
+        _mktSum = parts.slice(0, 3).join(" · "); })();
+      var _mkt = (!GATED && _cambioChip ? '<h4>' + (L ? "Currency" : "Câmbio") + '</h4>' + _cambioChip : '') + _indices + _cripto;
+      if (_mkt) h += _details(_mktLbl, _mkt, _mktSum);
+      // Panorama completo — recolhido por padrão (denso de apoio; as 5 lentes já estão no núcleo como "cinco forças")
+      h += _details(_foldLbl1, _scatter + _interm + _fiscal + _termoRest + _obsRest + _razoes + _extras + _leadlag + _analogo + _par + _portasBtns);
     } else {
       // ordem plana original (embeds / mini-radar) — comportamento idêntico ao anterior
       if (!sections || show("portas")) h += (!sections ? _tier2HTML : '') + _portasBtns;
