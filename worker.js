@@ -98,7 +98,6 @@ const EN_BODY = (function () {
     "eyb1": C.eyb1, "s1": C.s1, "s1s": C.s1s,
     "fbadge": C.fbadge, "fed": C.fed, "fprice": C.fprice, "fh": C.fh, "fp": C.fp, "wl-btn": C.wlbtn, "assine-link": "view plans →",
     "eyb-ult": "Latest readings", "s-ult": "The regime diary", "s-ult-s": "The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.", "ult-cta": "See the full Diaries →",
-    "sb-eyb": "A living library of precedents", "sb-lead": "We don&rsquo;t forecast — we document episodes. When similar regimes appeared before, what happened next?", "sb-cta": "Explore the archive →",
     "eyb3": C.eyb3, "s3": C.s3, "s3s": C.s3s, "eyb4": C.eyb4, "disc": C.disc,
     "eyb9": C.eyb9, "s9": C.s9, "qtag-txt": "CURRENT SIGNAL · REGIME BR",
     "lenses": lenses, "topnav": topnav, "conceitos-grid": cgrid, "ladder": ladder, "scale": scale, "princ": princ, "tiers": tiers, "faqbox": faqbox, "ftnav": C.ftnav

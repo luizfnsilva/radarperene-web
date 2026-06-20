@@ -201,16 +201,7 @@
   .instband:hover{color:var(--txt)}
   .instband b{color:var(--txt);font-weight:600}
   /* ★ P6 — painel de números "uau" (screenshot-able): gravidade editorial (serif) + escopo SentimenTrader */
-  .statband{text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:30px 0 32px;margin:4px 0 2px}
-  .statband .sb-h{font-family:var(--serif);font-size:clamp(22px,3.2vw,30px);font-weight:600;color:var(--txt);line-height:1.2;letter-spacing:-.01em;margin:0 0 13px}
-  .statband .sb-lead{font-size:clamp(14px,1.8vw,16px);line-height:1.6;color:var(--txt2);max-width:52ch;margin:0 auto}
-  .statband .eyebrow{font-family:var(--serif);font-style:italic;font-size:clamp(14px,2vw,17px);color:var(--txt2);text-transform:none;letter-spacing:0;margin-bottom:18px}
-  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
-  @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr);gap:26px 14px}}
-  @media(max-width:430px){.stats{grid-template-columns:repeat(2,1fr)}}
-  .stat{display:flex;flex-direction:column;gap:5px}
-  .stat .n{font-family:var(--serif);font-size:clamp(26px,3.4vw,34px);font-weight:600;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
-  .stat .l{font-size:11.5px;color:var(--dim);letter-spacing:.02em;line-height:1.35}
+  /* statband (faixa de métricas) removida 2026-06-20 — repetia a tese do hero; ver CANONICO_MARCA §2026-06-20 */
   /* "Do arquivo" — cartões de episódios marquee (memória); reusa o grid .cards */
   /* ★ P2 — episódios viram CAPÍTULOS de biblioteca (ensaio Economist/Grant's): ano · título serif · subtítulo itálico · gancho · "o que aconteceu depois" */
   .arcard{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 20px;text-decoration:none;transition:border-color .15s,transform .15s}
@@ -268,14 +259,6 @@
     <a class="herolink" href="#radar-teaser" id="cta2">Ler a edição de hoje →</a>
     <div class="micro" id="micro1">Conteúdo educacional de fontes públicas — nunca recomendação.</div>
   </div>
-</div>
-
-<div class="wrap">
-  <section class="statband" id="statband">
-    <h2 class="sb-h" id="sb-eyb">Uma biblioteca viva de precedentes</h2>
-    <p class="sb-lead" id="sb-lead">Não fazemos previsões — documentamos episódios. Quando regimes semelhantes apareceram antes, o que aconteceu depois?</p>
-    <p class="micro" style="margin-top:16px"><a id="sb-cta" href="/artigos" style="color:var(--gold)">Explorar o arquivo →</a></p>
-  </section>
 </div>
 
 <div class="wrap">
