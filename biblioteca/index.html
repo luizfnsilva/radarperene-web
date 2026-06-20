@@ -67,7 +67,12 @@
 <script>
 (function(){
   var EN = location.search.indexOf("lang=en")>=0 || location.hostname==="radarperene.com";
-  if(EN){var _mb=document.getElementById("me-biblioteca");if(_mb){_mb.textContent="Library";_mb.href="/library/";}}  /* .com: rótulo + slug EN */
+  if(EN){  /* .com: título/h1/lead/rótulo em inglês + slug EN (página servida em /library) */
+    document.title="Subscriber Library — Radar Perene";
+    var _h1=document.getElementById("h1");if(_h1)_h1.textContent="Subscriber Library";
+    var _ld=document.getElementById("lead");if(_ld)_ld.textContent="Daily, weekly and monthly reports — the full reading, subscribers only. The public sees each day's numeric snapshot.";
+    var _mb=document.getElementById("me-biblioteca");if(_mb){_mb.textContent="Library";_mb.href="/library/";}
+  }
   var API = location.origin + "/api/v1";
   var ANON = (window.RP_AUTH && window.RP_AUTH.ANON) || "";
   var TIPOS = [
