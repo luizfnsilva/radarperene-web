@@ -266,6 +266,15 @@
       ".rp .rp-forca.hot{border-left-color:var(--_hot);padding-left:13px}.rp .rp-forca.warm{border-left-color:var(--_warm);padding-left:13px}.rp .rp-forca.cool{border-left-color:var(--_cool);padding-left:13px}" +
       ".rp .rp-forca-k{font-family:Georgia,'Fraunces',serif;font-size:16px;font-weight:600;color:var(--_txt);margin-bottom:3px}" +
       ".rp .rp-forca-p{font-size:13.5px;line-height:1.55;color:var(--_dim);margin:0}.rp .rp-forca-p .rp-forca-n{color:var(--_txt);font-family:var(--_mono);font-size:12px}" +
+      // ★ 2026-06-20 Vértice editorial (Apple Health): pilha vertical, número grande serif, filete, sem caixa/cinza/grade
+      ".rp .rp-vsigs{margin:10px 0 2px}" +
+      ".rp .rp-vsig{padding:17px 0;border-top:1px solid var(--_line)}.rp .rp-vsig:first-child{border-top:0;padding-top:4px}" +
+      ".rp .rp-vsig-n{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--_dim);font-weight:600}" +
+      ".rp .rp-vsig-v{font-family:Georgia,'Fraunces',serif;font-size:46px;line-height:1;font-weight:600;color:var(--_txt);margin:8px 0 3px;font-feature-settings:'tnum'}" +
+      ".rp .rp-vsig-r{font-size:13px;color:var(--_dim)}" +
+      ".rp .rp-vsig.hot .rp-vsig-r{color:var(--_hot)}.rp .rp-vsig.warm .rp-vsig-r{color:var(--_warm)}.rp .rp-vsig.cool .rp-vsig-r{color:var(--_cool)}" +
+      ".rp .rp-vsig-flow{margin-top:10px;font-size:12.5px;line-height:1.7;color:var(--_txt)}" +
+      ".rp .rp-vsig-fl{display:inline-block;min-width:88px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--_dim)}" +
       // ★ estados do presente COMPACTOS, agrupados por CADÊNCIA (mensal=accent · diário=cool) — a memória é que merece espaço (filosofia do dono 2026-06-18)
       ".rp .rp-states{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:13px 0 2px}" +
       ".rp .rp-grp .rp-cad{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:6px}.rp .rp-grp .rp-cad-m{color:var(--_accent)}.rp .rp-grp .rp-cad-d{color:var(--_cool,var(--_dim))}" +
@@ -1952,10 +1961,21 @@
         if (b.length) h += '<div class="rp-2min"><div class="rp-2min-k">' + (L ? "The radar in 2 minutes" : "Radar em 2 minutos") + '</div><ul>' + b.slice(0, 5).map(function (x) { return '<li>' + x + '</li>'; }).join("") + '</ul></div>'; })();
       // 1) O que está estranho hoje — Divergências (moat) sobem da posição ~20 para o topo do núcleo
       if (_divergBody) h += '<h3 class="rp-serif-h">' + (L ? "What looks odd today" : "O que está estranho hoje") + '</h3>' + _divergBody;
-      // 2) O que chama atenção — Vértice (os sinais mais ativos) + 2 termômetros + fuga
-      var _c2core = (tCards.length ? tCards.slice(0, 2).join("") : "") + obFugaCard;
-      if (_c2core) h += '<h3 class="rp-serif-h">' + (L ? "What stands out" : "O que chama atenção") + '</h3><div class="rp-eyebrow">' + (L ? "Vértice — the loudest signals across markets today · experiment" : "Vértice — os sinais mais ativos nos mercados hoje · experimento") + '</div>' +
-        '<div class="legend">' + (L ? "0 = calm · 50 = neutral · 100 = extreme" : "0 = calmo · 50 = neutro · 100 = extremo") + '</div><div class="g3">' + _c2core + '</div>';
+      // 2) O que chama atenção — Vértice em layout EDITORIAL (Apple Health, consultor 06-20): pilha vertical, número
+      //    grande serif + regime + filete. Sem caixa/cinza/grade (que pareciam dashboard). A fuga ganha "Saindo de / Entrando em".
+      var _vsig = function (nome, valor, regime, tone, flow) {
+        return '<div class="rp-vsig ' + esc(tone || '') + '">' +
+          '<div class="rp-vsig-n">' + esc(nome) + '</div>' +
+          '<div class="rp-vsig-v">' + (valor == null ? (GATED ? glock() : '—') : esc(valor)) + '</div>' +
+          '<div class="rp-vsig-r">' + esc(regime || '') + '</div>' + (flow || '') + '</div>';
+      };
+      var _vcore = '';
+      if (tms) tms.slice(0, 2).forEach(function (t) { _vcore += _vsig(t.nome, t.valor, t.regime, cls(t.valor), ''); });
+      var _obF = v.observatorio && v.observatorio.fuga;
+      if (_obF) { var _fl = _obF.fluxo, _flowH = '';
+        if (_fl && _fl.de && _fl.de.length) _flowH = '<div class="rp-vsig-flow"><span class="rp-vsig-fl">' + (L ? "Out of" : "Saindo de") + '</span> ' + esc(_fl.de.join(" · ")) + (_fl.para ? '<br><span class="rp-vsig-fl">' + (L ? "Into" : "Entrando em") + '</span> ' + esc(_fl.para) : '') + '</div>';
+        _vcore += _vsig(_obF.nome, _obF.valor, _obF.regime, cls(_obF.valor), _flowH); }
+      if (_vcore) h += '<h3 class="rp-serif-h">' + (L ? "What stands out" : "O que chama atenção") + '</h3><div class="rp-eyebrow">' + (L ? "Vértice — the loudest signals across markets today · 0 calm · 100 extreme · experiment" : "Vértice — os sinais mais ativos nos mercados hoje · 0 calmo · 100 extremo · experimento") + '</div><div class="rp-vsigs">' + _vcore + '</div>';
       // 3) O que os arquivos dizem — "Hoje lembra" (clímax editorial / memória dos mercados)
       if (_hojelembra) h += '<h3 class="rp-serif-h">' + (L ? "What the archives say" : "O que os arquivos dizem") + '</h3>' + _hojelembra;
       // 4) As cinco forças do regime — as lentes como capítulos (só Founder, como sempre foram)
