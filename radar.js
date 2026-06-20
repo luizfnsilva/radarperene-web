@@ -235,7 +235,7 @@
       ".rp .rp-hle{border-top:1px solid var(--_line);padding:16px 0 4px;margin-top:8px}" +
       ".rp .rp-hle .hl-k{font-family:Georgia,'Fraunces',serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .rp-hle .hl-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:1px}" +
-      ".rp .rp-hle .hl-lead{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.55;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +
+      ".rp .rp-hle .hl-lead{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.7;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +  // ★ 2026-06-20: +line-height p/ a frase-herói respirar (consultor)
       ".rp .rp-hle .hl-d{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.03em;margin:5px 0 0}" +
       ".rp .rp-hle .hl-ep-name{font-size:13px;color:var(--_txt);line-height:1.5;margin:2px 0 0}.rp .rp-hle .hl-ep-name b{font-weight:600}" +
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
@@ -250,7 +250,7 @@
       ".rp .rp-eyebrow{font-size:10.5px;letter-spacing:.06em;color:var(--_dim);margin:0 0 9px}" +
       // hero-capa: standfirst serif + linha de arquivo (Economist-like)
       ".rp .rp-hero{margin:4px 0 16px}" +
-      ".rp .rp-hero-lead{font-family:Georgia,'Fraunces',serif;font-size:25px;line-height:1.3;font-weight:600;color:var(--_txt);letter-spacing:-.01em}.rp .rp-hero-lead b{font-weight:700;color:var(--_accent)}" +
+      ".rp .rp-hero-lead{font-family:Georgia,'Fraunces',serif;font-size:clamp(20px,2.4vw,25px);line-height:1.32;font-weight:600;color:var(--_txt);letter-spacing:-.01em}.rp .rp-hero-lead b{font-weight:700;color:var(--_accent)}" +  // ★ 2026-06-20: clamp responsivo (controla a quebra em telas estreitas, consultor)
       ".rp .rp-hero-sub{font-size:13.5px;line-height:1.5;color:var(--_dim);margin-top:9px;max-width:54ch}.rp .rp-hero-sub b{color:var(--_txt);font-weight:600}" +
       // Radar em 2 minutos: TL;DR escaneável (checklist) — o leitor de 2 min lê só isto
       ".rp .rp-2min{border:1px solid var(--_line);border-radius:10px;padding:14px 16px;margin:6px 0 18px;background:var(--_card,transparent)}" +
@@ -272,7 +272,7 @@
       ".rp .rp-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rp .rp-states .st{display:flex;flex-direction:column;gap:3px}.rp .rp-states .sl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--_dim);font-weight:700}.rp .rp-states .sv{font-size:12.5px;color:var(--_txt);line-height:1.3}" +
       "@media(max-width:520px){.rp .rp-states{grid-template-columns:1fr;gap:14px}}" +
       ".rp .rp-signals{border-top:1px solid var(--_line);margin-top:16px;padding-top:14px}.rp .rp-signals div{font-size:13.5px;line-height:1.7;color:var(--_dim)}.rp .rp-signals b{font-weight:600;color:var(--_txt)}" +
-      ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent)}" +
+      ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent);font-family:var(--_mono);font-weight:700;letter-spacing:.02em}" +  // ★ 2026-06-20: código DV em mono+laranja (vira linguagem própria, consultor)
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
       ".rp .brand{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--_txt);font-size:14px;font-weight:600;opacity:.92}.rp .brand b{color:var(--_accent);font-weight:700}.rp .brand svg{flex:none;opacity:.9}" +
       ".rp .ft{margin-top:14px;font-size:10px;color:var(--_dim);text-align:center}.rp .ft a{color:var(--_accent);text-decoration:none}" +
@@ -1787,7 +1787,9 @@
     if (show("lentes") && rr.lentes && rr.lentes.length) {
       _forcas = '<h3 class="rp-serif-h">' + (L ? "The five forces of the regime" : "As cinco forças do regime") + '</h3><div class="rp-forcas">' +
         rr.lentes.map(function (l) {
-          return '<div class="rp-forca ' + esc(l.tom || '') + '"><div class="rp-forca-k">' + esc(l.nome) + '</div><p class="rp-forca-p">' + esc(l.leitura || '') +
+          // ★ 2026-06-20: prosa = leitura (reading vivo) OU desc (o que a força é) — `leitura` vem VAZIA em 4/5 lentes no digest,
+          //   então sem o fallback os capítulos ficavam "títulos vazios" (bug pego no preview do consultor).
+          return '<div class="rp-forca ' + esc(l.tom || '') + '"><div class="rp-forca-k">' + esc(l.nome) + '</div><p class="rp-forca-p">' + esc(l.leitura || l.desc || '') +
             (l.valor != null && !GATED ? ' <span class="rp-forca-n">· ' + esc(l.indicador || '') + ' ' + esc(l.valor) + (l.unidade ? ' ' + esc(l.unidade) : '') + '</span>' : '') + '</p></div>';
         }).join("") + '</div>';
     }
@@ -1939,13 +1941,14 @@
       //   (substituem o h4 caixa-alta). Mercado (commodity) e o denso de apoio descem para DUAS gavetas RECOLHIDAS.
       //   regime + hero-capa já estão em `h` (acima). Sequência do núcleo:
       // 0) Radar em 2 minutos — TL;DR escaneável (o leitor de 2 min lê só isto). Determinístico do dado já calculado.
+      // ★ ordem (consultor): regime → valuation → MEMÓRIA (hoje lembra, pesa mais editorialmente) → sinais do Vértice.
       (function () { var b = [], gR = rr.regime || {};
-        if (gR.brasil && gR.brasil.regime) b.push('Brasil ' + (L ? '' : '') + '<b>' + esc(gR.brasil.regime) + '</b>');
+        if (gR.brasil && gR.brasil.regime) b.push('Brasil <b>' + esc(gR.brasil.regime) + '</b>');
         if (gR.valuation && gR.valuation.score != null) b.push('valuation <b>' + esc(gR.valuation.score) + '%</b>' + (L ? ' below fair value' : ' abaixo do valor-justo'));
-        if (tms && tms[0]) b.push('<b>' + esc(tms[0].nome) + '</b> ' + esc(tms[0].regime));
-        if (tms && tms[1]) b.push('<b>' + esc(tms[1].nome) + '</b> ' + esc(tms[1].regime));
         var _d0 = rr.analogo_br && rr.analogo_br.datas_analogas && rr.analogo_br.datas_analogas[0];
         if (_d0) b.push((L ? 'today resembles ' : 'hoje lembra ') + '<b>' + esc(_d0) + '</b>');
+        if (tms && tms[0]) b.push('<b>' + esc(tms[0].nome) + '</b> ' + esc(tms[0].regime));
+        if (tms && tms[1]) b.push('<b>' + esc(tms[1].nome) + '</b> ' + esc(tms[1].regime));
         if (b.length) h += '<div class="rp-2min"><div class="rp-2min-k">' + (L ? "The radar in 2 minutes" : "Radar em 2 minutos") + '</div><ul>' + b.slice(0, 5).map(function (x) { return '<li>' + x + '</li>'; }).join("") + '</ul></div>'; })();
       // 1) O que está estranho hoje — Divergências (moat) sobem da posição ~20 para o topo do núcleo
       if (_divergBody) h += '<h3 class="rp-serif-h">' + (L ? "What looks odd today" : "O que está estranho hoje") + '</h3>' + _divergBody;
@@ -1960,10 +1963,11 @@
       var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Other thermometers" : "Outros termômetros") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
       var _obsRest = obRestCards ? (_obsHead + '<div class="g3">' + obRestCards + '</div>') : '';
       // Mercado global — gaveta própria recolhida (commodity: dólar/índices/cripto sai do palco precioso). Câmbio só p/ Founder.
-      var _mktSum = ''; (function () { var parts = [];
-        var _ibov = (rr.indices || []).filter(function (x) { return /ibov/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_ibov) parts.push("IBOV " + _ibov.valor);
+      // ★ resumo em % de variação (consultor: "menos terminal, mais leitura") — ex.: IBOV +21% · Dólar R$5,06 · S&P +25%
+      var _mktSum = ''; (function () { var parts = [], pct = function (x) { return x.var12m != null ? (x.var12m >= 0 ? "+" : "") + x.var12m + "%" : x.valor; };
+        var _ibov = (rr.indices || []).filter(function (x) { return /ibov/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_ibov) parts.push("IBOV " + pct(_ibov));
         if (!GATED && rr.cambio) parts.push((L ? "USD R$ " : "Dólar R$ ") + rr.cambio.valor);
-        var _sp = (rr.indices || []).filter(function (x) { return /s&?p|spx|sp500/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_sp) parts.push("S&P " + _sp.valor);
+        var _sp = (rr.indices || []).filter(function (x) { return /s&?p|spx|sp500/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_sp) parts.push("S&P " + pct(_sp));
         _mktSum = parts.slice(0, 3).join(" · "); })();
       var _mkt = (!GATED && _cambioChip ? '<h4>' + (L ? "Currency" : "Câmbio") + '</h4>' + _cambioChip : '') + _indices + _cripto;
       if (_mkt) h += _details(_mktLbl, _mkt, _mktSum);
