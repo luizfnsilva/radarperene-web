@@ -195,7 +195,16 @@ function _apiUpstream(sub, search) {
 }
 async function _proxyApi(request, _url, sub) {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: _API_CORS });
-  const upstream = _apiUpstream(sub, _url.search);
+  // ★ EXCLUSIVIDADE POR DOMÍNIO/MOEDA: injeta cur pelo host nos endpoints GATEADOS (me/serie/biblioteca),
+  //   que são autenticados (pass-through, sem cache anon → não fragmenta). USD→.com, BRL→.com.br. O edge
+  //   filtra a assinatura Stripe pela moeda → assinante USD só destrava o .com; BRL só o .com.br.
+  let _search = _url.search;
+  const _sl = sub.toLowerCase();
+  if (_sl === "v1/me" || _sl.indexOf("v1/serie") === 0 || _sl.indexOf("v1/biblioteca") === 0) {
+    const _cur = /\.com\.br$/i.test(_url.hostname) ? "brl" : "usd";
+    _search = (_search ? _search + "&" : "?") + "cur=" + _cur;
+  }
+  const upstream = _apiUpstream(sub, _search);
   const auth = request.headers.get("Authorization") || "";
   const apikey = request.headers.get("apikey") || NARR_ANON;
   const isAnon = !auth || auth === "Bearer " + NARR_ANON;
