@@ -250,7 +250,8 @@
       // ★ 2026-06-20 masthead de assinatura (nameplate editorial discreto + linha fina laranja no topo = identidade)
       ".rp .rp-masthead{border-top:2px solid var(--_accent);padding-top:10px;margin:0 0 13px}" +
       ".rp .rp-mast-name{font-family:Georgia,'Fraunces',serif;font-size:20px;font-weight:700;letter-spacing:.01em;color:var(--_txt);line-height:1}" +
-      ".rp .rp-mast-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:4px;font-family:var(--_mono)}" +
+      ".rp .rp-mast-sub{font-size:11.5px;letter-spacing:.02em;color:var(--_dim);margin-top:5px}" +
+      ".rp .rp-mast-date{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:3px;font-family:var(--_mono)}" +
       ".rp .rp-eyebrow{font-size:10.5px;letter-spacing:.06em;color:var(--_dim);margin:0 0 9px}" +
       // hero-capa: standfirst serif + linha de arquivo (Economist-like)
       ".rp .rp-hero{margin:4px 0 16px}" +
@@ -1714,7 +1715,14 @@
       (_cob.tribunais != null ? _cob.tribunais : "15") + (L ? " courts · since " : " tribunais · desde ") +
       (_cob.desde != null ? _cob.desde : "1970");
     // ★ 2026-06-20 masthead de assinatura (consultor): nameplate editorial discreto + linha fina laranja no topo — identidade, não informação. Só radar completo (FOLD).
-    if (FOLD) h += '<div class="rp-masthead"><div class="rp-mast-name">Radar Perene</div><div class="rp-mast-sub">' + (L ? "A daily reading of Brazil&rsquo;s regime" : "Leitura diária do regime brasileiro") + (d.data_referencia ? ' · ' + esc(d.data_referencia) : '') + '</div></div>';
+    if (FOLD) {
+      // ★ 2026-06-20 (Fase 5/6 antecipada, dono): masthead Economist em 3 linhas — nome / subtítulo / DATA POR EXTENSO ("19 de junho de 2026"). Determinístico do data_referencia (ISO), sem Date() p/ não pegar timezone.
+      var _md = '';
+      (function () { var s = d.data_referencia; if (!s) return; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s)); if (!m) { _md = String(s); return; }
+        var MES = L ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        var mo = parseInt(m[2], 10) - 1, dd = parseInt(m[3], 10); _md = L ? (MES[mo] + " " + dd + ", " + m[1]) : (dd + " de " + MES[mo] + " de " + m[1]); })();
+      h += '<div class="rp-masthead"><div class="rp-mast-name">Radar Perene</div><div class="rp-mast-sub">' + (L ? "A daily reading of Brazil&rsquo;s regime" : "Leitura diária do regime brasileiro") + '</div>' + (_md ? '<div class="rp-mast-date">' + esc(_md) + '</div>' : '') + '</div>';
+    }
     if (chrome || !sections) h += '<div class="live"><span class="dot"></span>' + (L ? "latest available daily close" : "último fechamento diário disponível") + ' · ' + esc(covTxt) + '</div>';  // sem a data crua "updated {hoje}" (confundia: o pulso é o último fechamento, não "hoje"); a frase já diz tudo  // transparência: o pulso é sempre o ÚLTIMO fechamento diário (D-1 enquanto o pregão de hoje não fecha) — alinhado com o relatório do assinante (pré-abertura, fechamento anterior). cobertura/frescor só no radar completo ou embed; teaser começa no Sinal atual
 
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
@@ -1940,7 +1948,7 @@
 
     // ════ MONTAGEM — progressive disclosure ════
     // ★ 2026-06-20: dobra RECOLHIDA por padrão para todos (consultor: "só abre quem quer" — fim do scroll infinito) + resumo opcional de 1 linha no <summary>.
-    function _details(lbl, body, sub) { return body ? '<details class="rp-fold"><summary>' + esc(lbl) + ' →' + (sub ? '<span style="color:var(--_dim);font-weight:400;letter-spacing:.01em"> · ' + esc(sub) + '</span>' : '') + '</summary><div class="rp-foldbody">' + body + '</div></details>' : ''; }
+    function _details(lbl, body, sub) { return body ? '<details class="rp-fold"><summary>' + esc(lbl) + ' →' + (sub ? '<span style="color:var(--_dim);font-weight:400;letter-spacing:.01em">&nbsp;&nbsp;' + esc(sub) + '</span>' : '') + '</summary><div class="rp-foldbody">' + body + '</div></details>' : ''; }
     if (FOLD) {
       // ★ 2026-06-20 — identidade editorial (Fase 2.5, consultor): o núcleo responde, de cima p/ baixo, "o que está acontecendo /
       //   o que está estranho / o que chama atenção / o que os arquivos dizem / as cinco forças". Títulos de SEÇÃO em serif grande
@@ -1978,12 +1986,25 @@
       var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Other thermometers" : "Outros termômetros") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
       var _obsRest = obRestCards ? (_obsHead + '<div class="g3">' + obRestCards + '</div>') : '';
       // Mercado global — gaveta própria recolhida (commodity: dólar/índices/cripto sai do palco precioso). Câmbio só p/ Founder.
-      // ★ resumo em % de variação (consultor: "menos terminal, mais leitura") — ex.: IBOV +21% · Dólar R$5,06 · S&P +25%
-      var _mktSum = ''; (function () { var parts = [], pct = function (x) { return x.var12m != null ? (x.var12m >= 0 ? "+" : "") + x.var12m + "%" : x.valor; };
-        var _ibov = (rr.indices || []).filter(function (x) { return /ibov/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_ibov) parts.push("IBOV " + pct(_ibov));
-        if (!GATED && rr.cambio) parts.push((L ? "USD R$ " : "Dólar R$ ") + rr.cambio.valor);
-        var _sp = (rr.indices || []).filter(function (x) { return /s&?p|spx|sp500/i.test((x.nome || "") + (x.codigo || "")); })[0]; if (_sp) parts.push("S&P " + pct(_sp));
-        _mktSum = parts.slice(0, 3).join(" · "); })();
+      // ★ 2026-06-20 (Fase 5/6 antecipada, dono): "Mercado global" deixa de ser lista de tickers e vira NOTA EDITORIAL
+      //   determinística do próprio % ("Lá fora, o S&P acumula +25,4% enquanto o Ibovespa sobe +21,1%"). Zero LLM. Cai p/ lista se faltar var12m.
+      var _mktSum = ''; (function () {
+        var find = function (re) { return (rr.indices || []).filter(function (x) { return re.test((x.nome || "") + (x.codigo || "")); })[0]; };
+        var _ibov = find(/ibov/i), _sp = find(/s&?p|spx|sp500/i);
+        var vb = function (x) { return x && x.var12m != null; };
+        var vA = function (v) { return L ? (v >= 0 ? "is up " : "is down ") : (v >= 0 ? "acumula " : "recua "); };  // S&P
+        var vB = function (v) { return L ? (v >= 0 ? "is up " : "is down ") : (v >= 0 ? "sobe " : "cai "); };  // Ibovespa (verbo distinto p/ não repetir)
+        var sg = function (v) { return (v >= 0 ? "+" : "") + v + "%"; };
+        if (vb(_sp) && vb(_ibov)) {
+          _mktSum = L
+            ? ("Abroad, the S&P " + vA(_sp.var12m) + sg(_sp.var12m) + " while the Ibovespa " + vB(_ibov.var12m) + sg(_ibov.var12m) + " (12m).")
+            : ("Lá fora, o S&P " + vA(_sp.var12m) + sg(_sp.var12m) + " enquanto o Ibovespa " + vB(_ibov.var12m) + sg(_ibov.var12m) + " (12m).");
+        } else {  // fallback: lista curta como antes
+          var parts = [], pct = function (x) { return x.var12m != null ? sg(x.var12m) : x.valor; };
+          if (_ibov) parts.push("IBOV " + pct(_ibov)); if (_sp) parts.push("S&P " + pct(_sp));
+          if (!GATED && rr.cambio) parts.push((L ? "USD R$ " : "Dólar R$ ") + rr.cambio.valor);
+          _mktSum = parts.slice(0, 3).join(" · ");
+        } })();
       var _mkt = (!GATED && _cambioChip ? '<h4>' + (L ? "Currency" : "Câmbio") + '</h4>' + _cambioChip : '') + _indices + _cripto;
       if (_mkt) h += _details(_mktLbl, _mkt, _mktSum);
       // Panorama completo — recolhido por padrão (denso de apoio; as 5 lentes já estão no núcleo como "cinco forças")
