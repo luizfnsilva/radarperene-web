@@ -201,7 +201,9 @@
   .instband:hover{color:var(--txt)}
   .instband b{color:var(--txt);font-weight:600}
   /* ★ P6 — painel de números "uau" (screenshot-able): gravidade editorial (serif) + escopo SentimenTrader */
-  .statband{text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0 24px;margin:4px 0 2px}
+  .statband{text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:30px 0 32px;margin:4px 0 2px}
+  .statband .sb-h{font-family:var(--serif);font-size:clamp(22px,3.2vw,30px);font-weight:600;color:var(--txt);line-height:1.2;letter-spacing:-.01em;margin:0 0 13px}
+  .statband .sb-lead{font-size:clamp(14px,1.8vw,16px);line-height:1.6;color:var(--txt2);max-width:52ch;margin:0 auto}
   .statband .eyebrow{font-family:var(--serif);font-style:italic;font-size:clamp(14px,2vw,17px);color:var(--txt2);text-transform:none;letter-spacing:0;margin-bottom:18px}
   .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
   @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr);gap:26px 14px}}
@@ -270,16 +272,9 @@
 
 <div class="wrap">
   <section class="statband" id="statband">
-    <div class="eyebrow" id="sb-eyb">Uma biblioteca viva de precedentes</div>
-    <div class="stats">
-      <div class="stat"><span class="n" data-cob="desde">1913</span><span class="l" id="sl-desde">o registro mais antigo</span></div>
-      <div class="stat"><span class="n" data-cob="ativos">356</span><span class="l" id="sl-ativos">ativos cobertos</span></div>
-      <div class="stat"><span class="n" data-cob="linhas">2,1 mi</span><span class="l" id="sl-linhas">linhas de dados</span></div>
-      <div class="stat"><span class="n" id="stat-reports">206</span><span class="l" id="sl-reports">relatórios na biblioteca</span></div>
-      <div class="stat"><span class="n" data-cob="tribunais">15</span><span class="l" id="sl-tribunais">tribunais monitorados</span></div>
-      <div class="stat"><span class="n">26</span><span class="l" id="sl-snap">anos de história diária</span></div>
-    </div>
-    <p class="micro" style="margin-top:18px"><a id="sb-cta" href="/artigos" style="color:var(--gold)">Explorar o arquivo →</a></p>
+    <h2 class="sb-h" id="sb-eyb">Uma biblioteca viva de precedentes</h2>
+    <p class="sb-lead" id="sb-lead">Não fazemos previsões — documentamos episódios. Quando regimes semelhantes apareceram antes, o que aconteceu depois?</p>
+    <p class="micro" style="margin-top:16px"><a id="sb-cta" href="/artigos" style="color:var(--gold)">Explorar o arquivo →</a></p>
   </section>
 </div>
 
