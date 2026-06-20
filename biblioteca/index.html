@@ -67,6 +67,7 @@
 <script>
 (function(){
   var EN = location.search.indexOf("lang=en")>=0 || location.hostname==="radarperene.com";
+  if(EN){var _mb=document.getElementById("me-biblioteca");if(_mb){_mb.textContent="Library";_mb.href="/library/";}}  /* .com: rótulo + slug EN */
   var API = location.origin + "/api/v1";
   var ANON = (window.RP_AUTH && window.RP_AUTH.ANON) || "";
   var TIPOS = [
@@ -108,7 +109,7 @@
   function selecionar(tipo){
     atual=tipo;
     [].forEach.call(elTabs.children,function(b){ b.classList.toggle("on", b.dataset.k===tipo); });
-    try{ history.replaceState(null,"","/biblioteca/?tipo="+tipo+(EN?"&lang=en":"")); }catch(e){}
+    try{ history.replaceState(null,"", location.pathname.split("?")[0]+"?tipo="+tipo+(EN?"&lang=en":"")); }catch(e){}  /* slug-aware: mantém /library no .com, /biblioteca no .com.br */
     render(tipo); carregar(tipo);
   }
   elTabs.innerHTML = TIPOS.map(function(t){ return '<button data-k="'+t.k+'">'+(EN?t.en:t.pt)+'</button>'; }).join("");

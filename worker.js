@@ -246,6 +246,8 @@ function _consentRw(rw) { return rw.on("body", { element(e) { e.append(_CONSENT,
 //    LINKA p/ uma URL que redireciona — então o link tem de já apontar p/ o destino final. SEMPRE gated por isEN no
 //    chamador (no .com.br /diario é 200, não se toca). /daily não redireciona → sem loop. HTMLRewriter = streaming, custo ~0.
 function _enDailyRw(rw) { return rw.on('a[href^="/diario"]', { element(e) { const h = e.getAttribute("href"); if (h) e.setAttribute("href", h.replace(/^\/diario/, "/daily")); } }); }
+// slug i18n da BIBLIOTECA no .com (EN): /biblioteca… → /library… (mesmo motivo do _enDailyRw — evita slug PT + 301 no clique).
+function _enLibraryRw(rw) { return rw.on('a[href^="/biblioteca"]', { element(e) { const h = e.getAttribute("href"); if (h) e.setAttribute("href", h.replace(/^\/biblioteca/, "/library")); } }); }
 
 function _cobRewriter(rw, cob, en) {
   if (!cob) return rw;
@@ -652,7 +654,7 @@ async function _route(request, env, ctx) {
       const _shm = _url.pathname.match(/^\/(api\/docs|founder|free|widgets)\/?$/);
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
-        if (_er.ok) return _enDailyRw(_consentRw(new HTMLRewriter())).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
+        if (_er.ok) return _enLibraryRw(_enDailyRw(_consentRw(new HTMLRewriter()))).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
       }
       // slug i18n do arquivo diário: no .com (EN) /diario → 301 /daily (o conteúdo é o mesmo, só o slug muda; evita slug PT no domínio EN). /daily não redireciona → sem loop.
       if (/^\/diario(\/|$)/.test(_url.pathname)) {
@@ -661,6 +663,15 @@ async function _route(request, env, ctx) {
       // landing de assinatura: slug i18n /assine (PT) ↔ /subscribe (EN). No .com (EN) /assine → 301 /subscribe (slug PT não vive no domínio EN). /subscribe não redireciona aqui → sem loop.
       if (/^\/assine(\/|$)/.test(_url.pathname)) {
         return Response.redirect(_url.origin + _url.pathname.replace(/^\/assine/, "/subscribe") + _url.search, 301);
+      }
+      // biblioteca: slug i18n /biblioteca (PT) ↔ /library (EN). No .com serve /library do asset da biblioteca
+      //   (EN-aware) e 301 /biblioteca→/library (slug PT não vive no .com). /library não redireciona → sem loop.
+      if (/^\/library(\/|$)/.test(_url.pathname)) {
+        const _lr = await env.ASSETS.fetch(new Request(_url.origin + "/biblioteca/index.html"));
+        if (_lr.ok) return _enLibraryRw(_enDailyRw(_consentRw(new HTMLRewriter()))).transform(new Response(_lr.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
+      }
+      if (/^\/biblioteca(\/|$)/.test(_url.pathname)) {
+        return Response.redirect(_url.origin + _url.pathname.replace(/^\/biblioteca/, "/library") + _url.search, 301);
       }
     }
     // contraparte PT: no .com.br /subscribe → 301 /assine (mantém o slug EN fora do domínio PT). Gate por host (não !_isEN) p/ não redirecionar em dev/localhost, onde os 2 arquivos servem direto.
@@ -856,7 +867,7 @@ async function _route(request, env, ctx) {
           .on("#radar-teaser", { element(e) { e.remove(); } })  // teaser da home não faz sentido na página de um ticker → remove (limpo p/ crawler e usuário)
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
-        if (_isEN) rw = _enDailyRw(rw); // /ativo herda a nav da home shell → /diario→/daily no .com
+        if (_isEN) rw = _enLibraryRw(_enDailyRw(rw)); // /ativo herda a nav da home shell → /diario→/daily e /biblioteca→/library no .com
         // ★ Anúncios (2026-06-18) — APENAS nesta rota /ativo (NÃO na home, que serve o mesmo shell direto sem este rewriter).
         //   /ativo é SEO programático de ALTO tráfego, leitor quase sempre free. in-article após a leitura do ativo
         //   (antes da FAQ) + multiplex depois da FAQ. Gateados pelo /ads.js → Founder não vê (mesmo sinal rp_premium do shell).
@@ -894,7 +905,7 @@ async function _route(request, env, ctx) {
       if (!ct.includes("text/html")) return res; // não-HTML: intacto
       // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
       const cob = await _fetchCobertura();
-      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); if (isEN) rw = _enDailyRw(rw); const _t = rw.transform(res); const _h = new Headers(_t.headers); _h.set("content-type", "text/html; charset=utf-8"); return new Response(_t.body, { status: _t.status, headers: _h }); } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com). charset EXPLÍCITO: o ASSETS serve "text/html" pelado e webviews (X/LinkedIn in-app) BAIXAM html sem charset em vez de abrir.
+      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); if (isEN) rw = _enLibraryRw(_enDailyRw(rw)); const _t = rw.transform(res); const _h = new Headers(_t.headers); _h.set("content-type", "text/html; charset=utf-8"); return new Response(_t.body, { status: _t.status, headers: _h }); } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com). charset EXPLÍCITO: o ASSETS serve "text/html" pelado e webviews (X/LinkedIn in-app) BAIXAM html sem charset em vez de abrir.
 
       // ★ digest do dia (home payload) inlinado no HTML → o teaser/radar pintam SEM o round-trip cliente (~2-4s, o
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
@@ -964,7 +975,7 @@ async function _route(request, env, ctx) {
         rw = rw
           .on("#api-url", { element(e) { e.setInnerContent("GET https://radarperene.com/api/v1/digest?lang=en"); } })
           .on("#api-embed", { element(e) { e.setInnerContent('<iframe src="https://radarperene.com/radar-embed" width="100%" height="1400" style="border:0"></iframe>'); } });
-        rw = _enDailyRw(rw); // nav/footer/CTA do arquivo diário no .com → /daily (evita 301)
+        rw = _enLibraryRw(_enDailyRw(rw)); // nav/footer/CTA do arquivo diário no .com → /daily + /biblioteca→/library (evita 301)
       } else if (_gdt) {
         // PT: o graph estático vive no index.html → data o Dataset via BUFFER do texto inline (chunks do
         //   HTMLRewriter podem partir a âncora no meio; acumula tudo e emite 1× no último chunk).
