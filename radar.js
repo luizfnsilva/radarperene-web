@@ -81,7 +81,7 @@
       .then(function (r) { return r.json(); })
       .then(function (d) {
         var uni = (d && d.grupos) ? d.grupos.map(function (g) { return { cat: g.cat, items: g.items }; }) : [];
-        var SYNTH = { intermercado: 1, intermercado_ratio: 1, intermercado_den: 1, macro: 1 };  // composições intermercado + imóveis/FIPEZAP + fiscal vivem SÓ no digest (fora do universo /v1/tickers) → preserva-as
+        var SYNTH = { intermercado: 1, intermercado_ratio: 1, intermercado_den: 1, macro: 1 };  // composições intermercado + imóveis + fiscal vivem SÓ no digest (fora do universo /v1/tickers) → preserva-as
         // ★ catálogo TOTAL (2026-06-11): o /v1/catalog agora traz imóveis/macro/tesouro — dedupe por cod|cls p/ o
         //   item do digest não aparecer 2x; sobram no digestOnly só composições que o catálogo ainda não tem.
         var seen = {}; uni.forEach(function (g) { g.items.forEach(function (it) { seen[it.cod + "|" + it.cls] = 1; }); });
@@ -1728,7 +1728,7 @@
         //   a delegação acha o data-cod mais próximo) · rendimento · análogo 3m. Payload: rr.imovel_m2 (digest).
         if ((l.key === "imobiliaria" || /imobili/i.test(l.nome || "")) && rr.imovel_m2 && rr.imovel_m2.length) {
           var fD = function (d) { return d ? " · " + String(d).slice(5, 7) + "/" + String(d).slice(0, 4) : ""; };
-          am += '<div class="mi" style="margin:7px 0 2px"><b>' + (L ? "Cost per m² (FipeZap)" : "Custo do m² (FipeZap)") + '</b></div><div class="tk">' +
+          am += '<div class="mi" style="margin:7px 0 2px"><b>' + (L ? "Cost per m²" : "Custo do m²") + '</b></div><div class="tk">' +
             rr.imovel_m2.map(function (m) {
               var an = m.analogos && m.analogos.venda && m.analogos.venda["3m"];
               var mt = (m.venda != null ? "R$ " + Number(m.venda).toLocaleString(L ? "en-US" : "pt-BR") + "/m²" + fD(m.data) : "") +
