@@ -227,6 +227,11 @@
 
     <p>É descritivo, sempre. O Radar lê regimes e precedentes — nunca recomenda, nunca prevê preço.</p>
 
+    <!-- ★ 2026-06-21 (dono): a edição completa de hoje, AO VIVO — o observatório aparece travado até virar Founder. Demonstração viva do produto. -->
+    <h2 class="sec">A edição de hoje, ao vivo</h2>
+    <p>O que está acima, na prática — a leitura de hoje por inteiro. Os números e o observatório aparecem travados até você se tornar Founder.</p>
+    <div id="radar-perene" data-chrome="off" data-skin="editorial" style="--rp-max:100%;margin:16px 0 8px"></div>
+
     <h2 class="sec">R$ 149/mês</h2>
     <p>Travado enquanto a assinatura ficar ativa. Pagamento via Stripe, 7 dias de arrependimento com estorno integral, cancela em um clique.</p>
     <p class="ctarow"><a class="herolink lead" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Tornar-se Founder →</a></p>
@@ -241,5 +246,9 @@
   <p>© Radar Perene · <a href="/" style="color:var(--gold)">radarperene.com.br</a></p>
 </footer>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}var tg=document.getElementById("theme-tg");if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};})();</script>
+<!-- ★ 2026-06-21: radar editorial (gated) como demonstração viva na página Founder. auth.js destrava p/ Founder logado; prospect vê a edição aberta. -->
+<script src="/vendor/supabase-js/supabase.min.js"></script>
+<script src="/auth.js" defer></script>
+<script src="/radar.js" defer></script>
 </body>
 </html>
