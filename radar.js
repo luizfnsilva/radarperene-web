@@ -242,15 +242,17 @@
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
       // ★ 2026-06-21 v8 (dono): PÁGINA DO ECONOMIST. A FRASE é protagonista (Newsreader grande, 2 períodos, lh 1.25). Byline discreto. Marca d'água = ícone oficial (mapa do Brasil) preenchendo o vazio à direita, mesma faixa da porta. Rodapé humano.
-      ".rp .rp-poster{position:relative;overflow:hidden;font-family:'Inter',system-ui,sans-serif;border:0;border-radius:14px;background:var(--_card);box-shadow:0 6px 26px rgba(64,42,12,.10),0 1px 2px rgba(64,42,12,.05);max-width:780px;margin:8px auto 0;padding:clamp(20px,2.8vw,28px) clamp(24px,3.4vw,34px);display:flex;flex-direction:column;gap:clamp(15px,2vw,20px);text-align:left}" +
+      ".rp .rp-poster{position:relative;overflow:hidden;font-family:'Inter',system-ui,sans-serif;border:0;border-radius:14px;background:var(--_card);box-shadow:0 6px 26px rgba(64,42,12,.10),0 1px 2px rgba(64,42,12,.05);max-width:820px;margin:6px auto 0;padding:clamp(18px,2.4vw,24px) clamp(24px,3.4vw,34px);display:flex;flex-direction:column;gap:clamp(11px,1.5vw,15px);text-align:left}" +
       ".rp .rp-poster>.rp-ptop,.rp .rp-poster>.rp-quotes,.rp .rp-poster>.rp-pfoot{position:relative;z-index:1}" +
       ".rp .rp-poster .rp-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}" +
       ".rp .rp-poster .rp-pll{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .rp-poster .rp-pd{font-size:11.5px;font-weight:500;color:var(--_dim);letter-spacing:.02em;font-feature-settings:'tnum'}" +
-      ".rp .rp-poster .rp-quotes{display:flex;flex-direction:column;gap:clamp(10px,1.4vw,15px);max-width:74%}" +
-      ".rp .rp-poster .rp-quote{margin:0;font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(26px,3.7vw,42px);line-height:1.24;font-weight:400;color:var(--_txt);letter-spacing:-.012em}" +
+      // ★ v9 (dono): coluna LARGA (sem o estrangulamento 74% que empilhava 6 linhas) + fonte menor → 2-3 linhas FORTES, baixa. Parágrafos colados (mesmo raciocínio).
+      ".rp .rp-poster .rp-quotes{display:flex;flex-direction:column;gap:clamp(5px,0.7vw,8px);max-width:96%}" +
+      ".rp .rp-poster .rp-quote{margin:0;font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(20px,2.6vw,29px);line-height:1.25;font-weight:400;color:var(--_txt);letter-spacing:-.012em}" +
       ".rp .rp-poster .rp-qn{font-weight:600;color:var(--_accent);font-feature-settings:'tnum';white-space:nowrap}" +
-      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:7px}" +
+      // rodapé com ar + filete = vira publicação (consultor)
+      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:8px;margin-top:clamp(8px,1.4vw,14px);padding-top:clamp(15px,2vw,20px);border-top:1px solid var(--_line)}" +
       ".rp .rp-poster .hl-s{font-size:12px;font-style:italic;color:var(--_dim)}" +
       ".rp .rp-poster .hl-warn{font-size:10.5px}" +
       ".rp .rp-poster .hl-ep{font-size:13px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-poster .hl-ep:hover{text-decoration:underline}" +
