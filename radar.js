@@ -280,6 +280,14 @@
       ".rp .rp-vsig.hot .rp-vsig-r{color:var(--_hot)}.rp .rp-vsig.warm .rp-vsig-r{color:var(--_warm)}.rp .rp-vsig.cool .rp-vsig-r{color:var(--_cool)}" +
       ".rp .rp-vsig-flow{margin-top:10px;font-size:12.5px;line-height:1.7;color:var(--_txt)}" +
       ".rp .rp-vsig-fl{display:inline-block;min-width:88px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--_dim)}" +
+      // ★ 2026-06-20 edição aberta (grátis = publicação): sinal mostra nome+regime, 🔒 só na interpretação; CTA e fecho editoriais
+      ".rp .rp-vsig-gr{font-size:14.5px;color:var(--_txt);margin:7px 0 4px;font-family:Georgia,'Fraunces',serif}" +
+      ".rp .rp-vsig-lk{font-size:11.5px;color:var(--_dim)}" +
+      ".rp .rp-fcta{display:inline-block;margin-top:9px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-fcta:hover{text-decoration:underline}" +
+      ".rp .rp-upsell{border-top:2px solid var(--_accent);margin-top:26px;padding-top:15px}" +
+      ".rp .rp-upsell .rp-up-k{font-family:Georgia,'Fraunces',serif;font-size:16px;font-weight:600;color:var(--_txt)}" +
+      ".rp .rp-upsell .rp-up-s{font-size:12.5px;color:var(--_dim);margin:7px 0 6px}" +
+      ".rp .rp-upsell .rp-up-l{margin:0;padding:0;list-style:none;display:grid;gap:4px}.rp .rp-upsell .rp-up-l li{font-size:13px;color:var(--_txt);padding-left:15px;position:relative}.rp .rp-upsell .rp-up-l li::before{content:'·';position:absolute;left:3px;color:var(--_accent);font-weight:700}" +
       // ★ estados do presente COMPACTOS, agrupados por CADÊNCIA (mensal=accent · diário=cool) — a memória é que merece espaço (filosofia do dono 2026-06-18)
       ".rp .rp-states{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:13px 0 2px}" +
       ".rp .rp-grp .rp-cad{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:6px}.rp .rp-grp .rp-cad-m{color:var(--_accent)}.rp .rp-grp .rp-cad-d{color:var(--_cool,var(--_dim))}" +
@@ -1680,6 +1688,7 @@
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
     var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
     var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
+    var _fcta = '<a class="rp-fcta" href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir edição Founder →") + '</a>';  // CTA editorial reutilizável (edição aberta → edição completa)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
@@ -1949,7 +1958,7 @@
     var _diverg = '', _divergBody = '';
     if (show("divergencias") && v.divergencias) {
       if (v.divergencias.locked) {  // free: só a CONTAGEM + cadeado (as leituras são substância → Founder)
-        if (v.divergencias.n) _divergBody = '<div class="lr">' + esc(v.divergencias.n) + ' ' + (L ? "divergences flagged today " : "divergências sinalizadas hoje ") + glock() + '</div>';
+        if (v.divergencias.n) _divergBody = '<div class="lr" style="font-size:13.5px;color:var(--_txt)">' + esc(v.divergencias.n) + (L ? " divergences observed today — out of step with the historical pattern." : " divergências observadas hoje — destoando do padrão histórico.") + '</div>' + _fcta;  // ★ 2026-06-20: editorial, não "N sinalizadas 🔒" (SaaS)
       } else if (v.divergencias.length) { _divergBody = '<ul class="dv">' +
         v.divergencias.map(function (x) { return '<li><b>' + esc(x.codigo) + '</b> · ' + esc(x.leitura) + '</li>'; }).join("") + '</ul>'; }
       if (_divergBody) _diverg = '<h4>' + (L ? "Divergences today" : "Divergências hoje") + '</h4>' + _divergBody; }
@@ -1980,10 +1989,12 @@
       // 2) O que chama atenção — Vértice em layout EDITORIAL (Apple Health, consultor 06-20): pilha vertical, número
       //    grande serif + regime + filete. Sem caixa/cinza/grade (que pareciam dashboard). A fuga ganha "Saindo de / Entrando em".
       var _vsig = function (nome, valor, regime, tone, flow) {
-        return '<div class="rp-vsig ' + esc(tone || '') + '">' +
-          '<div class="rp-vsig-n">' + esc(nome) + '</div>' +
-          '<div class="rp-vsig-v">' + (valor == null ? (GATED ? glock() : '—') : esc(valor)) + '</div>' +
-          '<div class="rp-vsig-r">' + esc(regime || '') + '</div>' + (flow || '') + '</div>';
+        // ★ 2026-06-20 (consultor): no GRÁTIS mostra NOME (curiosidade) + regime (conclusão legível) + 🔒 só na interpretação —
+        //   nunca um cadeado gigante no número (frustra). No Founder: número grande + regime + fluxo.
+        var body = GATED
+          ? ('<div class="rp-vsig-gr">' + esc(regime || '') + '</div><div class="rp-vsig-lk">' + glock() + ' ' + (L ? "full reading in Founder" : "interpretação completa no Founder") + '</div>')
+          : ('<div class="rp-vsig-v">' + (valor == null ? '—' : esc(valor)) + '</div><div class="rp-vsig-r">' + esc(regime || '') + '</div>' + (flow || ''));
+        return '<div class="rp-vsig ' + esc(tone || '') + '"><div class="rp-vsig-n">' + esc(nome) + '</div>' + body + '</div>';
       };
       var _vcore = '';
       if (tms) tms.slice(0, 2).forEach(function (t) { _vcore += _vsig(t.nome, t.valor, t.regime, cls(t.valor), ''); });
@@ -2019,16 +2030,26 @@
       var _mkt = (!GATED && _cambioChip ? '<h4>' + (L ? "Currency" : "Câmbio") + '</h4>' + _cambioChip : '') + _indices + _cripto;
       if (_mkt) h += _details(_mktLbl, _mkt, _mktSum);
       // Panorama completo — recolhido por padrão (denso de apoio; as 5 lentes já estão no núcleo como "cinco forças")
-      h += _details(_foldLbl1, _scatter + _interm + _fiscal + _termoRest + _obsRest + _razoes + _extras + _leadlag + _analogo + _par + _portasBtns);
+      // ★ 2026-06-20 (consultor): o OBSERVATÓRIO ("Ver o mecanismo") não pertence à edição aberta — só Founder. O grátis é a publicação;
+      //   a nave atrás da parede é nomeada na linha de fecho (upsell), não pilotada aqui.
+      if (!GATED) h += _details(_foldLbl1, _scatter + _interm + _fiscal + _termoRest + _obsRest + _razoes + _extras + _leadlag + _analogo + _par + _portasBtns);
     } else {
       // ordem plana original (embeds / mini-radar) — comportamento idêntico ao anterior
       if (!sections || show("portas")) h += (!sections ? _tier2HTML : '') + _portasBtns;
       h += _interm + _fiscal + _hojelembra + _scatter + _vHead + _vTeaser + _termoFull + _obsFull + _razoes + _cripto + _extras + _leadlag + _analogo + _diverg + _par;
     }
-    if (chrome || !sections) h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +  // só no radar completo (sections=null) ou em embeds (chrome) — NÃO no teaser/pulso da home
+    // ★ 2026-06-20 (consultor): fecho da EDIÇÃO ABERTA (grátis/FOLD) = nomeia o observatório (a nave atrás da parede) sem pilotá-lo.
+    //   Founder não vê fecho (tem tudo). Embeds (chrome) mantêm a "amostra do motor".
+    if (FOLD && GATED) { var _av = (_cob.ativos != null ? _cob.ativos : 365);
+      h += '<div class="rp-upsell"><div class="rp-up-k">' + (L ? "This was today&rsquo;s open edition." : "Esta foi a edição aberta de hoje.") + '</div>' +
+        '<div class="rp-up-s">' + (L ? "The Founder edition adds:" : "A edição Founder inclui:") + '</div><ul class="rp-up-l">' +
+        (L ? ('<li>the reading of each signal</li><li>full episodes</li><li>historical analogs</li><li>a proprietary observatory with ' + _av + ' assets</li><li>50+ years of precedents</li>')
+           : ('<li>a interpretação dos sinais</li><li>episódios completos</li><li>análogos históricos</li><li>observatório proprietário com ' + _av + ' ativos</li><li>mais de 50 anos de precedentes</li>')) +
+        '</ul>' + _fcta + '</div>';
+    } else if (chrome) { h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
       (L ? ("The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across " + (_ca100 ? "over " + _ca100 + " assets" : "over 100 assets") + " and 50+ years of history.")
          : ("O plano completo acrescenta a proveniência de cada sinal, o cruzamento livre de qualquer indicador com qualquer outro, análogos históricos e projeção — sobre " + (_ca100 ? "mais de " + _ca100 + " ativos" : "mais de 100 ativos") + " e 50+ anos de histórico.")) +
-      (chrome ? '<br><a href="' + rpBacklink(mkt, lang) + '?utm_source=embed&utm_medium=widget" target="_blank" rel="noopener">' + (L ? "See the full app →" : "Ver o app completo →") + '</a>' : '') + '</div>';
+      '<br><a href="' + rpBacklink(mkt, lang) + '?utm_source=embed&utm_medium=widget" target="_blank" rel="noopener">' + (L ? "See the full app →" : "Ver o app completo →") + '</a></div>'; }
     if (chrome) h += '<div class="ft">' + (d.disclaimer ? esc(d.disclaimer[lang] || d.disclaimer.pt) : "") + ' · ' + (L ? "data by" : "dados de") + ' <a href="' + rpBacklink(mkt, lang) + '" target="_blank" rel="noopener">Radar Perene</a></div>';
     h += '</div>';
     node.innerHTML = h;
