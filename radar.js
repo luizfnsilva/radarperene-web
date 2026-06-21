@@ -241,6 +241,17 @@
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
+      // ★ 2026-06-21 (dono) CARTAZ compartilhável: peça VERTICAL estreita, centrada, número gigante dominante (Fear&Greed/Visual Capitalist). Muito ar, pouca informação, um foco.
+      ".rp .rp-poster{border:1px solid var(--_line);border-top:1px solid var(--_line);border-radius:16px;text-align:center;max-width:560px;margin:6px auto 0;padding:38px 30px 32px}" +
+      ".rp .rp-poster .rp-pk{font-family:var(--_mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--_dim)}" +
+      ".rp .rp-poster .rp-prule{width:48px;height:1px;background:var(--_line);margin:20px auto}" +
+      ".rp .rp-poster .rp-pll{font-family:Georgia,'Fraunces',serif;font-size:12.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--_txt)}" +
+      ".rp .rp-poster .rp-pd{font-family:var(--_mono);font-size:14px;color:var(--_accent);letter-spacing:.05em;margin-top:10px}" +
+      ".rp .rp-poster .rp-pbig{font-family:var(--_mono);font-size:clamp(62px,15vw,92px);line-height:.95;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';margin:6px 0 14px}" +
+      ".rp .rp-poster .rp-pbigl{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.5;color:var(--_txt);max-width:24ch;margin:0 auto}" +
+      ".rp .rp-poster .rp-pmed{font-family:var(--_mono);font-size:34px;line-height:1;font-weight:700;color:var(--_txt);font-feature-settings:'tnum';margin:30px 0 5px}" +
+      ".rp .rp-poster .rp-pmedl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-warn{margin-top:14px}.rp .rp-poster .hl-s{margin-top:22px}.rp .rp-poster .hl-ep{margin-top:16px;font-size:13px}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
@@ -1687,6 +1698,10 @@
     //   nossa página (#radar-perene: chrome off, sem data-sections) → núcleo conta a história e o denso recolhe atrás de
     //   <details> nativo (SEO ok · zero JS · Founder ABERTO / free fechado). Embeds (chrome) e mini-radar (TEASER) seguem planos.
     var FOLD = !sections && !chrome;
+    // ★ 2026-06-21 (dono): POSTER = o mini-radar COMPARTILHÁVEL (data-sections só "analogo_br"). Deixa de ser "card de dashboard"
+    //   e vira "cartaz editorial" vertical — número gigante protagonista (Fear&Greed/Visual Capitalist), centrado, estreito, muito ar.
+    //   Vale no home (chrome off) E no embed (/widgets, chrome on) — em ambos é o objeto que viaja num screenshot.
+    var POSTER = !!sections && sections.length === 1 && sections[0] === "analogo_br";
     var _foldLbl1 = L ? "See the mechanism" : "Ver o mecanismo";  // ★ 2026-06-20 vocabulário editorial (consultor): era "Explorar o panorama completo" (genérico)
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
     var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
@@ -1867,15 +1882,39 @@
       var _epTtl = _epM ? (L ? _epM.te : _epM.tp) : "";
       var _epLine = _epM ? ('<div class="hl-ep-name">' + (L ? "One of those moments: " : "Um desses momentos: ") + '<b>' + esc(_epTtl) + '</b> (' + _epYr + ').</div>') : "";
       var _epTxt = _epM ? (L ? "Read the full chapter →" : "Ler o capítulo completo →") : (L ? "Read the full episodes →" : "Ler episódios completos →");
+      var _dts = (ab.datas_analogas && ab.datas_analogas.length) ? esc(ab.datas_analogas.join(" · ")) : '';
+      var _foot = L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.";
+      if (POSTER) {
+        // ★ 2026-06-21 (dono): CARTAZ vertical — número gigante (hit-rate) protagonista, mediana subordinada, "Hoje lembra" entre
+        //   filetes (coluna do Economist). Auto-intitulado ("Leitura do Radar") p/ o screenshot viajar sozinho. Honesto em qualquer
+        //   regime: o % é dos episódios POSITIVOS (se vier baixo, o cartaz conta a verdade do regime negativo).
+        var _pwarn = (ab.n_analogos && ab.n_analogos < 20)
+          ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ')</div>' : '';
+        _hojelembra += '<div class="rp-hle rp-poster">' +
+          '<div class="rp-pk">' + (L ? "The Radar Reading" : "Leitura do Radar") + '</div>' +
+          '<div class="rp-prule"></div>' +
+          '<div class="rp-pll">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
+          (_dts ? '<div class="rp-pd">' + _dts + '</div>' : '') +
+          '<div class="rp-prule"></div>' +
+          '<div class="rp-pbig">' + esc(ab.hit_rate_pct) + '%</div>' +
+          '<div class="rp-pbigl">' + (L ? "of comparable episodes ended positive over six months" : "dos episódios semelhantes terminaram positivos em seis meses") + '</div>' +
+          '<div class="rp-pmed">' + _med + '</div>' +
+          '<div class="rp-pmedl">' + (L ? "observed median · n=" : "mediana observada · n=") + esc(ab.n_analogos) + '</div>' +
+          _pwarn +
+          '<div class="hl-s">' + _foot + '</div>' +
+          '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
+          '</div>';
+      } else {
       _hojelembra += '<div class="rp-hle">' +
         '<div class="hl-k">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
-        (ab.datas_analogas && ab.datas_analogas.length ? '<div class="hl-d">' + esc(ab.datas_analogas.join(" · ")) + '</div>' : '') +
+        (_dts ? '<div class="hl-d">' + _dts + '</div>' : '') +
         '<p class="hl-lead">' + _lead + '</p>' +
         _epLine +
         (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
-        '<div class="hl-s">' + (L ? "Observed distribution, not a forecast." : "Distribuição observada, não previsão.") + '</div>' +
+        '<div class="hl-s">' + _foot + '</div>' +
         '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
         '</div>';
+      }
     }
     var _scatter = '';
     if (show("scatter") && rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);

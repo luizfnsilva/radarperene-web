@@ -123,9 +123,8 @@
   .hero h1 .g{color:var(--gold);font-style:italic}
   .hero p.lead{font-size:clamp(16px,2.2vw,19px);color:var(--dim);max-width:62ch;margin:0 auto 6px;text-wrap:balance}
   /* ★ 2026-06-21 (dono): Leitura do Radar DENTRO do hero — bloco centrado, rótulo discreto à esquerda, o card "Hoje lembra" é a primeira coisa importante da página. */
-  .hero-leitura{max-width:680px;margin:34px auto 6px;text-align:left}
-  .hero-leitura .eyebrow{margin-bottom:12px}
-  .hero-leitura .rp-narr{margin:26px auto 4px}
+  .hero-leitura{max-width:680px;margin:30px auto 6px}
+  .hero-leitura .rp-narr{margin:30px auto 4px}
   body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
   /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
   .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;
@@ -277,8 +276,7 @@
     <h1 id="h1">O Brasil observado — e <span class="g">lembrado</span>.</h1>
     <p class="lead" id="lead">Um arquivo vivo do mercado brasileiro. O que o Radar viu — e o que veio depois.</p>
     <!-- ★ 2026-06-21 (dono): a LEITURA DO RADAR sobe para DENTRO do hero — é a melhor demonstração do produto. Você chega → vê a assinatura do jornal → recebe a leitura do dia → e só depois decide se quer explorar mais. -->
-    <div class="hero-leitura only-public">
-      <div class="eyebrow" id="s-tz">Leitura do Radar</div>
+    <div class="hero-leitura only-public"><!-- ★ 2026-06-21 (dono): sem eyebrow externo — o CARTAZ (radar.js POSTER) se auto-intitula "Leitura do Radar", objeto compartilhável de identidade própria. -->
       <div data-radar-perene data-chrome="off" data-sections="analogo_br" style="--rp-max:100%"></div>
       <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
     </div>
@@ -509,7 +507,6 @@
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
-  set("s-tz",C.sTz);
   set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fed",C.fed);set("fprice",C.fprice);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
   set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);set("ftnav",C.ftnav);
