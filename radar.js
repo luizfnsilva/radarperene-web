@@ -251,11 +251,17 @@
       ".rp .rp-poster .rp-quotes{display:flex;flex-direction:column;gap:clamp(5px,0.7vw,8px);max-width:98%}" +
       ".rp .rp-poster .rp-quote{margin:0;font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(19px,2.4vw,27px);line-height:1.25;font-weight:400;color:var(--_txt);letter-spacing:-.013em}" +  // ★ 27px: "80%...terminaram positivos." cabe em 1 linha
       ".rp .rp-poster .rp-qn{font-weight:600;color:var(--_accent);font-feature-settings:'tnum';white-space:nowrap}" +
-      // rodapé com ar + filete = vira publicação. ★ max-width 62%: o filete termina perto de "previsão", NÃO cruza a marca d'água (logo).
-      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:8px;max-width:62%;margin-top:clamp(8px,1.4vw,14px);padding-top:clamp(15px,2vw,20px);border-top:1px solid var(--_line)}" +
-      ".rp .rp-poster .hl-s{font-size:12px;font-style:italic;color:var(--_dim)}" +
+      // rodapé com ar + filete = vira publicação. ★ filete em elemento PRÓPRIO (rp-prule2, ~56%) → termina perto de "previsão", NÃO cruza a logo.
+      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:9px;margin-top:clamp(8px,1.4vw,14px)}" +
+      ".rp .rp-poster .rp-prule2{height:1px;background:var(--_line);width:56%;max-width:430px;margin-bottom:clamp(6px,1vw,10px)}" +
+      ".rp .rp-poster .hl-s{font-size:12px;font-style:italic;color:var(--_dim);max-width:62%}" +
       ".rp .rp-poster .hl-warn{font-size:10.5px}" +
+      ".rp .rp-poster .rp-pbot{display:flex;justify-content:space-between;align-items:center;gap:14px;position:relative}" +
       ".rp .rp-poster .hl-ep{font-size:13px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-poster .hl-ep:hover{text-decoration:underline}" +
+      // botão ÚNICO de compartilhar (canto, do lado da logo) — sem poluir: ícone discreto, abre o share nativo (mobile) ou o menu (desktop)
+      ".rp .rp-poster .rp-share{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:none;border:0;border-radius:50%;background:none;color:var(--_accent);cursor:pointer;padding:0;opacity:.8;transition:opacity .15s,background .15s}.rp .rp-poster .rp-share:hover{opacity:1;background:var(--_card2)}" +
+      ".rp .rp-poster .rp-sharemenu{position:absolute;bottom:calc(100% + 9px);right:0;z-index:6;background:var(--_card);border:1px solid var(--_line);border-radius:11px;box-shadow:0 10px 30px rgba(40,26,8,.16);padding:5px;display:flex;flex-direction:column;gap:1px;min-width:158px}" +
+      ".rp .rp-poster .rp-shitem{text-align:left;background:none;border:0;padding:9px 13px;font-size:13px;font-weight:500;color:var(--_txt);cursor:pointer;border-radius:7px;font-family:'Inter',system-ui,sans-serif;white-space:nowrap}.rp .rp-poster .rp-shitem:hover{background:var(--_card2);color:var(--_accent)}" +
       ".rp .rp-poster .rp-pmark{position:absolute;right:-22px;bottom:-26px;width:clamp(150px,24vw,212px);height:clamp(150px,24vw,212px);background:url('/icon-light.svg') center/contain no-repeat;opacity:.6;pointer-events:none;z-index:0}" +
       "[data-theme=\"dark\"] .rp .rp-poster .rp-pmark{background-image:url('/icon-dark.svg');opacity:.5}" +
       "@media(max-width:560px){.rp .rp-poster .rp-quotes,.rp .rp-poster .rp-pfoot{max-width:100%}.rp .rp-poster .rp-pmark{opacity:.25;right:-30px;bottom:-30px}}" +
@@ -848,6 +854,37 @@
     return { mode: m, obj: obj, estr: estr, curt: curt, canCurto: canCurto };
   }
   function checkoutURL(lang) { return window.RP_CHECKOUT || (lang === "en" ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"); }
+  // ★ 2026-06-21 (dono): compartilhar a Leitura do Radar. UM botão → share NATIVO no celular (WhatsApp + todas as redes) ou, no
+  //   desktop, um pequeno menu de opções. Compartilha ESTA página (o OG dinâmico = este card viaja) com o texto da descoberta de hoje.
+  function rpShare(btn, lang) {
+    var L = lang === "en";
+    var url = btn.getAttribute("data-shareurl") || (typeof location !== "undefined" ? location.href : "");
+    var text = btn.getAttribute("data-sharetext") || "";
+    var title = btn.getAttribute("data-sharetitle") || "Radar Perene";
+    var open = btn.parentNode && btn.parentNode.querySelector(".rp-sharemenu");
+    if (open) { open.parentNode.removeChild(open); return; }  // 2º clique fecha
+    if (typeof navigator !== "undefined" && navigator.share) { navigator.share({ title: title, text: text, url: url }).catch(function () {}); return; }
+    var E = encodeURIComponent, t = E(text), u = E(url), tu = E(text + " " + url);
+    var items = [
+      ["WhatsApp", "https://wa.me/?text=" + tu],
+      ["X", "https://twitter.com/intent/tweet?text=" + t + "&url=" + u],
+      ["LinkedIn", "https://www.linkedin.com/sharing/share-offsite/?url=" + u],
+      ["Telegram", "https://t.me/share/url?url=" + u + "&text=" + t],
+      ["Facebook", "https://www.facebook.com/sharer/sharer.php?u=" + u],
+      [L ? "Copy link" : "Copiar link", "__copy__"]
+    ];
+    var menu = document.createElement("div"); menu.className = "rp-sharemenu";
+    menu.innerHTML = items.map(function (it) { return '<button type="button" class="rp-shitem" data-h="' + esc(it[1]) + '">' + esc(it[0]) + '</button>'; }).join("");
+    btn.parentNode.appendChild(menu);
+    menu.addEventListener("click", function (e) {
+      var b = e.target; while (b && b !== menu && !(b.className && ("" + b.className).indexOf("rp-shitem") >= 0)) b = b.parentNode;
+      if (!b || b === menu) return;
+      var h = b.getAttribute("data-h");
+      if (h === "__copy__") { try { navigator.clipboard.writeText(url); b.textContent = (L ? "Copied ✓" : "Copiado ✓"); } catch (_) {} return; }
+      window.open(h, "_blank", "noopener,noreferrer"); if (menu.parentNode) menu.parentNode.removeChild(menu);
+    });
+    setTimeout(function () { document.addEventListener("click", function ox(e) { if (!menu.contains(e.target) && e.target !== btn) { if (menu.parentNode) menu.parentNode.removeChild(menu); document.removeEventListener("click", ox); } }); }, 0);
+  }
   // ★ cadeado SEMPRE clicável → checkout (religado 2026-06-11: o gate do MAX morreu quando os períodos viraram livres
   //   e os 🔒 restantes ficaram inertes — cadeado que não leva à compra é vitrine trancada sem porta).
   function lockA(L, inner) { return '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;cursor:pointer" title="' + (L ? "Unlock with Founder" : "Destravar com o Founder") + '">' + inner + '</a>'; }
@@ -1904,12 +1941,22 @@
         var _qn = function (s) { return '<b class="rp-qn">' + s + '</b>'; };
         var _q1 = L ? (_qn(esc(ab.hit_rate_pct) + '%') + ' of comparable episodes ended positive.') : (_qn(esc(ab.hit_rate_pct) + '%') + ' dos episódios semelhantes terminaram positivos.');
         var _q2 = L ? ('When that happened, the median for the Ibovespa over six months was ' + _qn(_med) + '.') : ('Quando isso aconteceu, a mediana do Ibovespa em seis meses foi ' + _qn(_med) + '.');
+        // ★ 2026-06-21 (dono): UM botão de compartilhar (canto, do lado da logo) que abre o share nativo (mobile: WhatsApp+todas) ou
+        //   um menu (desktop). Compartilha ESTA página → o OG dinâmico (este card) viaja. Texto = a própria descoberta de hoje.
+        var _sdts = (ab.datas_analogas && ab.datas_analogas.length) ? ab.datas_analogas.join(" · ") : "";
+        var _shareTitle = L ? "Radar Perene — The Radar Reading" : "Radar Perene — Leitura do Radar";
+        var _shareText = L
+          ? ("Today resembles " + _sdts + " — " + ab.hit_rate_pct + "% of comparable episodes ended positive; median " + _med + " over six months. — Radar Perene")
+          : ("Hoje lembra " + _sdts + " — " + ab.hit_rate_pct + "% dos episódios semelhantes terminaram positivos; mediana " + _med + " em seis meses. — Radar Perene");
+        var _shareUrl = chrome ? rpBacklink(mkt, lang) : ((typeof location !== "undefined" && location.origin) ? (location.origin + location.pathname) : rpBacklink(mkt, lang));
+        var _shareBtn = '<button type="button" class="rp-share" aria-label="' + (L ? "Share" : "Compartilhar") + '" title="' + (L ? "Share" : "Compartilhar") + '" data-shareurl="' + esc(_shareUrl) + '" data-sharetext="' + esc(_shareText) + '" data-sharetitle="' + esc(_shareTitle) + '"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><line x1="8.4" y1="10.85" x2="15.6" y2="6.15"/><line x1="8.4" y1="13.15" x2="15.6" y2="17.85"/></svg></button>';
         _hojelembra += '<div class="rp-hle rp-poster">' +
           '<div class="rp-ptop"><span class="rp-pll">' + (L ? "Today resembles" : "Hoje lembra") + '</span>' + (_dts ? '<span class="rp-pd">' + _dts + '</span>' : '') + '</div>' +
           '<div class="rp-quotes"><p class="rp-quote">' + _q1 + '</p><p class="rp-quote">' + _q2 + '</p></div>' +
           '<div class="rp-pfoot">' +
+            '<div class="rp-prule2"></div>' +
             '<div class="hl-s">' + _pnote + '</div>' + _pwarn +
-            '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
+            '<div class="rp-pbot"><a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' + _shareBtn + '</div>' +
           '</div>' +
           '<div class="rp-pmark" aria-hidden="true"></div>' +
           '</div>';
@@ -2281,8 +2328,9 @@
       if (asset) { renderAtivo(node, asset.trim(), node.getAttribute("data-classe") || "equity_br", lang, skin); return; }
       // clique num ticker → busca série + projeção e expande a sparkline tríade (interação básica por ticker)
       node.addEventListener("click", function (ev) {
-        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, xpl = null;
-        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!xpl && ("" + (t.className || "")).indexOf("rp-explore") >= 0) xpl = t; } t = t.parentNode; }
+        var t = ev.target, chip = null, exp = null, imxp = null, mtog = null, xpl = null, shr = null;
+        while (t && t !== node) { if (t.getAttribute) { if (!chip && t.getAttribute("data-cod")) chip = t; if (!exp && t.getAttribute("data-exp")) exp = t; if (!imxp && ("" + (t.className || "")).indexOf("rp-imxp") >= 0) imxp = t; if (!mtog && ("" + (t.className || "")).indexOf("rp-mtog") >= 0) mtog = t; if (!xpl && ("" + (t.className || "")).indexOf("rp-explore") >= 0) xpl = t; if (!shr && ("" + (t.className || "")).indexOf("rp-share") >= 0) shr = t; } t = t.parentNode; }
+        if (shr) { ev.stopPropagation(); ev.preventDefault(); rpShare(shr, lang); return; }  // ★ botão único de compartilhar → share nativo (mobile) ou menu (desktop)
         if (xpl) { ev.stopPropagation(); rpOpenExplorar(lang, xpl.getAttribute("data-tab") || "mercados"); return; }  // Fase 1B/1C/1D: portas → drawer na aba certa; sobe a árvore (o clique pode cair no <span> da seta). Os branches .rp-cmpbtn/.rp-estbtn saíram com os muros da home — os botões agora vivem nas abas (listeners próprios do pane).
         if (mtog) { ev.stopPropagation(); var ovv = mtog.previousElementSibling; if (ovv && ("" + (ovv.className || "")).indexOf("rp-ov") >= 0) { ovv.removeAttribute("hidden"); mtog.style.display = "none"; } return; }  // ★ "+N mais" → revela os itens recolhidos (one-way)
         if (imxp) {  // ⤢ comparar grande (intermercado) → modal já em compare com o COMPOSTO do setor (numerador) × IBOV
