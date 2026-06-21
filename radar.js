@@ -241,17 +241,20 @@
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
-      // ★ 2026-06-21 (dono) CARTAZ compartilhável: peça VERTICAL estreita, centrada, número gigante dominante (Fear&Greed/Visual Capitalist). Muito ar, pouca informação, um foco.
-      ".rp .rp-poster{border:1px solid var(--_line);border-top:1px solid var(--_line);border-radius:16px;text-align:center;max-width:560px;margin:6px auto 0;padding:38px 30px 32px}" +
-      ".rp .rp-poster .rp-pk{font-family:var(--_mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--_dim)}" +
-      ".rp .rp-poster .rp-prule{width:48px;height:1px;background:var(--_line);margin:20px auto}" +
-      ".rp .rp-poster .rp-pll{font-family:Georgia,'Fraunces',serif;font-size:12.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--_txt)}" +
-      ".rp .rp-poster .rp-pd{font-family:var(--_mono);font-size:14px;color:var(--_accent);letter-spacing:.05em;margin-top:10px}" +
-      ".rp .rp-poster .rp-pbig{font-family:var(--_mono);font-size:clamp(62px,15vw,92px);line-height:.95;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';margin:6px 0 14px}" +
-      ".rp .rp-poster .rp-pbigl{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.5;color:var(--_txt);max-width:24ch;margin:0 auto}" +
-      ".rp .rp-poster .rp-pmed{font-family:var(--_mono);font-size:34px;line-height:1;font-weight:700;color:var(--_txt);font-feature-settings:'tnum';margin:30px 0 5px}" +
-      ".rp .rp-poster .rp-pmedl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--_dim)}" +
-      ".rp .rp-poster .hl-warn{margin-top:14px}.rp .rp-poster .hl-s{margin-top:22px}.rp .rp-poster .hl-ep{margin-top:16px;font-size:13px}" +
+      // ★ 2026-06-21 v3 (dono) SHARE-CARD 16:9 — vira a imagem OG (1200×630) p/ compartilhar. Quote-card do FT: faixa-topo · miolo-monumento · rodapé. Número gigante = protagonista; contraste, não cerimônia.
+      ".rp .rp-poster{border:1px solid var(--_line);border-radius:14px;background:var(--_card2);max-width:760px;margin:8px auto 0;padding:clamp(18px,3.4vw,32px);aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:space-between;text-align:left}" +
+      ".rp .rp-poster .rp-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}" +
+      ".rp .rp-poster .rp-pll{font-family:Georgia,'Fraunces',serif;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--_txt)}" +
+      ".rp .rp-poster .rp-pd{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.04em;text-align:right}" +
+      ".rp .rp-poster .rp-pmid{display:flex;align-items:center;gap:clamp(16px,3vw,30px)}" +
+      ".rp .rp-poster .rp-pbig{font-family:var(--_mono);font-size:clamp(56px,11.5vw,104px);line-height:.84;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';letter-spacing:-.03em;flex:none}" +
+      ".rp .rp-poster .rp-pbigl{font-family:Georgia,'Fraunces',serif;font-size:clamp(16px,2.4vw,25px);line-height:1.32;color:var(--_txt);font-weight:500}" +
+      ".rp .rp-poster .rp-pbot{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}" +
+      ".rp .rp-poster .rp-pmed{font-family:var(--_mono);font-size:clamp(22px,3.4vw,32px);line-height:1;font-weight:700;color:var(--_txt);font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-pmedl{font-size:12px;font-weight:400;letter-spacing:.02em;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-warn{font-size:10.5px;margin-top:4px}.rp .rp-poster .hl-s{font-size:11.5px;margin-top:5px}" +
+      ".rp .rp-poster .hl-ep{margin:0;font-size:13px;font-weight:600;white-space:nowrap;flex:none}" +
+      "@media(max-width:560px){.rp .rp-poster{aspect-ratio:auto;gap:18px}.rp .rp-poster .rp-pmid{flex-direction:column;align-items:flex-start;gap:8px}}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
@@ -1890,19 +1893,17 @@
         //   regime: o % é dos episódios POSITIVOS (se vier baixo, o cartaz conta a verdade do regime negativo).
         var _pwarn = (ab.n_analogos && ab.n_analogos < 20)
           ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ')</div>' : '';
+        // ★ 2026-06-21 v3 (dono): SHARE-CARD 16:9 — pensado para virar a imagem OG (1200×630) automaticamente. Quote-card do FT /
+        //   Chart of the Week: faixa superior (Hoje lembra · datas), MIOLO com número-monumento (80%) + descritor serif ao lado,
+        //   rodapé com mediana + nota + porta. Canvas definido (é uma imagem que viaja), mas sem caixa-dentro-de-caixa nem cerimônia.
         _hojelembra += '<div class="rp-hle rp-poster">' +
-          '<div class="rp-pk">' + (L ? "The Radar Reading" : "Leitura do Radar") + '</div>' +
-          '<div class="rp-prule"></div>' +
-          '<div class="rp-pll">' + (L ? "Today resembles" : "Hoje lembra") + '</div>' +
-          (_dts ? '<div class="rp-pd">' + _dts + '</div>' : '') +
-          '<div class="rp-prule"></div>' +
-          '<div class="rp-pbig">' + esc(ab.hit_rate_pct) + '%</div>' +
-          '<div class="rp-pbigl">' + (L ? "of comparable episodes ended positive over six months" : "dos episódios semelhantes terminaram positivos em seis meses") + '</div>' +
-          '<div class="rp-pmed">' + _med + '</div>' +
-          '<div class="rp-pmedl">' + (L ? "observed median · n=" : "mediana observada · n=") + esc(ab.n_analogos) + '</div>' +
-          _pwarn +
-          '<div class="hl-s">' + _foot + '</div>' +
-          '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
+          '<div class="rp-ptop"><span class="rp-pll">' + (L ? "Today resembles" : "Hoje lembra") + '</span>' + (_dts ? '<span class="rp-pd">' + _dts + '</span>' : '') + '</div>' +
+          '<div class="rp-pmid"><div class="rp-pbig">' + esc(ab.hit_rate_pct) + '%</div>' +
+            '<div class="rp-pbigl">' + (L ? "of comparable episodes ended positive over six months." : "dos episódios semelhantes terminaram positivos em seis meses.") + '</div></div>' +
+          '<div class="rp-pbot"><div class="rp-pbl">' +
+            '<div class="rp-pmed">' + _med + ' <span class="rp-pmedl">' + (L ? "observed median (n=" : "mediana observada (n=") + esc(ab.n_analogos) + ')</span></div>' +
+            _pwarn + '<div class="hl-s">' + _foot + '</div></div>' +
+            '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a></div>' +
           '</div>';
       } else {
       _hojelembra += '<div class="rp-hle">' +
