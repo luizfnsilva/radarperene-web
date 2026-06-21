@@ -226,23 +226,29 @@
   .arcard .arcd{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--txt2);line-height:1.4}
   .arcard .archook{font-size:13px;color:var(--dim);line-height:1.6;flex:1}
   .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:6px}
-  /* ★ 2026-06-21 (dono): o Arquivo é a JOIA (o diferencial mais difícil de copiar — a alma do Radar). Cards maiores, título maior, subtítulo menor. */
-  #arquivo .sec{font-size:clamp(26px,3.6vw,38px)}
-  #arquivo .secsub{font-size:14px;color:var(--dim);max-width:60ch}
-  #arquivo .cards{gap:18px}
-  #arquivo .arcard{padding:28px 26px;gap:10px}
-  #arquivo .arcard .arct{font-size:clamp(20px,2.3vw,24px)}
-  #arquivo .arcard .arcd{font-size:14.5px}
-  #arquivo .arcard .archook{font-size:13.5px}
-  /* ★ 2026-06-21 (dono) RITMO editorial: jornal trabalha em movimentos (grande/estreito/compacto/grande/pequeno), não tudo igual.
-     Diário/Semanal/Founder = colunas estreitas; o Arquivo (a joia) fica LARGO e domina a metade inferior. */
-  #ultimas{max-width:680px;margin-left:auto;margin-right:auto}
-  #semanal{max-width:600px;margin-left:auto;margin-right:auto;padding:4px 0}
-  #founder-home{max-width:560px;margin-left:auto;margin-right:auto}
-  #founder-home .sec{font-size:clamp(19px,2.2vw,25px)}
+  /* ★ 2026-06-21 (dono) RITMO editorial — SÓ DOIS MONUMENTOS: o Hero e o ARQUIVO. O resto conduz até eles.
+     Muito vazio entre seções (Economist/Grant's: o vazio é identidade). Movimentos, não painel uniforme. */
+  /* silêncio entre seções + colunas (coluna de jornal) */
+  #radar-teaser{margin-top:88px}
+  #ultimas{margin-top:128px;max-width:660px;margin-left:auto;margin-right:auto}      /* Diário = coluna que respira */
+  #founder-home{margin-top:120px;max-width:660px;margin-left:auto;margin-right:auto;padding-top:30px;border-top:1px solid var(--line)}  /* Founder = porta/nota elegante (FT discreto) */
+  #semanal{margin-top:88px;max-width:600px;margin-left:auto;margin-right:auto;padding-top:28px;border-top:1px solid var(--line)}        /* Semanal = "receba em casa", pequeno */
+  #faq{margin-top:120px}
+  #founder-home .sec,#semanal .sec{font-size:clamp(18px,2vw,23px)}
   #founder-home .fnd-lead{font-family:var(--serif);font-size:clamp(16px,2vw,19px);font-weight:600;color:var(--txt);margin:4px 0 8px;line-height:1.3}
-  #founder-home .secsub{font-size:14px;color:var(--dim)}
-  #arquivo{margin:18px 0}
+  #founder-home .secsub,#semanal .secsub{font-size:13.5px;color:var(--dim)}
+  /* ARQUIVO = SEGUNDA CAPA: regras full, título enorme, 4 cards grandes, muito ar. É o 2º monumento da página. */
+  #arquivo{margin:150px 0;padding:78px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  #arquivo .eyebrow{display:none}
+  #arquivo .sec{font-size:clamp(34px,5.6vw,58px);line-height:1.04;letter-spacing:-.02em;margin:0 0 12px}
+  #arquivo .secsub{font-size:clamp(15px,1.9vw,18px);color:var(--txt2);max-width:60ch}
+  #arquivo .cards{grid-template-columns:repeat(4,1fr);gap:18px;margin-top:38px}
+  @media(max-width:900px){#arquivo .cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){#arquivo .cards{grid-template-columns:1fr}}
+  #arquivo .arcard{padding:28px 24px;gap:9px}
+  #arquivo .arcard .arct{font-size:clamp(19px,2.1vw,23px)}
+  #arquivo .arcard .arcd{font-size:14px}
+  #arquivo .arcard .archook{font-size:13px}
   /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
   .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
   .arcmerch b{color:var(--txt);font-weight:600}
@@ -265,7 +271,7 @@
 
 <div class="wrap">
   <div class="hero">
-    <a class="qtag" id="qtag" href="#radar-teaser" aria-label="regime ao vivo"><span class="dot"></span><span id="qtag-txt">SINAL ATUAL · REGIME BR</span></a>
+    <a class="qtag" id="qtag" href="#radar-teaser" aria-label="leitura do Radar ao vivo"><span class="dot"></span><span id="qtag-txt">A leitura do Radar, ao vivo</span></a>
     <h1 id="h1">O Brasil observado — e <span class="g">lembrado</span>.</h1>
     <p class="lead" id="lead">Um arquivo vivo do mercado brasileiro: relatórios diários, semanais e mensais e uma biblioteca de precedentes para ler o presente à luz do passado.</p>
     <!-- busca removida do hero (2026-06-16): competia com a mensagem editorial; descoberta de ativos vive no radar (Explorar ativos →) e em /ativos. Script abaixo auto-sai (guard #rp-q ausente). -->
@@ -307,9 +313,9 @@
 <div class="wrap only-public">
   <!-- ★ 2026-06-21 (dono): o mini-radar é um OBJETO PÚBLICO (API incorporável), não um teaser do Founder. Sem "Ao vivo · agora". -->
   <section id="radar-teaser">
-    <h2 class="sec" id="s-tz">A leitura de hoje</h2>
-    <p class="secsub" id="s-tz-s">O estado atual do mercado brasileiro, lido como dado — uma edição pública, livre para incorporar em qualquer site.</p>
-    <div data-radar-perene data-chrome="off" data-sections="regime,analogo_br" style="--rp-max:100%"></div><!-- ★ 2026-06-21 (dono): mini = faixa-metadado (4 sinais) + "Hoje lembra" (herói). Sem termômetros/observatório (declutter). -->
+    <h2 class="sec" id="s-tz">Leitura do Radar</h2>
+    <p class="secsub" id="s-tz-s">Uma leitura pública do presente, à luz dos precedentes.</p>
+    <div data-radar-perene data-chrome="off" data-sections="analogo_br" style="--rp-max:100%"></div><!-- ★ 2026-06-21 (dono): "Leitura do Radar" = SÓ "Hoje lembra" (a interpretação histórica, o objeto editorial próprio). Sinais removidos (linguagem interna). O widget distribui a Leitura do Radar, não sinais. -->
     <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). ★ P4 2026-06-18: subiu p/ logo após o mini-radar — síntese "Morning Brief" antes da profundidade. -->
     <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
     <p class="micro" style="margin-top:14px"><a id="tz-embed" href="/widgets" style="color:var(--gold)">Incorporar no seu site →</a></p>
@@ -443,7 +449,7 @@
     eyb2:"Methodology",s2:"How the Radar reads Brazil",s2s:"Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb5:"Depth",s5:"You choose the depth",s5s:"Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6:"What&rsquo;s underneath",
-    sTz:"Today&rsquo;s reading",sTzS:"The current state of the Brazilian market, read as data — a public edition, free to embed anywhere.",tzEmbed:"Embed on your site →",
+    sTz:"The Radar Reading",sTzS:"A public reading of the present, in light of the precedents.",tzEmbed:"Embed on your site →",
     eyb1:"Live · full radar",s1:"The full radar",s1s:"The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge:"Launch · seats limited to the first 100 founders",fed:"Founder Edition",fprice:'<b style="color:var(--gold)">US$ 149/mo</b>',fh:"Access to the complete archive.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> the entire report library since April 2010</li><li><span style="color:var(--gold)">✓</span> the full outcomes of every similar episode</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the historical distribution at 3, 6 and 12 months</li><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> a living archive that grows every day</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
     wlph:"you@email.com",wlbtn:"Get my invite",
@@ -475,7 +481,7 @@
     eyb2:"Metodologia",s2:"Como o Radar lê o Brasil",s2s:"Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href=\"/metodologia/\">Conheça a metodologia →</a>",
     eyb5:"Profundidade",s5:"Você escolhe a profundidade",s5s:"Cada lente abre em camadas — da manchete do regime à matemática visível: <b>cone de quantis</b> (distribuição de desfechos, nunca previsão), <b>Trend Score</b> 0&ndash;10, <b>breadth</b> real (% das ações acima da média de 200 dias), o <b>estudo de análogo</b> (isto ocorreu N vezes → o que se seguiu) e <b>lead-lag</b>. Sem teto para quem quer ir fundo.",
     eyb6:"O que está por trás",
-    sTz:"A leitura de hoje",sTzS:"O estado atual do mercado brasileiro, lido como dado — uma edição pública, livre para incorporar em qualquer site.",tzEmbed:"Incorporar no seu site →",
+    sTz:"Leitura do Radar",sTzS:"Uma leitura pública do presente, à luz dos precedentes.",tzEmbed:"Incorporar no seu site →",
     eyb1:"Ao vivo · completo",s1:"O radar completo",s1s:"O motor completo sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.",
     fbadge:"Lançamento · vagas limitadas aos 100 primeiros fundadores",fed:"Edição Founder",fprice:'<b style="color:var(--gold)">R$ 149/mês</b>',fh:"Acesso ao acervo completo.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> toda a biblioteca de relatórios desde abril de 2010</li><li><span style="color:var(--gold)">✓</span> os desfechos completos de cada episódio semelhante</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> a distribuição histórica em 3, 6 e 12 meses</li><li><span style="color:var(--gold)">✓</span> relatórios diários, semanais e mensais no e-mail</li><li><span style="color:var(--gold)">✓</span> um arquivo vivo que cresce todos os dias</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div>',
     wlph:"seu@email.com",wlbtn:"Quero meu convite",
@@ -569,7 +575,7 @@
      gp:"No fim de 2022, a estrutura tocou o piso enquanto a narrativa seguia sombria. O assoalho veio antes — e precedeu um ano inteiro de discordância.",ge:"In late 2022, structure touched its floor while the narrative stayed grim. The floor came first — and preceded a full year of discord."}
   ];
   var _now=new Date(), _doy=Math.floor((_now-new Date(_now.getFullYear(),0,0))/864e5), _st=_doy%ARC.length;
-  var _pick=[ARC[_st],ARC[(_st+1)%ARC.length],ARC[(_st+2)%ARC.length]];
+  var _pick=[ARC[_st],ARC[(_st+1)%ARC.length],ARC[(_st+2)%ARC.length],ARC[(_st+3)%ARC.length]];  // ★ 2026-06-21 4 cards (Arquivo = segunda capa)
   set("arc-cards",_pick.map(function(a){var slug=_en?a.en:a.pt,t=_en?a.te:a.tp,d=_en?a.de:a.dp,g=_en?a.ge:a.gp;
     return '<a class="arcard" href="'+U_ART+'/'+slug+'/"><span class="arcyr">'+a.yr+'</span><span class="arct">'+t+'</span><span class="arcd">'+d+'</span><span class="archook">'+g+'</span><span class="arcmore">'+(_en?"What happened next →":"O que aconteceu depois →")+'</span></a>';}).join(""));
   // merchan da biblioteca do assinante: TOTAL real de relatórios publicados (mensal+diário+semanal), buscado do
@@ -610,9 +616,8 @@
   // o assinante vê o SEU número só depois da compra (rank do /v1/me, no selo do login). Endpoint /v1/founders segue vivo.
   // i18n robusto do link de login (B9): não depende do sb.auth carregar (QA viu "Entrar" parado no .com)
   try{var _lg=document.getElementById("me-login");if(_lg&&LANG==="en"&&_lg.textContent==="Entrar")_lg.textContent="Sign in";}catch(e){}
-  // Hero quant-terminal: tag de regime AO VIVO (puxa o dado real, soma ao H1 editorial)
-  try{var QA="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjanRrZ2x0cnhkbmxhY2V6cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTk3MDQsImV4cCI6MjA5NTc5NTcwNH0.CkEmnGCSTfF-9FjjebyeBUFV0-vW6CsfpyBea6cLCUs";
-  fetch(location.origin+"/api/v1/radar?lang="+LANG,{headers:{apikey:QA,Authorization:"Bearer "+QA}}).then(function(r){return r.json()}).then(function(d){var br=(d&&d.regime&&d.regime.brasil)||null,el=document.getElementById("qtag-txt");if(br&&el){var lbl=String(br.regime||"").toUpperCase().replace(/_/g," ");el.textContent=(LANG==="en"?"CURRENT SIGNAL · BR ":"SINAL ATUAL · BR ")+lbl+" · "+Math.round(br.score)+"/100";}}).catch(function(){})}catch(e){}
+  // ★ 2026-06-21 (dono): pílula do hero editorial ("A leitura do Radar, ao vivo") — a tag quant-terminal ("SINAL ATUAL · BR DEFENSIVO · 28/100") morreu; sinais/score são linguagem interna. EN via i18n abaixo.
+  (function(){var el=document.getElementById("qtag-txt");if(el)el.textContent=(LANG==="en"?"The Radar Reading, live":"A leitura do Radar, ao vivo");})();
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   document.querySelectorAll("#radar-perene,[data-radar-perene]").forEach(function(n){n.setAttribute("data-lang",LANG);});  // teaser (topo) + radar completo herdam o idioma
