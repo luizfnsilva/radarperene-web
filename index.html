@@ -229,18 +229,19 @@
   /* ★ 2026-06-21 (dono) RITMO editorial — SÓ DOIS MONUMENTOS: o Hero e o ARQUIVO. O resto conduz até eles.
      Muito vazio entre seções (Economist/Grant's: o vazio é identidade). Movimentos, não painel uniforme. */
   /* silêncio entre seções + colunas (coluna de jornal) */
-  #radar-teaser{margin-top:88px}
-  #ultimas{margin-top:128px;max-width:660px;margin-left:auto;margin-right:auto}      /* Diário = coluna que respira */
-  #founder-home{margin-top:120px;max-width:660px;margin-left:auto;margin-right:auto;padding-top:30px;border-top:1px solid var(--line)}  /* Founder = porta/nota elegante (FT discreto) */
-  #semanal{margin-top:88px;max-width:600px;margin-left:auto;margin-right:auto;padding-top:28px;border-top:1px solid var(--line)}        /* Semanal = "receba em casa", pequeno */
-  #faq{margin-top:120px}
+  /* ★ 2026-06-21 (dono): ritmo em DOIS MOVIMENTOS — (Hero·Leitura·Diário) coesos / (Arquivo·Founder·Semanal) coesos / silêncio grande só ENTRE eles (Diário→Arquivo 140px). */
+  #radar-teaser{margin-top:100px}                                                   /* Hero → Leitura */
+  #ultimas{margin-top:72px;max-width:660px;margin-left:auto;margin-right:auto}       /* Leitura → Diário (mesmo movimento, próximos) */
+  #founder-home{margin-top:80px;max-width:660px;margin-left:auto;margin-right:auto;padding-top:30px;border-top:1px solid var(--line)}   /* Arquivo → Founder = colados (consequência) */
+  #semanal{margin-top:90px;max-width:600px;margin-left:auto;margin-right:auto;padding-top:28px;border-top:1px solid var(--line)}        /* Founder → Semanal */
+  #faq{margin-top:110px}
   #founder-home .sec,#semanal .sec{font-size:clamp(18px,2vw,23px)}
   #founder-home .fnd-lead{font-family:var(--serif);font-size:clamp(16px,2vw,19px);font-weight:600;color:var(--txt);margin:4px 0 8px;line-height:1.3}
   #founder-home .secsub,#semanal .secsub{font-size:13.5px;color:var(--dim)}
   /* ARQUIVO = SEGUNDA CAPA: regras full, título enorme, 4 cards grandes, muito ar. É o 2º monumento da página. */
-  #arquivo{margin:150px 0;padding:78px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  #arquivo{margin:140px 0 0;padding:78px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}  /* Diário→Arquivo 140px (vão entre movimentos); base 0 → founder governa o "colado" */
   #arquivo .eyebrow{display:none}
-  #arquivo .sec{font-size:clamp(34px,5.6vw,58px);line-height:1.04;letter-spacing:-.02em;margin:0 0 12px}
+  #arquivo .sec{font-size:clamp(40px,6.2vw,68px);line-height:1.02;letter-spacing:-.025em;margin:0 0 12px}  /* 2º monumento: título grande de verdade */
   #arquivo .secsub{font-size:clamp(15px,1.9vw,18px);color:var(--txt2);max-width:60ch}
   #arquivo .cards{grid-template-columns:repeat(4,1fr);gap:18px;margin-top:38px}
   @media(max-width:900px){#arquivo .cards{grid-template-columns:repeat(2,1fr)}}
@@ -313,8 +314,7 @@
 <div class="wrap only-public">
   <!-- ★ 2026-06-21 (dono): o mini-radar é um OBJETO PÚBLICO (API incorporável), não um teaser do Founder. Sem "Ao vivo · agora". -->
   <section id="radar-teaser">
-    <h2 class="sec" id="s-tz">Leitura do Radar</h2>
-    <p class="secsub" id="s-tz-s">Uma leitura pública do presente, à luz dos precedentes.</p>
+    <h2 class="sec" id="s-tz">Leitura do Radar</h2><!-- ★ 2026-06-21 (dono): sem subtítulo — o card "Hoje lembra" já se apresenta (evita "dupla apresentação"). -->
     <div data-radar-perene data-chrome="off" data-sections="analogo_br" style="--rp-max:100%"></div><!-- ★ 2026-06-21 (dono): "Leitura do Radar" = SÓ "Hoje lembra" (a interpretação histórica, o objeto editorial próprio). Sinais removidos (linguagem interna). O widget distribui a Leitura do Radar, não sinais. -->
     <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). ★ P4 2026-06-18: subiu p/ logo após o mini-radar — síntese "Morning Brief" antes da profundidade. -->
     <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
@@ -512,7 +512,7 @@
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
-  set("s-tz",C.sTz);set("s-tz-s",C.sTzS);set("tz-embed",C.tzEmbed);
+  set("s-tz",C.sTz);set("tz-embed",C.tzEmbed);
   set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fed",C.fed);set("fprice",C.fprice);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
   set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);set("ftnav",C.ftnav);
