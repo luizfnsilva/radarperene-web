@@ -241,20 +241,23 @@
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
-      // ★ 2026-06-21 v4 (dono) SHARE-CARD 16:9 — vira a imagem OG (1200×630). TUDO EM INTER (o mini-radar é objeto de DADOS, não ensaio): números peso 800 chamam atenção sem virar "pôster eleitoral". Faixa-topo · miolo · rodapé.
-      ".rp .rp-poster{font-family:'Inter',system-ui,sans-serif;border:1px solid var(--_line);border-radius:14px;background:var(--_card2);max-width:760px;margin:8px auto 0;padding:clamp(18px,3.4vw,30px);aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:space-between;text-align:left}" +
+      // ★ 2026-06-21 v5 (dono) ARTEFATO EDITORIAL 16:9 (vira a imagem OG 1200×630). DESCOBERTA, não prudência: SEM moldura dura — sombra quente + branco (objeto que se levanta), byline dourado, número-protagonista, ASSINADO com a marca. Tudo Inter.
+      ".rp .rp-poster{font-family:'Inter',system-ui,sans-serif;border:0;border-radius:16px;background:var(--_card);box-shadow:0 8px 30px rgba(64,42,12,.11),0 1px 2px rgba(64,42,12,.05);max-width:760px;margin:12px auto 0;padding:clamp(20px,3.6vw,34px);aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:space-between;text-align:left}" +
       ".rp .rp-poster .rp-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}" +
-      ".rp .rp-poster .rp-pll{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim)}" +
-      ".rp .rp-poster .rp-pd{font-size:12.5px;font-weight:500;color:var(--_accent);letter-spacing:.02em;text-align:right;font-feature-settings:'tnum'}" +
-      ".rp .rp-poster .rp-pmid{display:flex;align-items:center;gap:clamp(14px,2.6vw,26px)}" +
-      ".rp .rp-poster .rp-pbig{font-size:clamp(40px,6.4vw,64px);line-height:.92;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';letter-spacing:-.02em;flex:none}" +
-      ".rp .rp-poster .rp-pbigl{font-size:clamp(14px,1.9vw,17px);line-height:1.34;color:var(--_txt);font-weight:500}" +
-      ".rp .rp-poster .rp-pbot{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}" +
-      ".rp .rp-poster .rp-pmed{font-size:clamp(20px,2.8vw,27px);line-height:1;font-weight:800;color:var(--_txt);font-feature-settings:'tnum'}" +
-      ".rp .rp-poster .rp-pmedl{font-size:11.5px;font-weight:400;letter-spacing:.01em;color:var(--_dim)}" +
-      ".rp .rp-poster .hl-warn{font-size:10.5px;margin-top:4px}.rp .rp-poster .hl-s{font-size:11px;margin-top:5px;font-style:italic;color:var(--_dim)}" +
+      ".rp .rp-poster .rp-pll{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--_accent)}" +
+      ".rp .rp-poster .rp-pd{font-size:12.5px;font-weight:500;color:var(--_dim);letter-spacing:.02em;text-align:right;font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-pmid{display:flex;align-items:center;gap:clamp(16px,2.8vw,28px)}" +
+      ".rp .rp-poster .rp-pbig{font-size:clamp(44px,6.8vw,68px);line-height:.9;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';letter-spacing:-.025em;flex:none}" +
+      ".rp .rp-poster .rp-pbigl{font-size:clamp(15px,2vw,19px);line-height:1.34;color:var(--_txt);font-weight:500}" +
+      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:3px}" +
+      ".rp .rp-poster .rp-pmed{font-size:clamp(19px,2.6vw,25px);line-height:1.05;font-weight:800;color:var(--_txt);font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-pmed .rp-pmedl{font-size:12px;font-weight:400;letter-spacing:.01em;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-s{font-size:11px;font-style:italic;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-warn{font-size:10.5px}" +
+      ".rp .rp-poster .rp-pbot{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-top:9px}" +
+      ".rp .rp-poster .rp-pbrand{font-size:12.5px;font-weight:600;letter-spacing:.01em;color:var(--_txt)}.rp .rp-poster .rp-pbrand b{font-weight:700;color:var(--_accent)}" +
       ".rp .rp-poster .hl-ep{margin:0;font-size:12.5px;font-weight:600;white-space:nowrap;flex:none;color:var(--_accent)}" +
-      "@media(max-width:560px){.rp .rp-poster{aspect-ratio:auto;gap:18px}.rp .rp-poster .rp-pmid{flex-direction:column;align-items:flex-start;gap:8px}}" +
+      "@media(max-width:560px){.rp .rp-poster{aspect-ratio:auto;gap:16px}.rp .rp-poster .rp-pmid{flex-direction:column;align-items:flex-start;gap:8px}}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
@@ -1893,17 +1896,19 @@
         //   regime: o % é dos episódios POSITIVOS (se vier baixo, o cartaz conta a verdade do regime negativo).
         var _pwarn = (ab.n_analogos && ab.n_analogos < 20)
           ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ')</div>' : '';
-        // ★ 2026-06-21 v3 (dono): SHARE-CARD 16:9 — pensado para virar a imagem OG (1200×630) automaticamente. Quote-card do FT /
-        //   Chart of the Week: faixa superior (Hoje lembra · datas), MIOLO com número-monumento (80%) + descritor serif ao lado,
-        //   rodapé com mediana + nota + porta. Canvas definido (é uma imagem que viaja), mas sem caixa-dentro-de-caixa nem cerimônia.
+        // ★ 2026-06-21 v4 (dono): ARTEFATO EDITORIAL, não relatório. Deve transmitir DESCOBERTA, não prudência (quote-card do
+        //   Economist / Chart of the Week do FT / Our World in Data). Sem moldura dura (sombra suave + branco quente = objeto que
+        //   se levanta), número-protagonista quente, e ASSINADO com a marca p/ a imagem viajar identificada no X/LinkedIn/WhatsApp.
         _hojelembra += '<div class="rp-hle rp-poster">' +
           '<div class="rp-ptop"><span class="rp-pll">' + (L ? "Today resembles" : "Hoje lembra") + '</span>' + (_dts ? '<span class="rp-pd">' + _dts + '</span>' : '') + '</div>' +
           '<div class="rp-pmid"><div class="rp-pbig">' + esc(ab.hit_rate_pct) + '%</div>' +
             '<div class="rp-pbigl">' + (L ? "of comparable episodes ended positive over six months." : "dos episódios semelhantes terminaram positivos em seis meses.") + '</div></div>' +
-          '<div class="rp-pbot"><div class="rp-pbl">' +
+          '<div class="rp-pfoot">' +
             '<div class="rp-pmed">' + _med + ' <span class="rp-pmedl">' + (L ? "observed median (n=" : "mediana observada (n=") + esc(ab.n_analogos) + ')</span></div>' +
-            _pwarn + '<div class="hl-s">' + _foot + '</div></div>' +
-            '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a></div>' +
+            '<div class="hl-s">' + _foot + '</div>' + _pwarn +
+            '<div class="rp-pbot"><span class="rp-pbrand">Radar <b>Perene</b></span>' +
+              '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a></div>' +
+          '</div>' +
           '</div>';
       } else {
       _hojelembra += '<div class="rp-hle">' +
