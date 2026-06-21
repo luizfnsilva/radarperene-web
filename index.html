@@ -138,6 +138,11 @@
   .herolink.lead{font-size:clamp(16px,2.2vw,19px)}
   .hero-deep{margin:20px 0 0;font-size:13.5px;line-height:1.5;color:var(--dim);max-width:46ch}
   .hero-deep .herolink{margin-left:0;font-size:13.5px;display:inline}
+  /* ★ 2026-06-21 duas edições da MESMA porta: default (sem-JS / anônimo) = home pública; Founder logado vê a edição profunda.
+     SEO/crawler herda a pública (correto). O JS adiciona body.rp-founder ao detectar o login. */
+  .only-founder{display:none}
+  body.rp-founder .only-founder{display:block}
+  body.rp-founder .only-public{display:none}
   .micro{font-size:11.5px;color:var(--dim);margin-top:14px}
   section{padding:58px 0;border-top:1px solid var(--line)}
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
@@ -270,7 +275,15 @@
   </div>
 </div>
 
-<div class="wrap">
+<!-- ★ 2026-06-21 (dono): home = a publicação; logado, a MESMA porta vira a edição profunda. Radar completo = só Founder logado (only-founder). -->
+<div class="wrap only-founder">
+  <section id="radar">
+    <div class="eyebrow" id="eyb1">Sua edição · ao vivo</div>
+    <div id="radar-perene" data-chrome="off" data-skin="editorial" style="--rp-max:100%"></div>
+  </section>
+</div>
+
+<div class="wrap only-public">
   <section id="radar-teaser">
     <div class="eyebrow" id="eyb-tz">Ao vivo · agora</div>
     <h2 class="sec" id="s-tz">A leitura de hoje</h2>
@@ -278,11 +291,20 @@
     <div data-radar-perene data-chrome="off" data-sections="regime,analogo_br,termometros,observatorio" style="--rp-max:100%"></div>
     <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). ★ P4 2026-06-18: subiu p/ logo após o mini-radar — síntese "Morning Brief" antes da profundidade. -->
     <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
-    <p class="micro" style="margin-top:14px"><a href="#radar" id="tz-more" style="color:var(--gold)">Ver o radar completo ↓</a></p>
   </section>
 </div>
 
 <div class="wrap">
+  <!-- ★ 2026-06-21 (dono): Diário do regime SOBE (é a máquina de hábito: hoje→ontem→série). Ordem da home pública:
+       leitura de hoje → diário → arquivo → Perene Semanal → Founder. -->
+  <section id="ultimas">
+    <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
+    <h2 class="sec" id="s-ult">Diário do regime</h2>
+    <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — inserida em uma série histórica construída ao longo do tempo.</p>
+    <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
+    <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diários completos →</a></p>
+  </section>
+
   <section id="arquivo">
     <div class="eyebrow" id="eyb-arq"></div>
     <h2 class="sec" id="s-arq"></h2>
@@ -292,26 +314,23 @@
     <p class="arcmerch" id="arc-merch"></p>
   </section>
 
-  <section id="ultimas">
-    <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
-    <h2 class="sec" id="s-ult">Diário do regime</h2>
-    <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — inserida em uma série histórica construída ao longo do tempo.</p>
-    <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
-    <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diários completos →</a></p>
+  <!-- ★ 2026-06-21 Perene Semanal — produto editorial (R$29), só na home pública -->
+  <section id="semanal" class="only-public">
+    <div class="eyebrow">Assinatura</div>
+    <h2 class="sec">Perene Semanal</h2>
+    <p class="secsub">Uma leitura semanal do mercado brasileiro — toda sexta-feira, no seu e-mail. A síntese da semana, valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
+    <p style="margin-top:14px"><a class="herolink lead" href="/assine">Assinar o Perene Semanal →</a></p>
   </section>
 
-  <!-- ★ 2026-06-21 (dono): bloco "#fundadores" (pitch R$149 + waitlist) REMOVIDO da home. Novo IA: Founder é DESCOBERTO,
-       não apresentado — a home convida ao Perene Semanal; o Founder vive em /founder (manifesto). -->
-
-  <!-- ★ 2026-06-18 (diretoria): seção "Metodologia" REMOVIDA da home — a credibilidade é intrínseca ao produto,
-       não precisa ser afirmada na vitrine. A metodologia segue acessível pelo menu e pelo rodapé. -->
-
-  <section id="radar">
-    <div class="eyebrow" id="eyb1">Ao vivo · completo</div>
-    <div id="radar-perene" data-chrome="off" data-skin="editorial" style="--rp-max:100%"></div>
+  <!-- ★ 2026-06-21 Founder — a camada profunda, DESCOBERTA (sem preço na home), só pública -->
+  <section id="founder-home" class="only-public">
+    <div class="eyebrow">A camada profunda</div>
+    <h2 class="sec">Founder</h2>
+    <p class="secsub">Para leitores que desejam ir além da publicação. A edição Founder acrescenta a leitura completa dos sinais, os episódios completos, os análogos históricos e um observatório proprietário cobrindo centenas de ativos e mais de cinquenta anos de precedentes.</p>
+    <p style="margin-top:14px"><a class="herolink" href="/founder">Conhecer o Founder →</a></p>
   </section>
 
-  <section id="faq">
+  <section id="faq" class="only-public">
     <div class="eyebrow" id="eyb9">Perguntas frequentes</div>
     <h2 class="sec" id="s9">Como funciona</h2>
     <div id="faqbox"></div>
@@ -499,7 +518,7 @@
   // ── "Do arquivo" (memória): texto/links por idioma; cartões linkam ao portal editorial ──
   set("eyb-arq",_en?"From the archive":"Do arquivo");
   set("s-arq",_en?"The present, in conversation with memory":"O presente, em conversa com a memória");
-  set("s-arq-s",_en?"Fifteen years of regimes read honestly — what the Radar saw, and what came next.":"Quinze anos de regimes lidos com honestidade — o que o Radar viu, e o que veio depois.");
+  set("s-arq-s",_en?"What the Radar recorded — and what came next.":"O que o Radar registrou — e o que veio depois.");
   // pool de 7 regimes (um por ano); mostramos 3, rotacionando por DIA → a home "envelhece bem", mas é estável p/ SEO/cache no mesmo dia
   var ARC=[
     {pt:"crise-europeia-2011-discordia",en:"the-2011-european-crisis-as-discord",yr:"2011",
@@ -643,6 +662,13 @@
     setTimeout(function(){document.addEventListener("click",function h(ev){if(!m.contains(ev.target)&&ev.target!==loginEl){m.remove();document.removeEventListener("click",h)}})},50);
   });
   sb.auth.onAuthStateChange(function(){refresh()}); refresh();
+})();</script>
+<!-- ★ 2026-06-21 (dono): a MESMA porta, duas edições. Founder logado → body.rp-founder (radar completo no topo; some Semanal/Founder/FAQ). Anônimo/Semanal → home pública. SEO herda a pública (sem JS). -->
+<script>(function(){
+  function ed(){ var f=false; try{ f=(window.RP_PREMIUM===true)||localStorage.getItem("rp_premium")==="1"; }catch(e){} document.body.classList.toggle("rp-founder", f); }
+  ed();
+  window.addEventListener("rp-premium-change", ed);
+  window.addEventListener("storage", function(e){ if(!e||e.key==="rp_premium"||e.key===null) ed(); });
 })();</script>
 </body>
 </html>
