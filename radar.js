@@ -241,22 +241,18 @@
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
-      // ★ 2026-06-21 v6 (dono): UMA história, composição VERTICAL CENTRADA (OWID/Economist). O olho lê 80% ("quantos") → conector → +9,3% ("quanto", consequência). COMPACTO (cabe no 1º print junto do hero). Sem assinatura textual — só o ÍCONE do radar como carimbo bem leve no canto.
-      ".rp .rp-poster{position:relative;font-family:'Inter',system-ui,sans-serif;border:0;border-radius:16px;background:var(--_card);box-shadow:0 8px 30px rgba(64,42,12,.11),0 1px 2px rgba(64,42,12,.05);max-width:660px;margin:8px auto 0;padding:clamp(18px,2.6vw,26px) clamp(20px,3vw,30px);display:flex;flex-direction:column;gap:clamp(9px,1.4vw,13px);text-align:center}" +
-      ".rp .rp-poster .rp-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px;text-align:left}" +
+      // ★ 2026-06-21 v7 (dono): QUOTE CARD (Escola Economist) — NÃO é painel. Texto primeiro, números VIVEM DENTRO da frase (dourados, levemente maiores). Retangular, baixo, lido como uma DESCOBERTA/citação. Carimbo só-ícone no canto.
+      ".rp .rp-poster{position:relative;font-family:'Inter',system-ui,sans-serif;border:0;border-radius:14px;background:var(--_card);box-shadow:0 6px 26px rgba(64,42,12,.10),0 1px 2px rgba(64,42,12,.05);max-width:600px;margin:8px auto 0;padding:clamp(19px,2.6vw,25px) clamp(22px,3.2vw,30px);display:flex;flex-direction:column;gap:clamp(13px,1.8vw,16px);text-align:left}" +
+      ".rp .rp-poster .rp-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}" +
       ".rp .rp-poster .rp-pll{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--_accent)}" +
-      ".rp .rp-poster .rp-pd{font-size:12.5px;font-weight:500;color:var(--_dim);letter-spacing:.02em;font-feature-settings:'tnum'}" +
-      ".rp .rp-poster .rp-pnar{display:flex;flex-direction:column;align-items:center;gap:5px}" +
-      ".rp .rp-poster .rp-pbig{font-size:clamp(46px,7.2vw,70px);line-height:.84;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';letter-spacing:-.03em}" +
-      ".rp .rp-poster .rp-pbigl{font-size:clamp(15px,1.9vw,18px);line-height:1.3;color:var(--_txt);font-weight:500;max-width:30ch}" +
-      ".rp .rp-poster .rp-pconn{width:1px;height:17px;background:var(--_accent);opacity:.45;margin:4px 0}" +
-      ".rp .rp-poster .rp-pmed{font-size:clamp(32px,4.8vw,44px);line-height:.9;font-weight:800;color:var(--_txt);font-feature-settings:'tnum';letter-spacing:-.02em}" +
-      ".rp .rp-poster .rp-pmedl{font-size:clamp(13px,1.6vw,15px);line-height:1.28;color:var(--_txt);font-weight:500;max-width:28ch}" +
-      ".rp .rp-poster .hl-s{font-size:11px;font-style:italic;color:var(--_dim);margin-top:7px}" +
-      ".rp .rp-poster .hl-warn{font-size:10.5px;margin-top:2px}" +
-      ".rp .rp-poster .hl-ep{margin-top:5px;font-size:13px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-poster .hl-ep:hover{text-decoration:underline}" +
-      ".rp .rp-poster .rp-pstamp{position:absolute;right:15px;bottom:13px;line-height:0;color:var(--_accent);opacity:.26}" +
-      "@media(max-width:560px){.rp .rp-poster .rp-pbigl,.rp .rp-poster .rp-pmedl{max-width:24ch}}" +
+      ".rp .rp-poster .rp-pd{font-size:12px;font-weight:500;color:var(--_dim);letter-spacing:.02em;font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-quote{margin:0;font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(19px,2.5vw,24px);line-height:1.4;font-weight:400;color:var(--_txt);letter-spacing:-.003em}" +
+      ".rp .rp-poster .rp-qn{font-weight:600;color:var(--_accent);font-size:1.1em;white-space:nowrap;font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:6px}" +
+      ".rp .rp-poster .hl-s{font-size:11.5px;font-style:italic;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-warn{font-size:10.5px}" +
+      ".rp .rp-poster .hl-ep{font-size:13px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-poster .hl-ep:hover{text-decoration:underline}" +
+      ".rp .rp-poster .rp-pstamp{position:absolute;right:15px;bottom:13px;line-height:0;color:var(--_accent);opacity:.22}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
@@ -1895,18 +1891,17 @@
         //   regime: o % é dos episódios POSITIVOS (se vier baixo, o cartaz conta a verdade do regime negativo).
         var _pwarn = (ab.n_analogos && ab.n_analogos < 20)
           ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ')</div>' : '';
-        // ★ 2026-06-21 v5 (dono): UMA história, não dois blocos. Composição VERTICAL CENTRADA (OWID/Economist): o olho lê
-        //   80% ("quantos") → conector → +9,3% ("quanto"), o segundo número como CONSEQUÊNCIA do primeiro. Sem assinatura no
-        //   nosso site (rouba espaço; só em embed, rodapé discreto). Menos ar (não tão alto). Narrativa: "80% foram positivos. E, nesses, a mediana foi +9,3%."
+        // ★ 2026-06-21 v6 (dono): PARAR de fazer painel. Escola ECONOMIST = quote card: texto primeiro, os números VIVEM DENTRO da
+        //   frase ("80% sozinho não diz nada"). É uma descoberta lida como citação, não um KPI empilhado. Retangular, compacto, baixo.
         var _pnote = (L ? "Observed distribution, not a forecast · n = " : "Distribuição observada, não previsão · n = ") + esc(ab.n_analogos);
+        var _qn = function (s) { return '<b class="rp-qn">' + s + '</b>'; };
+        var _quote = L
+          ? (_qn(esc(ab.hit_rate_pct) + '%') + ' of comparable episodes ended positive. When that happened, the median for the Ibovespa over six months was ' + _qn(_med) + '.')
+          : (_qn(esc(ab.hit_rate_pct) + '%') + ' dos episódios semelhantes terminaram positivos. Quando isso aconteceu, a mediana do Ibovespa em seis meses foi ' + _qn(_med) + '.');
         _hojelembra += '<div class="rp-hle rp-poster">' +
           '<div class="rp-ptop"><span class="rp-pll">' + (L ? "Today resembles" : "Hoje lembra") + '</span>' + (_dts ? '<span class="rp-pd">' + _dts + '</span>' : '') + '</div>' +
-          '<div class="rp-pnar">' +
-            '<div class="rp-pbig">' + esc(ab.hit_rate_pct) + '%</div>' +
-            '<div class="rp-pbigl">' + (L ? "of comparable episodes ended positive over six months." : "dos episódios semelhantes terminaram positivos em seis meses.") + '</div>' +
-            '<div class="rp-pconn" aria-hidden="true"></div>' +
-            '<div class="rp-pmed">' + _med + '</div>' +
-            '<div class="rp-pmedl">' + (L ? "was the median observed return." : "foi o retorno mediano observado.") + '</div>' +
+          '<p class="rp-quote">' + _quote + '</p>' +
+          '<div class="rp-pfoot">' +
             '<div class="hl-s">' + _pnote + '</div>' + _pwarn +
             '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
           '</div>' +
