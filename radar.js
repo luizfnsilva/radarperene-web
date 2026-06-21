@@ -2040,11 +2040,11 @@
     }
     // ★ 2026-06-20 (consultor): fecho da EDIÇÃO ABERTA (grátis/FOLD) = nomeia o observatório (a nave atrás da parede) sem pilotá-lo.
     //   Founder não vê fecho (tem tudo). Embeds (chrome) mantêm a "amostra do motor".
-    if (FOLD && GATED) { var _av = (_cob.ativos != null ? _cob.ativos : 365);
+    if (FOLD && GATED) {  // ★ 2026-06-20: "centenas de ativos" (perene, sem número frio que muda) + "leitura completa" (casa com publicação)
       h += '<div class="rp-upsell"><div class="rp-up-k">' + (L ? "This was today&rsquo;s open edition." : "Esta foi a edição aberta de hoje.") + '</div>' +
         '<div class="rp-up-s">' + (L ? "The Founder edition adds:" : "A edição Founder inclui:") + '</div><ul class="rp-up-l">' +
-        (L ? ('<li>the reading of each signal</li><li>full episodes</li><li>historical analogs</li><li>a proprietary observatory with ' + _av + ' assets</li><li>50+ years of precedents</li>')
-           : ('<li>a interpretação dos sinais</li><li>episódios completos</li><li>análogos históricos</li><li>observatório proprietário com ' + _av + ' ativos</li><li>mais de 50 anos de precedentes</li>')) +
+        (L ? '<li>the full reading of each signal</li><li>full episodes</li><li>historical analogs</li><li>a proprietary observatory covering hundreds of assets</li><li>50+ years of precedents</li>'
+           : '<li>a leitura completa dos sinais</li><li>episódios completos</li><li>análogos históricos</li><li>observatório proprietário cobrindo centenas de ativos</li><li>mais de 50 anos de precedentes</li>') +
         '</ul>' + _fcta + '</div>';
     } else if (chrome) { h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
       (L ? ("The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across " + (_ca100 ? "over " + _ca100 + " assets" : "over 100 assets") + " and 50+ years of history.")
