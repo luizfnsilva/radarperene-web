@@ -141,6 +141,16 @@
   /* ★ 2026-06-21 CTAs editoriais (publicação convida, software empurra): links dourados com seta, sem bloco preenchido */
   .hero-ctas{display:flex;flex-direction:column;align-items:flex-start;gap:11px;margin:4px 0 0}
   .hero-ctas .herolink{margin-left:0}
+  /* ★ 2026-06-21 (dono): linha CTA = Assinar (esq) · Compartilhar (dir, oposto, abaixo do card/radar) */
+  .hero-cta-row{display:flex;justify-content:space-between;align-items:center;width:100%;gap:16px;position:relative}
+  .rp-sharebtn{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--gold);font-weight:600;font-size:14px;cursor:pointer;font-family:var(--sans);padding:2px 0}
+  .rp-sharebtn:hover{text-decoration:underline}
+  .rp-sharebtn svg{flex:none}
+  .rp-shmenu{position:absolute;bottom:calc(100% + 9px);right:0;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px rgba(40,26,8,.17);padding:6px;display:flex;flex-direction:column;gap:1px;min-width:184px}
+  .rp-shmenu .rp-shsep{height:1px;background:var(--line);margin:5px 8px}
+  .rp-shi{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 13px;font-size:13.5px;font-weight:500;color:var(--txt);cursor:pointer;border-radius:8px;font-family:var(--sans);white-space:nowrap}
+  .rp-shi:hover{background:var(--surface2);color:var(--gold)}
+  @media(max-width:560px){.rp-shmenu{min-width:170px}}
   .herolink.lead{font-size:clamp(16px,2.2vw,19px)}
   .hero-deep{margin:20px 0 0;font-size:13.5px;line-height:1.5;color:var(--dim);max-width:46ch}
   .hero-deep .herolink{margin-left:0;font-size:13.5px;display:inline}
@@ -306,7 +316,11 @@
     })();
     </script>
     <div class="hero-ctas">
-      <a class="herolink lead" href="/assine" id="cta1">Assinar o Perene Semanal →</a>
+      <!-- ★ 2026-06-21 (dono): compartilhar a Leitura do Radar — botão na MESMA linha do "Assinar", do lado OPOSTO (abaixo do card/radar). Menu próprio com os links diretos das redes + API pública (sem o share genérico do sistema). -->
+      <div class="hero-cta-row">
+        <a class="herolink lead" href="/assine" id="cta1">Assinar o Perene Semanal →</a>
+        <button type="button" id="rp-share-btn" class="rp-sharebtn" aria-label="Compartilhar a Leitura do Radar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><line x1="8.4" y1="10.85" x2="15.6" y2="6.15"/><line x1="8.4" y1="13.15" x2="15.6" y2="17.85"/></svg><span id="rp-share-lbl">Compartilhar</span></button>
+      </div>
       <a class="herolink" href="/diario" id="cta2">Ler a edição aberta de hoje →</a>
     </div>
     <p class="hero-deep"><span id="cta-deep">Para quem deseja ver o que sustenta as leituras do Radar.</span> <a class="herolink" href="/founder" id="cta3">Conhecer o Founder →</a></p>
@@ -443,7 +457,7 @@
   if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about.html";}}
 
   var C=LANG==="en"?{
-    kicker:"Since 2000",
+    kicker:"Since 2000",shareLbl:"Share",
     h1:'Brazil, observed —<br>and <span class="g">remembered</span>.',
     lead:"A living archive of Brazil&rsquo;s markets.<br>What the Radar saw — and what came next.",
     cta1:"Subscribe to Perene Semanal →",cta2:"Read today&rsquo;s open edition →",cta3:"Discover Founder →",ctaDeep:"For readers who want to see what underpins the Radar&rsquo;s readings.",micro:"Educational content from public sources — never a recommendation.",
@@ -476,7 +490,7 @@
     faq:[["What time does the daily report arrive?","In your inbox ~50 minutes before the Brazilian market opens, with the prior day&rsquo;s close — and the summary is posted to X/LinkedIn right after. The weekly ships on Friday and the monthly on the last day of the month."],["How far back does the report history go?","The subscriber library holds the enriched monthly reports since April 2010 (194 reports). The public daily snapshots go back to January 2000 (26 years), open to everyone."],["How does Radar Perene compute Brazil&rsquo;s macro regime?","A monthly cross-market sensor outputs a Risk-BR score (0–100) from 8 domestic sub-scores (liquidity, defensive rotation, credit stress and more), calibrated on central-bank expectations (Focus since 2001) and real-rate curves (long NTN-B since 2006), isolating statistically-significant anomalies in 36-month windows."],["What is the Founder price and what changes later?","US$ 149/month (or US$ 1,490/year · 2 months free), locked for your subscription while it stays active — and it includes all five Lenses and the Vértice Experiment. In the future the Lenses will be sold à la carte (Vértice alone will be US$290); together they exceed US$490/month. Founder secures them all for US$ 149. You join the preliminary product now and get full access when it is ready — the same product, not a separate premium."],["How do payment and the 7-day window work?","Payment is taken at signup (R$ on the .com.br domain, US$ on .com), processed by Stripe. You have a 7-day full, automatic refund window — a legal right, no friction. After 7 days the normal recurrence (monthly or annual) continues. Everything is managed by you in the Stripe Customer Portal — there is no human support desk."],["How do support, cancellation and data deletion work?","ALL subscription management — cancellation, refunds, card changes and invoices — is 100% self-service via the Stripe Customer Portal, anytime, in one click. There is no human support desk: you handle everything yourself, in the portal. Account and data deletion is also one click in your profile — we store nothing beyond your Google/Apple login and email."],["Is this investment advice?","No. Under our P7 protocol the system is strictly descriptive — it reads regimes and anomalies from public sources and never recommends, predicts a price, or gives financial advice."],["Does Radar Perene make forecasts?","No. Radar Perene does not predict a price or a point. It works with precedents, historical distributions and probabilities — describing what tended to follow similar environments, with the uncertainty band on display."],["How do the studies work?","Each Library study answers one question: what historically happened next when ___? — risk-on/off extreme, extreme pessimism/optimism, strong/weak dollar, Selic hiking/cutting cycle. The answer is the IBOV&rsquo;s empirical distribution over 3/6/12 months (median, % up, and the 50% and 80% bands)."],["Does the Radar learn?","Yes — through memory, self-evaluation and historical accumulation, not by rewriting the past. Past readings are confronted with the actual outcome 3/6/12 months later."],["What are historical analogs?","Past episodes historically similar to today&rsquo;s environment. Not a forecast — a distribution map: what happened next, with sample size and uncertainty shown."],["What is the Study Library?","A collection of editorial objects built from conditional events — regimes, sentiment, liquidity and rates. Each is a citable study: the Radar has a study for that."]],
     ok:"You&rsquo;re on the list — we&rsquo;ll be in touch.",err:"Couldn&rsquo;t register. Try again.",inv:"Enter a valid email."
   }:{
-    kicker:"Desde 2000",
+    kicker:"Desde 2000",shareLbl:"Compartilhar",
     h1:'O Brasil observado —<br>e <span class="g">lembrado</span>.',
     lead:"Um arquivo vivo do mercado brasileiro.<br>O que o Radar viu — e o que veio depois.",
     cta1:"Assinar o Perene Semanal →",cta2:"Ler a edição aberta de hoje →",cta3:"Conhecer o Founder →",ctaDeep:"Para quem deseja ver o que sustenta as leituras do Radar.",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
@@ -511,7 +525,7 @@
   };
   function set(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html}
   if(_isHomePg){set("h1",C.h1);set("lead",C.lead);}  // /ativo: H1/lead vêm do worker (ticker), não da home
-  set("cta1",C.cta1);set("cta2",C.cta2);set("cta3",C.cta3);set("cta-deep",C.ctaDeep);set("micro1",C.micro);
+  set("cta1",C.cta1);set("cta2",C.cta2);set("cta3",C.cta3);set("cta-deep",C.ctaDeep);set("micro1",C.micro);set("rp-share-lbl",C.shareLbl);
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
@@ -689,6 +703,41 @@
   ed();
   window.addEventListener("rp-premium-change", ed);
   window.addEventListener("storage", function(e){ if(!e||e.key==="rp_premium"||e.key===null) ed(); });
+})();</script>
+<!-- ★ 2026-06-21 (dono): compartilhar a Leitura do Radar — menu PRÓPRIO com os links diretos das redes + API pública (sem o share genérico do sistema). Texto dinâmico via window.RP_LEITURA_SHARE (setado pelo card). -->
+<script>(function(){
+  var btn=document.getElementById("rp-share-btn"); if(!btn) return;
+  var menu=null;
+  function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function isEN(){ var s=window.RP_LEITURA_SHARE; if(s&&s.lang) return s.lang==="en"; try{return (/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname))||/[?&]lang=en/.test(location.search);}catch(e){return false;} }
+  function data(){ var s=window.RP_LEITURA_SHARE||{}, en=isEN();
+    return { en:en, url:s.url||(location.origin+"/"), text:s.text||(en?"The Radar Reading — Radar Perene":"Leitura do Radar — Radar Perene") }; }
+  function close(){ if(menu){ if(menu.parentNode) menu.parentNode.removeChild(menu); menu=null; document.removeEventListener("click",onout); } }
+  function onout(e){ if(menu&&!menu.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)) close(); }
+  btn.addEventListener("click",function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(menu){ close(); return; }
+    var d=data(), E=encodeURIComponent, t=E(d.text), u=E(d.url), tu=E(d.text+" "+d.url);
+    var api=(d.en?"https://radarperene.com":"https://radarperene.com.br")+"/api/docs";
+    var items=[
+      ["WhatsApp","https://wa.me/?text="+tu],
+      ["X","https://twitter.com/intent/tweet?text="+t+"&url="+u],
+      ["LinkedIn","https://www.linkedin.com/sharing/share-offsite/?url="+u],
+      ["Telegram","https://t.me/share/url?url="+u+"&text="+t],
+      ["Facebook","https://www.facebook.com/sharer/sharer.php?u="+u],
+      ["Reddit","https://www.reddit.com/submit?url="+u+"&title="+t],
+      [d.en?"Copy link":"Copiar link","__copy__"],
+      [d.en?"Embed · public API":"Incorporar · API pública",api]
+    ];
+    menu=document.createElement("div"); menu.className="rp-shmenu";
+    var html=""; items.forEach(function(it,i){ if(i===6) html+='<div class="rp-shsep"></div>'; html+='<button type="button" class="rp-shi" data-h="'+esc(it[1])+'">'+esc(it[0])+'</button>'; });
+    menu.innerHTML=html; btn.parentNode.appendChild(menu);
+    menu.addEventListener("click",function(ev){ var b=ev.target; while(b&&b!==menu&&!(b.className&&(""+b.className).indexOf("rp-shi")>=0)) b=b.parentNode; if(!b||b===menu) return;
+      var h=b.getAttribute("data-h");
+      if(h==="__copy__"){ try{navigator.clipboard.writeText(d.url); b.textContent=d.en?"Copied ✓":"Copiado ✓";}catch(_){ } return; }
+      window.open(h,"_blank","noopener,noreferrer"); close(); });
+    setTimeout(function(){ document.addEventListener("click",onout); },0);
+  });
 })();</script>
 </body>
 </html>
