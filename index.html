@@ -143,6 +143,10 @@
   .only-founder{display:none}
   body.rp-founder .only-founder{display:block}
   body.rp-founder .only-public{display:none}
+  /* Founder logado: hero menor, sem CTAs de venda (já comprou tudo) */
+  body.rp-founder .hero-ctas,body.rp-founder .hero-deep{display:none}
+  /* Semanal logado: vê a publicação, MAS não o bloco/CTA que já assinou (segue podendo Conhecer o Founder) */
+  body.rp-semanal #semanal,body.rp-semanal #cta1{display:none}
   .micro{font-size:11.5px;color:var(--dim);margin-top:14px}
   section{padding:58px 0;border-top:1px solid var(--line)}
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
@@ -636,14 +640,10 @@
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     if(pw)pw.style.display="inline";
     try{ var r=await fetch(location.origin+"/api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); var d=await r.json();
-      if(d&&d.premium){ window.RP_PREMIUM=true; window.RP_TOKEN=sess.access_token;  /* ★ destrava os DADOS no /v1/serie (fopt manda este Bearer) — mesma sessão do selo; sem isso o Founder via teaser */ try{localStorage.setItem("rp_premium","1")}catch(e){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founding Member #":"Membro Fundador #")+d.rank;} if(bibEl){bibEl.style.display="inline";if(EN){bibEl.textContent="Library";bibEl.href="/library/";}}  /* .com: rótulo + slug EN (/library) */
-        try{ var rd=document.getElementById("radar"), he=document.querySelector(".hero");
-          if(rd&&he&&!document.getElementById("rp-welcome")){ // logado: sobe o Radar pro topo + saudação do fundador (experiência premium)
-            var w=document.createElement("div"); w.id="rp-welcome"; w.style.cssText="max-width:1100px;margin:16px auto -6px;padding:0 22px;font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600;color:var(--gold)";
-            w.innerHTML=(EN?"Welcome back, Founding Member #":"Bem-vindo de volta, Membro Fundador #")+(d.rank||"")+" · "+(EN?"your live Radar":"seu Radar ao vivo")+" ↓";
-            he.parentNode.insertBefore(rd, he); he.parentNode.insertBefore(w, rd); }
-        }catch(e){} }
-      else{ window.RP_PREMIUM=false; window.RP_TOKEN=null; if(seal)seal.style.display="none"; if(bibEl)bibEl.style.display="none"; try{localStorage.removeItem("rp_premium")}catch(x){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} }
+      window.RP_TIER=(d&&d.tier)||null;
+      if(d&&d.premium){ /* FOUNDER */ window.RP_PREMIUM=true; window.RP_TOKEN=sess.access_token;  /* destrava DADOS no /v1/serie */ try{localStorage.setItem("rp_premium","1");localStorage.setItem("rp_tier","founder");}catch(e){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} if(seal&&d.rank){seal.style.display="inline-block";seal.textContent=(EN?"Founding Member #":"Membro Fundador #")+d.rank;} if(bibEl){bibEl.style.display="inline";if(EN){bibEl.textContent="Library";bibEl.href="/library/";}} }
+      else if(d&&d.tier==="semanal"){ /* ★ PERENE SEMANAL — NÃO-premium: RP_TOKEN=null (radar/série/digest o tratam como anônimo = grátis; a JOIA do observatório NÃO vaza). A biblioteca semanal lê via RP_AUTH.token() do closure, não daqui. */ window.RP_PREMIUM=false; window.RP_TOKEN=null; try{localStorage.removeItem("rp_premium");localStorage.setItem("rp_tier","semanal");}catch(e){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} if(seal)seal.style.display="none"; if(bibEl){bibEl.style.display="inline";if(EN){bibEl.textContent="Library";bibEl.href="/library/";}} }
+      else{ /* não-assinante logado */ window.RP_PREMIUM=false; window.RP_TOKEN=null; if(seal)seal.style.display="none"; if(bibEl)bibEl.style.display="none"; try{localStorage.removeItem("rp_premium");localStorage.removeItem("rp_tier");}catch(x){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} }
     }catch(e){}
   }
   if(loginEl)loginEl.addEventListener("click",async function(e){ e.preventDefault();
@@ -665,7 +665,7 @@
 })();</script>
 <!-- ★ 2026-06-21 (dono): a MESMA porta, duas edições. Founder logado → body.rp-founder (radar completo no topo; some Semanal/Founder/FAQ). Anônimo/Semanal → home pública. SEO herda a pública (sem JS). -->
 <script>(function(){
-  function ed(){ var f=false; try{ f=(window.RP_PREMIUM===true)||localStorage.getItem("rp_premium")==="1"; }catch(e){} document.body.classList.toggle("rp-founder", f); }
+  function ed(){ var f=false,s=false; try{ f=(window.RP_PREMIUM===true)||localStorage.getItem("rp_premium")==="1"; }catch(e){} try{ s=(window.RP_TIER==="semanal")||localStorage.getItem("rp_tier")==="semanal"; }catch(e){} document.body.classList.toggle("rp-founder", f); document.body.classList.toggle("rp-semanal", s&&!f); }
   ed();
   window.addEventListener("rp-premium-change", ed);
   window.addEventListener("storage", function(e){ if(!e||e.key==="rp_premium"||e.key===null) ed(); });

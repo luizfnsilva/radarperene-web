@@ -31,11 +31,16 @@
     try {
       var r = await fetch(location.origin + "/api/v1/me", { headers: { apikey: ANON, Authorization: "Bearer " + token } });
       var d = await r.json();
-      if (d && d.premium) {
+      window.RP_TIER = (d && d.tier) || null;
+      if (d && d.premium) {  // FOUNDER
         window.RP_PREMIUM = true; window.RP_TOKEN = token;
         if (seal && d.rank) { seal.style.display = "inline-block"; seal.textContent = (EN ? "Founding Member #" : "Membro Fundador #") + d.rank; }
         if (bibEl) bibEl.style.display = "inline";
-      } else {
+      } else if (d && d.tier === "semanal") {  // ★ PERENE SEMANAL — NÃO-premium. RP_TOKEN=null → radar/série/digest tratam como anônimo (JOIA do observatório não vaza). A biblioteca semanal lê via RP_AUTH.token() (closure `token`, ainda setado), e a API libera só weeklies ≥ cutoff.
+        window.RP_PREMIUM = false; window.RP_TOKEN = null;
+        if (seal) seal.style.display = "none";
+        if (bibEl) bibEl.style.display = "inline";  // tem a biblioteca semanal → mostra o link
+      } else {  // não-assinante logado
         window.RP_PREMIUM = false; window.RP_TOKEN = null;
         if (seal) seal.style.display = "none";
         if (bibEl) bibEl.style.display = "none";
