@@ -293,6 +293,9 @@
       ".rp .rp-grp .rp-cad{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:6px}.rp .rp-grp .rp-cad-m{color:var(--_accent)}.rp .rp-grp .rp-cad-d{color:var(--_cool,var(--_dim))}" +
       ".rp .rp-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rp .rp-states .st{display:flex;flex-direction:column;gap:3px}.rp .rp-states .sl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--_dim);font-weight:700}.rp .rp-states .sv{font-size:12.5px;color:var(--_txt);line-height:1.3}" +
       "@media(max-width:520px){.rp .rp-states{grid-template-columns:1fr;gap:14px}}" +
+      // ★ 2026-06-21 faixa-metadado do mini (4 sinais discretos numa linha; a memória "Hoje lembra" é o herói abaixo)
+      ".rp .rp-meta{display:flex;flex-wrap:wrap;gap:4px 16px;margin:6px 0 4px;font-size:11.5px;color:var(--_dim);line-height:1.5}" +
+      ".rp .rp-meta .rp-meta-i b{color:var(--_txt);font-weight:700;text-transform:uppercase;font-size:9.5px;letter-spacing:.07em;margin-right:3px}" +
       ".rp .rp-signals{border-top:1px solid var(--_line);margin-top:16px;padding-top:14px}.rp .rp-signals div{font-size:13.5px;line-height:1.7;color:var(--_dim)}.rp .rp-signals b{font-weight:600;color:var(--_txt)}" +
       ".rp ul.dv{margin:6px 0 0;padding:0;list-style:none}.rp ul.dv li{font-size:12px;padding:5px 0;border-top:1px solid var(--_line)}.rp ul.dv b{color:var(--_accent);font-family:var(--_mono);font-weight:700;letter-spacing:.02em}" +  // ★ 2026-06-20: código DV em mono+laranja (vira linguagem própria, consultor)
       ".rp .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rp .sub{font-size:11px;color:var(--_dim)}" +
@@ -1739,18 +1742,11 @@
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
     if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
     if (show("regime") && rr.regime) { var g = rr.regime;
-      if (TEASER) {  // ★ mini editorial (filosofia capa): estados do presente COMPACTOS, agrupados por CADÊNCIA (mensal: BR+Global · diário: Capital+Concentração); a memória ("Hoje lembra") é que ganha espaço
+      if (TEASER) {  // ★ 2026-06-21 (dono): no mini, "Hoje lembra" é o HERÓI; os 4 sinais (Brasil/Global/Fuga/Concentração) viram uma faixa-METADADO discreta acima (uma linha, não grade). O olho pousa na memória, não nos sinais.
         var _ob = v.observatorio || {};
-        var _arr = function (t) { return (t && t.valor != null) ? (t.valor >= 55 ? "↑ " : (t.valor <= 45 ? "↓ " : "")) : ""; };  // direção do extremo (só Founder tem valor; free fica sem seta, com o descritor)
-        var _stt = function (lbl, t, arrow) { return (t && t.regime) ? '<div class="st"><span class="sl">' + lbl + '</span><span class="sv">' + (arrow || "") + esc(t.regime) + '</span></div>' : ''; };
-        var _mensal = _stt(L ? "Brazil" : "Brasil", g.brasil, "") + _stt("Global", g.global, "");
-        var _diario = _stt(L ? "Capital flight" : "Fuga de capital", _ob.fuga, _arr(_ob.fuga)) + _stt(L ? "Concentration" : "Concentração", _ob.concentracao, _arr(_ob.concentracao));
-        h += '<div class="rp-present">' +  // ★ 2026-06-18: headline "Brasil defensivo" suprimido (redundante com a célula Brasil do grupo mensal abaixo)
-          '<div class="rp-states">' +
-            (_mensal ? '<div class="rp-grp"><div class="rp-cad rp-cad-m">' + (L ? "monthly" : "mensal") + '</div><div class="rp-pair">' + _mensal + '</div></div>' : '') +
-            (_diario ? '<div class="rp-grp"><div class="rp-cad rp-cad-d">' + (L ? "daily" : "diário") + '</div><div class="rp-pair">' + _diario + '</div></div>' : '') +
-          '</div>' +
-          '</div>';
+        var _mi = function (lbl, t) { return (t && t.regime) ? '<span class="rp-meta-i"><b>' + esc(lbl) + '</b> ' + esc(t.regime) + '</span>' : ''; };
+        var _meta = _mi(L ? "Brazil" : "Brasil", g.brasil) + _mi("Global", g.global) + _mi(L ? "Capital flight" : "Fuga de capital", _ob.fuga) + _mi(L ? "Concentration" : "Concentração", _ob.concentracao);
+        if (_meta) h += '<div class="rp-meta">' + _meta + '</div>';
       } else {
         // ★ Hero-capa editorial (só radar completo / FOLD): standfirst serif (regime + valuation) + linha de arquivo (análogo),
         //   determinístico do próprio dado — sem prosa de backend, no espírito do motor zero-LLM. Mirror honesto do valstrip ("abaixo do valor-justo").
