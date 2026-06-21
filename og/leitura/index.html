@@ -12,12 +12,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/icon-light.svg">
 <style>
+  /* ★ tema do card = MESMAS variáveis da home (radar.js lê --rp-*; --surface/--txt/--bg trocam no dark) → o card escurece igual à home */
+  :root{
+    --bg:#faf9f6;--surface:#ffffff;--surface2:#f3f1ec;--line:#e6e3dc;--txt:#1a1a2e;--txt2:#3a3a45;--dim:#6e6e78;
+    --gold:#a8651a;--gold2:#8a4b38;--hot:#b02e22;--warm:#7a3b0e;--cool:#1a3a5c;--neu:#9c9c96;--sans:'Inter',system-ui,sans-serif;
+    --rp-bg:var(--bg);--rp-card:var(--surface);--rp-card2:var(--surface2);--rp-line:var(--line);--rp-txt:var(--txt);--rp-dim:var(--dim);
+    --rp-accent:var(--gold);--rp-hot:var(--hot);--rp-warm:var(--warm);--rp-cool:var(--cool);--rp-neu:var(--neu);--rp-font:var(--sans);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1217;--surface:#161b22;--surface2:#1c222b;--line:#28303a;--txt:#eceef1;--txt2:#c2c8d0;--dim:#8a929e;
+    --gold:#d9a441;--gold2:#e8c572;--hot:#e0533d;--warm:#d98a3d;--cool:#5b8fd0;--neu:#6b7682;
+  }
   *{margin:0;box-sizing:border-box}
   #rp-cookie{display:none !important}  /* cinto de segurança: nunca mostrar a barra de consentimento no cartão OG */
-  html,body{background:#faf9f6;width:1200px;height:630px;overflow:hidden}
-  html[data-theme="dark"],html[data-theme="dark"] body,html[data-theme="dark"] .og{background:#0e1217}  /* ★ OG dark "de acordo com o usuário" */
+  html,body{background:var(--bg);width:1200px;height:630px;overflow:hidden}
   /* canvas 1200×630 — o card centrado, escalado para a peça que viaja */
-  .og{width:1200px;height:630px;background:#faf9f6;display:flex;align-items:center;justify-content:center;padding:60px 72px}
+  .og{width:1200px;height:630px;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:60px 72px}
   .og-inner{width:100%}
   .og [data-radar-perene]{--rp-max:100%}
   /* escala OG do card (sobrepõe os clamps do radar.js, que são pequenos p/ a home) */
