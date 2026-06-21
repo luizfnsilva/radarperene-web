@@ -1,0 +1,54 @@
+name: OG · Leitura do Radar
+
+# ★ 2026-06-21 (dono): gera diariamente os cartões OG da Leitura do Radar (1200×630, PT/EN × claro/escuro) a partir da
+#   página /og/leitura (ao vivo) e commita os PNGs → o worker os serve como og:image do home. A peça que viaja no
+#   compartilhamento passa a ser EXATAMENTE o card, sempre fresco.
+# NOTA: requer "Settings → Actions → Workflow permissions = Read and write" no repositório (para o bot dar push).
+
+on:
+  schedule:
+    - cron: "10 0 * * *"   # 21:10 BRT (00:10 UTC) — depois do fechamento diário do pipeline
+  workflow_dispatch: {}     # disparo manual (1ª geração / sob demanda)
+
+permissions:
+  contents: write
+
+concurrency:
+  group: og-leitura
+  cancel-in-progress: true
+
+jobs:
+  shoot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright (chromium)
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm i -D playwright@1.48.0
+          npx playwright install --with-deps chromium
+
+      - name: Screenshot OG cards
+        env:
+          OG_BASE: https://radarperene.com.br
+        run: node .github/scripts/og-shot.mjs
+
+      - name: Commit updated cards
+        run: |
+          git config user.name "rp-og-bot"
+          git config user.email "og-bot@radarperene"
+          # não deixa o package.json/lock temporário do Playwright sujar o repo
+          git checkout -- package.json package-lock.json 2>/dev/null || true
+          rm -f package.json package-lock.json
+          git add og-leitura-pt.png og-leitura-pt-dark.png og-leitura-en.png og-leitura-en-dark.png
+          if git diff --cached --quiet; then
+            echo "OG cards unchanged — nada a commitar."
+          else
+            git commit -m "chore(og): atualiza cartões OG da Leitura do Radar [skip ci]"
+            git push
+          fi

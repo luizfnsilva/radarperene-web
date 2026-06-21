@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=1200">
+<title>Leitura do Radar — cartão OG</title>
+<!-- ★ 2026-06-21 (dono): página-fonte da imagem OG (1200×630). Renderiza EXATAMENTE o card da Leitura do Radar com dados ao
+     vivo; o GitHub Action tira o screenshot diário e publica og-leitura-{pt,en}.png. noindex (não é página de conteúdo). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/icon-light.svg">
+<style>
+  *{margin:0;box-sizing:border-box}
+  html,body{background:#faf9f6;width:1200px;height:630px;overflow:hidden}
+  html[data-theme="dark"],html[data-theme="dark"] body,html[data-theme="dark"] .og{background:#0e1217}  /* ★ OG dark "de acordo com o usuário" */
+  /* canvas 1200×630 — o card centrado, escalado para a peça que viaja */
+  .og{width:1200px;height:630px;background:#faf9f6;display:flex;align-items:center;justify-content:center;padding:60px 72px}
+  .og-inner{width:100%}
+  .og [data-radar-perene]{--rp-max:100%}
+  /* escala OG do card (sobrepõe os clamps do radar.js, que são pequenos p/ a home) */
+  .og .rp-poster{max-width:1056px !important;box-shadow:0 12px 44px rgba(64,42,12,.13) !important;padding:34px 40px !important;gap:18px !important}
+  .og .rp-poster .rp-pll{font-size:14px !important}
+  .og .rp-poster .rp-pd{font-size:15px !important}
+  .og .rp-poster .rp-quotes{max-width:96% !important;gap:10px !important}
+  .og .rp-poster .rp-quote{font-size:36px !important;line-height:1.24 !important}
+  .og .rp-poster .rp-prule2{width:48% !important;max-width:520px !important}
+  .og .rp-poster .hl-s{font-size:16px !important;max-width:66% !important}
+  .og .rp-poster .hl-ep{font-size:18px !important}
+  .og .rp-poster .rp-pmark{width:300px !important;height:300px !important;right:-34px !important;bottom:-40px !important;opacity:.62 !important}
+</style>
+</head>
+<body>
+  <div class="og"><div class="og-inner"><div data-radar-perene data-chrome="off" data-sections="analogo_br" data-lang="pt"></div></div></div>
+  <script>
+    (function(){ var p=new URLSearchParams(location.search), lang=p.get("lang")==="en"?"en":"pt", theme=p.get("theme")==="dark"?"dark":"light";
+      document.documentElement.setAttribute("lang",lang);
+      document.documentElement.setAttribute("data-theme",theme);  // OG claro OU escuro, conforme ?theme
+      document.querySelectorAll("[data-radar-perene]").forEach(function(n){ n.setAttribute("data-lang",lang); }); })();
+  </script>
+  <script src="/radar.js"></script>
+  <script>
+    // sinaliza prontidão para o screenshot: card+frase renderizados + fontes carregadas + 1 buffer p/ a marca d'água
+    (function(){
+      function ready(){ document.documentElement.setAttribute("data-og-ready","1"); }
+      var done=false, iv=setInterval(function(){
+        if(done) return;
+        var q=document.querySelector(".rp-poster .rp-quote");
+        if(q && q.textContent && q.textContent.length>10){ done=true; clearInterval(iv);
+          Promise.resolve(document.fonts && document.fonts.ready).then(function(){
+            requestAnimationFrame(function(){ setTimeout(ready, 250); });
+          });
+        }
+      }, 100);
+      setTimeout(function(){ if(!done){ done=true; clearInterval(iv); ready(); } }, 22000);  // timeout duro
+    })();
+  </script>
+</body>
+</html>

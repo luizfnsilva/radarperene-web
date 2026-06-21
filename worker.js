@@ -938,12 +938,15 @@ async function _route(request, env, ctx) {
       // canonical/og:url da home POR HOST no HTML cru: o index.html estático nasce com ".com" fixo e só o JS
       //   corrigia em runtime — crawler sem JS (Bing 1ª passada, bots de IA) via o .com.br se declarar duplicata
       //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
+      // ★ 2026-06-21 (dono): OG do home = o CARTÃO da Leitura do Radar (gerado diariamente). Por IDIOMA e por TEMA — o botão de
+      //   compartilhar anexa ?theme=dark quando o usuário está no escuro → a prévia que viaja casa com o tema dele.
+      const _ogDark = url.searchParams.get("theme") === "dark";
+      const _ogImg = url.origin + "/og-leitura-" + (isEN ? "en" : "pt") + (_ogDark ? "-dark" : "") + ".png";
       rw = rw
         .on("link#rp-canonical", { element(e) { e.setAttribute("href", url.origin + "/"); } })
         .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", url.origin + "/"); } })
-        // ★ og:image/twitter:image por HOST (o index nasce fixo .com → vazava no .com.br). EN sobrescreve p/ -en abaixo.
-        .on('meta[property="og:image"]', { element(e) { e.setAttribute("content", url.origin + "/og-image-1200x630.png"); } })
-        .on('meta[name="twitter:image"]', { element(e) { e.setAttribute("content", url.origin + "/og-image-1200x630.png"); } });
+        .on('meta[property="og:image"]', { element(e) { e.setAttribute("content", _ogImg); } })
+        .on('meta[name="twitter:image"]', { element(e) { e.setAttribute("content", _ogImg); } });
       if (isEN) {
         rw = rw
           .on("html", { element(e) { e.setAttribute("lang", "en"); } })
@@ -956,8 +959,7 @@ async function _route(request, env, ctx) {
           .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", EN_TITLE); } })
           .on('meta[property="og:locale"]', { element(e) { e.setAttribute("content", "en_US"); } })
           .on('meta[property="og:locale:alternate"]', { element(e) { e.setAttribute("content", "pt_BR"); } })
-          .on('meta[property="og:image"]', { element(e) { e.setAttribute("content", "https://radarperene.com/og-image-1200x630-en.png"); } })  // OG em inglês no .com (era a PT herdada do index)
-          .on('meta[name="twitter:image"]', { element(e) { e.setAttribute("content", "https://radarperene.com/og-image-1200x630-en.png"); } })
+          // og:image/twitter:image já resolvidos por idioma+tema acima (_ogImg) — sem override aqui
           .on("#rp-faq-ld", { element(e) { e.setInnerContent(EN_FAQ, { html: true }); } })
           .on("#rp-graph-ld", { element(e) { e.setInnerContent(_graphDated(EN_GRAPH, _gdt), { html: true }); } });
         // SSR-EN do BODY: traduz/preenche cada nó estático PT com o EN do catálogo (idêntico ao que o JS faz em-browser)

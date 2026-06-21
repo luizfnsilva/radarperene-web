@@ -711,8 +711,10 @@
   var menu=null;
   function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function isEN(){ var s=window.RP_LEITURA_SHARE; if(s&&s.lang) return s.lang==="en"; try{return (/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname))||/[?&]lang=en/.test(location.search);}catch(e){return false;} }
-  function data(){ var s=window.RP_LEITURA_SHARE||{}, en=isEN();
-    return { en:en, url:s.url||(location.origin+"/"), text:s.text||(en?"The Radar Reading — Radar Perene":"Leitura do Radar — Radar Perene") }; }
+  function curTheme(){ try{ var t=document.documentElement.getAttribute("data-theme"); if(t==="dark"||t==="light") return t; return localStorage.getItem("rp-theme")==="dark"?"dark":"light"; }catch(e){ return "light"; } }
+  function data(){ var s=window.RP_LEITURA_SHARE||{}, en=isEN(), url=s.url||(location.origin+"/");
+    if(curTheme()==="dark") url += (url.indexOf("?")>=0?"&":"?")+"theme=dark";  // OG dark casa com o tema do usuário
+    return { en:en, url:url, text:s.text||(en?"The Radar Reading — Radar Perene":"Leitura do Radar — Radar Perene") }; }
   function close(){ if(menu){ if(menu.parentNode) menu.parentNode.removeChild(menu); menu=null; document.removeEventListener("click",onout); } }
   function onout(e){ if(menu&&!menu.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)) close(); }
   btn.addEventListener("click",function(e){
