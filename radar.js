@@ -248,17 +248,17 @@
       ".rp .rp-poster .rp-pll{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .rp-poster .rp-pd{font-size:11.5px;font-weight:500;color:var(--_dim);letter-spacing:.02em;font-feature-settings:'tnum'}" +
       // ★ v9 (dono): coluna LARGA (sem o estrangulamento 74% que empilhava 6 linhas) + fonte menor → 2-3 linhas FORTES, baixa. Parágrafos colados (mesmo raciocínio).
-      ".rp .rp-poster .rp-quotes{display:flex;flex-direction:column;gap:clamp(5px,0.7vw,8px);max-width:96%}" +
-      ".rp .rp-poster .rp-quote{margin:0;font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(20px,2.6vw,29px);line-height:1.25;font-weight:400;color:var(--_txt);letter-spacing:-.012em}" +
+      ".rp .rp-poster .rp-quotes{display:flex;flex-direction:column;gap:clamp(5px,0.7vw,8px);max-width:98%}" +
+      ".rp .rp-poster .rp-quote{margin:0;font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(19px,2.4vw,27px);line-height:1.25;font-weight:400;color:var(--_txt);letter-spacing:-.013em}" +  // ★ 27px: "80%...terminaram positivos." cabe em 1 linha
       ".rp .rp-poster .rp-qn{font-weight:600;color:var(--_accent);font-feature-settings:'tnum';white-space:nowrap}" +
-      // rodapé com ar + filete = vira publicação (consultor)
-      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:8px;margin-top:clamp(8px,1.4vw,14px);padding-top:clamp(15px,2vw,20px);border-top:1px solid var(--_line)}" +
+      // rodapé com ar + filete = vira publicação. ★ max-width 62%: o filete termina perto de "previsão", NÃO cruza a marca d'água (logo).
+      ".rp .rp-poster .rp-pfoot{display:flex;flex-direction:column;gap:8px;max-width:62%;margin-top:clamp(8px,1.4vw,14px);padding-top:clamp(15px,2vw,20px);border-top:1px solid var(--_line)}" +
       ".rp .rp-poster .hl-s{font-size:12px;font-style:italic;color:var(--_dim)}" +
       ".rp .rp-poster .hl-warn{font-size:10.5px}" +
       ".rp .rp-poster .hl-ep{font-size:13px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-poster .hl-ep:hover{text-decoration:underline}" +
       ".rp .rp-poster .rp-pmark{position:absolute;right:-22px;bottom:-26px;width:clamp(150px,24vw,212px);height:clamp(150px,24vw,212px);background:url('/icon-light.svg') center/contain no-repeat;opacity:.6;pointer-events:none;z-index:0}" +
       "[data-theme=\"dark\"] .rp .rp-poster .rp-pmark{background-image:url('/icon-dark.svg');opacity:.5}" +
-      "@media(max-width:560px){.rp .rp-poster .rp-quotes{max-width:100%}.rp .rp-poster .rp-pmark{opacity:.25;right:-30px;bottom:-30px}}" +
+      "@media(max-width:560px){.rp .rp-poster .rp-quotes,.rp .rp-poster .rp-pfoot{max-width:100%}.rp .rp-poster .rp-pmark{opacity:.25;right:-30px;bottom:-30px}}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
