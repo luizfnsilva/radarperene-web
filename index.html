@@ -234,6 +234,14 @@
   #arquivo .arcard .arct{font-size:clamp(20px,2.3vw,24px)}
   #arquivo .arcard .arcd{font-size:14.5px}
   #arquivo .arcard .archook{font-size:13.5px}
+  /* ★ 2026-06-21 (dono) RITMO editorial: jornal trabalha em movimentos (grande/estreito/compacto/grande/pequeno), não tudo igual.
+     Diário/Semanal/Founder = colunas estreitas; o Arquivo (a joia) fica LARGO e domina a metade inferior. */
+  #ultimas{max-width:680px;margin-left:auto;margin-right:auto}
+  #semanal{max-width:600px;margin-left:auto;margin-right:auto;padding:4px 0}
+  #founder-home{max-width:560px;margin-left:auto;margin-right:auto}
+  #founder-home .sec{font-size:clamp(19px,2.2vw,25px)}
+  #founder-home .secsub{font-size:14px;color:var(--dim)}
+  #arquivo{margin:18px 0}
   /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
   .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
   .arcmerch b{color:var(--txt);font-weight:600}
@@ -310,8 +318,8 @@
 <div class="wrap">
   <!-- ★ 2026-06-21 (dono): escada editorial da home pública: leitura de hoje → Diário (hábito) → Perene Semanal (R$29, assinatura natural) → Arquivo (memória, bônus) → Founder (camada profunda) → FAQ. -->
   <section id="ultimas">
-    <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
-    <h2 class="sec" id="s-ult">Diário do regime</h2>
+    <div class="eyebrow" id="eyb-ult">Diário</div>
+    <h2 class="sec" id="s-ult">O regime, dia após dia</h2>
     <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — inserida em uma série histórica construída ao longo do tempo.</p>
     <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diários completos →</a></p>
@@ -319,10 +327,10 @@
 
   <!-- ★ 2026-06-21 (dono): Perene Semanal vem ANTES do arquivo — o R$29 é a assinatura natural (leitura recorrente); o arquivo/memória é o bônus de luxo. Só na home pública. -->
   <section id="semanal" class="only-public">
-    <div class="eyebrow">Assinatura</div>
-    <h2 class="sec">Perene Semanal</h2>
-    <p class="secsub">Uma leitura semanal do mercado brasileiro — toda sexta-feira, no seu e-mail. A síntese da semana, valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
-    <p style="margin-top:14px"><a class="herolink lead" href="/assine">Assinar o Perene Semanal →</a></p>
+    <div class="eyebrow" id="sem-eyb">Assinatura</div>
+    <h2 class="sec" id="sem-h">Perene Semanal</h2>
+    <p class="secsub" id="sem-s">Toda sexta-feira, uma leitura do mercado brasileiro — valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
+    <p style="margin-top:14px"><a class="herolink lead" id="sem-cta" href="/assine">Assinar o Perene Semanal →</a></p>
   </section>
 
   <section id="arquivo">
@@ -336,8 +344,8 @@
   <!-- ★ 2026-06-21 Founder — a camada profunda, DESCOBERTA (sem preço na home), só pública -->
   <section id="founder-home" class="only-public">
     <h2 class="sec">Founder</h2>
-    <p class="secsub">Para leitores que desejam ir além da publicação. A edição Founder acrescenta a leitura completa dos sinais, os episódios completos, os análogos históricos e um observatório proprietário cobrindo centenas de ativos e mais de cinquenta anos de precedentes.</p>
-    <p style="margin-top:14px"><a class="herolink" href="/founder">Conhecer o Founder →</a></p>
+    <p class="secsub" id="fnd-s">Uma camada mais profunda, para quem deseja explorar os mecanismos, os precedentes e o observatório proprietário do Radar.</p>
+    <p style="margin-top:14px"><a class="herolink" id="fnd-cta" href="/founder">Conhecer o Founder →</a></p>
   </section>
 
   <section id="faq" class="only-public">
@@ -429,7 +437,7 @@
 
   var C=LANG==="en"?{
     h1:'Brazil, observed — and <span class="g">remembered</span>.',
-    lead:"A living archive of Brazil&rsquo;s markets: daily, weekly and monthly reports and a library of precedents to read the present in light of the past.",
+    lead:"A living archive of Brazil&rsquo;s markets. What the Radar saw — and what came next.",
     cta1:"Subscribe to Perene Semanal →",cta2:"Read today&rsquo;s open edition →",cta3:"Discover Founder →",ctaDeep:"There is a deeper layer, for readers who want to explore the mechanisms and the precedents.",micro:"Educational content from public sources — never a recommendation.",
     eyb7:"Who it&rsquo;s for",s7:"Investors, analysts, managers — and serious newcomers.",s7s:"For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2:"Methodology",s2:"How the Radar reads Brazil",s2s:"Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
@@ -461,7 +469,7 @@
     ok:"You&rsquo;re on the list — we&rsquo;ll be in touch.",err:"Couldn&rsquo;t register. Try again.",inv:"Enter a valid email."
   }:{
     h1:'O Brasil observado — e <span class="g">lembrado</span>.',
-    lead:"Um arquivo vivo do mercado brasileiro: relatórios diários, semanais e mensais e uma biblioteca de precedentes para ler o presente à luz do passado.",
+    lead:"Um arquivo vivo do mercado brasileiro. O que o Radar viu — e o que veio depois.",
     cta1:"Assinar o Perene Semanal →",cta2:"Ler a edição aberta de hoje →",cta3:"Conhecer o Founder →",ctaDeep:"Existe uma camada mais profunda, para quem quer explorar os mecanismos e os precedentes.",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
     eyb7:"Para quem é",s7:"Investidores, analistas, gestores — e curiosos sérios.",s7s:"Para quem quer ler o mercado brasileiro sem ruído e sem palpite — não a previsão, mas o precedente: regimes, casos análogos e uma biblioteca de estudos do &ldquo;o que aconteceu depois&rdquo;. Memória desde 2000.",
     eyb2:"Metodologia",s2:"Como o Radar lê o Brasil",s2s:"Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href=\"/metodologia/\">Conheça a metodologia →</a>",
@@ -526,7 +534,7 @@
   // ── P6: painel de números "uau" — labels EN vêm do worker (EN_BODY, server-side); só o href do CTA é por idioma aqui ──
   var _sbc=document.getElementById("sb-cta");if(_sbc)_sbc.href=U_ART;
   // ── "Do arquivo" (memória): texto/links por idioma; cartões linkam ao portal editorial ──
-  set("eyb-arq",_en?"From the archive":"Do arquivo");
+  set("eyb-arq","");  // ★ 2026-06-21 (dono): mata "DO ARQUIVO" — a frase grande ("O presente, em conversa com a memória") domina, é a joia da casa.
   set("s-arq",_en?"The present, in conversation with memory":"O presente, em conversa com a memória");
   set("s-arq-s",_en?"What the Radar recorded — and what came next.":"O que o Radar registrou — e o que veio depois.");
   // pool de 7 regimes (um por ano); mostramos 3, rotacionando por DIA → a home "envelhece bem", mas é estável p/ SEO/cache no mesmo dia
@@ -577,7 +585,10 @@
   var _lc=document.getElementById("lng-cta");if(_lc)_lc.href=U_CON;  // CTA "ver toda a linguagem" → /concepts/ no .com
   var _uc=document.getElementById("ult-cta");if(_uc)_uc.href=U_DIA;  // CTA "ver Diário completo" → /daily no .com (evita 301)
   if(_en){set("eyb-lng","The Radar's language");set("s-lng","The concepts behind the reading");set("s-lng-s","Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.");set("lng-cta","See the full Radar language →");
-    set("eyb-ult","Latest readings");set("s-ult","The regime diary");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.");set("ult-cta","See the full Diaries →");
+    set("eyb-ult","Diary");set("s-ult","The regime, day by day");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.");set("ult-cta","See the full Diaries →");
+    // ★ 2026-06-21 EN dos blocos Semanal/Founder (eram PT estático = vazamento no .com)
+    set("sem-eyb","Subscription");set("sem-h","Perene Semanal");set("sem-s","Every Friday, a read of the Brazilian market — valuation, intermarket, the external backdrop, sentiment and the comparable episodes. US$ 29/mo.");set("sem-cta","Subscribe to Perene Semanal →");
+    set("fnd-s","A deeper layer, for those who want to explore the mechanisms, the precedents and the Radar&rsquo;s proprietary observatory.");set("fnd-cta","Discover Founder →");
     set("assine-link","view plans →");}
   var _alk=document.getElementById("assine-link");if(_alk&&_en)_alk.href="/subscribe";  // slug EN da landing de assinatura
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
