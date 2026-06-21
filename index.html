@@ -119,16 +119,17 @@
   .tg:hover{color:var(--gold);border-color:var(--gold)}
   /* hero */
   /* ★ 2026-06-21 v2 (dono): "bonito mas parece Word premium" = falta CONTRASTE e HIERARQUIA, não mais elegância. Largura menor (o branco em volta dá presença), título-monumento em DUAS linhas (a quebra cria ritmo), subtítulo menor e mais escuro, dourado mais queimado (FT, não luxo). */
-  .hero{text-align:center;padding:40px 0 18px;max-width:760px;margin:0 auto}  /* estreito: o branco em volta dá monumentalidade (Economist/FT/Apple) */
-  .hero-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#a66a26;font-weight:600;margin:0 0 16px}
-  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(44px,8vw,84px);line-height:.97;margin:0 auto 16px;max-width:none;letter-spacing:-.035em;color:#131329}  /* Newsreader 600, navy escuro #131329; duas linhas via <br> */
+  /* ★ 2026-06-21 v2 (dono): COMPACTAR — hero + mini-radar devem caber JUNTOS no 1º print (peça compartilhável). Título menor (cabe em 2 linhas sem o "—" sobrar sozinho), paddings/margens enxutos, card puxado pra cima. */
+  .hero{text-align:center;padding:18px 0 14px;max-width:760px;margin:0 auto}
+  .hero-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#a66a26;font-weight:600;margin:0 0 10px}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(36px,6vw,64px);line-height:.98;margin:0 auto 10px;max-width:none;letter-spacing:-.035em;color:#131329}  /* Newsreader 600, navy #131329; 64px cabe "O Brasil observado —" em 1 linha + "e lembrado." na 2ª */
   .hero h1 .g{color:#a66a26;font-style:italic;font-weight:600}
-  .hero p.lead{font-size:clamp(16px,1.8vw,19px);color:var(--dim);max-width:42ch;margin:0 auto 6px;line-height:1.55;font-weight:400}  /* Inter, médio (#666-ish) e estreito → contraste com o título-monumento */
+  .hero p.lead{font-size:clamp(15px,1.7vw,18px);color:var(--dim);max-width:42ch;margin:0 auto 6px;line-height:1.5;font-weight:400}
   [data-theme="dark"] .hero-kicker,[data-theme="dark"] .hero h1 .g{color:var(--gold)}
   [data-theme="dark"] .hero h1{color:var(--txt)}
   /* ★ 2026-06-21 (dono): Leitura do Radar DENTRO do hero — bloco centrado, rótulo discreto à esquerda, o card "Hoje lembra" é a primeira coisa importante da página. */
-  .hero-leitura{max-width:780px;margin:30px auto 6px}
-  .hero-leitura .rp-narr{margin:30px auto 4px}
+  .hero-leitura{max-width:680px;margin:14px auto 6px}
+  .hero-leitura .rp-narr{margin:22px auto 4px}
   body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
   /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
   .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;
