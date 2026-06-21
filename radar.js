@@ -1748,10 +1748,21 @@
         var _heroTxt = '';
         if (FOLD && g.brasil && g.brasil.regime) {
           var _hasVal = g.valuation && g.valuation.score != null, _ab0 = rr.analogo_br;
-          var _lead = _hasVal
-            ? (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime, with valuation <b>' + esc(g.valuation.score) + '%</b> below fair value as a counterweight to domestic stress.'
-                 : 'Regime <b>' + esc(g.brasil.regime) + '</b>, com o valuation <b>' + esc(g.valuation.score) + '%</b> abaixo do valor-justo como contrapeso ao stress doméstico.')
-            : (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime in Brazil.' : 'Regime <b>' + esc(g.brasil.regime) + '</b> no Brasil.');
+          // ★ 2026-06-20 (REGRA EDITORIAL do dono): hero = DOIS MOVIMENTOS, quase manchete do Economist.
+          //   Frase 1 = regime principal ("Regime defensivo."). Frase 2 = a principal FORÇA COMPENSATÓRIA *ou* o principal RISCO.
+          //   Hoje: força compensatória = valuation abaixo do valor-justo ("compensa parte" = honesto). Sem esse contrapeso →
+          //   Frase 2 = o termômetro mais extremo como principal risco (a regra nunca deixa o hero num movimento só).
+          var _f1 = (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime.' : 'Regime <b>' + esc(g.brasil.regime) + '</b>.');
+          var _lead;
+          if (_hasVal) {
+            _lead = _f1 + (L ? ' Valuation <b>' + esc(g.valuation.score) + '%</b> below fair value offsets part of the domestic stress.'
+                              : ' Valuation <b>' + esc(g.valuation.score) + '%</b> abaixo do valor-justo compensa parte do stress doméstico.');
+          } else {
+            var _risk = (!GATED && v.termometros && v.termometros.length) ? v.termometros.slice().sort(function (p, q) { return Math.abs((q.valor == null ? 50 : q.valor) - 50) - Math.abs((p.valor == null ? 50 : p.valor) - 50); })[0] : null;
+            _lead = (_risk && _risk.valor != null)
+              ? _f1 + (L ? ' <b>' + esc(_risk.nome) + '</b> stands out as the main risk, at a ' + esc(_risk.regime) + ' level.' : ' <b>' + esc(_risk.nome) + '</b> desponta como o principal risco, em nível ' + esc(_risk.regime) + '.')
+              : (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime in Brazil.' : 'Regime <b>' + esc(g.brasil.regime) + '</b> no Brasil.');
+          }
           var _sub = '';
           if (_ab0 && _ab0.mediana_ret_pct != null) { var _m0 = (_ab0.mediana_ret_pct >= 0 ? '+' : '') + esc(_ab0.mediana_ret_pct) + '%';
             _sub = (L ? 'Comparable regimes delivered a <b>' + _m0 + '</b> median for the Ibovespa over six months' + (_ab0.hit_rate_pct != null ? ', <b>' + esc(_ab0.hit_rate_pct) + '%</b> of them positive.' : '.')
