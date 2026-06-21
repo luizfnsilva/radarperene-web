@@ -1676,9 +1676,9 @@
     //   nossa página (#radar-perene: chrome off, sem data-sections) → núcleo conta a história e o denso recolhe atrás de
     //   <details> nativo (SEO ok · zero JS · Founder ABERTO / free fechado). Embeds (chrome) e mini-radar (TEASER) seguem planos.
     var FOLD = !sections && !chrome;
-    var _foldLbl1 = L ? "Explore the full landscape" : "Explorar o panorama completo";
+    var _foldLbl1 = L ? "See the mechanism" : "Ver o mecanismo";  // ★ 2026-06-20 vocabulário editorial (consultor): era "Explorar o panorama completo" (genérico)
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
-    var _mktLbl = L ? "Global markets" : "Mercado global";
+    var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
     var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
@@ -1912,7 +1912,7 @@
     // Razões geográficas — rotação entre geografias (ETF-país ÷ ETF-país); seção própria do Vértice. Reusa o card.
     var _razoes = '';
     if (show("razoes_geo") && v.razoes_geo && v.razoes_geo.length) {
-      _razoes = '<h4>' + (L ? "Geographic ratios · rotation" : "Razões geográficas · rotação") + '</h4><div class="legend">' + (L ? "which geography attracts capital (country-ETF ÷ country-ETF)" : "qual geografia atrai capital (ETF-país ÷ ETF-país)") + '</div><div class="g3">' +
+      _razoes = '<h4>' + (L ? "Flows between geographies" : "Fluxos entre geografias") + '</h4><div class="legend">' + (L ? "which geography attracts capital (country-ETF ÷ country-ETF)" : "qual geografia atrai capital (ETF-país ÷ ETF-país)") + '</div><div class="g3">' +
         v.razoes_geo.map(function (t) { return '<div class="t ' + cls(t.valor) + '"><div class="n">' + esc(t.nome) + '</div><div class="v">' + (t.valor == null ? (GATED ? glock() : "—") : esc(t.valor)) + '</div><div class="rr">' + esc(t.regime) + '</div>' +
           (t.valor != null ? '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, t.valor)) + '%"></i></div>' : '') +
           (t.desc && !GATED ? '<div class="rr" style="margin-top:5px;opacity:.8">' + esc(t.desc) + '</div>' : '') + '</div>'; }).join("") + '</div>'; }  // método só p/ Founder
@@ -1927,7 +1927,7 @@
         '<div class="legend">' + (L ? "% of stocks above their 200-day average · geographic = emerging vs developed rotation" : "% de ações acima da média de 200 dias · geográfico = rotação emergentes vs desenvolvidos") + '</div><div class="g3">' + ex.join("") + '</div>' +
         ((v.breadth && v.breadth.br && v.breadth.br.serie && v.breadth.br.serie.length > 1) ? '<div class="legend" style="margin-top:7px">' + (L ? "BR breadth over time · last 36 months (% > 200-day MA)" : "Breadth BR ao longo do tempo · últimos 36 meses (% > média 200d)") + '</div>' + bigChart({ hist: v.breadth.br.serie }) : ''); }
     var _leadlag = '';
-    if (show("leadlag") && v.lead_lag && v.lead_lag.length) { _leadlag = '<h4>' + (L ? "Lead-lag · statistically significant (FDR)" : "Lead-lag · com significância (FDR)") + '</h4>' +
+    if (show("leadlag") && v.lead_lag && v.lead_lag.length) { _leadlag = '<h4>' + (L ? "Which tends to move first" : "Quem costuma se mover primeiro") + '</h4>' +
       // ★ glossário no ponto de uso (rodada 50 personas, rec. 6: FDR 49 menções · lead-lag 48 — desistência nº 1 inclusive de quants)
       '<div class="legend">' + (L ? "lead-lag = one series tends to move BEFORE the other (observed lead, in days) · FDR = statistical filter that discards lucky correlations (false-discovery control)" : "lead-lag = uma série costuma se mover ANTES da outra (antecedência observada, em dias) · FDR = filtro estatístico que descarta correlações de sorte (controle de descobertas falsas)") + '</div><ul class="ll">' +
       v.lead_lag.map(function (x) { return '<li><b>' + esc(x.leitura) + '</b> <span class="tag">· ' + esc(x.sentido) + ' · corr ' + esc(x.corr) + ' · ' + esc(x.janela_dias) + 'd · FDR ✓</span></li>'; }).join("") + '</ul>'; }
@@ -1976,7 +1976,7 @@
         if (tms && tms[1]) b.push('<b>' + esc(tms[1].nome) + '</b> ' + esc(tms[1].regime));
         if (b.length) h += '<div class="rp-2min"><div class="rp-2min-k">' + (L ? "The radar in 2 minutes" : "Radar em 2 minutos") + '</div><ul>' + b.slice(0, 5).map(function (x) { return '<li>' + x + '</li>'; }).join("") + '</ul></div>'; })();
       // 1) O que está estranho hoje — Divergências (moat) sobem da posição ~20 para o topo do núcleo
-      if (_divergBody) h += '<h3 class="rp-serif-h">' + (L ? "What looks odd today" : "O que está estranho hoje") + '</h3>' + _divergBody;
+      if (_divergBody) h += '<h3 class="rp-serif-h">' + (L ? "What doesn&rsquo;t fit" : "O que não se encaixa") + '</h3>' + _divergBody;
       // 2) O que chama atenção — Vértice em layout EDITORIAL (Apple Health, consultor 06-20): pilha vertical, número
       //    grande serif + regime + filete. Sem caixa/cinza/grade (que pareciam dashboard). A fuga ganha "Saindo de / Entrando em".
       var _vsig = function (nome, valor, regime, tone, flow) {
@@ -1991,10 +1991,10 @@
       if (_obF) { var _fl = _obF.fluxo, _flowH = '';
         if (_fl && _fl.de && _fl.de.length) _flowH = '<div class="rp-vsig-flow"><span class="rp-vsig-fl">' + (L ? "Out of" : "Saindo de") + '</span> ' + esc(_fl.de.join(" · ")) + (_fl.para ? '<br><span class="rp-vsig-fl">' + (L ? "Into" : "Entrando em") + '</span> ' + esc(_fl.para) : '') + '</div>';
         _vcore += _vsig(_obF.nome, _obF.valor, _obF.regime, cls(_obF.valor), _flowH); }
-      if (_vcore) h += '<h3 class="rp-serif-h">' + (L ? "What stands out" : "O que chama atenção") + '</h3><div class="rp-eyebrow">' + (L ? "Vértice — the loudest signals across markets today · 0 calm · 100 extreme · experiment" : "Vértice — os sinais mais ativos nos mercados hoje · 0 calmo · 100 extremo · experimento") + '</div><div class="rp-vsigs">' + _vcore + '</div>';
+      if (_vcore) h += '<h3 class="rp-serif-h">' + (L ? "Signals in focus" : "Sinais em destaque") + '</h3><div class="rp-eyebrow">' + (L ? "Vértice — the most active readings across markets today · 0 calm · 100 extreme · experiment" : "Vértice — as leituras mais ativas nos mercados hoje · 0 calmo · 100 extremo · experimento") + '</div><div class="rp-vsigs">' + _vcore + '</div>';
       // 3) O que os arquivos dizem — "Hoje lembra" (clímax editorial / memória dos mercados)
       if (_hojelembra) h += '<h3 class="rp-serif-h">' + (L ? "What the archives say" : "O que os arquivos dizem") + '</h3>' + _hojelembra;
-      var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Other thermometers" : "Outros termômetros") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
+      var _termoRest = (tCards.length > 2) ? ('<h4>' + (L ? "Complementary thermometers" : "Termômetros complementares") + '</h4><div class="g3">' + tCards.slice(2).join("") + '</div>') : '';
       var _obsRest = obRestCards ? (_obsHead + '<div class="g3">' + obRestCards + '</div>') : '';
       // Mercado global — gaveta própria recolhida (commodity: dólar/índices/cripto sai do palco precioso). Câmbio só p/ Founder.
       // ★ 2026-06-20 (Fase 5/6 antecipada, dono): "Mercado global" deixa de ser lista de tickers e vira NOTA EDITORIAL
