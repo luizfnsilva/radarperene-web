@@ -299,8 +299,7 @@
 </div>
 
 <div class="wrap">
-  <!-- ★ 2026-06-21 (dono): Diário do regime SOBE (é a máquina de hábito: hoje→ontem→série). Ordem da home pública:
-       leitura de hoje → diário → arquivo → Perene Semanal → Founder. -->
+  <!-- ★ 2026-06-21 (dono): escada editorial da home pública: leitura de hoje → Diário (hábito) → Perene Semanal (R$29, assinatura natural) → Arquivo (memória, bônus) → Founder (camada profunda) → FAQ. -->
   <section id="ultimas">
     <div class="eyebrow" id="eyb-ult">Últimas leituras</div>
     <h2 class="sec" id="s-ult">Diário do regime</h2>
@@ -309,21 +308,20 @@
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diários completos →</a></p>
   </section>
 
+  <!-- ★ 2026-06-21 (dono): Perene Semanal vem ANTES do arquivo — o R$29 é a assinatura natural (leitura recorrente); o arquivo/memória é o bônus de luxo. Só na home pública. -->
+  <section id="semanal" class="only-public">
+    <div class="eyebrow">Assinatura</div>
+    <h2 class="sec">Perene Semanal</h2>
+    <p class="secsub">Uma leitura semanal do mercado brasileiro — toda sexta-feira, no seu e-mail. A síntese da semana, valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
+    <p style="margin-top:14px"><a class="herolink lead" href="/assine">Assinar o Perene Semanal →</a></p>
+  </section>
+
   <section id="arquivo">
     <div class="eyebrow" id="eyb-arq"></div>
     <h2 class="sec" id="s-arq"></h2>
     <p class="secsub" id="s-arq-s"></p>
     <div class="cards" id="arc-cards"></div>
     <p class="micro" style="margin-top:16px"><a id="arc-cta" href="/artigos" style="color:var(--gold)"></a></p>
-    <p class="arcmerch" id="arc-merch"></p>
-  </section>
-
-  <!-- ★ 2026-06-21 Perene Semanal — produto editorial (R$29), só na home pública -->
-  <section id="semanal" class="only-public">
-    <div class="eyebrow">Assinatura</div>
-    <h2 class="sec">Perene Semanal</h2>
-    <p class="secsub">Uma leitura semanal do mercado brasileiro — toda sexta-feira, no seu e-mail. A síntese da semana, valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
-    <p style="margin-top:14px"><a class="herolink lead" href="/assine">Assinar o Perene Semanal →</a></p>
   </section>
 
   <!-- ★ 2026-06-21 Founder — a camada profunda, DESCOBERTA (sem preço na home), só pública -->
@@ -562,10 +560,7 @@
   // radar-api (cresce sozinho conforme o pipeline gera). Fallback = nº de meses desde abr/2010 (piso honesto ≤ total).
   function _nf(n){return n.toLocaleString(_en?"en-US":"pt-BR");}
   var _libFallback=(_now.getFullYear()-2010)*12+(_now.getMonth()-3);  // ≈194 mensais; piso enquanto a contagem real não chega
-  set("arc-merch",_en
-    ? '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> reports</b> in the subscriber library — monthly since April 2010, now daily and weekly too. Growing with every new report. <a href="/subscribe">Explore the Founder Edition →</a>'
-    : '<b><span class="n" id="lib-n">'+_nf(_libFallback)+'</span> relatórios</b> na biblioteca do assinante — mensais desde abril de 2010, agora também diários e semanais. Cresce a cada novo relatório. <a href="/assine">Conhecer a Edição Founder →</a>');
-  fetch(location.origin+"/api/v1/biblioteca/contagem").then(function(r){return r.json();}).then(function(j){if(!j||!j.total)return;var el=document.getElementById("lib-n");if(el)el.textContent=_nf(j.total);var sr=document.getElementById("stat-reports");if(sr)sr.textContent=_nf(j.total);}).catch(function(){});  // TOTAL real (mensal+diário+semanal); alimenta a merchan E o painel "uau". Fallback ≈194 se o endpoint cair.
+  // ★ 2026-06-21 (dono): bloco "N relatórios na biblioteca" (arc-merch) REMOVIDO — remanescente da home antiga; o bloco Founder já comunica a profundidade melhor.
   (function(){var ib=document.getElementById("instband");if(ib)ib.setAttribute("href",U_ART);
     var ac=document.getElementById("arc-cta");if(ac){ac.textContent=_en?"Read all episodes →":"Ler todos os episódios →";ac.setAttribute("href",U_ART);}})();
   // ── grid "A linguagem do Radar" (9 conceitos, descoberta na home) ──
