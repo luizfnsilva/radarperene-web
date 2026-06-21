@@ -49,6 +49,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "OG cards unchanged — nada a commitar."
           else
-            git commit -m "chore(og): atualiza cartões OG da Leitura do Radar [skip ci]"
+            # SEM [skip ci]: o Cloudflare Workers Builds PULA builds com [skip ci] → o card fresco nunca iria ao ar.
+            # O workflow é schedule/dispatch (não push-triggered), então o commit não dispara outro run (sem loop).
+            git commit -m "chore(og): atualiza cartões OG da Leitura do Radar"
             git push
           fi
