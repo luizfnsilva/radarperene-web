@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Assine o Radar Perene — o daily que chega ~50min antes da abertura do mercado BR</title>
-<meta name="description" content="O daily do Radar Perene chega ~50 minutos antes da abertura do mercado brasileiro — mais o semanal (sexta), o mensal e a biblioteca de relatórios desde 2010. Regime BR lido como dado, não como previsão. R$ 149/mês · 7 dias de arrependimento.">
+<title>Assinaturas — Radar Perene · Perene Semanal R$ 29 e Founder R$ 149</title>
+<meta name="description" content="Escolha como acompanhar o Radar Perene, uma publicação sobre os regimes do mercado brasileiro. Perene Semanal (R$ 29/mês): a edição semanal Brasil e seu arquivo. Founder (R$ 149/mês): a publicação completa, com o observatório proprietário e 50+ anos de precedentes. 7 dias de arrependimento via Stripe.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Radar Perene">
@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://radarperene.com.br/assine/">
 <meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta property="og:title" content="Assine o Radar Perene — o daily que chega ~50min antes da abertura do mercado BR">
-<meta property="og:description" content="Daily pré-abertura + semanal + mensal + biblioteca desde 2010. O regime do Brasil lido como dado, não como previsão. R$ 149/mês.">
+<meta property="og:description" content="Uma publicação sobre os regimes do mercado brasileiro. Perene Semanal R$ 29/mês ou Founder R$ 149/mês (com o observatório proprietário). 7 dias de arrependimento.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
 <meta name="twitter:title" content="Assine o Radar Perene — daily pré-abertura do mercado BR">
@@ -23,7 +23,7 @@
 <link rel="alternate" hreflang="en" href="https://radarperene.com/subscribe/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com/subscribe/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com.br","logo":"https://radarperene.com.br/og.png","sameAs":["https://radarperene.com"],"description":"Observador histórico e biblioteca de precedentes do mercado brasileiro — descritivo, de fonte pública. Memória desde 2000."}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Radar Perene — Membro Fundador","image":"https://radarperene.com.br/og-image-1200x630.png","description":"Assinatura do Radar Perene: relatório diário ~50min antes da abertura do mercado BR, semanal (sexta), mensal e biblioteca de relatórios mensais desde abril/2010. R$ 149/mês, preço de fundador travado, 7 dias de arrependimento via Stripe.","url":"https://radarperene.com.br/assine/","brand":{"@type":"Brand","name":"Radar Perene"},"offers":[{"@type":"Offer","name":"Mensal","price":"149","priceCurrency":"BRL","availability":"https://schema.org/LimitedAvailability","url":"https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"},{"@type":"Offer","name":"Anual (2 meses grátis)","price":"1490","priceCurrency":"BRL","availability":"https://schema.org/LimitedAvailability","url":"https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Radar Perene — Assinaturas","image":"https://radarperene.com.br/og-image-1200x630.png","description":"Assinaturas do Radar Perene, uma publicação sobre os regimes do mercado brasileiro. Perene Semanal: a edição semanal Brasil e seu arquivo. Founder: a publicação completa com o observatório proprietário (centenas de ativos, 50+ anos de precedentes).","url":"https://radarperene.com.br/assine/","brand":{"@type":"Brand","name":"Radar Perene"},"offers":[{"@type":"Offer","name":"Perene Semanal","price":"29","priceCurrency":"BRL","url":"https://radarperene.com.br/assine/"},{"@type":"Offer","name":"Founder","price":"149","priceCurrency":"BRL","url":"https://radarperene.com.br/founder/"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Relatórios Radar Perene","serviceType":"Relatório de regime e intermercado do mercado brasileiro","provider":{"@type":"Organization","name":"Radar Perene"},"areaServed":{"@type":"Country","name":"Brasil"},"description":"Relatório diário entregue por e-mail ~50 minutos antes da abertura do mercado brasileiro (fechamento do dia anterior), relatório semanal às sextas e relatório mensal no último dia do mês. Descritivo, nunca recomendação.","hasOfferCatalog":{"@type":"OfferCatalog","name":"Cadências","itemListElement":[{"@type":"OfferCatalog","name":"Diário ~50min antes da abertura BR"},{"@type":"OfferCatalog","name":"Semanal (sexta)"},{"@type":"OfferCatalog","name":"Mensal (último dia do mês)"}]}}</script>
 <link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -98,6 +98,23 @@
   .price .amt{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,46px);margin:6px 0 2px}
   .price .amt small{font-size:.42em;color:var(--dim);font-weight:400}
   .price .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0 10px}
+  /* planos (2 cards: Semanal principal · Founder secundário) — editorial, sem botão preenchido */
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:680px){.plans{grid-template-columns:1fr}}
+  .plan{border:1px solid var(--line);border-radius:16px;padding:28px 26px;background:var(--surface)}
+  .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface));box-shadow:0 1px 24px rgba(168,101,26,.06)}
+  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:3px 12px;font-size:11px;font-weight:600;letter-spacing:.08em;margin-bottom:12px}
+  .plan .pname{font-family:var(--serif);font-weight:600;font-size:22px;margin:0}
+  .plan .amt{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,40px);margin:4px 0 2px}
+  .plan .amt small{font-size:.42em;color:var(--dim);font-weight:400}
+  .plan .ptag{color:var(--txt2);font-size:15px;margin:6px 0 14px;line-height:1.5}
+  .plan .pl{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:7px}
+  .plan .pl li{font-size:14px;color:var(--txt2);padding-left:18px;position:relative;line-height:1.45}
+  .plan .pl li::before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:700}
+  /* link editorial (sem bloco preenchido — o sólido só no checkout do Stripe) */
+  .herolink{display:inline-block;color:var(--gold);text-decoration:none;font-weight:600;font-size:14.5px}
+  .herolink:hover{text-decoration:underline}
+  .herolink.lead{font-size:clamp(16px,2.1vw,18px)}
   /* contrast / free */
   .free-note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;font-size:14px;color:var(--dim)}
   .free-note b{color:var(--txt)}
@@ -118,83 +135,47 @@
 
 <main class="wrap">
   <section class="hero" style="border-top:0">
-    <div class="eyebrow">Assinatura · daily pré-abertura</div>
-    <h1>O único daily que lê o regime do Brasil como <span class="g">dado</span> — não como previsão</h1>
-    <p class="lead">Dados públicos auditáveis, 26 anos de memória de mercado e o Experimento Vértice. A leitura chega no seu e-mail <b>~50 minutos antes</b> do mercado brasileiro abrir.</p>
-    <a class="qtag" id="live-regime" href="/" title="ver ao vivo"><span class="dot"></span>regime do dia · ver ao vivo</a>
-    <div>
-      <a class="btn big" id="cta-hero" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Assinar agora — R$ 149/mês</a>
-    </div>
-    <p class="micro">Preço de fundador travado · vaga entre os 100 · 7 dias de arrependimento · cancela em 1 clique.</p>
+    <div class="eyebrow">Assinaturas</div>
+    <h1>Escolha como acompanhar o <span class="g">Radar Perene</span></h1>
+    <p class="lead">Uma publicação sobre os regimes do mercado brasileiro.</p>
+    <a class="qtag" id="live-regime" href="/" title="ver ao vivo"><span class="dot"></span>regime do dia · ler a edição aberta</a>
   </section>
 
   <section>
-    <div class="eyebrow">O que você recebe</div>
-    <h2 class="sec">A leitura completa, entregue no ritmo do mercado</h2>
-    <p class="secsub">Três cadências por e-mail + a biblioteca exclusiva de tudo o que já foi escrito. Descritivo, nunca recomendação.</p>
-    <div class="cards">
-      <div class="vc">
-        <div class="ic">◆ Diário</div>
-        <h3>O fechamento de ontem, antes do pregão de hoje</h3>
-        <p>Regime, intermercado e o que mudou — no seu e-mail e publicado em X/LinkedIn logo em seguida.</p>
-        <span class="when">~50 min antes da abertura BR</span>
+    <div class="plans">
+      <div class="plan feat">
+        <div class="badge">Mais escolhido</div>
+        <h2 class="pname">Perene Semanal</h2>
+        <div class="amt">R$ 29<small>/mês</small></div>
+        <p class="ptag">Uma leitura semanal do mercado brasileiro.</p>
+        <ul class="pl">
+          <li>a edição semanal Brasil, toda sexta</li>
+          <li>o arquivo das edições semanais</li>
+          <li>acesso à edição aberta de cada dia</li>
+        </ul>
+        <a class="herolink lead" id="cta-semanal" href="https://buy.stripe.com/7sY6oG5QC54f4Lx1VZb3q06" target="_blank" rel="noopener">Assinar o Perene Semanal →</a>
       </div>
-      <div class="vc">
-        <div class="ic">◆ Semanal</div>
-        <h3>A semana fechada e o que ela deixou</h3>
-        <p>A leitura consolidada da semana — sinais, divergências e o saldo do regime.</p>
-        <span class="when">toda sexta</span>
-      </div>
-      <div class="vc">
-        <div class="ic">◆ Mensal</div>
-        <h3>O mês inteiro, em um relatório</h3>
-        <p>O panorama do mês com a memória histórica por trás de cada número.</p>
-        <span class="when">último dia do mês</span>
-      </div>
-      <div class="vc">
-        <div class="ic">◆ Biblioteca</div>
-        <h3>Tudo o que já foi escrito, só para assinantes</h3>
-        <p>Relatórios mensais enriquecidos <b>desde abril/2010</b> — e a biblioteca cresce a cada novo diário, semanal e mensal.</p>
-        <span class="when">194 relatórios · 16 anos</span>
+      <div class="plan">
+        <h2 class="pname">Founder</h2>
+        <div class="amt">R$ 149<small>/mês</small></div>
+        <p class="ptag">A publicação completa, acrescida do observatório proprietário.</p>
+        <ul class="pl">
+          <li>a leitura diária completa</li>
+          <li>os episódios completos</li>
+          <li>os análogos históricos</li>
+          <li>a leitura integral dos sinais</li>
+          <li>um observatório proprietário cobrindo centenas de ativos</li>
+          <li>mais de 50 anos de precedentes</li>
+        </ul>
+        <a class="herolink" href="/founder">Conhecer o Founder →</a>
       </div>
     </div>
-    <p style="font-size:13px;color:var(--dim);margin:18px 0 6px;font-weight:600">No plano assinado você também destrava:</p>
-    <ul class="unlock" id="assine-premium">
-      <li>Histórico e gráficos de 50+ anos de cada termômetro e regime</li>
-      <li>Estudos de análogo completos — todos os ativos, horizontes e datas-análogas</li>
-      <li>Todas as hipóteses + a evolução bayesiana das teses no tempo</li>
-      <li>Correlações cross-asset com lead-lag e teste estatístico (FDR)</li>
-      <li>Alertas de mudança de regime — do básico ao PhD</li>
-    </ul>
+    <p class="micro" style="text-align:center;margin-top:20px">Pagamento via Stripe · 7 dias de arrependimento com estorno integral automático · cancela quando quiser, em 1 clique.</p>
   </section>
 
   <section>
-    <div class="eyebrow">Prova ao vivo</div>
-    <h2 class="sec">O regime de hoje, como o assinante lê</h2>
-    <p class="secsub">Números reais do dia — atualizados ao vivo a partir do Radar. <a href="/" style="color:var(--gold)">veja ao vivo →</a></p>
-    <div class="live" id="assine-live">
-      <div class="st"><b>28,8<small style="font-size:.5em;color:var(--dim)">/100</small></b><span>regime BR · defensivo</span></div>
-      <div class="st"><b>−1,47<small style="font-size:.5em;color:var(--dim)"> pp</small></b><span>prêmio de risco das ações</span></div>
-      <div class="st"><b>61,1<small style="font-size:.5em;color:var(--dim)">/100</small></b><span>valuation (abaixo do justo)</span></div>
-      <div class="st"><b>26 anos</b><span>de memória, desde 2000</span></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="eyebrow">Preço</div>
-    <div class="price">
-      <div class="badge">Membro Fundador · vaga entre os 100</div>
-      <div class="amt">R$ 149<small>/mês</small></div>
-      <p style="color:var(--dim);max-width:46ch;margin:8px auto 0;font-size:14.5px">Preço de fundador travado enquanto a assinatura ficar ativa. Sem fidelidade, sem cláusula escondida.</p>
-      <div class="ctas">
-        <a class="btn big" id="cta-month" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Assinar mensal — R$ 149/mês</a>
-        <a class="btn ghost" id="cta-year" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener">Anual · R$ 1.490 (2 meses grátis)</a>
-      </div>
-      <p class="micro">Pagamento via Stripe · 7 dias de arrependimento com estorno integral automático · cancela quando quiser, em 1 clique.</p>
-    </div>
-    <div class="free-note" style="margin-top:16px">
-      <b>Aberto a todos, sempre:</b> a leitura de hoje ao vivo, os snapshots públicos do Diário <b>desde janeiro/2000 (26 anos)</b>, o Experimento Vértice com seus termômetros, as comparações entre ativos e a API/embed. O que você assina é a <b>leitura completa entregue no seu e-mail</b> e a profundidade decisória — não o acesso ao Radar.
-    </div>
+    <div class="free-note">
+      <b>A edição aberta fica aberta a todos, sempre:</b> a leitura ao vivo do regime do Brasil, os snapshots públicos do Diário <b>desde janeiro/2000 (26 anos)</b>, o Vértice com seus termômetros e as comparações entre ativos. <a href="/" style="color:var(--gold)">Ler a edição de hoje →</a></div>
   </section>
 
   <section>
@@ -209,7 +190,7 @@
       <dt>Como funciona o cancelamento?</dt>
       <dd>Tudo é self-service pelo Stripe: 7 dias de arrependimento com estorno integral e automático, e cancelamento em 1 clique a qualquer momento — sem contato humano.</dd>
     </dl>
-    <p style="text-align:center;margin-top:24px"><a class="btn big" id="cta-foot" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Começar agora — R$ 149/mês</a></p>
+    <p style="text-align:center;margin-top:24px"><a class="herolink lead" id="cta-foot" href="https://buy.stripe.com/7sY6oG5QC54f4Lx1VZb3q06" target="_blank" rel="noopener">Assinar o Perene Semanal →</a></p>
   </section>
 </main>
 
@@ -224,7 +205,7 @@
   var tg=document.getElementById("theme-tg");
   if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};
   // evento de conversão (rpTrack é injetado pelo worker junto do consent/GA)
-  ["cta-hero","cta-month","cta-year","cta-foot"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("click",function(){try{if(window.rpTrack)window.rpTrack("assine_cta_"+id.replace("cta-",""));}catch(e){}});});
+  ["cta-semanal","cta-foot"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("click",function(){try{if(window.rpTrack)window.rpTrack("assine_cta_"+id.replace("cta-",""));}catch(e){}});});
   // dados ao vivo do digest (mesma origem, via proxy do worker) — degrada gracioso
   function nf(v,d){try{return Number(v).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});}catch(e){return v;}}
   fetch("/api/v1/digest?lang=pt",{headers:{apikey:"x"}}).then(function(r){return r.ok?r.json():null;}).then(function(d){
