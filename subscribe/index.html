@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Subscribe to Radar Perene — the daily that lands ~50min before the Brazil market opens</title>
-<meta name="description" content="Radar Perene's daily lands ~50 minutes before the Brazilian market opens — plus the weekly (Friday), the monthly, and a subscriber library of reports since 2010. Brazil's market regime read as data, not as a forecast. US$ 149/mo · 7-day refund.">
+<title>Subscriptions — Radar Perene · Perene Semanal US$ 29 and Founder US$ 149</title>
+<meta name="description" content="Choose how to follow Radar Perene, a publication on the regimes of the Brazilian market. Perene Semanal (US$ 29/mo): the weekly Brazil edition and its archive. Founder (US$ 149/mo): the full publication, with the proprietary observatory and 50+ years of precedents. 7-day refund via Stripe.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Radar Perene">
@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://radarperene.com/subscribe/">
 <meta property="og:image" content="https://radarperene.com/og-image-1200x630-en.png">
 <meta property="og:title" content="Subscribe to Radar Perene — the daily before the Brazil market opens">
-<meta property="og:description" content="Pre-open daily + weekly + monthly + a library since 2010. Brazil's regime read as data, not a forecast. US$ 149/mo.">
+<meta property="og:description" content="A publication on the regimes of the Brazilian market. Perene Semanal US$ 29/mo or Founder US$ 149/mo (with the proprietary observatory). 7-day refund.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://radarperene.com/og-image-1200x630-en.png">
 <meta name="twitter:title" content="Subscribe to Radar Perene — pre-open daily on Brazil">
@@ -23,7 +23,7 @@
 <link rel="alternate" hreflang="en" href="https://radarperene.com/subscribe/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com/subscribe/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Radar Perene","url":"https://radarperene.com","logo":"https://radarperene.com/og.png","sameAs":["https://radarperene.com.br"],"description":"A historical observer and library of precedents for the Brazilian market — descriptive, from public data. Memory since 2000."}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Radar Perene — Founding Member","image":"https://radarperene.com/og-image-1200x630.png","description":"Radar Perene subscription: a daily report ~50min before the Brazil market opens, a weekly (Friday), a monthly, and a library of monthly reports since April 2010. US$ 149/mo, locked founder price, 7-day refund via Stripe.","url":"https://radarperene.com/subscribe/","brand":{"@type":"Brand","name":"Radar Perene"},"offers":[{"@type":"Offer","name":"Monthly","price":"149","priceCurrency":"USD","availability":"https://schema.org/LimitedAvailability","url":"https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03"},{"@type":"Offer","name":"Annual (2 months free)","price":"1490","priceCurrency":"USD","availability":"https://schema.org/LimitedAvailability","url":"https://buy.stripe.com/3cIdR85QC40bgufgQTb3q04"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Radar Perene — Subscriptions","image":"https://radarperene.com/og-image-1200x630.png","description":"Radar Perene subscriptions, a publication on the regimes of the Brazilian market. Perene Semanal: the weekly Brazil edition and its archive. Founder: the full publication with the proprietary observatory (hundreds of assets, 50+ years of precedents).","url":"https://radarperene.com/subscribe/","brand":{"@type":"Brand","name":"Radar Perene"},"offers":[{"@type":"Offer","name":"Perene Semanal","price":"29","priceCurrency":"USD","url":"https://radarperene.com/subscribe/"},{"@type":"Offer","name":"Founder","price":"149","priceCurrency":"USD","url":"https://radarperene.com/founder/"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Radar Perene Reports","serviceType":"Brazil market regime and intermarket report","provider":{"@type":"Organization","name":"Radar Perene"},"areaServed":{"@type":"Country","name":"Brazil"},"description":"A daily report emailed ~50 minutes before the Brazilian market opens (prior-day close), a weekly report on Fridays and a monthly report on the last day of the month. Descriptive, never advice.","hasOfferCatalog":{"@type":"OfferCatalog","name":"Cadences","itemListElement":[{"@type":"OfferCatalog","name":"Daily ~50min before the Brazil open"},{"@type":"OfferCatalog","name":"Weekly (Friday)"},{"@type":"OfferCatalog","name":"Monthly (last day of the month)"}]}}</script>
 <link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,6 +93,21 @@
   .price .amt{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,46px);margin:6px 0 2px}
   .price .amt small{font-size:.42em;color:var(--dim);font-weight:400}
   .price .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0 10px}
+  .plans{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:680px){.plans{grid-template-columns:1fr}}
+  .plan{border:1px solid var(--line);border-radius:16px;padding:28px 26px;background:var(--surface)}
+  .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface));box-shadow:0 1px 24px rgba(168,101,26,.06)}
+  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:3px 12px;font-size:11px;font-weight:600;letter-spacing:.08em;margin-bottom:12px}
+  .plan .pname{font-family:var(--serif);font-weight:600;font-size:22px;margin:0}
+  .plan .amt{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,40px);margin:4px 0 2px}
+  .plan .amt small{font-size:.42em;color:var(--dim);font-weight:400}
+  .plan .ptag{color:var(--txt2);font-size:15px;margin:6px 0 14px;line-height:1.5}
+  .plan .pl{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:7px}
+  .plan .pl li{font-size:14px;color:var(--txt2);padding-left:18px;position:relative;line-height:1.45}
+  .plan .pl li::before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:700}
+  .herolink{display:inline-block;color:var(--gold);text-decoration:none;font-weight:600;font-size:14.5px}
+  .herolink:hover{text-decoration:underline}
+  .herolink.lead{font-size:clamp(16px,2.1vw,18px)}
   .free-note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;font-size:14px;color:var(--dim)}
   .free-note b{color:var(--txt)}
   .faq dt{font-family:var(--serif);font-weight:600;font-size:16px;margin:16px 0 4px;color:var(--txt)}
@@ -111,83 +126,47 @@
 
 <main class="wrap">
   <section class="hero" style="border-top:0">
-    <div class="eyebrow">Subscription · pre-open daily</div>
-    <h1>The only daily that reads Brazil's regime as <span class="g">data</span> — not as a forecast</h1>
-    <p class="lead">Auditable public data, 26 years of market memory and the Vértice Experiment. The read lands in your inbox <b>~50 minutes before</b> the Brazilian market opens.</p>
-    <a class="qtag" id="live-regime" href="/" title="see it live"><span class="dot"></span>today's regime · see it live</a>
-    <div>
-      <a class="btn big" id="cta-hero" href="https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" target="_blank" rel="noopener">Subscribe now — US$ 149/mo</a>
-    </div>
-    <p class="micro">Locked founder price · a seat among the 100 · 7-day refund · cancel in 1 click.</p>
+    <div class="eyebrow">Subscriptions</div>
+    <h1>Choose how to follow <span class="g">Radar Perene</span></h1>
+    <p class="lead">A publication on the regimes of the Brazilian market.</p>
+    <a class="qtag" id="live-regime" href="/" title="see it live"><span class="dot"></span>today's regime · read the open edition</a>
   </section>
 
   <section>
-    <div class="eyebrow">What you get</div>
-    <h2 class="sec">The full read, delivered at the market's pace</h2>
-    <p class="secsub">Three cadences by email + the exclusive library of everything ever written. Descriptive, never advice.</p>
-    <div class="cards">
-      <div class="vc">
-        <div class="ic">◆ Daily</div>
-        <h3>Yesterday's close, before today's open</h3>
-        <p>Regime, intermarket and what changed — in your inbox and posted to X/LinkedIn right after.</p>
-        <span class="when">~50 min before the BR open</span>
+    <div class="plans">
+      <div class="plan feat">
+        <div class="badge">Most chosen</div>
+        <h2 class="pname">Perene Semanal</h2>
+        <div class="amt">US$ 29<small>/mo</small></div>
+        <p class="ptag">A weekly read of the Brazilian market.</p>
+        <ul class="pl">
+          <li>the weekly Brazil edition, every Friday</li>
+          <li>the archive of weekly editions</li>
+          <li>access to each day's open edition</li>
+        </ul>
+        <a class="herolink lead" id="cta-semanal" href="https://buy.stripe.com/cNi8wObaW9kv6TFeILb3q07" target="_blank" rel="noopener">Subscribe to Perene Semanal →</a>
       </div>
-      <div class="vc">
-        <div class="ic">◆ Weekly</div>
-        <h3>The week closed, and what it left behind</h3>
-        <p>The consolidated read of the week — signals, divergences and the regime's balance.</p>
-        <span class="when">every Friday</span>
-      </div>
-      <div class="vc">
-        <div class="ic">◆ Monthly</div>
-        <h3>The whole month, in one report</h3>
-        <p>The month's panorama with the historical memory behind every number.</p>
-        <span class="when">last day of the month</span>
-      </div>
-      <div class="vc">
-        <div class="ic">◆ Library</div>
-        <h3>Everything ever written, subscribers only</h3>
-        <p>Enriched monthly reports <b>since April 2010</b> — and the library grows with every new daily, weekly and monthly.</p>
-        <span class="when">194 reports · 16 years</span>
+      <div class="plan">
+        <h2 class="pname">Founder</h2>
+        <div class="amt">US$ 149<small>/mo</small></div>
+        <p class="ptag">The full publication, plus the proprietary observatory.</p>
+        <ul class="pl">
+          <li>the full daily read</li>
+          <li>the complete episodes</li>
+          <li>the historical analogs</li>
+          <li>the full reading of the signals</li>
+          <li>a proprietary observatory covering hundreds of assets</li>
+          <li>50+ years of precedents</li>
+        </ul>
+        <a class="herolink" href="/founder">Discover Founder →</a>
       </div>
     </div>
-    <p style="font-size:13px;color:var(--dim);margin:18px 0 6px;font-weight:600">The subscribed plan also unlocks:</p>
-    <ul class="unlock" id="assine-premium">
-      <li>History and charts of 50+ years for every thermometer and regime</li>
-      <li>Full analog studies — all assets, horizons and analog dates</li>
-      <li>All hypotheses + the Bayesian evolution of theses over time</li>
-      <li>Cross-asset correlations with lead-lag and a statistical test (FDR)</li>
-      <li>Regime-change alerts — from basics to PhD depth</li>
-    </ul>
+    <p class="micro" style="text-align:center;margin-top:20px">Payment via Stripe · 7-day full automatic refund · cancel anytime, in 1 click.</p>
   </section>
 
   <section>
-    <div class="eyebrow">Live proof</div>
-    <h2 class="sec">Today's regime, as a subscriber reads it</h2>
-    <p class="secsub">Real numbers from today — updated live from the Radar. <a href="/" style="color:var(--gold)">see it live →</a></p>
-    <div class="live" id="assine-live">
-      <div class="st"><b>28.8<small style="font-size:.5em;color:var(--dim)">/100</small></b><span>BR regime · defensive</span></div>
-      <div class="st"><b>−1.47<small style="font-size:.5em;color:var(--dim)"> pp</small></b><span>equity risk premium</span></div>
-      <div class="st"><b>61.1<small style="font-size:.5em;color:var(--dim)">/100</small></b><span>valuation (below fair)</span></div>
-      <div class="st"><b>26 years</b><span>of memory, since 2000</span></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="eyebrow">Price</div>
-    <div class="price">
-      <div class="badge">Founding Member · a seat among the 100</div>
-      <div class="amt">US$ 149<small>/mo</small></div>
-      <p style="color:var(--dim);max-width:46ch;margin:8px auto 0;font-size:14.5px">Locked founder price for as long as your subscription stays active. No lock-in, no hidden clause.</p>
-      <div class="ctas">
-        <a class="btn big" id="cta-month" href="https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" target="_blank" rel="noopener">Subscribe monthly — US$ 149/mo</a>
-        <a class="btn ghost" id="cta-year" href="https://buy.stripe.com/3cIdR85QC40bgufgQTb3q04" target="_blank" rel="noopener">Annual · US$ 1,490 (2 months free)</a>
-      </div>
-      <p class="micro">Payment via Stripe · 7-day full automatic refund · cancel anytime, in 1 click.</p>
-    </div>
-    <div class="free-note" style="margin-top:16px">
-      <b>Open to everyone, always:</b> today's read live, the public daily snapshots <b>since January 2000 (26 years)</b>, the Vértice Experiment with its thermometers, asset comparisons and the API/embed. What you subscribe to is the <b>full read delivered to your inbox</b> and the decision depth — not access to the Radar.
-    </div>
+    <div class="free-note">
+      <b>The open edition stays open to everyone, always:</b> today's live read of Brazil's regime, the public daily snapshots <b>since January 2000 (26 years)</b>, the Vértice with its thermometers and the asset comparisons. <a href="/" style="color:var(--gold)">Read today's edition →</a></div>
   </section>
 
   <section>
@@ -202,7 +181,7 @@
       <dt>How does cancellation work?</dt>
       <dd>Everything is self-service via Stripe: a 7-day full automatic refund, and one-click cancellation anytime — no human support desk.</dd>
     </dl>
-    <p style="text-align:center;margin-top:24px"><a class="btn big" id="cta-foot" href="https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" target="_blank" rel="noopener">Start now — US$ 149/mo</a></p>
+    <p style="text-align:center;margin-top:24px"><a class="herolink lead" id="cta-foot" href="https://buy.stripe.com/cNi8wObaW9kv6TFeILb3q07" target="_blank" rel="noopener">Subscribe to Perene Semanal →</a></p>
   </section>
 </main>
 
@@ -215,7 +194,7 @@
 (function(){
   var tg=document.getElementById("theme-tg");
   if(tg)tg.onclick=function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);try{localStorage.setItem("rp-theme",c);}catch(e){}};
-  ["cta-hero","cta-month","cta-year","cta-foot"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("click",function(){try{if(window.rpTrack)window.rpTrack("subscribe_cta_"+id.replace("cta-",""));}catch(e){}});});
+  ["cta-semanal","cta-foot"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("click",function(){try{if(window.rpTrack)window.rpTrack("subscribe_cta_"+id.replace("cta-",""));}catch(e){}});});
   function nf(v,d){try{return Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});}catch(e){return v;}}
   fetch("/api/v1/digest?lang=en",{headers:{apikey:"x"}}).then(function(r){return r.ok?r.json():null;}).then(function(d){
     if(!d)return;

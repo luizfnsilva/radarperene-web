@@ -300,24 +300,8 @@
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diários completos →</a></p>
   </section>
 
-  <section id="fundadores">
-    <div class="founder">
-      <div class="badge" id="fbadge">Lançamento · 100 fundadores</div>
-      <h2 id="fh">Acesso ao acervo completo.</h2>
-      <div id="fp"><ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> toda a biblioteca de relatórios desde abril de 2010</li><li><span style="color:var(--gold)">✓</span> os desfechos completos de cada episódio semelhante</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> a distribuição histórica em 3, 6 e 12 meses</li><li><span style="color:var(--gold)">✓</span> relatórios diários, semanais e mensais no e-mail</li><li><span style="color:var(--gold)">✓</span> um arquivo vivo que cresce todos os dias</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div></div>
-      <div id="fed" style="margin:22px 0 1px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:600">Edição Founder</div>
-      <div id="fprice" style="margin:0 0 10px;font-family:var(--serif);font-size:23px;color:var(--txt)"><b style="color:var(--gold)">R$ 149/mês</b></div>
-      <a class="btn" id="founder-buy" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Assinar →</a>
-      <p style="margin:16px auto 0;font-size:13.5px"><a id="founder-buy-year" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600">Plano anual · dois meses de cortesia →</a></p>
-      <p style="margin:10px auto 0;font-size:13px"><a href="#wl" id="wl-toggle" style="color:var(--dim);text-decoration:none">Receber aviso de novas vagas →</a><span style="color:var(--line)"> · </span><a href="/assine" id="assine-link" style="color:var(--dim);text-decoration:none">ver planos →</a></p>
-      <form class="wl" id="wl" autocomplete="on" style="display:none;margin-top:14px">
-        <input type="text" class="hp" name="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="email" id="wl-email" placeholder="seu@email.com" required>
-        <button class="btn ghost" type="submit" id="wl-btn" style="padding:9px 16px;font-size:13px;margin:0">Quero meu convite</button>
-      </form>
-      <div class="wl-msg" id="wl-msg"></div>
-    </div>
-  </section>
+  <!-- ★ 2026-06-21 (dono): bloco "#fundadores" (pitch R$149 + waitlist) REMOVIDO da home. Novo IA: Founder é DESCOBERTO,
+       não apresentado — a home convida ao Perene Semanal; o Founder vive em /founder (manifesto). -->
 
   <!-- ★ 2026-06-18 (diretoria): seção "Metodologia" REMOVIDA da home — a credibilidade é intrínseca ao produto,
        não precisa ser afirmada na vitrine. A metodologia segue acessível pelo menu e pelo rodapé. -->
@@ -489,7 +473,7 @@
   set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fed",C.fed);set("fprice",C.fprice);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
   set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);set("ftnav",C.ftnav);
-  document.getElementById("wl-email").placeholder=C.wlph;
+  var _wle=document.getElementById("wl-email");if(_wle)_wle.placeholder=C.wlph;  // ★ guardado: #fundadores/waitlist removido da home
   var expTag=LANG==="en"?"experiment":"experimento";
   var LSLUG=["patrimonial","eleitoral","macro","institucional","imobiliaria","vertice"];  // de-orphan: cada card linka pra sua página de lente (mesma ordem PT/EN)
   // ── slugs por idioma: no .com (EN) os links vão pras páginas EN (/methodology, /concepts/*, /lenses/*) ──
