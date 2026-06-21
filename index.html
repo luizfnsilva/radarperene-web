@@ -226,6 +226,14 @@
   .arcard .arcd{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--txt2);line-height:1.4}
   .arcard .archook{font-size:13px;color:var(--dim);line-height:1.6;flex:1}
   .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:6px}
+  /* ★ 2026-06-21 (dono): o Arquivo é a JOIA (o diferencial mais difícil de copiar — a alma do Radar). Cards maiores, título maior, subtítulo menor. */
+  #arquivo .sec{font-size:clamp(26px,3.6vw,38px)}
+  #arquivo .secsub{font-size:14px;color:var(--dim);max-width:60ch}
+  #arquivo .cards{gap:18px}
+  #arquivo .arcard{padding:28px 26px;gap:10px}
+  #arquivo .arcard .arct{font-size:clamp(20px,2.3vw,24px)}
+  #arquivo .arcard .arcd{font-size:14.5px}
+  #arquivo .arcard .archook{font-size:13.5px}
   /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
   .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
   .arcmerch b{color:var(--txt);font-weight:600}
@@ -288,13 +296,14 @@
 </div>
 
 <div class="wrap only-public">
+  <!-- ★ 2026-06-21 (dono): o mini-radar é um OBJETO PÚBLICO (API incorporável), não um teaser do Founder. Sem "Ao vivo · agora". -->
   <section id="radar-teaser">
-    <div class="eyebrow" id="eyb-tz">Ao vivo · agora</div>
     <h2 class="sec" id="s-tz">A leitura de hoje</h2>
-    <p class="secsub" id="s-tz-s">O regime do Brasil agora. A edição Founder acrescenta os números, os análogos completos e mais de 50 anos de histórico.</p>
+    <p class="secsub" id="s-tz-s">O estado atual do mercado brasileiro, lido como dado — uma edição pública, livre para incorporar em qualquer site.</p>
     <div data-radar-perene data-chrome="off" data-sections="regime,analogo_br,termometros,observatorio" style="--rp-max:100%"></div>
     <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). ★ P4 2026-06-18: subiu p/ logo após o mini-radar — síntese "Morning Brief" antes da profundidade. -->
     <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
+    <p class="micro" style="margin-top:14px"><a id="tz-embed" href="/widgets" style="color:var(--gold)">Incorporar no seu site →</a></p>
   </section>
 </div>
 
@@ -326,7 +335,6 @@
 
   <!-- ★ 2026-06-21 Founder — a camada profunda, DESCOBERTA (sem preço na home), só pública -->
   <section id="founder-home" class="only-public">
-    <div class="eyebrow">A camada profunda</div>
     <h2 class="sec">Founder</h2>
     <p class="secsub">Para leitores que desejam ir além da publicação. A edição Founder acrescenta a leitura completa dos sinais, os episódios completos, os análogos históricos e um observatório proprietário cobrindo centenas de ativos e mais de cinquenta anos de precedentes.</p>
     <p style="margin-top:14px"><a class="herolink" href="/founder">Conhecer o Founder →</a></p>
@@ -427,7 +435,7 @@
     eyb2:"Methodology",s2:"How the Radar reads Brazil",s2s:"Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb5:"Depth",s5:"You choose the depth",s5s:"Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
     eyb6:"What&rsquo;s underneath",
-    eybTz:"Live · now",sTz:"Today&rsquo;s reading",sTzS:"Brazil&rsquo;s regime right now. The Founder edition adds the numbers, the full analogs and 50+ years of history.",tzMore:"See the full radar ↓",
+    sTz:"Today&rsquo;s reading",sTzS:"The current state of the Brazilian market, read as data — a public edition, free to embed anywhere.",tzEmbed:"Embed on your site →",
     eyb1:"Live · full radar",s1:"The full radar",s1s:"The complete engine over today&rsquo;s public data. History, scenarios and free cross-analysis are in the paid plan.",
     fbadge:"Launch · seats limited to the first 100 founders",fed:"Founder Edition",fprice:'<b style="color:var(--gold)">US$ 149/mo</b>',fh:"Access to the complete archive.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> the entire report library since April 2010</li><li><span style="color:var(--gold)">✓</span> the full outcomes of every similar episode</li><li><span style="color:var(--gold)">✓</span> the provenance of every reading</li><li><span style="color:var(--gold)">✓</span> the historical distribution at 3, 6 and 12 months</li><li><span style="color:var(--gold)">✓</span> daily, weekly and monthly reports by email</li><li><span style="color:var(--gold)">✓</span> a living archive that grows every day</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Locked while your subscription stays active · 7-day refund · cancel in one click</div>',
     wlph:"you@email.com",wlbtn:"Get my invite",
@@ -459,7 +467,7 @@
     eyb2:"Metodologia",s2:"Como o Radar lê o Brasil",s2s:"Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href=\"/metodologia/\">Conheça a metodologia →</a>",
     eyb5:"Profundidade",s5:"Você escolhe a profundidade",s5s:"Cada lente abre em camadas — da manchete do regime à matemática visível: <b>cone de quantis</b> (distribuição de desfechos, nunca previsão), <b>Trend Score</b> 0&ndash;10, <b>breadth</b> real (% das ações acima da média de 200 dias), o <b>estudo de análogo</b> (isto ocorreu N vezes → o que se seguiu) e <b>lead-lag</b>. Sem teto para quem quer ir fundo.",
     eyb6:"O que está por trás",
-    eybTz:"Ao vivo · agora",sTz:"A leitura de hoje",sTzS:"O regime do Brasil agora. A edição Founder acrescenta os números, os análogos completos e mais de 50 anos de histórico.",tzMore:"Ver o radar completo ↓",
+    sTz:"A leitura de hoje",sTzS:"O estado atual do mercado brasileiro, lido como dado — uma edição pública, livre para incorporar em qualquer site.",tzEmbed:"Incorporar no seu site →",
     eyb1:"Ao vivo · completo",s1:"O radar completo",s1s:"O motor completo sobre dados públicos de hoje. O histórico, os cenários e o cruzamento livre ficam no plano assinado.",
     fbadge:"Lançamento · vagas limitadas aos 100 primeiros fundadores",fed:"Edição Founder",fprice:'<b style="color:var(--gold)">R$ 149/mês</b>',fh:"Acesso ao acervo completo.",fp:'<ul style="list-style:none;padding:0;margin:14px auto 0;display:table;text-align:left;font-size:14px;line-height:1.95"><li><span style="color:var(--gold)">✓</span> toda a biblioteca de relatórios desde abril de 2010</li><li><span style="color:var(--gold)">✓</span> os desfechos completos de cada episódio semelhante</li><li><span style="color:var(--gold)">✓</span> a proveniência de cada leitura</li><li><span style="color:var(--gold)">✓</span> a distribuição histórica em 3, 6 e 12 meses</li><li><span style="color:var(--gold)">✓</span> relatórios diários, semanais e mensais no e-mail</li><li><span style="color:var(--gold)">✓</span> um arquivo vivo que cresce todos os dias</li></ul><div style="margin-top:12px;font-size:13px;opacity:.75">Travado enquanto a assinatura ficar ativa · 7 dias de arrependimento · cancela em 1 clique</div>',
     wlph:"seu@email.com",wlbtn:"Quero meu convite",
@@ -490,7 +498,7 @@
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
-  set("eyb-tz",C.eybTz);set("s-tz",C.sTz);set("s-tz-s",C.sTzS);set("tz-more",C.tzMore);
+  set("s-tz",C.sTz);set("s-tz-s",C.sTzS);set("tz-embed",C.tzEmbed);
   set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fed",C.fed);set("fprice",C.fprice);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
   set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);set("ftnav",C.ftnav);
