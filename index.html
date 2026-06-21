@@ -143,8 +143,8 @@
   .hero-ctas .herolink{margin-left:0}
   /* ★ 2026-06-21 (dono): linha CTA = Assinar (esq) · Compartilhar (dir, oposto, abaixo do card/radar) */
   .hero-cta-row{display:flex;justify-content:space-between;align-items:center;width:100%;gap:16px;position:relative}
-  .rp-sharebtn{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--gold);font-weight:600;font-size:14px;cursor:pointer;font-family:var(--sans);padding:2px 0}
-  .rp-sharebtn:hover{text-decoration:underline}
+  .rp-sharebtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex:none;background:none;border:0;color:var(--gold);cursor:pointer;padding:0;border-radius:50%;opacity:.85;transition:opacity .15s,background .15s}
+  .rp-sharebtn:hover{opacity:1;background:var(--surface2)}
   .rp-sharebtn svg{flex:none}
   .rp-shmenu{position:absolute;bottom:calc(100% + 9px);right:0;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px rgba(40,26,8,.17);padding:6px;display:flex;flex-direction:column;gap:1px;min-width:184px}
   .rp-shmenu .rp-shsep{height:1px;background:var(--line);margin:5px 8px}
@@ -319,7 +319,7 @@
       <!-- ★ 2026-06-21 (dono): compartilhar a Leitura do Radar — botão na MESMA linha do "Assinar", do lado OPOSTO (abaixo do card/radar). Menu próprio com os links diretos das redes + API pública (sem o share genérico do sistema). -->
       <div class="hero-cta-row">
         <a class="herolink lead" href="/assine" id="cta1">Assinar o Perene Semanal →</a>
-        <button type="button" id="rp-share-btn" class="rp-sharebtn" aria-label="Compartilhar a Leitura do Radar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><line x1="8.4" y1="10.85" x2="15.6" y2="6.15"/><line x1="8.4" y1="13.15" x2="15.6" y2="17.85"/></svg><span id="rp-share-lbl">Compartilhar</span></button>
+        <button type="button" id="rp-share-btn" class="rp-sharebtn" aria-label="Compartilhar a Leitura do Radar" title="Compartilhar"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><line x1="8.4" y1="10.85" x2="15.6" y2="6.15"/><line x1="8.4" y1="13.15" x2="15.6" y2="17.85"/></svg></button>
       </div>
       <a class="herolink" href="/diario" id="cta2">Ler a edição aberta de hoje →</a>
     </div>
@@ -525,7 +525,8 @@
   };
   function set(id,html){var e=document.getElementById(id);if(e)e.innerHTML=html}
   if(_isHomePg){set("h1",C.h1);set("lead",C.lead);}  // /ativo: H1/lead vêm do worker (ticker), não da home
-  set("cta1",C.cta1);set("cta2",C.cta2);set("cta3",C.cta3);set("cta-deep",C.ctaDeep);set("micro1",C.micro);set("rp-share-lbl",C.shareLbl);
+  set("cta1",C.cta1);set("cta2",C.cta2);set("cta3",C.cta3);set("cta-deep",C.ctaDeep);set("micro1",C.micro);
+  (function(){var sb=document.getElementById("rp-share-btn");if(sb){sb.title=C.shareLbl;sb.setAttribute("aria-label",C.shareLbl);}})();
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
