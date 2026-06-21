@@ -118,14 +118,16 @@
   .tg:hover{color:var(--gold);border-color:var(--gold)}
   /* hero */
   .hero{text-align:center;padding:46px 0 18px}
-  .hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,52px);line-height:1.12;margin:0 auto 18px;max-width:18ch;letter-spacing:-.01em}
+  /* ★ 2026-06-21 (dono): h1 = assinatura da instituição, GRANDE e em UMA linha (72px é o teto que cabe sem quebrar p/ este título; subir mais quebraria). */
+  .hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(33px,6.4vw,72px);line-height:1.08;margin:0 auto 14px;max-width:none;letter-spacing:-.02em;text-wrap:balance}
   .hero h1 .g{color:var(--gold);font-style:italic}
-  .hero p.lead{font-size:clamp(15px,2.2vw,18px);color:var(--dim);max-width:60ch;margin:0 auto 26px}
-  .qtag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 15px;margin:0 auto 20px;text-decoration:none;transition:border-color .15s}
-  .qtag:hover{border-color:var(--gold)}
-  .qtag .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;animation:qpulse 2.4s ease-out infinite}
-  @keyframes qpulse{0%{box-shadow:0 0 0 0 rgba(168,101,26,.45)}70%{box-shadow:0 0 0 7px rgba(168,101,26,0)}100%{box-shadow:0 0 0 0 rgba(168,101,26,0)}}
-  @media(prefers-reduced-motion:reduce){.qtag .dot{animation:none}}
+  .hero p.lead{font-size:clamp(16px,2.2vw,19px);color:var(--dim);max-width:62ch;margin:0 auto 6px;text-wrap:balance}
+  /* ★ 2026-06-21 (dono): Leitura do Radar DENTRO do hero — bloco centrado, rótulo discreto à esquerda, o card "Hoje lembra" é a primeira coisa importante da página. */
+  .hero-leitura{max-width:680px;margin:34px auto 6px;text-align:left}
+  .hero-leitura .eyebrow{margin-bottom:12px}
+  .hero-leitura .rp-narr{margin:26px auto 4px}
+  body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
+  /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
   .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;
     padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
   .btn:hover{background:var(--gold2)}
@@ -229,9 +231,8 @@
   /* ★ 2026-06-21 (dono) RITMO editorial — SÓ DOIS MONUMENTOS: o Hero e o ARQUIVO. O resto conduz até eles.
      Muito vazio entre seções (Economist/Grant's: o vazio é identidade). Movimentos, não painel uniforme. */
   /* silêncio entre seções + colunas (coluna de jornal) */
-  /* ★ 2026-06-21 (dono): ritmo em DOIS MOVIMENTOS — (Hero·Leitura·Diário) coesos / (Arquivo·Founder·Semanal) coesos / silêncio grande só ENTRE eles (Diário→Arquivo 140px). */
-  #radar-teaser{margin-top:100px}                                                   /* Hero → Leitura */
-  #ultimas{margin-top:72px;max-width:660px;margin-left:auto;margin-right:auto}       /* Leitura → Diário (mesmo movimento, próximos) */
+  /* ★ 2026-06-21 (dono): a Leitura mora no hero. Ritmo: Hero(+Leitura) → respiro → Diário → vão grande → Arquivo (2º monumento) → Founder/Semanal colados. */
+  #ultimas{margin-top:112px;max-width:660px;margin-left:auto;margin-right:auto}      /* Hero → Diário */
   #founder-home{margin-top:80px;max-width:660px;margin-left:auto;margin-right:auto;padding-top:30px;border-top:1px solid var(--line)}   /* Arquivo → Founder = colados (consequência) */
   #semanal{margin-top:90px;max-width:600px;margin-left:auto;margin-right:auto;padding-top:28px;border-top:1px solid var(--line)}        /* Founder → Semanal */
   #faq{margin-top:110px}
@@ -272,9 +273,15 @@
 
 <div class="wrap">
   <div class="hero">
-    <a class="qtag" id="qtag" href="#radar-teaser" aria-label="leitura do Radar ao vivo"><span class="dot"></span><span id="qtag-txt">A leitura do Radar, ao vivo</span></a>
+    <!-- ★ 2026-06-21 (dono): pílula "ao vivo" REMOVIDA — "ao vivo" é Bloomberg; o Radar é Grant's (memória). O hero é a assinatura da instituição, não uma etiqueta temporária. -->
     <h1 id="h1">O Brasil observado — e <span class="g">lembrado</span>.</h1>
-    <p class="lead" id="lead">Um arquivo vivo do mercado brasileiro: relatórios diários, semanais e mensais e uma biblioteca de precedentes para ler o presente à luz do passado.</p>
+    <p class="lead" id="lead">Um arquivo vivo do mercado brasileiro. O que o Radar viu — e o que veio depois.</p>
+    <!-- ★ 2026-06-21 (dono): a LEITURA DO RADAR sobe para DENTRO do hero — é a melhor demonstração do produto. Você chega → vê a assinatura do jornal → recebe a leitura do dia → e só depois decide se quer explorar mais. -->
+    <div class="hero-leitura only-public">
+      <div class="eyebrow" id="s-tz">Leitura do Radar</div>
+      <div data-radar-perene data-chrome="off" data-sections="analogo_br" style="--rp-max:100%"></div>
+      <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
+    </div>
     <!-- busca removida do hero (2026-06-16): competia com a mensagem editorial; descoberta de ativos vive no radar (Explorar ativos →) e em /ativos. Script abaixo auto-sai (guard #rp-q ausente). -->
     <script>
     (function(){
@@ -296,9 +303,9 @@
     </script>
     <div class="hero-ctas">
       <a class="herolink lead" href="/assine" id="cta1">Assinar o Perene Semanal →</a>
-      <a class="herolink" href="#radar-teaser" id="cta2">Ler a edição aberta de hoje →</a>
+      <a class="herolink" href="/diario" id="cta2">Ler a edição aberta de hoje →</a>
     </div>
-    <p class="hero-deep"><span id="cta-deep">Existe uma camada mais profunda, para quem quer explorar os mecanismos e os precedentes.</span> <a class="herolink" href="/founder" id="cta3">Conhecer o Founder →</a></p>
+    <p class="hero-deep"><span id="cta-deep">Para quem deseja ver o que sustenta as leituras do Radar.</span> <a class="herolink" href="/founder" id="cta3">Conhecer o Founder →</a></p>
     <div class="micro" id="micro1">Conteúdo educacional de fontes públicas — nunca recomendação.</div>
   </div>
 </div>
@@ -311,17 +318,7 @@
   </section>
 </div>
 
-<div class="wrap only-public">
-  <!-- ★ 2026-06-21 (dono): o mini-radar é um OBJETO PÚBLICO (API incorporável), não um teaser do Founder. Sem "Ao vivo · agora". -->
-  <section id="radar-teaser">
-    <h2 class="sec" id="s-tz">Leitura do Radar</h2><!-- ★ 2026-06-21 (dono): sem subtítulo — o card "Hoje lembra" já se apresenta (evita "dupla apresentação"). -->
-    <div data-radar-perene data-chrome="off" data-sections="analogo_br" style="--rp-max:100%"></div><!-- ★ 2026-06-21 (dono): "Leitura do Radar" = SÓ "Hoje lembra" (a interpretação histórica, o objeto editorial próprio). Sinais removidos (linguagem interna). O widget distribui a Leitura do Radar, não sinais. -->
-    <!-- AI-readability: leitura do dia em texto (preenchida pelo Worker server-side → bots de IA/busca leem o estado; o gráfico é JS/SVG, cego a eles). ★ P4 2026-06-18: subiu p/ logo após o mini-radar — síntese "Morning Brief" antes da profundidade. -->
-    <div id="rp-narrative" class="rp-narr" aria-label="Leitura do regime de mercado de hoje em texto"></div>
-    <p class="micro" style="margin-top:14px"><a id="tz-embed" href="/widgets" style="color:var(--gold)">Incorporar no seu site →</a></p>
-  </section>
-</div>
-
+<!-- ★ 2026-06-21 (dono): a seção "Leitura do Radar" deixou de existir como bloco separado — subiu para DENTRO do hero (a melhor demonstração mora no topo). A distribuição (incorporar) vive em /widgets. -->
 <div class="wrap">
   <section id="ultimas">
     <div class="eyebrow" id="eyb-ult">Diário</div>
@@ -343,7 +340,7 @@
   <section id="founder-home" class="only-public">
     <h2 class="sec">Founder</h2>
     <p class="fnd-lead" id="fnd-lead">Os mecanismos por trás das leituras.</p>
-    <p class="secsub" id="fnd-s">Uma camada mais profunda, para quem deseja explorar os precedentes, os análogos históricos e o observatório proprietário do Radar.</p>
+    <p class="secsub" id="fnd-s">Para quem deseja ver o que sustenta as leituras: os precedentes, os análogos históricos e o observatório proprietário do Radar.</p>
     <p style="margin-top:14px"><a class="herolink" id="fnd-cta" href="/founder">Conhecer o Founder →</a></p>
   </section>
 
@@ -444,7 +441,7 @@
   var C=LANG==="en"?{
     h1:'Brazil, observed — and <span class="g">remembered</span>.',
     lead:"A living archive of Brazil&rsquo;s markets. What the Radar saw — and what came next.",
-    cta1:"Subscribe to Perene Semanal →",cta2:"Read today&rsquo;s open edition →",cta3:"Discover Founder →",ctaDeep:"There is a deeper layer, for readers who want to explore the mechanisms and the precedents.",micro:"Educational content from public sources — never a recommendation.",
+    cta1:"Subscribe to Perene Semanal →",cta2:"Read today&rsquo;s open edition →",cta3:"Discover Founder →",ctaDeep:"For readers who want to see what underpins the Radar&rsquo;s readings.",micro:"Educational content from public sources — never a recommendation.",
     eyb7:"Who it&rsquo;s for",s7:"Investors, analysts, managers — and serious newcomers.",s7s:"For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2:"Methodology",s2:"How the Radar reads Brazil",s2s:"Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb5:"Depth",s5:"You choose the depth",s5s:"Each lens opens in layers — from the regime headline to the math made visible: a <b>quantile cone</b> (distribution of outcomes, never a forecast), <b>Trend Score</b> 0&ndash;10, real <b>breadth</b> (% of stocks above their 200-day average), the <b>analog study</b> (this setup happened N times → what followed) and <b>lead-lag</b>. No ceiling for those who want to go deep.",
@@ -476,7 +473,7 @@
   }:{
     h1:'O Brasil observado — e <span class="g">lembrado</span>.',
     lead:"Um arquivo vivo do mercado brasileiro. O que o Radar viu — e o que veio depois.",
-    cta1:"Assinar o Perene Semanal →",cta2:"Ler a edição aberta de hoje →",cta3:"Conhecer o Founder →",ctaDeep:"Existe uma camada mais profunda, para quem quer explorar os mecanismos e os precedentes.",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
+    cta1:"Assinar o Perene Semanal →",cta2:"Ler a edição aberta de hoje →",cta3:"Conhecer o Founder →",ctaDeep:"Para quem deseja ver o que sustenta as leituras do Radar.",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
     eyb7:"Para quem é",s7:"Investidores, analistas, gestores — e curiosos sérios.",s7s:"Para quem quer ler o mercado brasileiro sem ruído e sem palpite — não a previsão, mas o precedente: regimes, casos análogos e uma biblioteca de estudos do &ldquo;o que aconteceu depois&rdquo;. Memória desde 2000.",
     eyb2:"Metodologia",s2:"Como o Radar lê o Brasil",s2s:"Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href=\"/metodologia/\">Conheça a metodologia →</a>",
     eyb5:"Profundidade",s5:"Você escolhe a profundidade",s5s:"Cada lente abre em camadas — da manchete do regime à matemática visível: <b>cone de quantis</b> (distribuição de desfechos, nunca previsão), <b>Trend Score</b> 0&ndash;10, <b>breadth</b> real (% das ações acima da média de 200 dias), o <b>estudo de análogo</b> (isto ocorreu N vezes → o que se seguiu) e <b>lead-lag</b>. Sem teto para quem quer ir fundo.",
@@ -512,7 +509,7 @@
   set("eyb7",C.eyb7);set("s7",C.s7);set("s7s",C.s7s);
   set("eyb2",C.eyb2);set("s2",C.s2);set("s2s",C.s2s);
   set("eyb5",C.eyb5);set("s5",C.s5);set("s5s",C.s5s);set("eyb6",C.eyb6);
-  set("s-tz",C.sTz);set("tz-embed",C.tzEmbed);
+  set("s-tz",C.sTz);
   set("eyb1",C.eyb1);set("s1",C.s1);set("s1s",C.s1s);
   set("fbadge",C.fbadge);set("fed",C.fed);set("fprice",C.fprice);set("fh",C.fh);set("fp",C.fp);set("wl-btn",C.wlbtn);
   set("eyb3",C.eyb3);set("s3",C.s3);set("s3s",C.s3s);set("eyb4",C.eyb4);set("disc",C.disc);set("ftnav",C.ftnav);
@@ -594,7 +591,7 @@
     set("eyb-ult","Diary");set("s-ult","The regime, day by day");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.");set("ult-cta","See the full Diaries →");
     // ★ 2026-06-21 EN dos blocos Semanal/Founder (eram PT estático = vazamento no .com)
     set("sem-eyb","Subscription");set("sem-h","Perene Semanal");set("sem-s","Every Friday, a read of the Brazilian market — valuation, intermarket, the external backdrop, sentiment and the comparable episodes. US$ 29/mo.");set("sem-cta","Subscribe to Perene Semanal →");
-    set("fnd-lead","The mechanisms behind the readings.");set("fnd-s","A deeper layer, for those who want to explore the precedents, the historical analogs and the Radar&rsquo;s proprietary observatory.");set("fnd-cta","Discover Founder →");
+    set("fnd-lead","The mechanisms behind the readings.");set("fnd-s","To see what underpins the readings: the precedents, the historical analogs and the Radar&rsquo;s proprietary observatory.");set("fnd-cta","Discover Founder →");
     set("assine-link","view plans →");}
   var _alk=document.getElementById("assine-link");if(_alk&&_en)_alk.href="/subscribe";  // slug EN da landing de assinatura
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
@@ -616,8 +613,7 @@
   // o assinante vê o SEU número só depois da compra (rank do /v1/me, no selo do login). Endpoint /v1/founders segue vivo.
   // i18n robusto do link de login (B9): não depende do sb.auth carregar (QA viu "Entrar" parado no .com)
   try{var _lg=document.getElementById("me-login");if(_lg&&LANG==="en"&&_lg.textContent==="Entrar")_lg.textContent="Sign in";}catch(e){}
-  // ★ 2026-06-21 (dono): pílula do hero editorial ("A leitura do Radar, ao vivo") — a tag quant-terminal ("SINAL ATUAL · BR DEFENSIVO · 28/100") morreu; sinais/score são linguagem interna. EN via i18n abaixo.
-  (function(){var el=document.getElementById("qtag-txt");if(el)el.textContent=(LANG==="en"?"The Radar Reading, live":"A leitura do Radar, ao vivo");})();
+  // ★ 2026-06-21 (dono): pílula "ao vivo" do hero REMOVIDA (Bloomberg, não Grant's). A Leitura do Radar agora mora dentro do hero como o card "Hoje lembra".
 
   // radar ao vivo — render ÚNICO via widget canônico radar.js (chrome off: sem marca/teaser-link, já é a nossa página).
   document.querySelectorAll("#radar-perene,[data-radar-perene]").forEach(function(n){n.setAttribute("data-lang",LANG);});  // teaser (topo) + radar completo herdam o idioma
