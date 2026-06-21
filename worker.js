@@ -911,11 +911,14 @@ async function _route(request, env, ctx) {
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
       //   idêntico, moat intacto. cacheTtl 1800 (muda 1×/dia no pulso) mantém quente. Concorrente com narr/ultimas.
       const _lk = isEN ? "en" : "pt";
-      // ── B: edge-cache da home RENDERIZADA + SWR (Cache API). O HTML é anon-idêntico por host+lang (digest é
+      // ★ 2026-06-21: o og:image do home varia por TEMA (?theme=dark → cartão dark). Computado AQUI (antes da chave de cache)
+      //   porque a chave precisa incluir o tema — senão o HTML cacheado (og light) era servido p/ ?theme=dark.
+      const _ogDark = url.searchParams.get("theme") === "dark";
+      // ── B: edge-cache da home RENDERIZADA + SWR (Cache API). O HTML é anon-idêntico por host+lang+tema (digest é
       //    token-agnóstico; o Founder muda só client-side) → seguro cachear. Corta SSR+awaits por request; o digest
-      //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang.
+      //    muda ~1×/dia, logo 120s fresco + stale 24h (revalida em bg via ctx.waitUntil) é folgado. Chave = host+lang+tema.
       //    NÃO usa o cf-cache (resposta de Worker não é cacheada por header) — daí o Cache API explícito, como _cachedText.
-      const _hcache = caches.default, _hk = "https://rp-home.internal/v12/" + host + "/" + _lk; // versiona a chave (v12 2026-06-18: copy 'Ler todos os episódios' + 'Ver Diários completos')
+      const _hcache = caches.default, _hk = "https://rp-home.internal/v13/" + host + "/" + _lk + (_ogDark ? "/dark" : ""); // v13 2026-06-21: chave inclui o TEMA (og:image dark)
       const _hserve = (b) => new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600" } });
       const _hok = (b) => b && b.length > 5000; // render completo (home real ~145KB) — NUNCA cacheia/serve vazio ou parcial (anti-poison)
       const _hfresh = await _hcache.match(new Request(_hk));
@@ -939,9 +942,8 @@ async function _route(request, env, ctx) {
       // canonical/og:url da home POR HOST no HTML cru: o index.html estático nasce com ".com" fixo e só o JS
       //   corrigia em runtime — crawler sem JS (Bing 1ª passada, bots de IA) via o .com.br se declarar duplicata
       //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
-      // ★ 2026-06-21 (dono): OG do home = o CARTÃO da Leitura do Radar (gerado diariamente). Por IDIOMA e por TEMA — o botão de
-      //   compartilhar anexa ?theme=dark quando o usuário está no escuro → a prévia que viaja casa com o tema dele.
-      const _ogDark = url.searchParams.get("theme") === "dark";
+      // ★ 2026-06-21 (dono): OG do home = o CARTÃO da Leitura do Radar (gerado diariamente). Por IDIOMA e por TEMA (_ogDark, def. acima
+      //   junto da chave de cache) — o botão de compartilhar anexa ?theme=dark quando o usuário está no escuro → a prévia casa com o tema.
       const _ogImg = url.origin + "/og-leitura-" + (isEN ? "en" : "pt") + (_ogDark ? "-dark" : "") + ".png";
       rw = rw
         .on("link#rp-canonical", { element(e) { e.setAttribute("href", url.origin + "/"); } })
