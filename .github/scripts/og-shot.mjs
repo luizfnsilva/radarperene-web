@@ -14,7 +14,9 @@ const browser = await chromium.launch();
 let fail = 0;
 for (const s of shots) {
   const url = BASE + "/og/leitura" + s.q;
-  const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 2 });
+  // deviceScaleFactor 1 → PNG EXATAMENTE 1200×630 (casa com og:image:width/height; o X recomenda 1200×630 e
+  // descasamento declarado×real costuma fazer ele NÃO renderizar a miniatura).
+  const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
   try {
     await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
     // espera o sinal de prontidão do card (frase + fontes + marca d'água)
