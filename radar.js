@@ -225,7 +225,7 @@
       ".rp .hl.hero{background:rgba(168,101,26,.06);border:0;border-left:3px solid var(--_accent);border-radius:0 10px 10px 0;padding:16px 18px;margin-top:6px}.rp .hl.hero .q:first-child{font-size:14.5px;color:var(--_txt);font-weight:500}.rp .hl.hero .v{font-size:30px}.rp .hl.hero .stat{gap:26px;margin-top:4px}" +  // Análogo BR = peça-herói (o "tchan"): cor quente p/ o olho pousar + números grandes
       // capa editorial "Hoje lembra" (mini-radar): datas como estrela + 2 números grandes + assinatura. Sem rótulo, estilo nota.
       ".rp .rp-hl{text-align:center;padding:16px 14px 12px;border-top:1px solid var(--_line);margin-top:8px}" +
-      ".rp .rp-hl .hl-k{font-family:Georgia,'Fraunces',serif;font-size:21px;font-weight:600;color:var(--_txt);letter-spacing:.01em}" +
+      ".rp .rp-hl .hl-k{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:21px;font-weight:600;color:var(--_txt);letter-spacing:.01em}" +
       ".rp .rp-hl .hl-d{font-family:var(--_mono);font-size:13.5px;color:var(--_accent);margin:7px 0 16px;letter-spacing:.03em}" +
       ".rp .rp-hl .hl-n{display:flex;justify-content:center;gap:42px;margin:0 0 12px}" +
       ".rp .rp-hl .hl-n b{display:block;font-family:var(--_mono);font-size:30px;line-height:1;font-weight:700;color:var(--_txt);font-feature-settings:'tnum'}" +
@@ -233,43 +233,43 @@
       ".rp .rp-hl .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85}" +
       // ★ "Hoje lembra" editorial (radar completo): frase-líder serif, números subordinados em destaque + porta p/ episódios
       ".rp .rp-hle{border-top:1px solid var(--_line);padding:16px 0 4px;margin-top:8px}" +
-      ".rp .rp-hle .hl-k{font-family:Georgia,'Fraunces',serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--_dim)}" +
+      ".rp .rp-hle .hl-k{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--_dim)}" +
       ".rp .rp-hle .hl-sub{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:1px}" +
-      ".rp .rp-hle .hl-lead{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.7;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +  // ★ 2026-06-20: +line-height p/ a frase-herói respirar (consultor)
+      ".rp .rp-hle .hl-lead{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:18px;line-height:1.7;font-weight:500;color:var(--_txt);margin:11px 0 9px}.rp .rp-hle .hl-lead b{font-weight:700;color:var(--_accent)}" +  // ★ 2026-06-20: +line-height p/ a frase-herói respirar (consultor)
       ".rp .rp-hle .hl-d{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.03em;margin:5px 0 0}" +
       ".rp .rp-hle .hl-ep-name{font-size:13px;color:var(--_txt);line-height:1.5;margin:2px 0 0}.rp .rp-hle .hl-ep-name b{font-weight:600}" +
       ".rp .rp-hle .hl-warn{font-size:11px;color:var(--_warm);opacity:.9;margin-top:6px}" +
       ".rp .rp-hle .hl-s{font-size:11.5px;color:var(--_dim);font-style:italic;opacity:.85;margin-top:6px}" +
       ".rp .rp-hle .hl-ep{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-hle .hl-ep:hover{text-decoration:underline}" +
-      // ★ 2026-06-21 v3 (dono) SHARE-CARD 16:9 — vira a imagem OG (1200×630) p/ compartilhar. Quote-card do FT: faixa-topo · miolo-monumento · rodapé. Número gigante = protagonista; contraste, não cerimônia.
-      ".rp .rp-poster{border:1px solid var(--_line);border-radius:14px;background:var(--_card2);max-width:760px;margin:8px auto 0;padding:clamp(18px,3.4vw,32px);aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:space-between;text-align:left}" +
+      // ★ 2026-06-21 v4 (dono) SHARE-CARD 16:9 — vira a imagem OG (1200×630). TUDO EM INTER (o mini-radar é objeto de DADOS, não ensaio): números peso 800 chamam atenção sem virar "pôster eleitoral". Faixa-topo · miolo · rodapé.
+      ".rp .rp-poster{font-family:'Inter',system-ui,sans-serif;border:1px solid var(--_line);border-radius:14px;background:var(--_card2);max-width:760px;margin:8px auto 0;padding:clamp(18px,3.4vw,30px);aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:space-between;text-align:left}" +
       ".rp .rp-poster .rp-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}" +
-      ".rp .rp-poster .rp-pll{font-family:Georgia,'Fraunces',serif;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--_txt)}" +
-      ".rp .rp-poster .rp-pd{font-family:var(--_mono);font-size:13px;color:var(--_accent);letter-spacing:.04em;text-align:right}" +
-      ".rp .rp-poster .rp-pmid{display:flex;align-items:center;gap:clamp(16px,3vw,30px)}" +
-      ".rp .rp-poster .rp-pbig{font-family:var(--_mono);font-size:clamp(56px,11.5vw,104px);line-height:.84;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';letter-spacing:-.03em;flex:none}" +
-      ".rp .rp-poster .rp-pbigl{font-family:Georgia,'Fraunces',serif;font-size:clamp(16px,2.4vw,25px);line-height:1.32;color:var(--_txt);font-weight:500}" +
+      ".rp .rp-poster .rp-pll{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--_dim)}" +
+      ".rp .rp-poster .rp-pd{font-size:12.5px;font-weight:500;color:var(--_accent);letter-spacing:.02em;text-align:right;font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-pmid{display:flex;align-items:center;gap:clamp(14px,2.6vw,26px)}" +
+      ".rp .rp-poster .rp-pbig{font-size:clamp(40px,6.4vw,64px);line-height:.92;font-weight:800;color:var(--_accent);font-feature-settings:'tnum';letter-spacing:-.02em;flex:none}" +
+      ".rp .rp-poster .rp-pbigl{font-size:clamp(14px,1.9vw,17px);line-height:1.34;color:var(--_txt);font-weight:500}" +
       ".rp .rp-poster .rp-pbot{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}" +
-      ".rp .rp-poster .rp-pmed{font-family:var(--_mono);font-size:clamp(22px,3.4vw,32px);line-height:1;font-weight:700;color:var(--_txt);font-feature-settings:'tnum'}" +
-      ".rp .rp-poster .rp-pmedl{font-size:12px;font-weight:400;letter-spacing:.02em;color:var(--_dim)}" +
-      ".rp .rp-poster .hl-warn{font-size:10.5px;margin-top:4px}.rp .rp-poster .hl-s{font-size:11.5px;margin-top:5px}" +
-      ".rp .rp-poster .hl-ep{margin:0;font-size:13px;font-weight:600;white-space:nowrap;flex:none}" +
+      ".rp .rp-poster .rp-pmed{font-size:clamp(20px,2.8vw,27px);line-height:1;font-weight:800;color:var(--_txt);font-feature-settings:'tnum'}" +
+      ".rp .rp-poster .rp-pmedl{font-size:11.5px;font-weight:400;letter-spacing:.01em;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-warn{font-size:10.5px;margin-top:4px}.rp .rp-poster .hl-s{font-size:11px;margin-top:5px;font-style:italic;color:var(--_dim)}" +
+      ".rp .rp-poster .hl-ep{margin:0;font-size:12.5px;font-weight:600;white-space:nowrap;flex:none;color:var(--_accent)}" +
       "@media(max-width:560px){.rp .rp-poster{aspect-ratio:auto;gap:18px}.rp .rp-poster .rp-pmid{flex-direction:column;align-items:flex-start;gap:8px}}" +
       ".rp .brain .bsub{flex-basis:100%;font-size:11.5px;color:var(--_dim);margin-top:3px;letter-spacing:.01em}" +
       // ★ mini editorial (filosofia capa): presente (2º peso) + sinais (3º peso) como TEXTO, não cards. Hierarquia: Hoje lembra > presente > sinais.
       ".rp .rp-present{margin:8px 0 2px}" +
-      ".rp .rp-state-h{font-family:Georgia,'Fraunces',serif;font-size:18px;line-height:1.4;color:var(--_txt)}.rp .rp-state-h b{font-weight:600}.rp .rp-present .rp-mtag{margin-left:7px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--_accent);font-weight:700;vertical-align:middle}" +
+      ".rp .rp-state-h{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:18px;line-height:1.4;color:var(--_txt)}.rp .rp-state-h b{font-weight:600}.rp .rp-present .rp-mtag{margin-left:7px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--_accent);font-weight:700;vertical-align:middle}" +
       // ★ 2026-06-20 — identidade editorial (consultor): títulos de SEÇÃO do núcleo em serif grande (substituem o h4 caixa-alta), hero-capa, "Radar em 2 minutos", "As cinco forças do regime".
-      ".rp .rp-serif-h{font-family:Georgia,'Fraunces',serif;font-size:22px;line-height:1.25;font-weight:600;color:var(--_txt);margin:30px 0 4px;letter-spacing:-.005em}" +
+      ".rp .rp-serif-h{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:22px;line-height:1.25;font-weight:600;color:var(--_txt);margin:30px 0 4px;letter-spacing:-.005em}" +
       // ★ 2026-06-20 masthead de assinatura (nameplate editorial discreto + linha fina laranja no topo = identidade)
       ".rp .rp-masthead{border-top:2px solid var(--_accent);padding-top:10px;margin:0 0 13px}" +
-      ".rp .rp-mast-name{font-family:Georgia,'Fraunces',serif;font-size:20px;font-weight:700;letter-spacing:.01em;color:var(--_txt);line-height:1}" +
+      ".rp .rp-mast-name{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:20px;font-weight:700;letter-spacing:.01em;color:var(--_txt);line-height:1}" +
       ".rp .rp-mast-sub{font-size:11.5px;letter-spacing:.02em;color:var(--_dim);margin-top:5px}" +
       ".rp .rp-mast-date{font-size:11px;letter-spacing:.04em;color:var(--_dim);margin-top:3px;font-family:var(--_mono)}" +
       ".rp .rp-eyebrow{font-size:10.5px;letter-spacing:.06em;color:var(--_dim);margin:0 0 9px}" +
       // hero-capa: standfirst serif + linha de arquivo (Economist-like)
       ".rp .rp-hero{margin:4px 0 16px}" +
-      ".rp .rp-hero-lead{font-family:Georgia,'Fraunces',serif;font-size:clamp(20px,2.4vw,25px);line-height:1.32;font-weight:600;color:var(--_txt);letter-spacing:-.01em}.rp .rp-hero-lead b{font-weight:700;color:var(--_accent)}" +  // ★ 2026-06-20: clamp responsivo (controla a quebra em telas estreitas, consultor)
+      ".rp .rp-hero-lead{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:clamp(20px,2.4vw,25px);line-height:1.32;font-weight:600;color:var(--_txt);letter-spacing:-.01em}.rp .rp-hero-lead b{font-weight:700;color:var(--_accent)}" +  // ★ 2026-06-20: clamp responsivo (controla a quebra em telas estreitas, consultor)
       ".rp .rp-hero-sub{font-size:13.5px;line-height:1.5;color:var(--_dim);margin-top:9px;max-width:54ch}.rp .rp-hero-sub b{color:var(--_txt);font-weight:600}" +
       // Radar em 2 minutos: TL;DR escaneável (checklist) — o leitor de 2 min lê só isto
       ".rp .rp-2min{border:1px solid var(--_line);border-radius:10px;padding:14px 16px;margin:6px 0 18px;background:var(--_card,transparent)}" +
@@ -283,23 +283,23 @@
       ".rp .rp-forcas{margin:8px 0 2px}" +
       ".rp .rp-forca{border-top:1px solid var(--_line);padding:13px 0 11px;border-left:2px solid transparent;padding-left:0}" +
       ".rp .rp-forca.hot{border-left-color:var(--_hot);padding-left:13px}.rp .rp-forca.warm{border-left-color:var(--_warm);padding-left:13px}.rp .rp-forca.cool{border-left-color:var(--_cool);padding-left:13px}" +
-      ".rp .rp-forca-k{font-family:Georgia,'Fraunces',serif;font-size:16px;font-weight:600;color:var(--_txt);margin-bottom:3px}" +
+      ".rp .rp-forca-k{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:16px;font-weight:600;color:var(--_txt);margin-bottom:3px}" +
       ".rp .rp-forca-p{font-size:13.5px;line-height:1.55;color:var(--_dim);margin:0}.rp .rp-forca-p .rp-forca-n{color:var(--_txt);font-family:var(--_mono);font-size:12px}" +
       // ★ 2026-06-20 Vértice editorial (Apple Health): pilha vertical, número grande serif, filete, sem caixa/cinza/grade
       ".rp .rp-vsigs{margin:10px 0 2px}" +
       ".rp .rp-vsig{padding:17px 0;border-top:1px solid var(--_line)}.rp .rp-vsig:first-child{border-top:0;padding-top:4px}" +
       ".rp .rp-vsig-n{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--_dim);font-weight:600}" +
-      ".rp .rp-vsig-v{font-family:Georgia,'Fraunces',serif;font-size:46px;line-height:1;font-weight:600;color:var(--_txt);margin:8px 0 3px;font-feature-settings:'tnum'}" +
+      ".rp .rp-vsig-v{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:46px;line-height:1;font-weight:600;color:var(--_txt);margin:8px 0 3px;font-feature-settings:'tnum'}" +
       ".rp .rp-vsig-r{font-size:13px;color:var(--_dim)}" +
       ".rp .rp-vsig.hot .rp-vsig-r{color:var(--_hot)}.rp .rp-vsig.warm .rp-vsig-r{color:var(--_warm)}.rp .rp-vsig.cool .rp-vsig-r{color:var(--_cool)}" +
       ".rp .rp-vsig-flow{margin-top:10px;font-size:12.5px;line-height:1.7;color:var(--_txt)}" +
       ".rp .rp-vsig-fl{display:inline-block;min-width:88px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--_dim)}" +
       // ★ 2026-06-20 edição aberta (grátis = publicação): sinal mostra nome+regime, 🔒 só na interpretação; CTA e fecho editoriais
-      ".rp .rp-vsig-gr{font-size:14.5px;color:var(--_txt);margin:7px 0 4px;font-family:Georgia,'Fraunces',serif}" +
+      ".rp .rp-vsig-gr{font-size:14.5px;color:var(--_txt);margin:7px 0 4px;font-family:'Newsreader','Fraunces',Georgia,serif}" +
       ".rp .rp-vsig-lk{font-size:11.5px;color:var(--_dim)}" +
       ".rp .rp-fcta{display:inline-block;margin-top:9px;font-size:12.5px;font-weight:600;color:var(--_accent);text-decoration:none}.rp .rp-fcta:hover{text-decoration:underline}" +
       ".rp .rp-upsell{border-top:2px solid var(--_accent);margin-top:26px;padding-top:15px}" +
-      ".rp .rp-upsell .rp-up-k{font-family:Georgia,'Fraunces',serif;font-size:16px;font-weight:600;color:var(--_txt)}" +
+      ".rp .rp-upsell .rp-up-k{font-family:'Newsreader','Fraunces',Georgia,serif;font-size:16px;font-weight:600;color:var(--_txt)}" +
       ".rp .rp-upsell .rp-up-s{font-size:12.5px;color:var(--_dim);margin:7px 0 6px}" +
       ".rp .rp-upsell .rp-up-l{margin:0;padding:0;list-style:none;display:grid;gap:4px}.rp .rp-upsell .rp-up-l li{font-size:13px;color:var(--_txt);padding-left:15px;position:relative}.rp .rp-upsell .rp-up-l li::before{content:'·';position:absolute;left:3px;color:var(--_accent);font-weight:700}" +
       // ★ estados do presente COMPACTOS, agrupados por CADÊNCIA (mensal=accent · diário=cool) — a memória é que merece espaço (filosofia do dono 2026-06-18)
