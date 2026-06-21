@@ -240,6 +240,7 @@
   #semanal{max-width:600px;margin-left:auto;margin-right:auto;padding:4px 0}
   #founder-home{max-width:560px;margin-left:auto;margin-right:auto}
   #founder-home .sec{font-size:clamp(19px,2.2vw,25px)}
+  #founder-home .fnd-lead{font-family:var(--serif);font-size:clamp(16px,2vw,19px);font-weight:600;color:var(--txt);margin:4px 0 8px;line-height:1.3}
   #founder-home .secsub{font-size:14px;color:var(--dim)}
   #arquivo{margin:18px 0}
   /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
@@ -316,21 +317,12 @@
 </div>
 
 <div class="wrap">
-  <!-- ★ 2026-06-21 (dono): escada editorial da home pública: leitura de hoje → Diário (hábito) → Perene Semanal (R$29, assinatura natural) → Arquivo (memória, bônus) → Founder (camada profunda) → FAQ. -->
   <section id="ultimas">
     <div class="eyebrow" id="eyb-ult">Diário</div>
     <h2 class="sec" id="s-ult">O regime, dia após dia</h2>
     <p class="secsub" id="s-ult-s">O Radar publica diariamente o regime do dia. Cada entrada é breve, datada e verificável — inserida em uma série histórica construída ao longo do tempo.</p>
     <div id="rp-ultimas" class="rp-narr" aria-label="Últimas leituras diárias do regime"></div>
     <p class="micro" style="margin-top:12px"><a href="/diario" id="ult-cta" style="color:var(--gold)">Ver Diários completos →</a></p>
-  </section>
-
-  <!-- ★ 2026-06-21 (dono): Perene Semanal vem ANTES do arquivo — o R$29 é a assinatura natural (leitura recorrente); o arquivo/memória é o bônus de luxo. Só na home pública. -->
-  <section id="semanal" class="only-public">
-    <div class="eyebrow" id="sem-eyb">Assinatura</div>
-    <h2 class="sec" id="sem-h">Perene Semanal</h2>
-    <p class="secsub" id="sem-s">Toda sexta-feira, uma leitura do mercado brasileiro — valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
-    <p style="margin-top:14px"><a class="herolink lead" id="sem-cta" href="/assine">Assinar o Perene Semanal →</a></p>
   </section>
 
   <section id="arquivo">
@@ -341,11 +333,19 @@
     <p class="micro" style="margin-top:16px"><a id="arc-cta" href="/artigos" style="color:var(--gold)"></a></p>
   </section>
 
-  <!-- ★ 2026-06-21 Founder — a camada profunda, DESCOBERTA (sem preço na home), só pública -->
+  <!-- ★ 2026-06-21 (dono): Arquivo é a estrela da 2ª metade → Founder (pequeno, frase forte) → Semanal (pequeno) → footer. Narrativa: hoje → registramos → já vimos antes → ir fundo (Founder) → receber (Semanal). -->
   <section id="founder-home" class="only-public">
     <h2 class="sec">Founder</h2>
-    <p class="secsub" id="fnd-s">Uma camada mais profunda, para quem deseja explorar os mecanismos, os precedentes e o observatório proprietário do Radar.</p>
+    <p class="fnd-lead" id="fnd-lead">Os mecanismos por trás das leituras.</p>
+    <p class="secsub" id="fnd-s">Uma camada mais profunda, para quem deseja explorar os precedentes, os análogos históricos e o observatório proprietário do Radar.</p>
     <p style="margin-top:14px"><a class="herolink" id="fnd-cta" href="/founder">Conhecer o Founder →</a></p>
+  </section>
+
+  <section id="semanal" class="only-public">
+    <div class="eyebrow" id="sem-eyb">Assinatura</div>
+    <h2 class="sec" id="sem-h">Perene Semanal</h2>
+    <p class="secsub" id="sem-s">Toda sexta-feira, uma leitura do mercado brasileiro — valuation, intermercado, contexto externo, sentimento e os episódios semelhantes. R$ 29/mês.</p>
+    <p style="margin-top:14px"><a class="herolink lead" id="sem-cta" href="/assine">Assinar o Perene Semanal →</a></p>
   </section>
 
   <section id="faq" class="only-public">
@@ -588,7 +588,7 @@
     set("eyb-ult","Diary");set("s-ult","The regime, day by day");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.");set("ult-cta","See the full Diaries →");
     // ★ 2026-06-21 EN dos blocos Semanal/Founder (eram PT estático = vazamento no .com)
     set("sem-eyb","Subscription");set("sem-h","Perene Semanal");set("sem-s","Every Friday, a read of the Brazilian market — valuation, intermarket, the external backdrop, sentiment and the comparable episodes. US$ 29/mo.");set("sem-cta","Subscribe to Perene Semanal →");
-    set("fnd-s","A deeper layer, for those who want to explore the mechanisms, the precedents and the Radar&rsquo;s proprietary observatory.");set("fnd-cta","Discover Founder →");
+    set("fnd-lead","The mechanisms behind the readings.");set("fnd-s","A deeper layer, for those who want to explore the precedents, the historical analogs and the Radar&rsquo;s proprietary observatory.");set("fnd-cta","Discover Founder →");
     set("assine-link","view plans →");}
   var _alk=document.getElementById("assine-link");if(_alk&&_en)_alk.href="/subscribe";  // slug EN da landing de assinatura
   set("ladder",C.ladder.map(function(s,i){return '<div class="st"><div class="no">'+(i+1)+'</div><div class="ti">'+s.t+'</div><div class="de">'+s.d+'</div></div>'}).join(""));
