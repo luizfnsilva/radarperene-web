@@ -901,6 +901,12 @@ async function _route(request, env, ctx) {
       const isEN = /radarperene\.com$/i.test(host) && !/\.com\.br$/i.test(host); // só .com (não .com.br)
       const isRoot = url.pathname === "/" || url.pathname === "/index.html";
       const ct = res.headers.get("content-type") || "";
+      // ★ 2026-06-21: cartões OG (og-leitura-*.png) mudam 1×/dia via deploy. A CDN do Cloudflare estava segurando o PNG ANTIGO
+      //   (cf-cache HIT, etag velho) mesmo após o deploy → no-store força sempre o asset recém-deployado (crawlers = baixo volume).
+      if (/^\/og-leitura-[a-z-]*\.png$/.test(url.pathname)) {
+        const _oh = new Headers(res.headers); _oh.set("Cache-Control", "no-store"); _oh.delete("ETag");
+        return new Response(res.body, { status: res.status, headers: _oh });
+      }
       if (!ct.includes("text/html")) return res; // não-HTML: intacto
       if (url.pathname.startsWith("/og/")) return res; // ★ página-fonte do cartão OG — servida PURA (sem barra de consentimento/cobertura) p/ o screenshot sair limpo
       // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
