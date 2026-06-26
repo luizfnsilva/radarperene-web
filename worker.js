@@ -1012,31 +1012,43 @@ async function _route(request, env, ctx) {
         const _MES = isEN ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
           : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
         const _humDate = function (ds) { const p = String(ds).split("-"); if (p.length !== 3) return _esc(ds); const d = parseInt(p[2], 10), m = _MES[parseInt(p[1], 10) - 1] || p[1], y = p[0]; return isEN ? (m + " " + d + ", " + y) : (d + " de " + m + " de " + y); };
+        // ★ 2026-06-26 (dono): o resumo LIDERA com o MOVIMENTO de apetite (Perene) e humor (Ânima) — os índices
+        //   que mudam todo dia útil — em PROSA (sem número cru); regime BR (mensal) + exterior viram CAUDA curta.
+        //   Antes liderava com regime+global (idênticos por construção) → dias saíam iguais. Degrada gracioso:
+        //   sem dia anterior / sem Perene (era mensal) cai na nota de regime.
+        const _humAp = function (d) {              // apetite por risco (delta do Perene; alto = risk-on)
+          if (d >= 5) return isEN ? "Risk appetite rose" : "O apetite por risco subiu";
+          if (d >= 2) return isEN ? "Risk appetite edged up" : "O apetite por risco avançou um pouco";
+          if (d > -2) return isEN ? "Risk appetite was little changed" : "O apetite por risco ficou praticamente estável";
+          if (d > -5) return isEN ? "Risk appetite eased" : "O apetite por risco cedeu um pouco";
+          return isEN ? "Risk appetite pulled back" : "O apetite por risco recuou";
+        };
+        const _humHu = function (d, lvl) {          // humor estrutural (delta do Ânima; baixo = pessimismo)
+          const piso = lvl != null && lvl <= 25;
+          if (d >= 4) return isEN ? "the mood lifted" : "o humor melhorou";
+          if (d >= 1.5) return isEN ? "the mood eased a little" : "o humor ficou um pouco menos deprimido";
+          if (d > -1.5) return piso ? (isEN ? "the mood stayed at the floor" : "o humor seguiu no piso")
+                                    : (isEN ? "the mood held" : "o humor ficou estável");
+          if (d > -4) return isEN ? "the mood slipped" : "o humor recuou";
+          return isEN ? "the mood sank to the floor" : "o humor recuou ao fundo da banda";
+        };
         const uh = ultimas.slice(0, 3).map(function (s, i) {
-          const prev = ultimas[i + 1] || null;  // dia anterior — base da continuidade
-          const _sent = [];
-          // regime BR (continuidade)
-          if (s.regime_label) {
-            if (prev && prev.regime_label === s.regime_label) _sent.push((isEN ? "Brazil's regime stayed " : "O regime brasileiro permaneceu ") + _esc(s.regime_label));
-            else if (prev && prev.regime_label) _sent.push((isEN ? "Brazil's regime turned " : "O regime brasileiro passou a ") + _esc(s.regime_label));
-            else _sent.push((isEN ? "Brazil's regime: " : "O regime brasileiro: ") + _esc(s.regime_label));
-          }
-          // ambiente global (continuidade)
-          if (s.global) {
-            if (prev && prev.global === s.global) _sent.push((isEN ? "the global backdrop held at " : "o ambiente global seguiu em ") + _esc(s.global));
-            else if (prev && prev.global) _sent.push((isEN ? "the global backdrop shifted to " : "o ambiente global passou a ") + _esc(s.global));
-            else _sent.push((isEN ? "global backdrop in " : "ambiente global em ") + _esc(s.global));
-          }
-          let prose = _sent.length ? (_sent.join(", ") + ".") : ((isEN ? "Monthly regime " : "Regime do mês ") + (s.regime_score != null ? s.regime_score + "/100" : "—") + ".");
-          // avaliação de mudança vs dia anterior (delta do Perene → 5 faixas; dá variação diária sem mostrar número cru)
+          const prev = ultimas[i + 1] || null;  // dia anterior — base do movimento
+          let prose;
           if (prev && s.perene != null && prev.perene != null) {
-            const d = s.perene - prev.perene;
-            let chg = d < 2 && d > -2 ? (isEN ? "Little changed from the day before." : "Pouca mudança em relação ao dia anterior.")
-              : d >= 5 ? (isEN ? "Risk rose from the day before." : "O risco subiu ante o dia anterior.")
-              : d >= 2 ? (isEN ? "Risk edged up from the day before." : "Leve elevação do risco ante o dia anterior.")
-              : d <= -5 ? (isEN ? "Risk receded from the day before." : "O risco recuou ante o dia anterior.")
-              : (isEN ? "Risk eased slightly from the day before." : "Leve alívio do risco ante o dia anterior.");
-            prose += " " + chg;
+            let lead = _humAp(s.perene - prev.perene);
+            if (s.anima != null && prev.anima != null) lead += (isEN ? " and " : " e ") + _humHu(s.anima - prev.anima, s.anima);
+            lead += ".";
+            const cauda = [];
+            if (s.regime_label) cauda.push((isEN ? "Brazil " : "Regime ") + _esc(s.regime_label));
+            if (s.global) cauda.push((isEN ? "global backdrop " : "exterior em ") + _esc(s.global));
+            prose = lead + (cauda.length ? " " + cauda.join(", ") + "." : "");
+          } else {
+            // sem base de movimento (1ª entrada / era mensal sem Perene): nota de regime
+            const _sent = [];
+            if (s.regime_label) _sent.push((isEN ? "Brazil's regime " : "Regime brasileiro ") + _esc(s.regime_label));
+            if (s.global) _sent.push((isEN ? "global backdrop " : "exterior em ") + _esc(s.global));
+            prose = _sent.length ? (_sent.join(", ") + ".") : ((isEN ? "Monthly regime " : "Regime do mês ") + (s.regime_score != null ? s.regime_score + "/100" : "—") + ".");
           }
           return '<a class="ult" href="' + (isEN ? "/daily/" : "/diario/") + s.data + '"><span class="ultd">' + _humDate(s.data) + '</span><span class="ultp">' + prose + "</span></a>";
         }).join("");
