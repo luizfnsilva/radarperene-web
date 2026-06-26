@@ -34,13 +34,14 @@
 <link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- ★ 2026-06-21 (dono): títulos em NEWSREADER (não Georgia, não Fraunces) — serif editorial moderna; "70% do 'parece Word' some só com a troca da fonte". Corpo e widget em Inter (números Inter 800: o mini-radar é objeto de dados, não ensaio). -->
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#6e6e78;
     --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
     --l-patr:#1a3a5c; --l-elei:#2c5f2e; --l-macro:#a8651a; --l-inst:#5b3a6b; --l-imob:#8a4b38;
-    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
     --rp-bg:var(--bg);--rp-card:var(--surface);--rp-card2:var(--surface2);--rp-line:var(--line);--rp-txt:var(--txt);--rp-dim:var(--dim);
     --rp-accent:var(--gold);--rp-hot:var(--hot);--rp-warm:var(--warm);--rp-cool:var(--cool);--rp-neu:var(--neu);--rp-font:var(--sans);
@@ -91,21 +92,51 @@
   .tg{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;padding:2px 8px;cursor:pointer;font-size:12px;line-height:1.3;font-family:var(--sans);margin-left:6px}
   .tg:hover{color:var(--gold);border-color:var(--gold)}
   /* hero */
-  .hero{text-align:center;padding:46px 0 18px}
-  .hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,52px);line-height:1.12;margin:0 auto 18px;max-width:18ch;letter-spacing:-.01em}
-  .hero h1 .g{color:var(--gold);font-style:italic}
-  .hero p.lead{font-size:clamp(15px,2.2vw,18px);color:var(--dim);max-width:60ch;margin:0 auto 26px}
-  .qtag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 15px;margin:0 auto 20px;text-decoration:none;transition:border-color .15s}
-  .qtag:hover{border-color:var(--gold)}
-  .qtag .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;animation:qpulse 2.4s ease-out infinite}
-  @keyframes qpulse{0%{box-shadow:0 0 0 0 rgba(168,101,26,.45)}70%{box-shadow:0 0 0 7px rgba(168,101,26,0)}100%{box-shadow:0 0 0 0 rgba(168,101,26,0)}}
-  @media(prefers-reduced-motion:reduce){.qtag .dot{animation:none}}
+  /* ★ 2026-06-21 v2 (dono): "bonito mas parece Word premium" = falta CONTRASTE e HIERARQUIA, não mais elegância. Largura menor (o branco em volta dá presença), título-monumento em DUAS linhas (a quebra cria ritmo), subtítulo menor e mais escuro, dourado mais queimado (FT, não luxo). */
+  /* ★ 2026-06-21 v2 (dono): COMPACTAR — hero + mini-radar devem caber JUNTOS no 1º print (peça compartilhável). Título menor (cabe em 2 linhas sem o "—" sobrar sozinho), paddings/margens enxutos, card puxado pra cima. */
+  .hero{text-align:center;padding:14px 0 12px;max-width:810px;margin:0 auto}  /* 810: dá ao card largura p/ "80%...terminaram positivos." numa linha (título centrado, mesmo tamanho) */
+  .hero-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#a66a26;font-weight:600;margin:0 0 9px}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,5.4vw,57px);line-height:1;margin:0 auto 9px;max-width:none;letter-spacing:-.03em;color:#131329}  /* Newsreader 600, navy #131329; 57px garante "O Brasil observado —" em 1 linha (não deixa o "—" sobrar sozinho) */
+  .hero h1 .g{color:#a66a26;font-style:italic;font-weight:600}
+  .hero p.lead{font-size:clamp(15px,1.7vw,18px);color:var(--dim);max-width:42ch;margin:0 auto 6px;line-height:1.5;font-weight:400}
+  [data-theme="dark"] .hero-kicker,[data-theme="dark"] .hero h1 .g{color:var(--gold)}
+  [data-theme="dark"] .hero h1{color:var(--txt)}
+  /* ★ 2026-06-21 (dono): Leitura do Radar DENTRO do hero — bloco centrado, rótulo discreto à esquerda, o card "Hoje lembra" é a primeira coisa importante da página. */
+  .hero-leitura{max-width:810px;margin:6px auto 6px}  /* colado ao subtítulo: o card é continuação do hero, não outra seção */
+  .hero-leitura .rp-narr{margin:22px auto 4px}
+  body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
+  /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
   .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;
     padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
   .btn:hover{background:var(--gold2)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
+  /* ★ 2026-06-21 CTAs editoriais (publicação convida, software empurra): links dourados com seta, sem bloco preenchido */
+  .hero-ctas{display:flex;flex-direction:column;align-items:flex-start;gap:11px;margin:4px 0 0}
+  .hero-ctas .herolink{margin-left:0}
+  /* ★ 2026-06-21 (dono): linha CTA = Assinar (esq) · Compartilhar (dir, oposto, abaixo do card/radar) */
+  .hero-cta-row{display:flex;justify-content:space-between;align-items:center;width:100%;gap:16px;position:relative}
+  .rp-sharebtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex:none;background:none;border:0;color:var(--gold);cursor:pointer;padding:0;border-radius:50%;opacity:.85;transition:opacity .15s,background .15s}
+  .rp-sharebtn:hover{opacity:1;background:var(--surface2)}
+  .rp-sharebtn svg{flex:none}
+  .rp-shmenu{position:absolute;bottom:calc(100% + 9px);right:0;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px rgba(40,26,8,.17);padding:6px;display:flex;flex-direction:column;gap:1px;min-width:184px}
+  .rp-shmenu .rp-shsep{height:1px;background:var(--line);margin:5px 8px}
+  .rp-shi{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 13px;font-size:13.5px;font-weight:500;color:var(--txt);cursor:pointer;border-radius:8px;font-family:var(--sans);white-space:nowrap}
+  .rp-shi:hover{background:var(--surface2);color:var(--gold)}
+  @media(max-width:560px){.rp-shmenu{min-width:170px}}
+  .herolink.lead{font-size:clamp(16px,2.2vw,19px)}
+  .hero-deep{margin:20px 0 0;font-size:13.5px;line-height:1.5;color:var(--dim);max-width:46ch}
+  .hero-deep .herolink{margin-left:0;font-size:13.5px;display:inline}
+  /* ★ 2026-06-21 duas edições da MESMA porta: default (sem-JS / anônimo) = home pública; Founder logado vê a edição profunda.
+     SEO/crawler herda a pública (correto). O JS adiciona body.rp-founder ao detectar o login. */
+  .only-founder{display:none}
+  body.rp-founder .only-founder{display:block}
+  body.rp-founder .only-public{display:none}
+  /* Founder logado: hero menor, sem CTAs de venda (já comprou tudo) */
+  body.rp-founder .hero-ctas,body.rp-founder .hero-deep{display:none}
+  /* Semanal logado: vê a publicação, MAS não o bloco/CTA que já assinou (segue podendo Conhecer o Founder) */
+  body.rp-semanal #semanal,body.rp-semanal #cta1{display:none}
   .micro{font-size:11.5px;color:var(--dim);margin-top:14px}
   section{padding:58px 0;border-top:1px solid var(--line)}
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
@@ -175,14 +206,7 @@
   .instband:hover{color:var(--txt)}
   .instband b{color:var(--txt);font-weight:600}
   /* ★ P6 — painel de números "uau" (screenshot-able): gravidade editorial (serif) + escopo SentimenTrader */
-  .statband{text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0 24px;margin:4px 0 2px}
-  .statband .eyebrow{font-family:var(--serif);font-style:italic;font-size:clamp(14px,2vw,17px);color:var(--txt2);text-transform:none;letter-spacing:0;margin-bottom:18px}
-  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
-  @media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr);gap:26px 14px}}
-  @media(max-width:430px){.stats{grid-template-columns:repeat(2,1fr)}}
-  .stat{display:flex;flex-direction:column;gap:5px}
-  .stat .n{font-family:var(--serif);font-size:clamp(26px,3.4vw,34px);font-weight:600;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
-  .stat .l{font-size:11.5px;color:var(--dim);letter-spacing:.02em;line-height:1.35}
+  /* statband (faixa de métricas) removida 2026-06-20 — repetia a tese do hero; ver CANONICO_MARCA §2026-06-20 */
   /* "Do arquivo" — cartões de episódios marquee (memória); reusa o grid .cards */
   /* ★ P2 — episódios viram CAPÍTULOS de biblioteca (ensaio Economist/Grant's): ano · título serif · subtítulo itálico · gancho · "o que aconteceu depois" */
   .arcard{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 20px;text-decoration:none;transition:border-color .15s,transform .15s}
@@ -192,6 +216,29 @@
   .arcard .arcd{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--txt2);line-height:1.4}
   .arcard .archook{font-size:13px;color:var(--dim);line-height:1.6;flex:1}
   .arcard .arcmore{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:6px}
+  /* ★ 2026-06-21 (dono) RITMO editorial — SÓ DOIS MONUMENTOS: o Hero e o ARQUIVO. O resto conduz até eles.
+     Muito vazio entre seções (Economist/Grant's: o vazio é identidade). Movimentos, não painel uniforme. */
+  /* silêncio entre seções + colunas (coluna de jornal) */
+  /* ★ 2026-06-21 (dono): a Leitura mora no hero. Ritmo: Hero(+Leitura) → respiro → Diário → vão grande → Arquivo (2º monumento) → Founder/Semanal colados. */
+  #ultimas{margin-top:112px;max-width:660px;margin-left:auto;margin-right:auto}      /* Hero → Diário */
+  #founder-home{margin-top:80px;max-width:660px;margin-left:auto;margin-right:auto;padding-top:30px;border-top:1px solid var(--line)}   /* Arquivo → Founder = colados (consequência) */
+  #semanal{margin-top:90px;max-width:600px;margin-left:auto;margin-right:auto;padding-top:28px;border-top:1px solid var(--line)}        /* Founder → Semanal */
+  #faq{margin-top:110px}
+  #founder-home .sec,#semanal .sec{font-size:clamp(18px,2vw,23px)}
+  #founder-home .fnd-lead{font-family:var(--serif);font-size:clamp(16px,2vw,19px);font-weight:600;color:var(--txt);margin:4px 0 8px;line-height:1.3}
+  #founder-home .secsub,#semanal .secsub{font-size:13.5px;color:var(--dim)}
+  /* ARQUIVO = SEGUNDA CAPA: regras full, título enorme, 4 cards grandes, muito ar. É o 2º monumento da página. */
+  #arquivo{margin:140px 0 0;padding:78px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}  /* Diário→Arquivo 140px (vão entre movimentos); base 0 → founder governa o "colado" */
+  #arquivo .eyebrow{display:none}
+  #arquivo .sec{font-size:clamp(40px,6.2vw,68px);line-height:1.02;letter-spacing:-.025em;margin:0 0 12px}  /* 2º monumento: título grande de verdade */
+  #arquivo .secsub{font-size:clamp(15px,1.9vw,18px);color:var(--txt2);max-width:60ch}
+  #arquivo .cards{grid-template-columns:repeat(4,1fr);gap:18px;margin-top:38px}
+  @media(max-width:900px){#arquivo .cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){#arquivo .cards{grid-template-columns:1fr}}
+  #arquivo .arcard{padding:28px 24px;gap:9px}
+  #arquivo .arcard .arct{font-size:clamp(19px,2.1vw,23px)}
+  #arquivo .arcard .arcd{font-size:14px}
+  #arquivo .arcard .archook{font-size:13px}
   /* merchan da biblioteca do assinante — ponte do arquivo free pro acervo completo; número cresce todo dia */
   .arcmerch{margin:20px 0 0;padding:15px 18px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--dim);line-height:1.6}
   .arcmerch b{color:var(--txt);font-weight:600}
@@ -220,7 +267,7 @@
 <h2 class="sec">Institucional / Integridade</h2>
 <p>As regras que estão sendo escritas agora. Compliance setorial, LGPD/ANPD, anticorrupção, regulação por agência, contratações públicas, jurisprudência institucional. <a href="/lentes/institucional/">Acessar a Lente Institucional →</a></p>
 <h2 class="sec">Imobiliária</h2>
-<p>Imóveis versus renda fixa. Regulação setorial, crédito imobiliário, FIIs, SINAPI, legislação urbana, ITBI municipal. Cruzamento com a cesta IMOB. <a href="/lentes/imobiliaria/">Acessar a Lente Imobiliária →</a></p>
+<p>Imóveis versus renda fixa. Regulação setorial, crédito imobiliário, FIIs, SINAPI/FipeZap, legislação urbana, ITBI municipal. Cruzamento com a cesta IMOB. <a href="/lentes/imobiliaria/">Acessar a Lente Imobiliária →</a></p>
 <h2 class="sec">Eleitoral</h2>
 <p>O humor político antes do voto. Candidaturas, financiamento, prestação de contas, propaganda, julgamento. Janelas curtas amarradas ao calendário oficial. <a href="/lentes/eleitoral/">Acessar a Lente Eleitoral →</a></p>
 <h2 class="sec">Lente Vértice — experimental</h2>

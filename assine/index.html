@@ -28,12 +28,12 @@
 <link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#6e6e78;
     --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
-    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
   }
   :root[data-theme="dark"]{
@@ -60,15 +60,15 @@
   .hero h1 .g{color:var(--gold);font-style:italic}
   .hero p.lead{font-size:clamp(15px,2.2vw,18px);color:var(--dim);max-width:58ch;margin:0 auto 22px}
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
-  .qtag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--txt2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 16px;margin:0 auto 20px;text-decoration:none;transition:border-color .15s}
-  .qtag:hover{border-color:var(--gold)}
-  .qtag .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;animation:qpulse 2.4s ease-out infinite}
-  @keyframes qpulse{0%{box-shadow:0 0 0 0 rgba(168,101,26,.45)}70%{box-shadow:0 0 0 7px rgba(168,101,26,0)}100%{box-shadow:0 0 0 0 rgba(168,101,26,0)}}
-  @media(prefers-reduced-motion:reduce){.qtag .dot{animation:none}}
-  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:700;padding:15px 30px;border-radius:10px;font-size:16px;transition:transform .1s,background .15s}
-  .btn:hover{background:var(--gold2);transform:translateY(-1px)}
+  /* ★ editorial: a pílula viva pulsante ("ao vivo", Bloomberg) virou nota de texto discreta (publicação convida, não empurra) — espelha a remoção da .qtag na home */
+  .regime-note{display:inline-block;margin:2px auto 20px;font-size:13.5px;color:var(--dim);text-decoration:none}
+  .regime-note b{color:var(--txt2);font-weight:600}
+  .regime-note .go{color:var(--gold);font-weight:600;white-space:nowrap}
+  .regime-note:hover .go{text-decoration:underline}
+  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;padding:14px 34px;border-radius:2px;font-size:15px;transition:background .15s}  /* ★ editorial: cantos retos, sem "lift" de SaaS — casa com a home (publicação convida, software empurra) */
+  .btn:hover{background:var(--gold2)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
-  .btn.big{padding:17px 38px;font-size:17px}
+  .btn.big{padding:16px 40px;font-size:16px}
   .micro{font-size:12px;color:var(--dim);margin-top:13px}
   section{padding:32px 0;border-top:1px solid var(--line)}
   h2.sec{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,30px);margin:0 0 8px}
@@ -93,17 +93,17 @@
   .live .st b{display:block;font-family:var(--mono);font-size:23px;font-weight:600;color:var(--gold);line-height:1.1}
   .live .st span{font-size:11.5px;color:var(--dim);display:block;margin-top:5px}
   /* price */
-  .price{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--gold);border-radius:16px;padding:30px;text-align:center}
-  .price .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:4px 14px;font-size:12px;font-weight:600;letter-spacing:.08em;margin-bottom:14px}
+  .price{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--gold);border-radius:12px;padding:30px;text-align:center}
+  .price .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:3px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
   .price .amt{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,46px);margin:6px 0 2px}
   .price .amt small{font-size:.42em;color:var(--dim);font-weight:400}
   .price .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0 10px}
   /* planos (2 cards: Semanal principal · Founder secundário) — editorial, sem botão preenchido */
   .plans{display:grid;grid-template-columns:1fr 1fr;gap:20px}
   @media(max-width:680px){.plans{grid-template-columns:1fr}}
-  .plan{border:1px solid var(--line);border-radius:16px;padding:28px 26px;background:var(--surface)}
-  .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface));box-shadow:0 1px 24px rgba(168,101,26,.06)}
-  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:3px 12px;font-size:11px;font-weight:600;letter-spacing:.08em;margin-bottom:12px}
+  .plan{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--surface)}
+  .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface))}  /* ★ editorial: destaque pelo traço dourado + fundo, sem glow de SaaS (a home reserva sombra a menus, nunca a card de conteúdo) */
+  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:3px;padding:3px 11px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
   .plan .pname{font-family:var(--serif);font-weight:600;font-size:22px;margin:0}
   .plan .amt{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,40px);margin:4px 0 2px}
   .plan .amt small{font-size:.42em;color:var(--dim);font-weight:400}
@@ -138,7 +138,7 @@
     <div class="eyebrow">Assinaturas</div>
     <h1>Escolha como acompanhar o <span class="g">Radar Perene</span></h1>
     <p class="lead">Uma publicação sobre os regimes do mercado brasileiro.</p>
-    <a class="qtag" id="live-regime" href="/" title="ver ao vivo"><span class="dot"></span>regime do dia · ler a edição aberta</a>
+    <a class="regime-note" id="live-regime" href="/" title="ver ao vivo">Regime do dia · <span class="go">ler a edição aberta →</span></a>
   </section>
 
   <section>
@@ -229,10 +229,10 @@
       cells.push('<div class="st"><b>26 anos</b><span>de memória, desde 2000</span></div>');
       if(cells.length)live.innerHTML=cells.join("");
     }
-    // qtag do regime no hero
+    // nota de regime no hero (.regime-note)
     if(rg&&rg.valor!=null){
       var q=document.getElementById("live-regime");
-      if(q)q.innerHTML='<span class="dot"></span>regime BR hoje · '+nf(rg.valor,1)+'/100 · '+(rg.classificacao||"")+' → ver ao vivo';
+      if(q)q.innerHTML='Regime BR hoje · <b>'+nf(rg.valor,1)+'/100 · '+(rg.classificacao||"")+'</b> · <span class="go">ver ao vivo →</span>';
     }
   }).catch(function(){});
 })();
