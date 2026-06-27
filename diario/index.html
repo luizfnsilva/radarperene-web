@@ -7,6 +7,12 @@
 <meta name="description" content="Relatório do Radar Perene — leitura completa do dia, da semana e do mês. Conteúdo exclusivo para assinantes; o público vê o snapshot numérico do dia.">
 <meta name="robots" content="noindex, follow"><!-- página de membro: não indexar o corpo gateado -->
 <link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/svg+xml" href="/icon-light.svg" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/svg+xml" href="/icon-dark.svg" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#131521">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,8 +31,9 @@
   a{color:var(--gold);text-decoration:none} a:hover{text-decoration:underline}
   .top{display:flex;align-items:center;justify-content:space-between;max-width:820px;margin:0 auto;padding:16px 22px;gap:12px}
   .brand{display:flex;align-items:center;gap:6px}
-  .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--txt)}
-  .brand .nm b{color:var(--gold)}
+  .brand .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   #me-seal{display:none;font-size:11px;background:#b8801f;color:#0a0c0f;padding:2px 9px;border-radius:20px;font-weight:700}
   #me-biblioteca{display:none;font-size:12px}
   .lang{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:8px}
@@ -67,7 +74,7 @@
 <body>
 <div class="top">
   <div class="brand">
-    <a class="nm" href="/">Radar <b>Perene</b></a>
+    <a href="/" aria-label="Radar Perene — início"><img class="logo-w logo-w-light" src="/logo-light.svg" alt="Radar Perene" width="139" height="35"><img class="logo-w logo-w-dark" src="/logo-dark.svg" alt="Radar Perene" width="139" height="35"></a>
     <span id="me-seal"></span>
     <a id="me-biblioteca" href="/biblioteca/">Biblioteca</a>
   </div>
