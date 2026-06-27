@@ -1,3 +1,8 @@
 
 # wrangler local runtime cache (não versionar — contém cache de conta/estado)
 .wrangler/
+
+# Claude Code: ferramental/estado local de sessão (skills instalados, agentes) — não é do site
+.claude/
+.agents/
+skills-lock.json
