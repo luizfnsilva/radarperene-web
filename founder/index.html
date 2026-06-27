@@ -40,7 +40,7 @@
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#5f5f69;
     --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
-    --gold-ink:#94560f; --btn-ink:#fff; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
+    --gold-ink:#94560f; --btn-ink:#fff; --btn-bg:#1a1a2e; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
     --l-patr:#1a3a5c; --l-elei:#2c5f2e; --l-macro:#a8651a; --l-inst:#5b3a6b; --l-imob:#8a4b38;
     --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
@@ -50,7 +50,7 @@
   :root[data-theme="dark"]{
     --bg:#0e1217; --surface:#161b22; --surface2:#1c222b; --line:#28303a; --txt:#eceef1; --txt2:#c2c8d0; --dim:#8a929e;
     --gold:#d9a441; --gold2:#e8c572; --hot:#e0533d; --warm:#d98a3d; --cool:#5b8fd0; --neu:#6b7682;
-    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
+    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --btn-bg:var(--gold); --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
@@ -127,9 +127,9 @@
   .hero-leitura .rp-narr{margin:22px auto 4px}
   body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
   /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
-  .btn{display:inline-block;background:var(--gold);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
+  .btn{display:inline-block;background:var(--btn-bg);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
     padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
-  .btn:hover{background:var(--gold2)}
+  .btn:hover{background:var(--gold)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold-ink);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
@@ -268,7 +268,7 @@
 </style>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 
-<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
+<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
 </head>
 <body>
 <a class="skip" href="#main">Pular para o conteúdo</a>
@@ -283,25 +283,24 @@
     <h1>Founder Access</h1>
     <p>100 contas. R$ 149/mês, travado enquanto a assinatura permanecer ativa. Acesso integral às cinco lentes do Radar e à Lente Vértice à medida que ficarem prontas. Profundidade decisória completa — cone de quantis manipulável, projeção condicional do futuro, leitura aprofundada por lente.</p>
 <p class="rel">2/100 contas tomadas · 98 restantes.</p>
-<p class="ctarow"><a class="btn" href="/#fundadores">Entrar como fundador · R$ 149/mês</a></p>
-<p class="ctarow"><a class="btn" href="/#fundadores">Anual: R$ 1.490/ano (dois meses gratuitos)</a></p>
-<p>---</p>
+<div class="ctarow" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><a class="btn" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Entrar como fundador · R$ 149/mês</a><a class="btn ghost" style="margin-left:0;border-color:var(--field-line)" href="https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05" target="_blank" rel="noopener">Anual · R$ 1.490/ano · dois meses grátis</a></div>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">O que você destrava como Fundador</h2>
 <p><strong>Cinco lentes principais.</strong> Patrimonial, Macro/CVM/BCB, Institucional/Integridade, Imobiliária, Eleitoral. Cada lente lê seu eixo do Brasil em editorial sóbrio, com trajetória, convergência, janela temporal e confiança contextual declaradas.</p>
 <p><strong>A Lente Vértice à medida que ficar pronta.</strong> O experimento metodológico do Radar — sistema bayesiano que formula hipóteses cross-domínio sob disciplina rigorosa. Sem evidências e contradições listadas, a hipótese é rejeitada antes de aparecer.</p>
 <p><strong>Profundidade decisória.</strong> O cone de quantis completo, o gráfico que se manipula, a projeção condicional do futuro. A leitura gratuita mostra o regime; o Fundador atravessa as camadas.</p>
 <p><strong>Histórico completo.</strong> Memória estatística acumulada desde o início da coleta. Cada análogo histórico verificável.</p>
 <p><strong>Cruzamentos livres.</strong> Combinar lentes, ativos e instrumentos sem restrição editorial.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">Preço travado, sem mística</h2>
 <p>R$ 149/mês permanece R$ 149/mês enquanto a assinatura ficar ativa. Sem desconto introdutório que sobe depois. Sem &quot;vitalício&quot; — preço travado <strong>enquanto mantida a assinatura</strong>, com expressão jurídica clara. Em caso de cancelamento e retorno posterior, vale o preço vigente no momento do retorno.</p>
 <p>Quando as 100 contas estiverem tomadas, as lentes passam a ser vendidas separadamente — só a Lente Vértice avulsa será R$ 500/mês (pt-BR) ou US$ 290/mês (versão internacional). O Founder garante o pacote integral por R$ 149.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">Pagamento, reembolso, cancelamento</h2>
 <p>Pagamento via Stripe. <strong>7 dias de arrependimento</strong> com estorno integral automático — basta cancelar dentro do prazo na própria plataforma. <strong>Cancelamento em um clique</strong> a qualquer momento; o acesso permanece ativo até o final do ciclo já pago.</p>
 <p>Não há cobrança escondida. Não há cláusula de fidelidade. A renovação é automática conforme periodicidade escolhida; o Fundador pode desligá-la em um clique.</p>
-<p class="ctarow"><a class="btn" href="/#fundadores">Entrar como fundador · R$ 149/mês</a></p>
-<p>---</p>
+<p class="ctarow"><a class="btn" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Entrar como fundador · R$ 149/mês</a></p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">Perguntas frequentes</h2>
 <p><strong>O que muda depois das 100 vagas?</strong> As lentes passam a ser vendidas separadamente. A Lente Vértice avulsa será R$ 500/mês (pt-BR). Quem entrar como Fundador mantém o pacote integral pelo preço travado enquanto a assinatura ficar ativa.</p>
 <p><strong>Para onde vão os recursos da fase Founder?</strong> Os recursos da fase fundadora estão sendo direcionados para ampliar a frequência das leituras, expandir a cobertura de ativos e acelerar o desenvolvimento dos motores quantitativos do Radar — incluindo a infraestrutura necessária para pulsos mais frequentes ao longo do dia e o amadurecimento contínuo do Experimento Vértice. Os Fundadores não compram um produto pronto; participam da fase em que a metodologia ganha amplitude. Em reconhecimento, preservam acesso integral pelo valor de entrada enquanto a assinatura permanecer ativa.</p>
@@ -313,8 +312,8 @@
 <p><strong>O que é incluído quando a Lente Vértice ficar pronta?</strong> Tudo. Hipóteses cross-domínio ativas, k-NN sobre análogos históricos, backtest e calibração contínua. Inclusa sem custo adicional para Fundadores enquanto a assinatura permanecer ativa.</p>
 <p><strong>Posso embutir conteúdo do Radar no meu site?</strong> A Leitura do dia é gratuita e embedável por qualquer pessoa via <a href="/api/docs/">/api/docs</a>, com atribuição obrigatória. Conteúdo Founder é pessoal e não-redistribuível.</p>
 <p><strong>Tem versão em inglês?</strong> Sim. <a href="https://radarperene.com">radarperene.com</a>. Mesmo produto, mesma metodologia, em US$ 149/mês para Fundadores internacionais.</p>
-<p>---</p>
-<p class="ctarow"><a class="btn" href="/#fundadores">Entrar como fundador · R$ 149/mês</a></p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
+<p class="ctarow"><a class="btn" href="https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" target="_blank" rel="noopener">Entrar como fundador · R$ 149/mês</a></p>
 <p class="rel">2/100 contas tomadas · 98 restantes · 7 dias de arrependimento · cancela em 1 clique.</p>
   </article>
 </div>

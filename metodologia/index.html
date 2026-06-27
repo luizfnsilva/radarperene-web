@@ -42,7 +42,7 @@
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#5f5f69;
     --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
-    --gold-ink:#94560f; --btn-ink:#fff; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
+    --gold-ink:#94560f; --btn-ink:#fff; --btn-bg:#1a1a2e; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
     --l-patr:#1a3a5c; --l-elei:#2c5f2e; --l-macro:#a8651a; --l-inst:#5b3a6b; --l-imob:#8a4b38;
     --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
@@ -52,7 +52,7 @@
   :root[data-theme="dark"]{
     --bg:#0e1217; --surface:#161b22; --surface2:#1c222b; --line:#28303a; --txt:#eceef1; --txt2:#c2c8d0; --dim:#8a929e;
     --gold:#d9a441; --gold2:#e8c572; --hot:#e0533d; --warm:#d98a3d; --cool:#5b8fd0; --neu:#6b7682;
-    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
+    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --btn-bg:var(--gold); --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
@@ -129,9 +129,9 @@
   .hero-leitura .rp-narr{margin:22px auto 4px}
   body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
   /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
-  .btn{display:inline-block;background:var(--gold);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
+  .btn{display:inline-block;background:var(--btn-bg);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
     padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
-  .btn:hover{background:var(--gold2)}
+  .btn:hover{background:var(--gold)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold-ink);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
@@ -270,7 +270,7 @@
 </style>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 
-<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
+<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
 </head>
 <body>
 <a class="skip" href="#main">Pular para o conteúdo</a>
@@ -289,11 +289,11 @@
 <p>Última revisão: 4 de junho de 2026 · Versão da metodologia: 3.0 · Operador: Radar Perene.</p>
 <p>Nesta página:</p>
 <ol><li>O que o Radar faz, em uma frase</li><li>Os três eixos da leitura</li><li>O elenco — os personagens da leitura</li><li>As cinco lentes</li><li>O Experimento Vértice</li><li>Cinco princípios de leitura</li><li>Dez princípios imutáveis de integridade</li><li>O que publicamos e onde</li><li>O arquivo — o que aconteceu depois</li><li>Limites declarados</li><li>Como citar o Radar Perene</li><li>Fontes</li><li>Perguntas frequentes</li></ol>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">1. O que o Radar Perene faz, em uma frase</h2>
 <p>O Radar Perene lê o estado do mercado brasileiro combinando três eixos ortogonais (Regime Brasil, Regime Global, Intermercado BR), um conjunto de instrumentos proprietários (ERP_BR, Cone de Regressão Logarítmica, <strong>Índice Ânima e Índice de Risco Perene</strong> — os dois índices proprietários empilhados sob o preço de cada ativo —, Análogos Históricos e Sinais de virada) e cinco lentes regulatórias e de mercado (Patrimonial, Macro/CVM/BCB, Institucional/Integridade, Imobiliária, Eleitoral), mais um experimento adjacente (Lente Vértice) para hipóteses cross-domínio sob disciplina bayesiana.</p>
 <p>O Radar <strong>não prevê</strong>. O Radar <strong>contextualiza</strong>. Primeiro o regime. Depois a decisão.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">2. Os três eixos da leitura</h2>
 <p>A leitura do Radar nasce do cruzamento de três eixos independentes. Convergências confirmam; divergências organizam a nuance.</p>
 <h3 class="sub">2.1 Regime Brasil</h3>
@@ -305,7 +305,7 @@
 <h3 class="sub">2.4 Por que os três são ortogonais</h3>
 <p>Os três eixos lêem dimensões independentes. Regime Brasil é regulatório e quantitativo doméstico de superfície; Regime Global é macro externo; Intermercado BR é fluxo setorial doméstico. <strong>Capital institucional frequentemente se posiciona no eixo Intermercado antes de o eixo regulatório se mover</strong> — a frase-tese canônica do produto vem desse cruzamento: <em>o capital se posicionou antes da manchete</em>.</p>
 <p>O peso exato com que os três eixos se combinam — pesos, gates, normalizações, cestas, filtros — é parte do ofício da casa: declarado na arquitetura técnica para auditoria, não exposto na superfície. Mas o que distingue o Radar não é a fórmula nem a memória isoladas — é a combinação. O método permite observar; o arquivo permite comparar. E não são quinze anos quaisquer: são quinze anos observados pela mesma lente, congelados e auditáveis — algo que ninguém fabrica retroativamente.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">3. O elenco — os personagens da leitura</h2>
 <p>O Radar não tem categorias; tem personagens recorrentes, que voltam em todo episódio do arquivo. Abaixo, o elenco — em dois grupos: os personagens (as forças que se observam — humor, apetite, estrutura, dólar, juros, cíclicos, defensivos) e os instrumentos (as lentes de aumento sobre eles). Cada um tem sua página de conceito própria, com definição, exemplo e limitação.</p>
 <h3 class="sub">3.1 ERP_BR — Equity Risk Premium Brazil</h3>
@@ -326,17 +326,17 @@
 <h3 class="sub">3.6 Sinais de virada</h3>
 <p>Em transições de regime de risco — tipicamente medo extremo seguido de reversão —, o motor marca <strong>sinais datados</strong> sobre o gráfico do ativo e exibe a <strong>tabela histórica do que se seguiu</strong> (retornos observados de uma semana a um ano) junto às estatísticas agregadas do padrão (frequência, mediana, dispersão). Cada sinal é confrontado com o desfecho real, à medida que o tempo passa.</p>
 <p>Leitura: um sinal de virada é uma <strong>distribuição histórica descritiva</strong> do que costumou se seguir a configurações parecidas — nunca uma recomendação de compra ou venda, nem uma promessa de repetição. Referência: <a href="/conceitos/risk-on-risk-off/">/conceitos/risk-on-risk-off</a>.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">4. As cinco lentes</h2>
 <p>As cinco lentes principais cobrem dimensões regulatórias e de mercado do Brasil. Cada lente é alimentada por taxonomia própria, janela própria e fontes próprias; cada lente devolve trajetória, convergência, janela temporal e confiança contextual.</p>
 <ul><li><strong>Lente Patrimonial</strong> — o que ameaça ou favorece a preservação do patrimônio. ITCMD em movimento, holding familiar sob revisão, Lei 14.754 e o terreno offshore, sucessão e proteção. <a href="/lentes/patrimonial/">Página da lente</a>.</li><li><strong>Lente Macro / CVM / BCB</strong> — o preço do dinheiro no Brasil. Política monetária, câmbio, mercado de capitais, regulação bancária, crédito, fiscal. <a href="/lentes/macro/">Página da lente</a>.</li><li><strong>Lente Institucional / Integridade</strong> — as regras que estão sendo escritas agora. Compliance setorial, LGPD/ANPD, anticorrupção, regulação por agência, contratações públicas, jurisprudência institucional. <a href="/lentes/institucional/">Página da lente</a>.</li><li><strong>Lente Imobiliária</strong> — imóveis versus renda fixa. Regulação setorial, crédito imobiliário, FIIs, SINAPI/FipeZap, legislação urbana, ITBI municipal, cruzamento com a cesta IMOB. <a href="/lentes/imobiliaria/">Página da lente</a>.</li><li><strong>Lente Eleitoral</strong> — o humor político antes do voto. Candidaturas, financiamento, prestação de contas, propaganda, julgamento. Janelas curtas amarradas ao calendário oficial. <a href="/lentes/eleitoral/">Página da lente</a>.</li></ul>
 <p>Página guarda-chuva: <a href="/lentes/">/lentes</a>.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">5. O Experimento Vértice</h2>
 <p>O Vértice é o experimento metodológico do Radar — um sistema bayesiano que formula hipóteses cross-domínio entre regulatório, mercado, cripto, sentimento e fragilidade brasileira. Não substitui as cinco lentes; opera em paralelo, sob disciplina mais dura.</p>
 <p>Cada hipótese do Vértice é estruturada como objeto: evidências, contradições, o que a fortalece, o que a enfraquece, próximos sinais a observar, confiança contextual categórica e crítica adversarial obrigatória. <strong>Sem evidências e contradições listadas, a hipótese é rejeitada antes de aparecer.</strong> O Vértice formula hipóteses; a história calibra confiança; a decisão continua humana.</p>
 <p>Referência: <a href="/conceitos/vertice/">/conceitos/vertice</a> (conceito metodológico) e <a href="/lentes/vertice/">/lentes/vertice</a> (página do produto).</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">6. Cinco princípios de leitura</h2>
 <p>São os princípios pelos quais o método opera. Cada um responde a uma armadilha cognitiva comum no consumo de análise financeira.</p>
 <p><strong>6.1 Indicadores isolados informam; é o regime que organiza.</strong> Um juro real elevado, sozinho, é um número. Um juro real elevado em percentil histórico no topo da faixa, dentro de um regime fiscal em deterioração, com intermercado defensivo e sentimento esticado, é uma <strong>leitura</strong>. O Radar opera sempre na segunda forma.</p>
@@ -344,22 +344,22 @@
 <p><strong>6.3 A janela estatística é o regime moderno.</strong> Antes do Real, a hiperinflação distorce a estatística. Empilhar a cauda hiperinflacionária com 2024 destrói o sinal. O Radar respeita a fronteira de regime: a estatística não atravessa fronteiras de regime monetário. Eventos pré-2000 entram como referência qualitativa, não como ponto na distribuição.</p>
 <p><strong>6.4 Calibração visível antes de número fingido.</strong> Quando o histórico real para uma métrica é insuficiente, a interface mostra &quot;em calibração&quot; e diz por quê. O Radar <strong>prefere admitir calibração a fabricar um número</strong>.</p>
 <p><strong>6.5 O futuro é cenário condicional, não ponto.</strong> O Radar nunca diz <em>&quot;o IBOV fechará em X&quot;</em>. Diz <em>&quot;sob as condições atuais, em janelas históricas semelhantes, o índice se moveu entre X e Y em N dos M casos observados, em janela de K dias&quot;</em>. Frase mais longa, mais honesta, falsificável.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">7. Dez princípios imutáveis de integridade</h2>
 <p>São a política do produto. Vinculantes para o motor, para a interface, para a comunicação e para qualquer integração via API ou widget.</p>
 <ol><li>O Radar <strong>não finge confiança</strong>. A confiança contextual é categórica (baixa, moderada, moderada-alta, alta) e auditável; corpus de baixa densidade nunca exibe &quot;alta&quot;.</li><li>O Radar <strong>não finge data</strong>. `data_publicacao = data_coleta` é tratado como data sintética; jamais apresentado como publicação real.</li><li>O Radar <strong>não finge fonte</strong>. Toda métrica tem fonte primária declarada e URL rastreável; fontes primárias recebem tratamento distinto de imprensa, agregador e notícia.</li><li>O Radar <strong>não finge previsão</strong>. Apenas trajetórias, janelas temporais, cenários condicionais e confiança contextual; nunca certeza determinística sobre ponto futuro.</li><li><strong>Sem cálculo sobre data sintética.</strong> Tendência, regime, convergência e forecasting só são computados sobre itens com data real e verificável (gate R1, invariante absoluto).</li><li><strong>Calibração visível.</strong> Sem histórico suficiente para uma métrica, a interface mostra estado de calibração — não um número fabricado.</li><li><strong>Score original imutável.</strong> O score de cada item nunca é sobrescrito; o histórico é auditável.</li><li><strong>Score ajustado auditável.</strong> Quando convergência ou regime ajustam um score, o ajuste é aditivo, capado e justificado — com motivo registrado.</li><li><strong>Fonte primária diferenciada.</strong> Tribunal, órgão regulador e autorregulador recebem tratamento distinto de imprensa, agregador e notícia.</li><li><strong>Sem parecer, recomendação ou decisão automática.</strong> O produto descreve — nunca prescreve. Não emite parecer jurídico, contábil ou de investimento. Não recomenda comprar, vender, contratar ou estruturar.</li></ol>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">8. O que publicamos e onde</h2>
 <p>O método não é abstrato. Cada peça do Radar tem superfície pública verificável.</p>
 <ul><li><strong>Leitura do dia</strong> — endpoint JSON público com a leitura agregada do regime brasileiro atual, atualizada diariamente, em <a href="/api/leitura-do-dia.json">radarperene.com.br/api/leitura-do-dia.json</a>. Documentação em <a href="/api/docs/">/api/docs</a>.</li><li><strong>Leitura por ativo</strong> — cada ação, FII, índice ou cripto coberto abre em `/ativo/{ticker}` com a pilha diária <strong>preço · Índice Ânima · Índice de Risco Perene</strong> sincronizada, sinais de virada datados, cone e análogos. Lista completa em <a href="/ativos">/ativos</a>.</li><li><strong>Widget embedável</strong> — `&lt;iframe&gt;` com a Leitura do dia, gratuito, citação automática. Disponível em três tamanhos em <a href="/api/docs/">/api/docs</a>.</li><li><strong>Diário do Radar</strong> — histórico público das leituras diárias com data, scores, lente em destaque, análogo do dia e comentário sóbrio. Acumula permanência — daqui a seis ou doze meses, o leitor poderá auditar como o Radar leu cada janela. Disponível em <a href="/diario/">/diario</a>.</li><li><strong>A linguagem do Radar</strong> — todas as páginas de conceito em <a href="/conceitos/">/conceitos</a>.</li><li><strong>Lentes</strong> — todas as lentes principais e o Vértice em <a href="/lentes/">/lentes</a>.</li><li><strong>Como ler o Radar</strong> — guia em seis passos para usuários novos em <a href="/como-ler-o-radar/">/como-ler-o-radar</a>.</li></ul>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">9. O arquivo — o que aconteceu depois</h2>
 <p>A espinha do Radar não é a leitura de hoje; é a memória de quinze anos de leituras. Cada mês desde 2010 foi lido e congelado — e é desse arquivo que nasce o formato que dá nome à casa: <em>o que o Radar dizia, e o que aconteceu depois</em>. Os episódios reconstroem os grandes regimes (a crise de 2015, a COVID, as eleições de 2022) mostrando, com datas, o que a leitura acertou — e, sobretudo, <strong>o que ela não implicava</strong>. É memória, não previsão. Leia em /artigos e acompanhe a leitura diária em /diario.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">10. Limites declarados</h2>
 <p>O leitor sofisticado lê esta seção antes de qualquer outra.</p>
 <ul><li><strong>Janela estatística</strong>: a estatística de regime começa em 2000. Eventos pré-2000 entram como referência qualitativa, não como pontos na distribuição.</li><li><strong>Cobertura jurisprudencial</strong>: o motor cobre jurisprudência limpa a partir do RSS contínuo (atos pós-cobertura inicial). Retroativo profundo (decisões anteriores ao início da coleta automatizada) tem cobertura desigual — declarado explicitamente nas páginas onde é relevante.</li><li><strong>Volume e profundidade brasileiros</strong>: ativos de baixa liquidez podem produzir leituras instáveis no Índice Ânima. Quando o volume mínimo não está disponível, o instrumento fica em calibração para o ativo.</li><li><strong>Defasagem de transmissão</strong>: sinais do Regime Global têm transmissão variável para o Brasil (semanas a meses). O Radar identifica defasagens em janelas históricas semelhantes; não crava o ponto de chegada.</li><li><strong>Não substitui profissional</strong>: o Radar não emite parecer jurídico, contábil ou de investimento. Consulte profissional habilitado antes de decisões patrimoniais.</li><li><strong>Não é terminal financeiro</strong>: o Radar não oferece preço em tempo real, book de ordens, execução, alocação automatizada ou call de trade.</li><li><strong>Cenário, não ponto</strong>: toda projeção é condicional (&quot;sob as condições atuais, …&quot;). O Radar nunca atribui certeza a ponto futuro.</li></ul>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">11. Como citar o Radar Perene</h2>
 <p>Esta seção responde a uma necessidade específica de quem cita o Radar — jornalistas, analistas, IAs generalistas, pesquisadores, advisors.</p>
 <p><strong>Forma curta</strong> (uma menção em texto):</p>
@@ -371,12 +371,12 @@
 <p><strong>Forma de leitura do dia</strong> (para citar a leitura agregada):</p>
 <blockquote class="ex">Radar Perene, Leitura do dia [DD/MM/AAAA]. Disponível em: https://radarperene.com.br/api/leitura-do-dia.json.</blockquote>
 <p><strong>Atribuição mínima requerida</strong> ao usar o widget embedável ou a API pública: incluir &quot;Fonte: Radar Perene&quot; com link para a página de origem. Uso comercial permitido com a mesma atribuição. Modificações ao output são permitidas se a citação explicitar que o dado bruto foi processado.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">12. Fontes</h2>
 <p>O Radar opera sobre fontes primárias e dados públicos. Categorias e exemplos representativos abaixo. <strong>Não exaustiva — cobertura completa é mantida na arquitetura técnica.</strong></p>
 <ul><li><strong>Atos normativos federais</strong>: Diário Oficial da União (DOU), Receita Federal (RFB), Conselho Monetário Nacional (CMN), Comissão de Valores Mobiliários (CVM).</li><li><strong>Atos normativos do Banco Central</strong>: Resoluções do BCB, séries do BCB SGS, Boletim Focus.</li><li><strong>Jurisprudência</strong>: STF, STJ, TSE, TST, e tribunais cobertos pelo motor.</li><li><strong>Atos legislativos</strong>: Câmara dos Deputados, Senado Federal, assembleias estaduais relevantes (especialmente para ITCMD e regulação imobiliária).</li><li><strong>Séries econômicas e de mercado</strong>: BCB SGS, Tesouro Transparente, ANBIMA (IMA-B), B3 (índices via ETFs proxy), FipeZap, SINAPI, IBGE (IPCA, PIM, PMC, PMS, atividade).</li><li><strong>Séries internacionais</strong>: Federal Reserve (FRED), provedores licenciados de dados de mercado e market-data público de bolsas (Binance/Bitstamp para cripto), com ETFs-proxy para índices e commodities, e BCB PTAX para câmbio. Fontes públicas de cripto e on-chain quando relevantes para o Vértice.</li><li><strong>Como os dados de mercado são obtidos</strong>: usamos exclusivamente valores de <strong>fechamento (end-of-day)</strong>, por <strong>APIs públicas ou licenciadas</strong> — <strong>sem extração ou scraping</strong> de páginas de terceiros. O histórico fica armazenado; só o fechamento diário é atualizado.</li><li><strong>Agregadores jurídicos e econômicos</strong>: tratados como sinal de eco com confiança menor; nunca substituem a fonte primária.</li></ul>
 <p>A política de fontes do Radar é declarada: <strong>fonte primária recebe peso maior que fonte secundária</strong>, e toda atribuição é rastreável em cada item exibido.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">13. Perguntas frequentes</h2>
 <p><strong>P: O Radar Perene usa inteligência artificial?</strong> R: Há uma camada técnica de linguagem (LLM) que organiza, classifica e narra os outputs do motor determinístico. A camada de inferência probabilística é matemática declarada, não mística. A expressão &quot;IA invisível&quot; descreve uma decisão de design (não vender &quot;IA&quot; como argumento), não opacidade no tratamento de dados.</p>
 <p><strong>P: O Radar dá recomendação de investimento?</strong> R: Não. Consultoria jurídica, contábil e de investimento é privativa de profissional habilitado. Descrever regime regulatório e cruzamento de mercado é diferente de aconselhar a operar. O Radar faz a primeira; nunca a segunda.</p>
@@ -394,7 +394,7 @@
 <p><strong>P: Posso embutir a Leitura do dia no meu site?</strong> R: Sim. O endpoint JSON é público, e o widget é embedável e gratuito. Documentação em <a href="/api/docs/">/api/docs</a>. Citação obrigatória.</p>
 <p><strong>P: O Radar cobre mercados fora do Brasil?</strong> R: O foco do Radar é o Brasil. O eixo Regime Global existe apenas como contexto externo cruzado com o Brasil — não como leitura autônoma de mercados estrangeiros. Uma versão internacional em inglês está disponível em <a href="https://radarperene.com">radarperene.com</a>.</p>
 <p><strong>P: Como o Radar atualiza sua metodologia?</strong> R: Esta página é a referência canônica versionada. Mudanças metodológicas significativas geram nova versão (v3.0 → v3.1), com data e descrição da alteração registradas. Mudanças que afetam a comparabilidade histórica das séries são declaradas explicitamente.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <p>O Radar não transforma incerteza em certeza. Transforma ruído em contexto.</p>
     <div class="ad-slot" data-ad-type="multiplex" style="min-height:90px;margin:26px 0 0"></div>
   </article>

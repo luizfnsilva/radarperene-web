@@ -32,13 +32,13 @@
 <style>
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#6e6e78;
-    --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
+    --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96; --gold-ink:#94560f; --btn-ink:#fff; --btn-bg:#1a1a2e;
     --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
   }
   :root[data-theme="dark"]{
     --bg:#0e1217; --surface:#161b22; --surface2:#1c222b; --line:#28303a; --txt:#eceef1; --txt2:#c2c8d0; --dim:#8a929e;
-    --gold:#d9a441; --gold2:#e8c572; --hot:#e0533d; --warm:#d98a3d; --cool:#5b8fd0; --neu:#6b7682;
+    --gold:#d9a441; --gold2:#e8c572; --hot:#e0533d; --warm:#d98a3d; --cool:#5b8fd0; --neu:#6b7682; --gold-ink:#d9a441; --btn-ink:#0a0c0f; --btn-bg:var(--gold);
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
@@ -65,8 +65,8 @@
   .regime-note b{color:var(--txt2);font-weight:600}
   .regime-note .go{color:var(--gold);font-weight:600;white-space:nowrap}
   .regime-note:hover .go{text-decoration:underline}
-  .btn{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:600;letter-spacing:.02em;padding:14px 34px;border-radius:2px;font-size:15px;transition:background .15s}  /* ★ editorial: cantos retos, sem "lift" de SaaS — casa com a home (publicação convida, software empurra) */
-  .btn:hover{background:var(--gold2)}
+  .btn{display:inline-block;background:var(--btn-bg);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;padding:14px 34px;border-radius:2px;font-size:15px;transition:background .15s}  /* ★ editorial: cantos retos, sem "lift" de SaaS — casa com a home (publicação convida, software empurra) */
+  .btn:hover{background:var(--gold)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
   .btn.big{padding:16px 40px;font-size:16px}
   .micro{font-size:12px;color:var(--dim);margin-top:13px}
@@ -94,7 +94,7 @@
   .live .st span{font-size:11.5px;color:var(--dim);display:block;margin-top:5px}
   /* price */
   .price{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--gold);border-radius:12px;padding:30px;text-align:center}
-  .price .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:3px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+  .price .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold-ink);border-radius:3px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
   .price .amt{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,46px);margin:6px 0 2px}
   .price .amt small{font-size:.42em;color:var(--dim);font-weight:400}
   .price .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0 10px}
@@ -103,7 +103,7 @@
   @media(max-width:680px){.plans{grid-template-columns:1fr}}
   .plan{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--surface)}
   .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface))}  /* ★ editorial: destaque pelo traço dourado + fundo, sem glow de SaaS (a home reserva sombra a menus, nunca a card de conteúdo) */
-  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:3px;padding:3px 11px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold-ink);border-radius:3px;padding:3px 11px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
   .plan .pname{font-family:var(--serif);font-weight:600;font-size:22px;margin:0}
   .plan .amt{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,40px);margin:4px 0 2px}
   .plan .amt small{font-size:.42em;color:var(--dim);font-weight:400}

@@ -42,7 +42,7 @@
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#5f5f69;
     --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
-    --gold-ink:#94560f; --btn-ink:#fff; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
+    --gold-ink:#94560f; --btn-ink:#fff; --btn-bg:#1a1a2e; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
     --l-patr:#1a3a5c; --l-elei:#2c5f2e; --l-macro:#a8651a; --l-inst:#5b3a6b; --l-imob:#8a4b38;
     --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
@@ -52,7 +52,7 @@
   :root[data-theme="dark"]{
     --bg:#0e1217; --surface:#161b22; --surface2:#1c222b; --line:#28303a; --txt:#eceef1; --txt2:#c2c8d0; --dim:#8a929e;
     --gold:#d9a441; --gold2:#e8c572; --hot:#e0533d; --warm:#d98a3d; --cool:#5b8fd0; --neu:#6b7682;
-    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
+    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --btn-bg:var(--gold); --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
@@ -129,9 +129,9 @@
   .hero-leitura .rp-narr{margin:22px auto 4px}
   body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
   /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
-  .btn{display:inline-block;background:var(--gold);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
+  .btn{display:inline-block;background:var(--btn-bg);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
     padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
-  .btn:hover{background:var(--gold2)}
+  .btn:hover{background:var(--gold)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold-ink);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
@@ -270,7 +270,7 @@
 </style>
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 
-<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a,.pg p a{color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
+<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -289,11 +289,11 @@
 <p>Last revised: 4 June 2026 · Methodology version: 3.0 · Operator: Radar Perene.</p>
 <p>In this page:</p>
 <ol><li>What the Radar does, in one sentence</li><li>The three axes of the reading</li><li>The cast — the characters of the reading</li><li>The five lenses</li><li>The Vértice Experiment</li><li>Five reading principles</li><li>Ten immutable integrity principles</li><li>What we publish, and where</li><li>The archive — what happened next</li><li>Declared limits</li><li>How to cite Radar Perene</li><li>Sources</li><li>Frequently asked questions</li></ol>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">1. What Radar Perene does, in one sentence</h2>
 <p>Radar Perene reads the state of the Brazilian market by combining three orthogonal axes (Brazil Regime, Global Regime, Intermarket BR), a set of proprietary instruments (ERP_BR, Logarithmic Regression Cone, <strong>the Ânima Index and the Perene Risk Index</strong> — the two proprietary indices stacked under every asset's price —, Historical Analogs, and turning-point Signals), and five regulatory and market lenses (Wealth, Macro/CVM/Central Bank, Institutional/Integrity, Real Estate, Electoral), plus an adjacent experiment (Lente Vértice) for cross-domain hypotheses under Bayesian discipline.</p>
 <p>The Radar <strong>does not forecast</strong>. The Radar <strong>contextualizes</strong>. First the regime. Then the decision.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">2. The three axes of the reading</h2>
 <p>The Radar's reading comes from the crossing of three independent axes. Convergences confirm; divergences organize nuance.</p>
 <h3 class="sub">2.1 Brazil Regime</h3>
@@ -305,7 +305,7 @@
 <h3 class="sub">2.4 Why the three are orthogonal</h3>
 <p>The three axes read independent dimensions. The Brazil Regime is domestic regulatory and quantitative surface; the Global Regime is external macro; Intermarket BR is domestic sectoral flow. <strong>Institutional capital often positions itself on the Intermarket axis before the regulatory axis moves</strong> — the product's canonical thesis sentence comes from that crossing: <em>capital positioned before the headline</em>.</p>
 <p>The exact weighting by which the three axes combine — weights, gates, normalizations, baskets, filters — is part of the house's craft: declared in the technical architecture for audit, not exposed on the surface. But what sets the Radar apart is neither the formula nor the memory alone — it is the combination. The method lets you observe; the archive lets you compare. And these are not just any fifteen years: they are fifteen years observed through the same lens, frozen and auditable — something no one fabricates retroactively.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">3. The cast — the characters of the reading</h2>
 <p>The Radar has no categories; it has recurring characters that return in every episode of the archive. Below, the cast — in two groups: the characters (the forces observed — mood, appetite, structure, the dollar, rates, cyclicals, defensives) and the instruments (the magnifying lenses over them). Each has its own concept page, with definition, example and limitation.</p>
 <h3 class="sub">3.1 ERP_BR — Equity Risk Premium Brazil</h3>
@@ -326,17 +326,17 @@
 <h3 class="sub">3.6 Turning-point Signals</h3>
 <p>In risk-regime transitions — typically extreme fear followed by reversal — the engine marks <strong>dated signals</strong> on the asset's chart and shows the <strong>historical table of what followed</strong> (observed returns from one week to one year) alongside the pattern's aggregate statistics (frequency, median, dispersion). Each signal is confronted with the actual outcome as time passes.</p>
 <p>Reading: a turning-point signal is a <strong>descriptive historical distribution</strong> of what tended to follow similar setups — never a buy or sell recommendation, nor a promise of repetition. Reference: <a href="/concepts/risk-on-risk-off/">/concepts/risk-on-risk-off</a>.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">4. The five lenses</h2>
 <p>The five principal lenses cover regulatory and market dimensions of Brazil. Each lens is fed by its own taxonomy, window, and sources; each lens returns trajectory, convergence, context window, and contextual confidence.</p>
 <ul><li><strong>Wealth Lens</strong> — what threatens or favors the preservation of wealth. ITCMD in motion, family holdings under review, Law 14.754 and the offshore terrain, succession and asset protection. <a href="/lenses/wealth/">Lens page</a>.</li><li><strong>Macro / CVM / Central Bank Lens</strong> — the price of money in Brazil. Monetary policy, FX, capital markets, banking regulation, credit, fiscal. <a href="/lenses/macro/">Lens page</a>.</li><li><strong>Institutional / Integrity Lens</strong> — the rules being written now. Sectoral compliance, LGPD/ANPD, anticorruption, agency-level regulation, public procurement, institutional case law. <a href="/lenses/institutional/">Lens page</a>.</li><li><strong>Real Estate Lens</strong> — property versus fixed income. Sectoral regulation, mortgage credit, REITs, SINAPI/FipeZap, urban legislation, municipal property tax, IMOB basket cross-check. <a href="/lenses/real-estate/">Lens page</a>.</li><li><strong>Electoral Lens</strong> — political mood before the vote. Candidacies, campaign finance, accounting, advertising, rulings. Short windows tied to the official calendar. <a href="/lenses/electoral/">Lens page</a>.</li></ul>
 <p>Umbrella page: <a href="/lenses/">/lenses</a>.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">5. The Vértice Experiment</h2>
 <p>Vértice is the Radar's methodological experiment — a Bayesian system that formulates cross-domain hypotheses between regulatory, market, crypto, sentiment, and Brazilian fragility. It does not replace the five lenses; it operates in parallel, under stricter discipline.</p>
 <p>Every Vértice hypothesis is structured as an object: evidence, contradictions, what strengthens it, what weakens it, next signals to watch, categorical contextual confidence, and mandatory adversarial critique. <strong>Without listed evidence and contradictions, the hypothesis is rejected before it appears.</strong> Vértice formulates hypotheses; history calibrates confidence; the decision remains human.</p>
 <p>Reference: <a href="/concepts/vertice/">/concepts/vertice</a> (methodological concept) and <a href="/lenses/vertice/">/lenses/vertice</a> (product page).</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">6. Five reading principles</h2>
 <p>These are the principles by which the method operates. Each answers a common cognitive trap in financial analysis.</p>
 <p><strong>6.1 Isolated indicators inform; the regime organizes.</strong> A high real rate, on its own, is a number. A high real rate at the top historical percentile, within a deteriorating fiscal regime, with defensive intermarket and stretched sentiment, is a <strong>reading</strong>. The Radar always operates in the second form.</p>
@@ -344,22 +344,22 @@
 <p><strong>6.3 The statistical window is the modern regime.</strong> Before the Real, hyperinflation distorts statistics. Stacking the hyperinflation tail against 2024 destroys the signal. The Radar respects the regime boundary: statistics do not cross monetary-regime boundaries. Pre-2000 events enter as qualitative reference, not as distribution points.</p>
 <p><strong>6.4 Visible calibration over fake numbers.</strong> When real history for a metric is insufficient, the interface shows &quot;in calibration&quot; and says why. The Radar <strong>prefers admitting calibration over fabricating a number</strong>.</p>
 <p><strong>6.5 The future is conditional scenario, not point.</strong> The Radar never says <em>&quot;the IBOV will close at X&quot;</em>. It says <em>&quot;under current conditions, in historically similar windows, the index moved between X and Y in N of M observed cases, over a K-day window&quot;</em>. A longer sentence, more honest, falsifiable.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">7. Ten immutable integrity principles</h2>
 <p>These are the product's policy. Binding for the engine, the interface, the communication, and any integration via API or widget.</p>
 <ol><li>The Radar <strong>does not fake confidence</strong>. Contextual confidence is categorical (low, moderate, moderate-high, high) and auditable; a low-density corpus never displays &quot;high&quot;.</li><li>The Radar <strong>does not fake dates</strong>. `publication_date = collection_date` is treated as synthetic; never presented as real publication.</li><li>The Radar <strong>does not fake sources</strong>. Every metric has a declared primary source and a traceable URL; primary sources receive different treatment from press, aggregators, and news.</li><li>The Radar <strong>does not fake forecasts</strong>. Only trajectories, context windows, conditional scenarios, and contextual confidence; never deterministic certainty about a future point.</li><li><strong>No computation on synthetic dates.</strong> Trajectory, regime, convergence, and forecasting are computed only on items with real, verifiable dates (R1 gate, absolute invariant).</li><li><strong>Visible calibration.</strong> Without enough history for a metric, the interface shows a calibration state — never a fabricated number.</li><li><strong>Original score immutable.</strong> The score of each item is never overwritten; the history is auditable.</li><li><strong>Adjusted score auditable.</strong> When convergence or regime adjusts a score, the adjustment is additive, capped, and justified — with reason recorded.</li><li><strong>Primary source differentiated.</strong> Courts, regulators, and self-regulators receive different treatment from press, aggregators, and news.</li><li><strong>No advice, recommendation, or automated decision.</strong> The product describes — it never prescribes. It does not issue legal, accounting, or investment advice. It does not recommend buying, selling, hiring, or restructuring.</li></ol>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">8. What we publish, and where</h2>
 <p>The method is not abstract. Every piece of the Radar has a verifiable public surface.</p>
 <ul><li><strong>Today's reading</strong> — public JSON endpoint with the current aggregate regime reading, updated daily, at <a href="/api/leitura-do-dia.json">radarperene.com/api/todays-reading.json</a>. Documentation at <a href="/api/docs/">/api/docs</a>.</li><li><strong>Per-asset reading</strong> — every covered stock, REIT, index or crypto opens at `/ativo/{ticker}` with the synchronized daily stack <strong>price · Ânima Index · Perene Risk Index</strong>, dated turning-point signals, cone and analogs. Full list at <a href="/ativos">/ativos</a>.</li><li><strong>Embeddable widget</strong> — `&lt;iframe&gt;` with Today's reading, free, automatic citation. Available in three sizes at <a href="/api/docs/">/api/docs</a>.</li><li><strong>Radar Diary</strong> — public history of daily readings with date, scores, featured lens, daily analog, and a sober comment. It accumulates permanence — six or twelve months from now, the reader will be able to audit how the Radar read each window. Available at <a href="/diario/">/diary</a>.</li><li><strong>The Radar's language</strong> — every concept page at <a href="/concepts/">/concepts</a>.</li><li><strong>Lenses</strong> — all principal lenses and Vértice at <a href="/lenses/">/lenses</a>.</li><li><strong>How to read the Radar</strong> — six-step guide for new users at <a href="/how-to-read-the-radar/">/how-to-read-the-radar</a>.</li></ul>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">9. The archive — what happened next</h2>
 <p>The Radar's backbone is not today's reading; it is the memory of fifteen years of readings. Every month since 2010 was read and frozen — and from that archive comes the format that names the house: <em>what the Radar said, and what happened next</em>. The episodes reconstruct the great regimes (the 2015 crisis, COVID, the 2022 elections), showing — with dates — what the reading got right and, above all, <strong>what it did not imply</strong>. It is memory, not prediction. Read it at /artigos and follow the daily reading at /diario.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">10. Declared limits</h2>
 <p>The sophisticated reader reads this section before any other.</p>
 <ul><li><strong>Statistical window</strong>: regime statistics begin in 2000. Pre-2000 events enter as qualitative reference, not as distribution points.</li><li><strong>Case-law coverage</strong>: the engine covers clean case law from continuous RSS onward (acts after initial coverage). Deep retroactive coverage (decisions prior to the start of automated collection) is uneven — declared explicitly where relevant.</li><li><strong>Brazilian volume and depth</strong>: low-liquidity assets can produce unstable readings on the Ânima Index. Without minimum volume, the instrument remains in calibration for that asset.</li><li><strong>Transmission lag</strong>: Global Regime signals have variable transmission to Brazil (weeks to months). The Radar identifies lags in historically similar windows; it does not nail the destination point.</li><li><strong>Does not replace a professional</strong>: the Radar does not issue legal, accounting, or investment advice. Consult a licensed professional before wealth decisions.</li><li><strong>Not a financial terminal</strong>: the Radar does not offer real-time price, order book, execution, automated allocation, or trade calls.</li><li><strong>Scenario, not point</strong>: every projection is conditional (&quot;under current conditions, …&quot;). The Radar never assigns certainty to a future point.</li></ul>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">11. How to cite Radar Perene</h2>
 <p>This section addresses a specific need of those who cite the Radar — journalists, analysts, general-purpose AIs, researchers, advisors.</p>
 <p><strong>Short form</strong> (one in-text mention):</p>
@@ -371,12 +371,12 @@
 <p><strong>Daily reading form</strong> (for citing the aggregate reading):</p>
 <blockquote class="ex">Radar Perene, Today's reading [YYYY-MM-DD]. Available at: https://radarperene.com/api/todays-reading.json.</blockquote>
 <p><strong>Minimum attribution</strong> when using the embeddable widget or the public API: include &quot;Source: Radar Perene&quot; with a link to the origin page. Commercial use is permitted with the same attribution. Modifications to the output are permitted if the citation specifies that the raw data was processed.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">12. Sources</h2>
 <p>The Radar operates on primary sources and public data. Categories and representative examples below. <strong>Not exhaustive — full coverage is maintained inside the technical architecture.</strong></p>
 <ul><li><strong>Federal normative acts</strong>: Brazilian Official Gazette (DOU), Federal Revenue Service (RFB), National Monetary Council (CMN), Securities and Exchange Commission (CVM).</li><li><strong>Central Bank normative acts</strong>: Brazilian Central Bank (BCB) resolutions, BCB SGS series, Focus survey.</li><li><strong>Case law</strong>: Brazilian Supreme Court (STF), Superior Court of Justice (STJ), Superior Electoral Court (TSE), Superior Labor Court (TST), and other courts covered by the engine.</li><li><strong>Legislative acts</strong>: Brazilian Chamber of Deputies, Federal Senate, relevant state assemblies (especially for ITCMD and real estate regulation).</li><li><strong>Economic and market series</strong>: BCB SGS, Treasury Direct (Tesouro Transparente), ANBIMA (IMA-B), B3 (indices via ETF proxies), FipeZap, SINAPI, IBGE (CPI, industrial production, retail and services surveys, activity).</li><li><strong>International series</strong>: Federal Reserve (FRED), licensed market-data providers and public exchange market-data (Binance/Bitstamp for crypto), with ETF proxies for indices and commodities, and BCB PTAX for FX. Public crypto and on-chain sources when relevant to Vértice.</li><li><strong>How market data is obtained</strong>: we use <strong>end-of-day closing values only</strong>, via <strong>public or licensed APIs</strong> — <strong>no scraping or page extraction</strong> from third parties. History is stored; only the daily close is updated.</li><li><strong>Legal and economic aggregators</strong>: treated as echo signal with lower confidence; they never replace primary sources.</li></ul>
 <p>The Radar's source policy is declared: <strong>primary sources carry greater weight than secondary sources</strong>, and every attribution is traceable in each displayed item.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <h2 class="sec">13. Frequently asked questions</h2>
 <p><strong>Q: Does Radar Perene use artificial intelligence?</strong> A: There is a technical language layer (LLM) that organizes, classifies, and narrates the outputs of the deterministic engine. The probabilistic inference layer is declared mathematics, not mysticism. The phrase &quot;invisible AI&quot; describes a design decision (not selling &quot;AI&quot; as a sales argument), not opacity in data handling.</p>
 <p><strong>Q: Does the Radar give investment advice?</strong> A: No. Legal, accounting, and investment advice is the regulated activity of licensed professionals. Describing a regulatory regime and a market crossing is different from advising a trade. The Radar does the first; never the second.</p>
@@ -394,7 +394,7 @@
 <p><strong>Q: Can I embed Today's reading on my site?</strong> A: Yes. The JSON endpoint is public, and the widget is embeddable and free. Documentation at <a href="/api/docs/">/api/docs</a>. Attribution mandatory.</p>
 <p><strong>Q: Does the Radar cover markets outside Brazil?</strong> A: The Radar's focus is Brazil. The Global Regime axis exists only as external context crossed with Brazil — not as standalone reading of foreign markets. A Brazilian Portuguese version is available at <a href="https://radarperene.com.br">radarperene.com.br</a>.</p>
 <p><strong>Q: How does the Radar update its methodology?</strong> A: This page is the versioned canonical reference. Significant methodological changes generate a new version (v3.0 → v3.1), with date and description of the change recorded. Changes that affect the historical comparability of series are declared explicitly.</p>
-<p>---</p>
+<hr style="border:0;border-top:1px solid var(--line);max-width:90px;margin:34px 0 26px">
 <p>Radar Perene provides contextual regulatory intelligence. Nothing in this publication constitutes legal, accounting, economic, or investment advice. Consult a licensed professional before acting on any content shown here.</p>
 <p class="closing">The Radar does not turn uncertainty into certainty. It turns noise into context.</p>
     <div class="ad-slot" data-ad-type="multiplex" style="min-height:90px;margin:26px 0 0"></div>

@@ -29,8 +29,8 @@
 <link rel="manifest" href="/site.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#faf9f6;--surface:#fff;--surface2:#f3f1ec;--line:#e6e3dc;--txt:#1a1a2e;--txt2:#3a3a45;--dim:#6e6e78;--gold:#a8651a;--serif:'Newsreader',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
-  :root[data-theme="dark"]{--bg:#0e1217;--surface:#161b22;--surface2:#1c222b;--line:#28303a;--txt:#eceef1;--txt2:#c2c8d0;--dim:#8a929e;--gold:#d9a441}
+  :root{--bg:#faf9f6;--surface:#fff;--surface2:#f3f1ec;--line:#e6e3dc;--txt:#1a1a2e;--txt2:#3a3a45;--dim:#6e6e78;--gold:#a8651a;--gold-ink:#94560f;--btn-ink:#fff;--btn-bg:#1a1a2e;--serif:'Newsreader',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  :root[data-theme="dark"]{--bg:#0e1217;--surface:#161b22;--surface2:#1c222b;--line:#28303a;--txt:#eceef1;--txt2:#c2c8d0;--dim:#8a929e;--gold:#d9a441;--gold-ink:#d9a441;--btn-ink:#0a0c0f;--btn-bg:var(--gold)}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.65;font-size:17px}
   .wrap{max-width:760px;margin:0 auto;padding:34px 22px 60px}
@@ -47,7 +47,7 @@
   h3{font-size:17px;font-weight:600;margin:20px 0 4px}
   .lead{font-size:20px;color:var(--dim);margin:0 0 8px}
   ul{padding-left:20px}li{margin:6px 0}
-  .cta{display:inline-block;background:var(--gold);color:#0a0c0f;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:9px;margin:8px 8px 8px 0}
+  .cta{display:inline-block;background:var(--btn-bg);color:var(--btn-ink);text-decoration:none;font-weight:700;padding:12px 22px;border-radius:9px;margin:8px 8px 8px 0}
   .cta.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
   .faq dt{font-weight:700;margin-top:18px}.faq dd{margin:4px 0 0;color:var(--txt2)}
   .disc{color:var(--dim);font-size:13px;border-top:1px solid var(--line);margin-top:36px;padding-top:18px}
