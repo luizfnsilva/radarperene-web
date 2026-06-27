@@ -70,6 +70,10 @@
   .brand .nm b{color:var(--gold-ink)}
   .lang{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:4px}.lang a{text-decoration:none;padding:0 4px}.lang a.on{color:var(--gold-ink);font-weight:600}
   .lang .lglink{background:none;border:0;padding:0 4px;margin:0;color:inherit;font:inherit;cursor:pointer;line-height:inherit}.lang .lglink:hover{color:var(--gold-ink)}
+  /* tap-targets ≥24px (WCAG 2.5.8) SEM mudar o visual: links/login (transparentes, sem caixa) ganham altura por inline-flex; o toggle de tema (borda VISÍVEL) mantém a caixa e expande só a ÁREA de toque por pseudo fora de fluxo. Masthead é 71px (logo) → crescer p/ 24px não muda o envelope. */
+  .lang a,.lang .lglink{display:inline-flex;align-items:center;justify-content:center;min-height:24px;min-width:24px}
+  .tg{position:relative}
+  .tg::after{content:"";position:absolute;top:-3px;bottom:-3px;left:0;right:0}
   /* hambúrguer mobile: revela a .topnav como drawer ≤820px; ≥44px de alvo de toque; oculto no desktop */
   .navtoggle{display:none;align-items:center;justify-content:center;width:44px;height:44px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--txt2);cursor:pointer;padding:0;margin-left:6px;flex:none}
   .navtoggle:hover{color:var(--gold-ink);border-color:var(--gold-ink)}
