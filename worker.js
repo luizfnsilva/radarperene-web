@@ -642,6 +642,7 @@ function _applySec(resp, request) {
     h.set("X-Content-Type-Options", "nosniff");
     h.set("Referrer-Policy", "strict-origin-when-cross-origin");
     h.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+    h.set("Access-Control-Allow-Origin", "*"); // CORS aberto p/ leitura cross-origin (agentes/ferramentas de agent-readiness como isitagentready leem HTML/llms.txt/robots.txt do navegador); conteúdo 100% público, sem cookies de auth
     if ((resp.headers.get("content-type") || "").includes("text/html") && !h.has("Link")) h.set("Link", _FONT_LINK); // A: só em HTML; não pisa Link já setado
     const _pn = new URL(request.url).pathname;
     // Forma 3 = iframe embedável por terceiros. CF 307-redireciona /radar-embed.html → /radar-embed (extensionless),
