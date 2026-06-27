@@ -41,7 +41,7 @@
   :root{
     --bg:#faf9f6; --surface:#ffffff; --surface2:#f3f1ec; --line:#e6e3dc; --txt:#1a1a2e; --txt2:#3a3a45; --dim:#5f5f69;
     --gold:#a8651a; --gold2:#8a4b38; --hot:#b02e22; --warm:#7a3b0e; --cool:#1a3a5c; --neu:#9c9c96;
-    --gold-ink:#94560f; --btn-ink:#fff; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
+    --gold-ink:#94560f; --btn-ink:#fff; --btn-bg:#1a1a2e; --field-line:#8c877b; /* a11y 2026-06-27: gold legível como TEXTO no claro (5.5:1), texto do botão, borda de campo >=3:1 */
     --l-patr:#1a3a5c; --l-elei:#2c5f2e; --l-macro:#a8651a; --l-inst:#5b3a6b; --l-imob:#8a4b38;
     --serif:'Newsreader',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace; --max:1080px;
@@ -51,7 +51,7 @@
   :root[data-theme="dark"]{
     --bg:#0e1217; --surface:#161b22; --surface2:#1c222b; --line:#28303a; --txt:#eceef1; --txt2:#c2c8d0; --dim:#8a929e;
     --gold:#d9a441; --gold2:#e8c572; --hot:#e0533d; --warm:#d98a3d; --cool:#5b8fd0; --neu:#6b7682;
-    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
+    --gold-ink:#d9a441; --btn-ink:#0a0c0f; --btn-bg:var(--gold); --field-line:#566478; /* a11y: no escuro o gold já passa como texto (8.3:1) */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
@@ -128,9 +128,9 @@
   .hero-leitura .rp-narr{margin:22px auto 4px}
   body.rp-founder .hero-leitura{display:none}  /* Founder logado vê o radar completo abaixo, não o mini */
   /* ★ 2026-06-21 (dono): .qtag (pílula "ao vivo") removida — era Bloomberg, não Grant's. */
-  .btn{display:inline-block;background:var(--gold);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
+  .btn{display:inline-block;background:var(--btn-bg);color:var(--btn-ink);text-decoration:none;font-weight:600;letter-spacing:.02em;
     padding:13px 34px;border-radius:2px;font-size:14px;transition:background .15s}  /* editorial: cantos retos, sem "lift" de SaaS */
-  .btn:hover{background:var(--gold2)}
+  .btn:hover{background:var(--gold)}
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);margin-left:8px}
   .herolink{display:inline-block;color:var(--gold-ink);text-decoration:none;font-weight:600;font-size:14px;margin-left:16px;vertical-align:middle}
   .herolink:hover{text-decoration:underline}
@@ -297,7 +297,6 @@
 <p class="rel">Continue a história: O que sobra quando o medo precifica tudo · Março de 2020 foi o fundo · O dólar como termômetro de regime →</p>
 <p class="rel">O Radar lê esses regimes todos os dias. Veja a leitura de hoje →</p>
 <p class="rel" style="margin-top:24px">Leia também: <a href="/artigos/o-que-aconteceu-depois-medo-precificou-tudo/">O que aconteceu depois que o medo precificou tudo</a> · <a href="/artigos/marco-2020-foi-fundo/">Março de 2020 foi fundo?</a> · <a href="/artigos/dolar-termometro/">O dólar como termômetro de regime</a></p>
-<p class="rel">Personagens: <a href="/artigos/personagem/estrutura/">Estrutura (intermercado)</a> · <a href="/artigos/personagem/fluxo/">Fluxo (apetite por risco)</a> · <a href="/artigos/personagem/humor/">Humor</a> · <a href="/artigos/personagem/dolar/">Dólar</a></p>
 <div class="ctarow" style="border-top:1px solid var(--line);margin-top:32px;padding-top:22px"><p class="closing" style="font-style:normal;margin:0 0 14px">Isto é a memória do Radar. A leitura de hoje — regime, 5 lentes e os análogos do dia — está no ar, de graça.</p><a class="btn" href="/">Ver a leitura de hoje</a><a class="btn ghost" href="/assine">Conhecer a Edição Founder →</a></div>
   </article>
 </div>
