@@ -436,10 +436,12 @@ ${headStyle}
 ${PG_CSS}
 </head>
 <body>
-<div class="top">
+<a class="skip" href="#main">${en ? "Skip to content" : "Pular para o conteúdo"}</a>
+<header class="top">
   <a class="brand" href="/" style="text-decoration:none" aria-label="Radar Perene">${LOGO_IMG}</a>
   <div class="lang"><a href="/">← ${en ? "home" : "início"}</a> <button id="theme-tg" class="tg" type="button" aria-label="theme">☾</button></div>
-</div>
+</header>
+<main id="main">
 <div class="wrap">
   <article class="pg">
     <p class="crumb"><a href="/">Radar Perene</a> / ${esc(crumbLabel(p.slug, en))}</p>
@@ -447,6 +449,7 @@ ${PG_CSS}
     ${bodyOut}${multiplexSlot}
   </article>
 </div>
+</main>
 <footer>
   <nav class="ftnav">${en ? FOOT_EN : FOOT_PT}</nav>
   <p class="disc">${esc(disc)}</p>

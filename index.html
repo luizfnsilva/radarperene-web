@@ -87,7 +87,7 @@
   .skip:focus{top:8px;outline:2px solid var(--txt);outline-offset:2px}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
   /* topbar */
-  .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 22px;max-width:var(--max);margin:0 auto}
+  .top{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 22px;max-width:var(--max);margin:0 auto}
   .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.3px}
   .brand .logo-w{display:block;height:35px;width:auto}
   :root[data-theme="dark"] .logo-w-light{display:none}
@@ -96,17 +96,30 @@
   .brand .nm{font-family:var(--serif);font-size:18px;font-weight:600}
   .brand .nm b{color:var(--gold-ink)}
   .lang{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:4px}.lang a{text-decoration:none;padding:0 4px}.lang a.on{color:var(--gold-ink);font-weight:600}
+  .lang .lglink{background:none;border:0;padding:0 4px;margin:0;color:inherit;font:inherit;cursor:pointer;line-height:inherit}.lang .lglink:hover{color:var(--gold-ink)}
+  /* hambúrguer mobile: revela a .topnav como drawer ≤820px; ≥44px de alvo de toque; oculto no desktop */
+  .navtoggle{display:none;align-items:center;justify-content:center;width:44px;height:44px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--txt2);cursor:pointer;padding:0;margin-left:6px;flex:none}
+  .navtoggle:hover{color:var(--gold-ink);border-color:var(--gold-ink)}
+  .navtoggle svg{display:block}
   /* menu superior de conteúdo educacional (estilo SentimenTrader/Lead-Lag): links + dropdowns leves */
   .topnav{display:flex;align-items:center;gap:18px;font-size:13px;flex-wrap:wrap}
   .topnav>a,.topnav .dd>a{text-decoration:none;color:var(--txt2);white-space:nowrap;padding:4px 0;border-bottom:1.5px solid transparent;transition:color .15s,border-color .15s}
   .topnav>a:hover,.topnav .dd>a:hover{color:var(--gold-ink);border-color:var(--gold-ink)}
   .topnav .dd{position:relative}
   .topnav .ddm{position:absolute;top:100%;left:0;z-index:120;min-width:230px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.18);padding:7px;display:none;flex-direction:column;margin-top:6px}
-  .topnav .dd:hover .ddm,.topnav .dd:focus-within .ddm{display:flex}
+  .topnav .dd:hover .ddm,.topnav .dd.open .ddm{display:flex}
   .topnav .ddm a{text-decoration:none;color:var(--txt2);font-size:12.5px;padding:7px 10px;border-radius:7px;white-space:nowrap}
   .topnav .ddm a:hover{background:var(--surface2);color:var(--gold-ink)}
   .topnav .ddm a b{display:block;font-size:11px;color:var(--dim);font-weight:400;margin-top:1px}
-  @media(max-width:820px){.topnav{display:none}}
+  @media(max-width:820px){
+    .navtoggle{display:inline-flex}
+    .topnav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 22px 14px;box-shadow:0 16px 34px rgba(40,26,8,.16);z-index:150}
+    .top.nav-open .topnav{display:flex}
+    .topnav>a,.topnav .dd>a{padding:11px 2px;border-bottom:0;white-space:normal}
+    .topnav .dd,.topnav .ddm{position:static}
+    .topnav .ddm{display:flex;background:transparent;border:0;box-shadow:none;min-width:0;margin:0 0 4px;padding:0 0 4px 12px}
+    .topnav .ddm a{padding:8px 6px}
+  }
   /* grid "A linguagem do Radar" (9 conceitos) */
   .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
   .cgrid a{display:block;text-decoration:none;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;transition:border-color .15s,transform .15s}
@@ -281,7 +294,7 @@
 </head>
 <body>
 <a class="skip" href="#main">Pular para o conteúdo</a>
-<div class="top">
+<header class="top">
   <div class="brand">
     <img class="logo-w logo-w-light" src="/logo-light.svg" alt="Radar Perene" width="139" height="35" fetchpriority="high">
     <img class="logo-w logo-w-dark" src="/logo-dark.svg" alt="Radar Perene" width="139" height="35" fetchpriority="high">
@@ -289,8 +302,8 @@
     <a id="me-biblioteca" href="/biblioteca/" style="display:none;margin-left:10px;font-size:12px;font-weight:600;vertical-align:middle">Biblioteca</a>
   </div>
   <nav class="topnav" id="topnav" aria-label="conteúdo"></nav>
-  <div class="lang"><a href="/sobre" id="l-sobre">O que é</a> · <a href="#" id="me-login">Entrar</a> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a><button id="theme-tg" class="tg" type="button" aria-label="alternar tema">☾</button></div>
-</div>
+  <div class="lang"><a href="/sobre" id="l-sobre">O que é</a> · <button type="button" id="me-login" class="lglink">Entrar</button> · <a href="?lang=pt" id="l-pt">PT</a>·<a href="?lang=en" id="l-en">EN</a><button id="theme-tg" class="tg" type="button" aria-label="alternar tema">☾</button><button class="navtoggle" id="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="topnav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3.5" y1="6.5" x2="20.5" y2="6.5"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><line x1="3.5" y1="17.5" x2="20.5" y2="17.5"/></svg></button></div>
+</header>
 
 <main id="main">
 <div class="wrap">
@@ -386,7 +399,7 @@
 </main>
 
 <footer>
-  <nav class="ftnav" id="ftnav"></nav>
+  <nav class="ftnav" id="ftnav" aria-label="rodapé"></nav>
   <div class="disc" id="disc">Conteúdo educacional e informativo, de fontes públicas. Descritivo — NÃO constitui recomendação de investimento, oferta, solicitação ou consultoria financeira.</div>
   <div>Radar Perene · <a href="mailto:contato@radarperene.com.br" id="mail">contato@radarperene.com.br</a><span id="portal-wrap" style="display:none"> · <a href="https://billing.stripe.com/p/login/14A14mbaWcwH2Dp58bb3q00" target="_blank" rel="noopener" id="portal">Gerenciar assinatura</a></span> · radarperene.com</div>
 </footer>
@@ -460,7 +473,7 @@
   }
   // toggle de tema claro/escuro (persiste; ícone = próximo modo)
   var _tg=document.getElementById("theme-tg");
-  function _themeIcon(){if(_tg)_tg.textContent=document.documentElement.getAttribute("data-theme")==="dark"?"☀":"☾";}
+  function _themeIcon(){if(_tg){var _d=document.documentElement.getAttribute("data-theme")==="dark";_tg.textContent=_d?"☀":"☾";_tg.setAttribute("aria-pressed",_d?"true":"false");}}
   _themeIcon();
   if(_tg)_tg.addEventListener("click",function(){var nx=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",nx);try{localStorage.setItem("rp-theme",nx);}catch(e){}_themeIcon();});
   if(LANG==="en"){var _ls=document.getElementById("l-sobre");if(_ls){_ls.textContent="About";_ls.href="/about.html";}}
@@ -562,6 +575,14 @@
   // ── topo ENXUTO, editorial-first (dono 2026-06-17): Artigos (portal/ads) · Conceitos · Diário · Lentes ▾.
   //    Metodologia/Como ler/Versão grátis descem pro rodapé (sem ads → menos prioridade de clique). ──
   set("topnav",'<a href="'+U_ART+'">'+NAV.art+'</a><a href="'+U_CON+'">'+NAV.con+'</a><a href="'+U_DIA+'">'+NAV.dia+'</a><span class="dd"><a href="'+U_LEN+'" tabindex="0">'+NAV.len+' ▾</a><div class="ddm">'+lenDD+'</div></span>');
+  // a11y 4.1.2: dropdown da topnav com aria-haspopup/aria-expanded (estado real) + Escape fecha e devolve foco ao gatilho.
+  (function(){ var dds=document.querySelectorAll(".topnav .dd"); for(var i=0;i<dds.length;i++){ (function(dd){
+    var trig=dd.querySelector("a"); if(!trig) return; trig.setAttribute("aria-haspopup","true"); trig.setAttribute("aria-expanded","false");
+    var closing=false; function open(o){ dd.classList.toggle("open",o); trig.setAttribute("aria-expanded",o?"true":"false"); }
+    dd.addEventListener("focusin",function(){ if(!closing) open(true); });
+    dd.addEventListener("focusout",function(){ setTimeout(function(){ if(!dd.contains(document.activeElement)) open(false); },0); });
+    dd.addEventListener("keydown",function(e){ if(e.key==="Escape"){ closing=true; open(false); trig.focus(); setTimeout(function(){ closing=false; },0); } });
+  })(dds[i]); } })();
   void conDD;  // dropdown de Conceitos saiu do topo (vira link simples); CN segue no grid "linguagem do Radar"
   // ── P6: painel de números "uau" — labels EN vêm do worker (EN_BODY, server-side); só o href do CTA é por idioma aqui ──
   var _sbc=document.getElementById("sb-cta");if(_sbc)_sbc.href=U_ART;
@@ -717,6 +738,7 @@
 <!-- ★ 2026-06-21 (dono): compartilhar a Leitura do Radar — menu PRÓPRIO com os links diretos das redes + API pública (sem o share genérico do sistema). Texto dinâmico via window.RP_LEITURA_SHARE (setado pelo card). -->
 <script>(function(){
   var btn=document.getElementById("rp-share-btn"); if(!btn) return;
+  btn.setAttribute("aria-haspopup","true"); btn.setAttribute("aria-expanded","false");
   var menu=null;
   function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function isEN(){ var s=window.RP_LEITURA_SHARE; if(s&&s.lang) return s.lang==="en"; try{return (/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname))||/[?&]lang=en/.test(location.search);}catch(e){return false;} }
@@ -724,8 +746,9 @@
   function data(){ var s=window.RP_LEITURA_SHARE||{}, en=isEN(), url=s.url||(location.origin+"/");
     if(curTheme()==="dark") url += (url.indexOf("?")>=0?"&":"?")+"theme=dark";  // OG dark casa com o tema do usuário
     return { en:en, url:url, text:s.text||(en?"The Radar Reading — Radar Perene":"Leitura do Radar — Radar Perene") }; }
-  function close(){ if(menu){ if(menu.parentNode) menu.parentNode.removeChild(menu); menu=null; document.removeEventListener("click",onout); } }
+  function close(){ if(menu){ if(menu.parentNode) menu.parentNode.removeChild(menu); menu=null; document.removeEventListener("click",onout); document.removeEventListener("keydown",onkey); btn.setAttribute("aria-expanded","false"); } }
   function onout(e){ if(menu&&!menu.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)) close(); }
+  function onkey(e){ if(e.key==="Escape"&&menu){ close(); btn.focus(); } }
   btn.addEventListener("click",function(e){
     e.preventDefault(); e.stopPropagation();
     if(menu){ close(); return; }
@@ -743,13 +766,23 @@
     ];
     menu=document.createElement("div"); menu.className="rp-shmenu";
     var html=""; items.forEach(function(it,i){ if(i===6) html+='<div class="rp-shsep"></div>'; html+='<button type="button" class="rp-shi" data-h="'+esc(it[1])+'">'+esc(it[0])+'</button>'; });
-    menu.innerHTML=html; btn.parentNode.appendChild(menu);
+    menu.innerHTML=html; btn.parentNode.appendChild(menu); btn.setAttribute("aria-expanded","true");
     menu.addEventListener("click",function(ev){ var b=ev.target; while(b&&b!==menu&&!(b.className&&(""+b.className).indexOf("rp-shi")>=0)) b=b.parentNode; if(!b||b===menu) return;
       var h=b.getAttribute("data-h");
       if(h==="__copy__"){ try{navigator.clipboard.writeText(d.url); b.textContent=d.en?"Copied ✓":"Copiado ✓";}catch(_){ } return; }
       window.open(h,"_blank","noopener,noreferrer"); close(); });
-    setTimeout(function(){ document.addEventListener("click",onout); },0);
+    setTimeout(function(){ document.addEventListener("click",onout); document.addEventListener("keydown",onkey); },0);
   });
+})();</script>
+<!-- a11y 2026-06-27: hambúrguer mobile — revela a .topnav como drawer (≤820px) com aria-expanded + Escape; sem JS, o desktop segue inline. -->
+<script>(function(){
+  var t=document.getElementById("nav-toggle"), nav=document.getElementById("topnav");
+  if(!t||!nav) return; var top=t.closest(".top"); if(!top) return;
+  function setOpen(o){ top.classList.toggle("nav-open",o); t.setAttribute("aria-expanded",o?"true":"false"); }
+  t.addEventListener("click",function(e){ e.stopPropagation(); setOpen(t.getAttribute("aria-expanded")!=="true"); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&top.classList.contains("nav-open")){ setOpen(false); t.focus(); } });
+  document.addEventListener("click",function(e){ if(top.classList.contains("nav-open")&&!top.contains(e.target)) setOpen(false); });
+  nav.addEventListener("click",function(e){ var n=e.target; while(n&&n!==nav){ if(n.tagName==="A"){ setOpen(false); break; } n=n.parentNode; } });
 })();</script>
 </body>
 </html>

@@ -185,6 +185,10 @@
     while (el && el.firstChild) el.removeChild(el.firstChild);
   }
   function keep(el, u) { try { el._rpU = u; } catch (e) {} return u; }  // registra a instância viva p/ o próximo clear destruir
+  // a11y: o <canvas> puro do uPlot não tem alternativa textual → marca a raiz como role="img" + aria-label
+  //   (resumo do que o gráfico mostra; os números estão no texto/tooltip ao redor) e esconde o canvas do leitor de tela.
+  function a11yChart(u, label) { try { if (u && u.root) { u.root.setAttribute("role", "img"); u.root.setAttribute("aria-label", label); var cs = u.root.querySelectorAll("canvas"); for (var i = 0; i < cs.length; i++) cs[i].setAttribute("aria-hidden", "true"); } } catch (e) {} return u; }
+  function _docEN() { try { return ((document.documentElement.getAttribute("lang") || "").slice(0, 2).toLowerCase() === "en"); } catch (e) { return false; } }
 
   // =========================================================================
   // navPlugin — a "sensação TradingView": WHEEL = zoom-x em torno do cursor,
@@ -568,6 +572,7 @@
     };
 
     var u = new window.uPlot(opts, data, el);
+    a11yChart(u, opt.lang === "en" ? "Price chart over time with a scenario cone (percentile band of possible outcomes). Visual aid — the figures are in the reading text and the tooltip." : "Gráfico de preço ao longo do tempo com cone de cenários (faixa de percentis dos desfechos possíveis). Apoio visual — os números estão no texto da leitura e no tooltip.");
     try { u.over.appendChild(tip); } catch (e) {}  // tooltip consolidado vive sobre a área de plot
     makeResponsive(u, el);
     linkRegister(u, opt.sync);
@@ -684,6 +689,7 @@
       }
     }, data, el);
     u._rpRole = opt.role || null;  // anima/risk → o tooltip consolidado do preço lê o valor deste painel no mesmo timestamp
+    a11yChart(u, opt.lang === "en" ? "0–100 index over time (market regime / mood oscillator). Visual aid — the values are in the reading text and the tooltip." : "Índice 0–100 ao longo do tempo (oscilador de regime/humor do mercado). Apoio visual — os valores estão no texto da leitura e no tooltip.");
     makeResponsive(u, el);
     linkRegister(u, opt.sync);
     return keep(el, u);
@@ -783,6 +789,7 @@
         draw: [drawToday]
       }
     }, data, el);
+    a11yChart(u, _docEN() ? "Scatter plot positioning today's reading against historical analogs (lead-lag quadrants). Visual aid — the readout is in the surrounding text." : "Dispersão posicionando a leitura de hoje ante os análogos históricos (quadrantes lead-lag). Apoio visual — a leitura está no texto ao redor.");
     makeResponsive(u, el);
     return keep(el, u);
   }
@@ -859,6 +866,7 @@
       plugins: opt.nav ? [navPlugin({ clamp: opt.clamp, onReset: opt.onReset })] : [],
       hooks: opt.sync ? { setScale: [linkScaleHook(opt.sync)] } : {}  // janela-x propaga aos painéis empilhados (Ânima/risk)
     }, data, el);
+    a11yChart(u, opt.lang === "en" ? "Comparative chart of two rebased series (base 100) plus their ratio over time. Visual aid — values are in the surrounding text." : "Gráfico comparativo de duas séries rebaseadas (base 100) e a razão entre elas ao longo do tempo. Apoio visual — os valores estão no texto ao redor.");
     makeResponsive(u, el);
     if (opt.sync) linkRegister(u, opt.sync);
     return keep(el, u);
@@ -925,6 +933,7 @@
       plugins: opt.nav ? [navPlugin({ clamp: opt.clamp, onReset: opt.onReset })] : [],
       hooks: hooks
     }, data, el);
+    a11yChart(u, opt.lang === "en" ? "Comparative time-series chart of multiple rebased series (base 100). Visual aid — values are in the surrounding text." : "Gráfico comparativo de múltiplas séries rebaseadas (base 100) ao longo do tempo. Apoio visual — os valores estão no texto ao redor.");
     makeResponsive(u, el);
     if (opt.sync) linkRegister(u, opt.sync);
     return keep(el, u);
