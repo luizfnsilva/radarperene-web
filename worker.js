@@ -677,6 +677,28 @@ async function _route(request, env, ctx) {
     if (/\.com\.br$/i.test(_url.hostname) && /^\/subscribe(\/|$)/.test(_url.pathname)) {
       return Response.redirect(_url.origin + _url.pathname.replace(/^\/subscribe/, "/assine") + _url.search, 301);
     }
+    // ── /__purge — invalida o edge-cache da home/digest após novo snapshot (auditoria 2026-06-27 C1). ──
+    //    Guardado por env.PURGE_TOKEN (FAIL-CLOSED: sem o secret configurado no Worker, responde 403 sempre).
+    //    A wave pode chamar ?token=… ao fim do EOD. ⚠️ caches.default é POR-COLO → apaga só no data center que
+    //    atende a chamada; p/ purga GLOBAL usar a Cache Purge API de zona. Best-effort, aditivo, sem efeito até o
+    //    dono pôr o secret. Sem ele, o staleness do worker já se auto-cura por SWR em ~30min.
+    if (_url.pathname === "/__purge") {
+      const _tok = _url.searchParams.get("token") || request.headers.get("x-purge-token");
+      if (!env.PURGE_TOKEN || _tok !== env.PURGE_TOKEN) return new Response("forbidden", { status: 403 });
+      const _c = caches.default, _langs = ["pt", "en"];
+      const _hosts = ["radarperene.com.br", "www.radarperene.com.br", "radarperene.com", "www.radarperene.com"];
+      const _ks = [];
+      for (const l of _langs) for (const b of ["digest-" + l, "narr-" + l, "ult-" + l]) {
+        _ks.push("https://rp-cache.internal/" + b, "https://rp-cache.internal/stale/" + b);
+      }
+      for (const h of _hosts) for (const l of _langs) for (const d of ["", "/dark"]) {
+        _ks.push("https://rp-home.internal/v13/" + h + "/" + l + d, "https://rp-home.internal/v13/" + h + "/" + l + d + "/stale");
+      }
+      let _n = 0;
+      for (const k of _ks) { try { if (await _c.delete(new Request(k))) _n++; } catch (e) { /* best-effort */ } }
+      return new Response(JSON.stringify({ purged: _n, of: _ks.length, colo: (request.cf && request.cf.colo) || null }),
+        { headers: { "content-type": "application/json" } });
+    }
     // ── /sitemap.xml — ÍNDICE de sitemaps (origin-aware): amarra os 4 filhos do MESMO domínio (páginas estáticas +
     //    ativos + indicadores + arquivo diário) num só ponto de submissão. Os diários crescem sozinhos via o filho
     //    sitemap-snapshots.xml (data-driven), então o índice reflete as centenas de URLs sem regenerar nada. ──
