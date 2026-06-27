@@ -94,6 +94,25 @@ const PERSONAGEM_NOME_EN = {
   dolar: "Dollar", juros: "Rates (Selic)", anomalia: "Statistical anomaly",
   "ciclicos-defensivos": "Cyclicals × defensives", commodities: "Commodities",
 };
+// ── parágrafo-abertura de ESTUDO no topo do hub de personagem (transforma índice → página-estudo) ──
+const ESTUDO_INTRO = {
+  commodities: {
+    pt: `No Brasil, a commodity raramente é só commodity — é o câmbio disfarçado. Este é o estudo de quando a matéria-prima liderou o mercado, e de quantas vezes a força que parecia apetite por crescimento era, no fundo, um real fraco repreçando exportadoras. Os episódios abaixo rastreiam a razão Commodities(R$)/IBOV nos seus extremos: o reinado, o fim do reinado, e cada colheita que a moeda — não o mundo — decidiu.`,
+    en: `In Brazil, a commodity is rarely just a commodity — it is the exchange rate in disguise. This is the study of when raw materials led the market, and how often the strength that looked like growth appetite was, underneath, a weak real repricing exporters. The episodes below trace the Commodities(BRL)/IBOV ratio at its extremes: the reign, the end of the reign, and every harvest decided by the currency, not the world.`,
+  },
+  "ciclicos-defensivos": {
+    pt: `Toda bolsa tem dois cômodos: o que respira com a economia — os cíclicos — e o que paga aluguel indiferente a ela — os defensivos (utilities, tijolo, concessão). O dinheiro mora num ou no outro conforme o medo. Este é o estudo dessa mudança de endereço ao longo de quinze anos: quando o capital lotou o abrigo, quando voltou ao ciclo, e o que a rotação anunciou — e o que não.`,
+    en: `Every market has two rooms: the one that breathes with the economy — the cyclicals — and the one that pays rent regardless of it — the defensives (utilities, real estate, concessions). Money lives in one or the other depending on fear. This is the study of that change of address across fifteen years: when capital filled the shelter, when it returned to the cycle, and what the rotation announced — and what it did not.`,
+  },
+  anomalia: {
+    pt: `Uma anomalia estatística é um movimento tão fora do comum que deixa de ser ruído e passa a ser sinal de regime — três, quatro desvios da própria história. Não diz para onde o mercado vai; diz que o presente saiu do território comum. Este é o estudo dos extremos do arquivo: o apetite a 100 e a 0, o dólar em desvio raro, os quatro sigmas que mudaram — ou não — o que veio depois.`,
+    en: `A statistical anomaly is a move so far out of the ordinary that it stops being noise and becomes a regime signal — three, four deviations from its own history. It does not say where the market is going; it says the present has left common territory. This is the study of the archive's extremes: appetite at 100 and at 0, the dollar in rare deviation, the four sigmas that changed — or did not — what came next.`,
+  },
+  juros: {
+    pt: `O preço do dinheiro é o pano de fundo de tudo — e, em alguns meses, vira o protagonista. Este é o estudo da Selic como força de regime: o primeiro corte que rechama o risco, o aperto que encarece o medo, o juro real que paga para esperar, o piso e o teto. Quando o juro lidera, ele reorganiza a casa inteira.`,
+    en: `The price of money is the backdrop to everything — and, in some months, it takes the lead. This is the study of the Selic as a regime force: the first cut that calls risk back, the tightening that makes fear expensive, the real rate that pays to wait, the floor and the ceiling. When rates lead, they rearrange the whole house.`,
+  },
+};
 // normaliza um token do campo personagens → chave canônica
 function canonPersonagem(tok) {
   if (PERSONAGEM_NOME[tok]) return tok;                       // já é canônico
@@ -485,6 +504,7 @@ for (const p of Object.keys(PERSONAGEM_NOME)) {
   // ── PT ──
   CUR_LANG = "pt";
   let b = `<div class="ad-slot" data-ad-slot="topo" style="min-height:90px;margin:18px 0"></div>\n`;
+  if (ESTUDO_INTRO[p]) b += `<p class="lead">${ESTUDO_INTRO[p].pt}</p>\n`;
   if (verbete && BY_SLUG[verbete]) {
     b += `<p>${mdInline(deriveDesc(BY_SLUG[verbete].body))}</p>\n`;
     b += `<p class="rel"><a href="/artigos/${verbete}/">Ler o verbete completo: ${esc(BY_SLUG[verbete].meta.titulo)} →</a></p>\n`;
@@ -517,6 +537,7 @@ for (const p of Object.keys(PERSONAGEM_NOME)) {
     const nomeEn = PERSONAGEM_NOME_EN[p];
     const verbeteEn = verbete && EN_BY_SLUG[verbete] ? EN_BY_SLUG[verbete] : null;
     let be = `<div class="ad-slot" data-ad-slot="topo" style="min-height:90px;margin:18px 0"></div>\n`;
+    if (ESTUDO_INTRO[p]) be += `<p class="lead">${ESTUDO_INTRO[p].en}</p>\n`;
     if (verbeteEn) {
       be += `<p>${mdInline(deriveDescEn(verbeteEn.body))}</p>\n`;
       be += `<p class="rel"><a href="/articles/${verbeteEn.slugEn}/">Read the full entry: ${esc(verbeteEn.meta.title)} →</a></p>\n`;
