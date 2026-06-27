@@ -30,6 +30,7 @@
     token = sess.access_token;
     try {
       var r = await fetch(location.origin + "/api/v1/me", { headers: { apikey: ANON, Authorization: "Bearer " + token } });
+      if (!r.ok) { fire(); return; }  // CJS-01: resposta ruim NÃO rebaixa Founder — mantém o estado atual (a sessão já provou login); só um 200 autoritativo muda o tier
       var d = await r.json();
       window.RP_TIER = (d && d.tier) || null;
       if (d && d.premium) {  // FOUNDER
