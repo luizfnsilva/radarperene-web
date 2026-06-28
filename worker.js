@@ -847,11 +847,10 @@ async function _route(request, env, ctx) {
         (list.length ? "<input id=\"aq\" type=\"search\" autocomplete=\"off\" placeholder=\"" + (en ? "Search an asset — PETR4, CDI, NVDA…" : "Buscar ativo — PETR4, CDI, NVDA…") + "\">" : "") +
         "<p class=\"alist\">" + links + "</p>" +
         "<div class=\"cta-row\"><a class=\"btn\" href=\"/\">" + (en ? "See today&rsquo;s reading" : "Ver a leitura de hoje") + "</a> <a class=\"go\" href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Explore the Founder edition →" : "Conhecer a edição Founder →") + "</a></div>" +
-        "<div class=\"adslot\"><span>" + (en ? "Advertisement" : "Publicidade") + "</span></div>" +
+        // ★ AdSense removido do hub /ativos (2026-06-27) — superfície de ticker (Res. CVM 20); coerência com /ativo.
         "</div></main>" +
         "<footer><a href=\"/\">" + (en ? "&larr; Full radar" : "&larr; Radar completo") + "</a></footer>" +
         "<script>(function(){var q=document.getElementById('aq');if(!q)return;var a=[].slice.call(document.querySelectorAll('.alist a'));q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();for(var i=0;i<a.length;i++){a[i].style.display=(!v||a[i].textContent.toLowerCase().indexOf(v)>=0)?'':'none';}});})();</script>" +
-        "<script src=\"/ads.js\" defer></script>" +
         _themeScript() + _CONSENT + "</body></html>";
       // fresh = 6h; stale/vazio = 2min (re-tenta quando o DB voltar). NUNCA 404 → footer/SEO sempre navegáveis.
       return new Response(html, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": fresh ? "public, max-age=21600" : "public, max-age=120" } });
