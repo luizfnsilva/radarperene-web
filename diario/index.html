@@ -107,8 +107,6 @@
   var EN = location.search.indexOf("lang=en")>=0 || location.hostname==="radarperene.com";
   var API = location.origin + "/api/v1";
   var ANON = (window.RP_AUTH && window.RP_AUTH.ANON) || "";
-  var STRIPE_M = EN ? "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01";
-  var STRIPE_Y = "https://buy.stripe.com/dRm28q3Iu2W7b9VeILb3q05";
   var TIPO_NOME = { diario:(EN?"Daily report":"Relatório diário"), semanal:(EN?"Weekly report":"Relatório semanal"), mensal:(EN?"Monthly memo":"Memo mensal") };
 
   // ── resolve tipo + data (query OU último segmento do path /diario/<data>) ──
@@ -178,8 +176,7 @@
     return '<div class="gate"><span class="badge">'+(EN?"Subscribers":"Assinantes")+'</span>'
       + '<h3>'+esc(EN?"The full reading is for subscribers":"A leitura completa é para assinantes")+'</h3>'
       + '<p>'+esc(gancho||(EN?"Daily, weekly and monthly reports — subscribers only.":"Relatórios diários, semanais e mensais — exclusivos para assinantes."))+'</p>'
-      + '<div class="btns"><a class="btn" href="'+STRIPE_M+'" target="_blank" rel="noopener">'+(EN?"Founder · US$149/mo":"Founder · R$149/mês")+'</a>'
-      + '<a class="btn ghost" href="'+STRIPE_Y+'" target="_blank" rel="noopener">'+(EN?"Annual":"Anual")+'</a></div>'
+      + '<div class="btns"><a class="btn" href="'+(EN?"/subscribe":"/assine")+'">'+(EN?"See subscriptions":"Ver assinaturas")+'</a></div>'
       + '<p style="margin:16px 0 0"><a href="#" id="gate-login" class="muted">'+(EN?"Already a subscriber? Sign in":"Já é assinante? Entrar")+'</a></p></div>';
   }
   function carregar(){

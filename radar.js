@@ -683,6 +683,7 @@
     var cone = (s.cone && s.cone.mid && s.cone.mid.length > 1) ? s.cone : null;       // cone de quantis (assimétrico, estilo Cowen)
     var proj = (!cone && s.proj && s.proj.length > 1) ? s.proj : [];                   // fallback: projeção linear
     var futN = cone ? (cone.mid.length - 1) : (proj.length ? proj.length - 1 : 0);
+    if (opt.noFuture) { cone = null; proj = []; futN = 0; }                            // ★ per-ativo no free: NENHUMA projeção futura (linha/⤳ lê como "previsão de preço de papel"). Só quando o call-site PEDE (per-ticker); o IBOV/índice e demais NÃO passam noFuture → intactos. Founder (pro) sempre mantém.
     var all = hist.slice();
     if (cone) { if (pro && (cone.lo2 || cone.lo)) all = all.concat((cone.lo2 || cone.lo).slice(1), (cone.hi2 || cone.hi).slice(1)); else all = all.concat(cone.mid.slice(1)); }  // free/gateado: range só até a mediana; pro c/ bandas: até p10–p90
     else if (proj.length) all = all.concat(proj.slice(1));
@@ -848,10 +849,10 @@
     var obj = (m === "curto") ? curt : (estr || (pro ? curt : null));  // free sem estrutural → sem painel (não expõe o curto gated)
     return { mode: m, obj: obj, estr: estr, curt: curt, canCurto: canCurto };
   }
-  function checkoutURL(lang) { return window.RP_CHECKOUT || (lang === "en" ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"); }
+  function checkoutURL(lang) { return window.RP_CHECKOUT || "/founder"; }  // ★ 2026-06-28: profundidade per-ativo é acesso institucional (não venda de varejo) → aponta p/ a apresentação /founder, não p/ checkout Stripe
   // ★ cadeado SEMPRE clicável → checkout (religado 2026-06-11: o gate do MAX morreu quando os períodos viraram livres
   //   e os 🔒 restantes ficaram inertes — cadeado que não leva à compra é vitrine trancada sem porta).
-  function lockA(L, inner) { return '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;cursor:pointer" title="' + (L ? "Unlock with Founder" : "Destravar com o Founder") + '">' + inner + '</a>'; }
+  function lockA(L, inner) { return '<a href="' + checkoutURL(L ? "en" : "pt") + '" style="color:inherit;text-decoration:none;cursor:pointer" title="' + (L ? "Institutional access" : "Acesso institucional") + '">' + inner + '</a>'; }
   // ★ embed domain-aware (briefing: separar .com / .com.br). Sem override explícito (data-market), a ORIGEM do próprio radar.js (RP_SRC) revela o mercado → backlink/atribuição vão p/ o domínio certo, mesmo num site terceiro.
   function detectMarketFromSrc() { var m = (RP_SRC || "").match(/radarperene\.com(\.br)?/i); return m ? (m[1] ? "br" : "us") : ""; }
   function rpMarket(market, lang) { market = ("" + (market || "")).toLowerCase(); if (market === "br" || market === "us") return market; var d = detectMarketFromSrc(); if (d) return d; return lang === "en" ? "us" : "br"; }
@@ -1146,10 +1147,10 @@
       : function (v) { return (v != null && cur) ? Math.round(((v - cur) / Math.abs(cur)) * 1000) / 10 : null; };
     var sgn = function (x) { return (x >= 0 ? "+" : "") + x + (isDiff ? "pp" : "%"); };
     // gate embed-friendly: o widget só LINKA pro fluxo hospedado (login Google/Apple + Stripe vivem no domínio) — funciona de qualquer site (backlink)
-    var checkout = (window.RP_CHECKOUT || (L ? "https://buy.stripe.com/cNi00idj40NZ91NgQTb3q03" : "https://buy.stripe.com/5kQ6oG3Iu40bem7asvb3q01"));  // Stripe Founder: EN=US$149 · PT=R$149
+    var checkout = (window.RP_CHECKOUT || "/founder");  // ★ 2026-06-28: profundidade per-ativo = acesso institucional → /founder (apresentação), sem checkout Stripe de varejo
     var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
       return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid }); };
-    var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Manipulate & project the future — Founder" : "🔒 Manipular & projetar o futuro — Founder") + '</b><small>' + (L ? "Free range (drag-zoom), compare A×B and toggle overlays — plus the full asymmetric cone (p10–p90) with the past analogs overlaid. The history is here; with Founder you actually work it. Lock it all for US$149/mo while active — first 100 only." : "Período livre (arrasta-zoom), comparar A×B e ligar/desligar overlays — e o cone assimétrico completo (p10–p90) com os análogos passados sobrepostos. O histórico está aqui; com o Founder você trabalha ele. Trave tudo por R$149/mês enquanto ativo — só os 100 primeiros.") + '</small><em class="rp-anchor">' + (L ? "After the first 100, Vértice alone is US$290/mo. Right now both — Radar + Vértice — for US$149." : "Depois dos 100, o Vértice sozinho sai R$500/mês. Agora os dois — Radar + Vértice — por R$149.") + '</em><a class="cta" href="' + checkout + '" target="_blank" rel="noopener">' + (L ? "Get Founder — US$149/mo →" : "Quero o Founder — R$149/mês →") + '</a></div>';
+    var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Manipulate & project the future" : "🔒 Manipular & projetar o futuro") + '</b><small>' + (L ? "Free range (drag-zoom), compare A×B and toggle overlays — plus the full asymmetric cone (p10–p90) with the past analogs overlaid. This per-asset depth is part of institutional access." : "Período livre (arrasta-zoom), comparar A×B e ligar/desligar overlays — e o cone assimétrico completo (p10–p90) com os análogos passados sobrepostos. Essa profundidade por ativo integra o acesso institucional.") + '</small><a class="cta" href="' + checkout + '">' + (L ? "Institutional access →" : "Acesso institucional →") + '</a></div>';
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
     if (fund) h += '<div class="rp-ml" style="margin-top:2px"><b>' + (L ? "Fundamentals · " : "Fundamentos · ") + '</b>' + esc(fund) + '</div>';
@@ -2132,7 +2133,7 @@
           if (animaOk) h += animaSelHTML(aSel, lang) + '<div class="rp-ml rp-anima-cap" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div><div class="rp-osc rp-anima"></div>';
           if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div><div class="rp-osc rp-risk"></div>';
         } else {  // SVG (fallback)
-          h += '<div>' + bigChart(s, { big: true }) + '</div>';
+          h += '<div>' + bigChart(s, { big: true, noFuture: !gpaid }) + '</div>';
           if (animaOk) h += '<div class="rp-ml" style="margin-top:9px">' + esc(animaCap(aObj, lang, aSel.mode)) + '</div>' + riskPane(aObj, { big: true });
           if (riscoOk) h += '<div class="rp-ml" style="margin-top:7px">' + esc(oscCaption(s.risco, lang, "risk")) + '</div>' + riskPane(s.risco, { big: true });
         }
@@ -2157,7 +2158,7 @@
           var pEl = node.querySelector(".rp-ativo-price");
           if (pEl) {
             var _navClampA = null;  // janela navegável permitida (~3a → fim do cone) p/ FREE e Founder (BUG C)
-            var pOpt = { big: true, pro: gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, nav: true, clamp: function () { return _navClampA; }, sinais: s.sinais };  // free navega COM zoom mas clampado ao tempo permitido; Founder = livre. pinos do buy signal (Índice de Risco Perene)
+            var pOpt = { big: true, pro: gpaid, noFuture: !gpaid, sync: SYNC, lang: lang, hideX: !!hasStack, axisW: 52, nav: true, clamp: function () { return _navClampA; }, sinais: s.sinais };  // free navega COM zoom mas clampado ao tempo permitido; Founder = livre. pinos do buy signal (Índice de Risco Perene)
             var up = window.RPUplot.upPrice(pEl, gateSerie(s, gpaid), pOpt);
             if (up) {
               _upMounted.push({ el: pEl, draw: function (el) { window.RPUplot.upPrice(el, gateSerie(s, gpaid), pOpt); } });  // re-tema
