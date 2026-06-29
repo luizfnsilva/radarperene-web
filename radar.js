@@ -1715,7 +1715,7 @@
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
     var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
     var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
-    var _fcta = '<a class="rp-fcta" href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open full access →" : "Abrir o acesso completo →") + '</a>';  // CTA editorial reutilizável (edição aberta → edição completa)
+    var _fcta = '<a class="rp-fcta" href="' + (L ? "/subscribe" : "/assine") + '">' + (L ? "Subscribe to Perene Semanal · US$ 29/mo →" : "Assinar o Perene Semanal · R$ 29/mês →") + '</a>';  // ★ 2026-06-29: fecho público funila p/ o varejo (Semanal R$29); só renderiza no FOLD&GATED same-origin (embeds usam o ramo chrome), então link relativo ok
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
@@ -2098,9 +2098,9 @@
     //   Founder não vê fecho (tem tudo). Embeds (chrome) mantêm a "amostra do motor".
     if (FOLD && GATED) {  // ★ 2026-06-20: "centenas de ativos" (perene, sem número frio que muda) + "leitura completa" (casa com publicação)
       h += '<div class="rp-upsell"><div class="rp-up-k">' + (L ? "This was today&rsquo;s open edition." : "Esta foi a edição aberta de hoje.") + '</div>' +
-        '<div class="rp-up-s">' + (L ? "Full access adds:" : "O acesso completo acrescenta:") + '</div><ul class="rp-up-l">' +
-        (L ? '<li>the full reading of each signal</li><li>full episodes</li><li>historical analogs</li><li>a proprietary observatory covering hundreds of assets</li><li>50+ years of precedents</li>'
-           : '<li>a leitura completa dos sinais</li><li>episódios completos</li><li>análogos históricos</li><li>um observatório proprietário cobrindo centenas de ativos</li><li>mais de 50 anos de precedentes</li>') +
+        '<div class="rp-up-s">' + (L ? "Perene Semanal brings, every week:" : "O Perene Semanal traz, toda semana:") + '</div><ul class="rp-up-l">' +
+        (L ? '<li>the weekly edition on the Brazilian market</li><li>the archive of weekly editions</li><li>access to each day&rsquo;s open edition</li>'
+           : '<li>a edição semanal do mercado brasileiro</li><li>o arquivo das edições semanais</li><li>o acesso à edição aberta de cada dia</li>') +
         '</ul>' + _fcta + '</div>';
     } else if (chrome) { h += '<div class="teaser"><b>' + (L ? "This is a sample of the engine." : "Esta é uma amostra do motor.") + '</b> ' +
       (L ? ("The full plan adds the provenance of every signal, free cross-analysis of any indicator against any other, historical analogs and projection — across " + (_ca100 ? "over " + _ca100 + " assets" : "over 100 assets") + " and 50+ years of history.")
