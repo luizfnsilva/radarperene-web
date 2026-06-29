@@ -66,6 +66,12 @@ const PAGES = [
 // ─── SEO_OVERRIDE: title ≤ 60c, description ≤ 158c. Ajusta SÓ os metas (knobs de SEO), preservando
 //     keywords; o H1 e o corpo continuam verbatim do ghostwriter. Só as páginas que estouravam o limite. ───
 const SEO_OVERRIDE = {
+  // ★ 2026-06-29: descrições ≤150 que fecham o pensamento (antes o clampD(150) cortava a desc-fonte mid-frase → meta/DefinedTerm truncados, ruim p/ AEO/GEO).
+  "risk-on-risk-off": { dPt: "O Índice de Risco Perene mede o apetite a risco do mercado brasileiro numa escala 0–100, com sinais de virada datados e validados.", dEn: "The Perene Risk Index measures Brazil's market risk appetite on a 0–100 scale, with dated, validated turning-point signals." },
+  "regime-brasil": { dPt: "Regime Brasil é a leitura agregada do mercado brasileiro em uma janela definida — defensivo, neutro ou pró-risco, com escala 0–100 auxiliar." },
+  "regime-global": { dPt: "Regime Global é a leitura agregada do ambiente externo que pressiona o Brasil — volatilidade, dólar, juros longos americanos e câmbio." },
+  "analogos-historicos": { dPt: "Análogos Históricos: janelas do passado com perfil de regime semelhante ao atual e o que se seguiu — distribuição, não previsão." },
+  "vertice": { dPt: "A Lente Vértice é o observatório cross-asset do Radar — sistema bayesiano que formula hipóteses com evidências e contradições à mostra." },
   "como-ler-o-radar": { tPt: "Como ler o Radar Perene — seis passos para o regime do dia" },
   "metodologia": { tPt: "Metodologia do Radar Perene — regime e percentil histórico", tEn: "Radar Perene methodology — regime & historical percentile", dPt: "Como o Radar Perene lê o mercado brasileiro: regime, intermercado, valuation, sentimento, análogos. Método declarado e auditável — sem previsão, sem parecer." },
   "conceitos": { tPt: "A linguagem do Radar — todos os conceitos do Radar Perene", tEn: "The Radar's language — every Radar Perene concept" },
