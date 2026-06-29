@@ -58,7 +58,8 @@ const PAGES = [
   { slug: "termos",        src: 5, sec: ["1.1", "1.2"], type: "legal" },
   { slug: "privacidade",   src: 5, sec: ["2.1", "2.2"], type: "legal" },
   { slug: "api/docs",      src: 5, sec: ["3.1", "3.2"], type: "apidocs" },
-  { slug: "founder",       src: 5, sec: ["4.1", "4.2"], type: "founder" },
+  // ★ 2026-06-29: /founder SAIU do gerador — é hand-written institucional (founder/index.html|.en.html).
+  //   Mantê-la aqui faria um regen reverter p/ a landing de venda R$149/100-contas. NÃO reintroduzir.
   { slug: "widgets",       src: 5, sec: ["6.1", "6.2"], type: "apidocs" },  // catálogo de embeds <radar-perene> (slug PT==EN → index.en.html + rota no worker)
 ];
 
@@ -71,7 +72,6 @@ const SEO_OVERRIDE = {
   "termos": { dPt: "Termos de uso do Radar Perene: serviço, camadas Free e Founder, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade." },
   "privacidade": { dEn: "Radar Perene privacy policy: data collected (Google/Apple login, email), how it is used, your LGPD/GDPR rights, retention and one-click deletion." },
   "api/docs": { dPt: "Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed." },
-  "founder": { dPt: "Founder Access do Radar Perene: 100 contas, R$ 149/mês travado, cinco lentes + Vértice, 7 dias de reembolso via Stripe. A fase fundadora.", dEn: "Founder Access at Radar Perene: 100 seats, US$ 149/mo locked, the five lenses + Vértice, 7-day Stripe refund. Join the founding phase." },
   "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o Brasil em cinco dimensões regulatórias e de mercado. A Lente Vértice é o experimento cross-domínio; Intermercado é leitura paralela." },
   "conceitos/regime-brasil": { tPt: "Regime Brasil — como o Radar lê o mercado brasileiro", tEn: "Brazil Regime — how the Radar reads Brazil's market", dEn: "Brazil Regime: the aggregate reading of the Brazilian market — defensive, neutral, or pro-risk. Categorical, with a 0–100 auxiliary scale." },
   "conceitos/intermercado-br": { tPt: "Intermercado BR — razões patrimoniais como regime", dPt: "Intermercado BR: leitura cruzada de razões patrimoniais brasileiras (finanças, utilities, commodities, FIIs, café/ouro). Camada paralela às lentes.", dEn: "Intermarket BR: cross-reading of Brazilian wealth-sector ratios (finance, utilities, commodities, REITs, coffee/gold). A layer parallel to the lenses." },
@@ -349,7 +349,7 @@ function buildSchemas(p, raw, block, lg, title, desc) {
   else if (p.type === "guia") s.push({ "@context": "https://schema.org", "@type": "HowTo", "name": block.h1, "description": desc, "url": url, "inLanguage": inLang });
   else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": org + (en ? "/api/docs/" : "/api/docs/"), "provider": { "@type": "Organization", "name": "Radar Perene" } });
   else if (p.type === "apidocs") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": url, "provider": { "@type": "Organization", "name": "Radar Perene" } });
-  else if (p.type === "founder") s.push({ "@context": "https://schema.org", "@type": "Product", "name": "Radar Perene — Founder Access", "description": desc, "url": url, "brand": { "@type": "Brand", "name": "Radar Perene" }, "offers": { "@type": "Offer", "price": "149", "priceCurrency": en ? "USD" : "BRL", "availability": "https://schema.org/LimitedAvailability", "url": url } });
+  // ★ 2026-06-29: ramo "founder" REMOVIDO — /founder não é gerada nem é produto comprável (Offer 149 saía daqui).
   return s.map((x) => `<script type="application/ld+json">${JSON.stringify(x).replace(/</g, "\\u003c")}</script>`).join("\n");
 }
 
