@@ -170,6 +170,33 @@ function mdInline(s) {
 
 // ─── corpo markdown → HTML. Trata: AD_SLOT (→ div vazia CLS-safe), # H1 (ignora; vem do frontmatter), ### sub,
 //     ## sec, blockquote, listas, parágrafos. A linha *Continue a história:…* e o CTA *O Radar lê…* viram .rel/itálico. ───
+// ★ 2026-06-29: auto-link da 1ª menção dos conceitos proprietários → /conceitos (regen-safe; espelha os links manuais 2756f3f).
+const CONCEPT_LINKS_PT = [["Índice de Risco Perene","/conceitos/risk-on-risk-off/"],["Risco Perene","/conceitos/risk-on-risk-off/"],["Índice Ânima","/conceitos/indice-anima/"],["Ânima","/conceitos/indice-anima/"]];
+const CONCEPT_LINKS_EN = [["Perene Risk Index","/concepts/risk-on-risk-off/"],["Ânima Index","/concepts/anima-index/"],["Ânima","/concepts/anima-index/"]];
+function autoLinkConcepts(html, en) {
+  const map = en ? CONCEPT_LINKS_EN : CONCEPT_LINKS_PT;
+  const parts = html.split(/(<[^>]+>)/);
+  const depth = new Array(parts.length).fill(0);
+  let d = 0;
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) { depth[i] = d; const m = parts[i].match(/^<(\/?)(a|h1|h2|h3|h4)\b/i); if (m) { d += m[1] ? -1 : 1; if (d < 0) d = 0; } }
+    else depth[i] = d;
+  }
+  const done = new Set();
+  for (const [term, href] of map) {
+    if (done.has(href)) continue;
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 1 || depth[i] > 0) continue;
+      const seg = parts[i], idx = seg.indexOf(term);
+      if (idx < 0) continue;
+      const b = idx === 0 ? " " : seg[idx - 1], a = seg[idx + term.length] || " ";
+      if (/[0-9A-Za-zÀ-ÿ]/.test(b) || /[0-9A-Za-zÀ-ÿ]/.test(a)) continue;
+      parts[i] = seg.slice(0, idx) + '<a href="' + href + '">' + term + '</a>' + seg.slice(idx + term.length);
+      done.add(href); break;
+    }
+  }
+  return parts.join("");
+}
 function renderBody(body) {
   const lines = body.split("\n");
   const out = [];
@@ -348,7 +375,7 @@ for (const a of ARTS) {
 
   // ── PT ──
   CUR_LANG = "pt";
-  let bodyHtml = `<p class="crumb-tag tag">${esc(camada)}</p>\n` + renderBody(a.body);
+  let bodyHtml = `<p class="crumb-tag tag">${esc(camada)}</p>\n` + autoLinkConcepts(renderBody(a.body), false);
   const conts = [...new Set([...(a.meta.links_continue || []), ...(a.meta.episodios_relacionados || [])])].filter((s) => SLUGS.has(s));
   if (conts.length) {
     const links = conts.map((s) => `<a href="/artigos/${s}/">${esc(BY_SLUG[s].meta.titulo || s)}</a>`).join(" · ");
@@ -382,7 +409,7 @@ for (const a of ARTS) {
     const titleEn = e.meta.title || e.slugEn;
     const descEn = deriveDescEn(e.body);
     const camadaEn = CAMADA_LABEL_EN[a.meta.camada] || CAMADA_LABEL_EN[a.meta.tipo] || "Article";
-    let bodyHtmlEn = `<p class="crumb-tag tag">${esc(camadaEn)}</p>\n` + renderBody(e.body);
+    let bodyHtmlEn = `<p class="crumb-tag tag">${esc(camadaEn)}</p>\n` + autoLinkConcepts(renderBody(e.body), true);
     // "Read also" do frontmatter EN (links_continue já em slugs-EN; valida contra EN_SLUGS)
     const contsEn = [...new Set([...(e.meta.links_continue || []), ...(e.meta.episodios_relacionados || [])])].filter((s) => EN_SLUGS.has(s));
     if (contsEn.length) {
