@@ -260,8 +260,8 @@ const FOOT_EN = '<a href="/articles/">Articles</a> · <a href="/methodology/">Me
 // CTA de conversão no fim de cada página de conteúdo (episódio/comparativo/conceito) → landing por idioma (/assine·/subscribe)
 const CTA_PT = '<div class="ctarow" style="border-top:1px solid var(--line);margin-top:32px;padding-top:22px"><p class="closing" style="font-style:normal;margin:0 0 14px">Isto é a memória do Radar. A leitura de hoje — regime, 5 lentes e os análogos do dia — está no ar, de graça.</p><a class="btn" href="/">Ver a leitura de hoje</a><a class="btn ghost" href="/assine">Assinar o Perene Semanal · R$ 29/mês →</a></div>';
 const CTA_EN = '<div class="ctarow" style="border-top:1px solid var(--line);margin-top:32px;padding-top:22px"><p class="closing" style="font-style:normal;margin:0 0 14px">This is the Radar&rsquo;s memory. Today&rsquo;s reading — regime, 5 lenses and the day&rsquo;s analogs — is live, free.</p><a class="btn" href="/">See today&rsquo;s reading</a><a class="btn ghost" href="/subscribe">Subscribe to Perene Semanal · US$ 29/mo →</a></div>';
-const DISC = "O Radar Perene fornece inteligência regulatória contextualizada. Não constitui parecer jurídico, contábil, econômico ou de investimento.";
-const DISC_EN = "Radar Perene provides contextual regulatory intelligence. Nothing here constitutes legal, accounting, economic, or investment advice.";
+const DISC = "O Radar Perene é uma publicação editorial que descreve e contextualiza o regime do mercado brasileiro. O conteúdo é informativo e não constitui recomendação, parecer ou consultoria de investimento, nem indicação de compra ou venda de ativos.";
+const DISC_EN = "Radar Perene is an editorial publication that describes and contextualizes Brazil's market regime. Its content is informational and is not a recommendation, opinion, or investment advice, nor a solicitation to buy or sell any security.";
 const ORIGIN = "https://radarperene.com.br";       // gêmeo PT
 const ORIGIN_EN = "https://radarperene.com";       // gêmeo EN
 const LASTMOD = "2026-06-17";
@@ -270,8 +270,8 @@ const ldScript = (o) => `<script type="application/ld+json">${JSON.stringify(o).
 // Entidade (invariante §10): Org sameAs = SÓ o gêmeo de locale. founder = @id da Pessoa CANÔNICA
 // no brazilcomplexity (consolidação cross-site; não redefine a Person localmente).
 const FOUNDER_REF = { "@id": "https://brazilcomplexity.com/about.html#person" };
-const orgLd = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN + "/#org", "name": "Radar Perene", "url": ORIGIN, "logo": ORIGIN + "/og.png", "sameAs": ["https://radarperene.com"], "founder": FOUNDER_REF, "description": "Inteligência regulatória brasileira lida como dado — leitura de regime, intermercado e contexto." };
-const orgLdEn = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN_EN + "/#org", "name": "Radar Perene", "url": ORIGIN_EN, "logo": ORIGIN_EN + "/og.png", "sameAs": ["https://radarperene.com.br"], "founder": FOUNDER_REF, "description": "Brazilian regulatory intelligence read as data — regime, intermarket and context." };
+const orgLd = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN + "/#org", "name": "Radar Perene", "url": ORIGIN, "logo": ORIGIN + "/og.png", "sameAs": ["https://radarperene.com"], "founder": FOUNDER_REF, "description": "Publicação editorial que lê o regime do mercado brasileiro — macro, intermercado e contexto. Não recomenda ativos." };
+const orgLdEn = { "@context": "https://schema.org", "@type": "Organization", "@id": ORIGIN_EN + "/#org", "name": "Radar Perene", "url": ORIGIN_EN, "logo": ORIGIN_EN + "/og.png", "sameAs": ["https://radarperene.com.br"], "founder": FOUNDER_REF, "description": "Editorial publication reading Brazil's market regime — macro, intermarket and context. Not investment advice." };
 
 // shell de página, lang-aware. `alt` = { pt, en } com paths absolutos p/ hreflang (en só presente quando há espelho).
 // canonical = próprio origin/idioma; x-default = PT (mercado primário/gêmeo PT).

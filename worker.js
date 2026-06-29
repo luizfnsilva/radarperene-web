@@ -10,7 +10,7 @@
 const WEEKLY_SAMPLE_DATES = ["2026-06-12"];
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
 const EN_DESC = "A living archive of Brazil's markets: daily, weekly and monthly reports and a library of precedents — to read the present in light of the past.";
-const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, equity risk premium, fair value, Brazil valuation, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, inflation, IPCA, study library, historical analogs, regulatory intelligence"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
+const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, equity risk premium, fair value, Brazil valuation, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, inflation, IPCA, study library, historical analogs, market regime analysis"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
 const EN_FAQ = JSON.stringify({
   "@context": "https://schema.org", "@type": "FAQPage", "inLanguage": "en", "mainEntity": [
     { "@type": "Question", "name": "What time does the daily report arrive?", "acceptedAnswer": { "@type": "Answer", "text": "In your inbox ~50 minutes before the Brazilian market opens, with the prior day's close, and the summary is posted to X/LinkedIn right after. The weekly ships on Friday and the monthly on the last day of the month." } },
