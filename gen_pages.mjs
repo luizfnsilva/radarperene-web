@@ -172,13 +172,13 @@ const SLUG_MAP = [
 function normPath(url) {
   for (const [en, pt] of SLUG_MAP) url = url.split(en).join(pt);
   // trailing slash p/ rotas-diretório internas (não p/ arquivos /sobre /about, /ativo, âncoras, externos)
-  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo") && !/\.[a-z0-9]+$/i.test(url)) {
+  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo") && url !== "/assine" && url !== "/subscribe" && !/\.[a-z0-9]+$/i.test(url)) {
     if (!url.endsWith("/")) url += "/";  // rotas-diretório → barra; arquivos (.json/.xml) ficam intactos
   }
   return url;
 }
 // paths internos válidos (após normPath) → links p/ inexistentes viram TEXTO (mata 404 de conceito/lente citados na copy)
-const VALID_PATHS = new Set(["/", "/sobre", "/about", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", ...PAGES.map((p) => "/" + p.slug + "/")]);
+const VALID_PATHS = new Set(["/", "/sobre", "/about", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", "/assine", "/subscribe", "/termos/", "/terms/", "/conceitos/indice-de-liquidez-imobiliaria/", "/concepts/real-estate-liquidity-index/", ...PAGES.map((p) => "/" + p.slug + "/")]);
 const OK_PREFIX = ["/ativo/", "/indicador/", "/diario/"];  // rotas dinâmicas do worker (não enumeráveis) — permite por prefixo
 function validInternal(p) {
   if (!p.startsWith("/") || p.includes("#") || /\.[a-z0-9]+$/i.test(p)) return true;  // âncora/arquivo/externo → não mexe
@@ -198,10 +198,10 @@ const enSlug = (s) => EN_SLUG[s] || s;
 const SLUG_MAP_EN = [["/api/todays-reading.json", "/api/leitura-do-dia.json"], ["/diary", "/diario"]];  // arquivo EN: rotas-worker PT-only; o resto mantém o slug EN da copy
 function normPathEN(url) {
   for (const [a, b] of SLUG_MAP_EN) url = url.split(a).join(b);
-  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo") && !/\.[a-z0-9]+$/i.test(url)) { if (!url.endsWith("/")) url += "/"; }
+  if (url.startsWith("/") && !url.includes("#") && url !== "/" && url !== "/sobre" && url !== "/about" && !url.startsWith("/ativo") && url !== "/assine" && url !== "/subscribe" && !/\.[a-z0-9]+$/i.test(url)) { if (!url.endsWith("/")) url += "/"; }
   return url;
 }
-const VALID_PATHS_EN = new Set(["/", "/about", "/sobre", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", ...PAGES.map((p) => "/" + enSlug(p.slug) + "/")]);
+const VALID_PATHS_EN = new Set(["/", "/about", "/sobre", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", "/assine", "/subscribe", "/termos/", "/terms/", "/conceitos/indice-de-liquidez-imobiliaria/", "/concepts/real-estate-liquidity-index/", ...PAGES.map((p) => "/" + enSlug(p.slug) + "/")]);
 function validInternalEN(p) {
   if (!p.startsWith("/") || p.includes("#") || /\.[a-z0-9]+$/i.test(p)) return true;
   if (VALID_PATHS_EN.has(p)) return true;
