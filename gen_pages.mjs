@@ -69,7 +69,7 @@ const SEO_OVERRIDE = {
   "como-ler-o-radar": { tPt: "Como ler o Radar Perene — seis passos para o regime do dia" },
   "metodologia": { tPt: "Metodologia do Radar Perene — regime e percentil histórico", tEn: "Radar Perene methodology — regime & historical percentile", dPt: "Como o Radar Perene lê o mercado brasileiro: regime, intermercado, valuation, sentimento, análogos. Método declarado e auditável — sem previsão, sem parecer." },
   "conceitos": { tPt: "A linguagem do Radar — todos os conceitos do Radar Perene", tEn: "The Radar's language — every Radar Perene concept" },
-  "termos": { dPt: "Termos de uso do Radar Perene: serviço, camadas Free e Founder, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade." },
+  "termos": { dPt: "Termos de uso do Radar Perene: serviço, camadas Free e Perene Semanal, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade." },
   "privacidade": { dEn: "Radar Perene privacy policy: data collected (Google/Apple login, email), how it is used, your LGPD/GDPR rights, retention and one-click deletion." },
   "api/docs": { dPt: "Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed." },
   "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o Brasil em cinco dimensões regulatórias e de mercado. A Lente Vértice é o experimento cross-domínio; Intermercado é leitura paralela." },

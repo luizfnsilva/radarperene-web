@@ -966,11 +966,11 @@
     }).join("");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</div>' + rows
-      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in Founder" : "horizontes 6m e 12m no Founder")) + '</div>' : '')
+      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in full access" : "horizontes 6m e 12m no acesso completo")) + '</div>' : '')
       + '<div class="rp-ml" style="margin-top:5px;opacity:.6">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div></div>';
   }
   // ★ MOAT — bloco-análogo no FREE = só TEASER (existência + nº de casos + leitura qualitativa); a DISTRIBUIÇÃO (probabilidade
-  //   de alta · retorno mediano · faixa · 3/6/12m) é o que se vende no Founder. Doutrina (dono + CANONICO_TIER_FREE §moat):
+  //   de alta · retorno mediano · faixa · 3/6/12m) é o que se vende no acesso completo. Doutrina (dono + CANONICO_TIER_FREE §moat):
   //   "Free = onde estamos; Founder = o que aconteceu depois". Vende-se a CONCLUSÃO, não a planilha. Per-ativo NUNCA mostra o número
   //   (o macro/diário mostra a mediana do IBOV como gancho — esse é o único análogo numérico livre, e é de propósito).
   function analogFreeHTML(br, L) {
@@ -1119,7 +1119,7 @@
     var _openAll = br.h && br.h["6m"] && br.h["12m"];
     if (!pro) out += _openAll
       ? '<div class="rp-ml" style="margin-top:5px;opacity:.92"><span style="color:var(--_accent)">★</span> ' + (L ? "all three horizons open — a free sample" : "os três prazos liberados como amostra de cortesia") + '</div>'
-      : '<div class="rp-ml" style="margin-top:5px;opacity:.92">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6-month & 12-month horizons in Founder" : "prazos de 6 e 12 meses no Founder")) + '</div>';
+      : '<div class="rp-ml" style="margin-top:5px;opacity:.92">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6-month & 12-month horizons in full access" : "prazos de 6 e 12 meses no acesso completo")) + '</div>';
     out += '<div class="rp-ml" style="opacity:.6;margin-top:6px">' + (L ? "empirical distribution of past analogous cases — not a forecast" : "distribuição de casos análogos passados — não é previsão") + '</div>';
     return out;
   }
@@ -1191,20 +1191,20 @@
     var hasStack = useUp && !!((s.anima && s.anima.serie && s.anima.serie.length > 1) || (s.risco && s.risco.serie && s.risco.serie.length > 1));  // tem oscilador empilhado? (preço esconde o eixo-X, datas vão p/ o painel de baixo)
     var SYNC = "rpbig" + (++_syncSeq);  // grupo de sync (crosshair + janela-x) deste modal: preço ↔ Ânima ↔ risk
     h += '<div class="rp-chart">' + (useUp ? '' : bigChart(s, { big: true })) + '</div>';  // uPlot desenha no div vazio depois do innerHTML
-    if (!gpaid) {  // FREE: 2 overlays (1 projeção = cone/mediana + 1 indicador) — "gostinho"; manipular/comparar/cone-completo ficam no Founder
+    if (!gpaid) {  // FREE: 2 overlays (1 projeção = cone/mediana + 1 indicador) — "gostinho"; manipular/comparar/cone-completo ficam no acesso completo
       var freeIds = ["cone"]; if (s.ma200 && s.ma200.length) freeIds.push("ma200");  // valor-justo (linha) = Founder; free vê o prêmio/desconto em TEXTO (decisão do dono)
       var fLbl = { cone: (L ? "Projection (median)" : "Projeção (mediana)"), fair: "Valuation", ma200: "MM200" };
-      h += '<div class="rp-tgf" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">' + freeIds.map(function (id) { var don = ((RP_LAYERS.filter(function (l) { return l.id === id; })[0]) || {}).defaultOn; return '<button class="rp-tog" data-fk="' + id + '" data-lbl="' + esc(fLbl[id]) + '" style="font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:6px;padding:3px 9px;cursor:pointer">' + (don ? "● " : "○ ") + esc(fLbl[id]) + '</button>'; }).join("") + '<span class="rp-ml" style="opacity:.5">' + (L ? "· compare A×B & manipulate in Founder" : "· comparar A×B & manipular no Founder") + '</span></div>';
+      h += '<div class="rp-tgf" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">' + freeIds.map(function (id) { var don = ((RP_LAYERS.filter(function (l) { return l.id === id; })[0]) || {}).defaultOn; return '<button class="rp-tog" data-fk="' + id + '" data-lbl="' + esc(fLbl[id]) + '" style="font-size:10px;background:var(--_card2);border:1px solid var(--_line);color:var(--_dim);border-radius:6px;padding:3px 9px;cursor:pointer">' + (don ? "● " : "○ ") + esc(fLbl[id]) + '</button>'; }).join("") + '<span class="rp-ml" style="opacity:.5">' + (L ? "· compare A×B & manipulate in full access" : "· comparar A×B & manipular no acesso completo") + '</span></div>';
     }
     var lead = "";  // ★ precedentes (cone + análogos) — sobem p/ logo abaixo do chart (briefing: subordinam só ao gráfico principal). Em modo imx (lead-lag) seguem suprimidos como antes.
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);  // bandas só se a data trouxe (token); gateado → cai p/ a mediana abaixo (sem quebrar)
         if (dmid != null) lead += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b>' + (dlo != null && dhi != null ? ' · ' + (L ? "50% of cases " : "50% dos casos ") + sgn(dlo) + ' … ' + sgn(dhi) : '') + (dlo2 != null && dhi2 != null ? ' · ' + (L ? "80% of cases " : "80% dos casos ") + sgn(dlo2) + ' … ' + sgn(dhi2) : '') + ' · ' + (L ? "in similar situations in the past — not a forecast" : "em situações parecidas no passado — não é previsão") + '</div>'; }
-      else if (dmid != null) lead += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in Founder" : "caso mediano & faixas 50% / 80% no Founder")) + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
+      else if (dmid != null) lead += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in full access" : "caso mediano & faixas 50% / 80% no acesso completo")) + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) lead += gpaid
         ? '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'
-        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "value in Founder" : "valor no Founder")) + '</span></div>'; }
+        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "value in full access" : "valor no acesso completo")) + '</span></div>'; }
     if (s.base_rate) lead += baseRatePanel(s.base_rate, L, gpaid);  // casos análogos — free: teaser (existência+nº+leitura) / Founder: distribuição completa
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : "Valuation ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
@@ -1486,7 +1486,7 @@
               chartEl.innerHTML = cc.svg;
               yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");
               chartEl.appendChild(yax);
-              legF.innerHTML = (meta ? '<div class="rp-ml" style="margin-top:3px"><b style="color:var(--_accent)">Lead-lag</b> — ' + esc(meta) + '</div>' : '') + '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs && cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c; }).join(" · ") : '') + '</div><div class="rp-ml" style="margin-top:4px"><span style="color:var(--_accent)">🔒</span> ' + (L ? "cross any series & drag-zoom in Founder" : "cruzar qualquer série & zoom no Founder") + '</div>';
+              legF.innerHTML = (meta ? '<div class="rp-ml" style="margin-top:3px"><b style="color:var(--_accent)">Lead-lag</b> — ' + esc(meta) + '</div>' : '') + '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs && cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c; }).join(" · ") : '') + '</div><div class="rp-ml" style="margin-top:4px"><span style="color:var(--_accent)">🔒</span> ' + (L ? "cross any series & drag-zoom in full access" : "cruzar qualquer série & zoom no acesso completo") + '</div>';
             }
           }).catch(function () { });
       });
@@ -1587,7 +1587,7 @@
     var dmid = dp(cone.mid[cone.mid.length - 1]);
     if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null, dhi2 = cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null;
       return '<div class="rp-ml" style="margin-top:6px"><b style="color:var(--_warm)">' + (L ? "Median " : "Mediana ") + sgn(dmid) + '</b>' + (dlo != null ? ' · 50% ' + sgn(dlo) + '…' + sgn(dhi) : '') + (dlo2 != null ? ' · 80% ' + sgn(dlo2) + '…' + sgn(dhi2) : '') + '</div>'; }
-    return dmid != null ? '<div class="rp-ml" style="margin-top:6px;opacity:.8"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median & ranges in Founder" : "mediana & faixas no Founder") + '</div>' : "";
+    return dmid != null ? '<div class="rp-ml" style="margin-top:6px;opacity:.8"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median & ranges in full access" : "mediana & faixas no acesso completo") + '</div>' : "";
   }
   function _cmpCol(s, x, L, gpaid) {
     if (!s || !s.hist || s.hist.length < 2) return '<div class="rp-cmpcol"><div class="rp-mt2">' + esc(x.nome) + '</div><div class="rp-ml" style="opacity:.7;padding:22px 0;text-align:center">' + (L ? "series unavailable" : "série indisponível") + '</div></div>';
@@ -1715,7 +1715,7 @@
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
     var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
     var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
-    var _fcta = '<a class="rp-fcta" href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir edição Founder →") + '</a>';  // CTA editorial reutilizável (edição aberta → edição completa)
+    var _fcta = '<a class="rp-fcta" href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open full access →" : "Abrir o acesso completo →") + '</a>';  // CTA editorial reutilizável (edição aberta → edição completa)
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
@@ -1764,7 +1764,7 @@
     // ════ CÉREBRO 1 — Radar · 5 lentes (regime regulatório, conservador) ════
     if (!TEASER && !FOLD) h += brain("Radar Perene", (L ? "a daily reading of Brazil&rsquo;s regime" : "leitura diária do regime brasileiro"), false, true);  // ★ 2026-06-18: no MINI sem masthead. ★ 2026-06-20: no radar completo (FOLD) o `rp-masthead` o substitui; embeds/flat mantêm o brain.
     // gate: NÃO no teaser (a mensagem grátis/Founder já vai fundida no subtítulo da seção); no radar completo/embed fica COMPACTO (1 linha), não o bloco gigante
-    if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in Founder. " : "Números, 50+ anos de histórico e análogos completos no Founder. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open the Founder edition →" : "Abrir a edição Founder →") + '</a></div>';  // editorial, não "Destravar"/SaaS
+    if (GATED && (chrome || !sections)) h += '<div class="teaser" style="margin-bottom:14px;font-size:12px"><b>' + (L ? "Free reading — conclusions only." : "Leitura grátis — só as conclusões.") + '</b> ' + (L ? "Numbers, 50+ years of history and full analogs in full access. " : "Números, 50+ anos de histórico e análogos completos no acesso completo. ") + '<a href="' + checkoutURL(L ? "en" : "pt") + '" target="_blank" rel="noopener">' + (L ? "Open full access →" : "Abrir o acesso completo →") + '</a></div>';  // editorial, não "Destravar"/SaaS
     if (show("regime") && rr.regime) { var g = rr.regime;
       if (TEASER) {  // ★ 2026-06-21 (dono): no mini, "Hoje lembra" é o HERÓI; os 4 sinais (Brasil/Global/Fuga/Concentração) viram uma faixa-METADADO discreta acima (uma linha, não grade). O olho pousa na memória, não nos sinais.
         var _ob = v.observatorio || {};
@@ -2002,7 +2002,7 @@
       if (a.locked || GATED) {  // free: mostra a PERGUNTA + as datas-análogas; tranca o RESULTADO (mediana/hit-rate)
         _analogo = '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta || "") + '</div>' + aDatas +
           '<div class="stat"><div><div class="v">' + glock() + '</div><div class="r">' + (L ? "median · hit-rate" : "mediana · hit-rate") + '</div></div></div>' +  // free: sem "n=" (não vaza a escala da amostra no teaser travado)
-          '<div class="rp-ml" style="opacity:.82;margin-top:5px">' + (L ? "full analog outcomes (median, hit-rate, all horizons) in Founder" : "resultados completos do análogo (mediana, hit-rate, todos os horizontes) no Founder") + '</div></div>';
+          '<div class="rp-ml" style="opacity:.82;margin-top:5px">' + (L ? "full analog outcomes (median, hit-rate, all horizons) in full access" : "resultados completos do análogo (mediana, hit-rate, todos os horizontes) no acesso completo") + '</div></div>';
       } else {
         _analogo = '<h4>' + (L ? "Analog study · past → future" : "Estudo de análogo · passado → futuro") + '</h4><div class="hl"><div class="q">' + esc(a.pergunta) + '</div>' + aDatas + '<div class="stat">' +
           '<div><div class="v">' + esc(a.mediana_ret_pct) + '%</div><div class="r">' + (L ? "median" : "mediana") + '</div></div>' +
@@ -2048,7 +2048,7 @@
         // ★ 2026-06-20 (consultor): no GRÁTIS mostra NOME (curiosidade) + regime (conclusão legível) + 🔒 só na interpretação —
         //   nunca um cadeado gigante no número (frustra). No Founder: número grande + regime + fluxo.
         var body = GATED
-          ? ('<div class="rp-vsig-gr">' + esc(regime || '') + '</div><div class="rp-vsig-lk">' + glock() + ' ' + (L ? "full reading in Founder" : "interpretação completa no Founder") + '</div>')
+          ? ('<div class="rp-vsig-gr">' + esc(regime || '') + '</div><div class="rp-vsig-lk">' + glock() + ' ' + (L ? "full reading in full access" : "interpretação completa no acesso completo") + '</div>')
           : ('<div class="rp-vsig-v">' + (valor == null ? '—' : esc(valor)) + '</div><div class="rp-vsig-r">' + esc(regime || '') + '</div>' + (flow || ''));
         return '<div class="rp-vsig ' + esc(tone || '') + '"><div class="rp-vsig-n">' + esc(nome) + '</div>' + body + '</div>';
       };
@@ -2098,7 +2098,7 @@
     //   Founder não vê fecho (tem tudo). Embeds (chrome) mantêm a "amostra do motor".
     if (FOLD && GATED) {  // ★ 2026-06-20: "centenas de ativos" (perene, sem número frio que muda) + "leitura completa" (casa com publicação)
       h += '<div class="rp-upsell"><div class="rp-up-k">' + (L ? "This was today&rsquo;s open edition." : "Esta foi a edição aberta de hoje.") + '</div>' +
-        '<div class="rp-up-s">' + (L ? "The Founder edition adds:" : "A edição Founder acrescenta:") + '</div><ul class="rp-up-l">' +
+        '<div class="rp-up-s">' + (L ? "Full access adds:" : "O acesso completo acrescenta:") + '</div><ul class="rp-up-l">' +
         (L ? '<li>the full reading of each signal</li><li>full episodes</li><li>historical analogs</li><li>a proprietary observatory covering hundreds of assets</li><li>50+ years of precedents</li>'
            : '<li>a leitura completa dos sinais</li><li>episódios completos</li><li>análogos históricos</li><li>um observatório proprietário cobrindo centenas de ativos</li><li>mais de 50 anos de precedentes</li>') +
         '</ul>' + _fcta + '</div>';
@@ -2139,10 +2139,10 @@
         }
         h += oscTextLine(s.hist2, s.hist2_label, lang) + oscTextLine(s.hist3, s.hist3_label, lang);  // domínio (cripto FnG/TVL · ações volume) → texto; pilha empilhada = padrão
         // ★ VALUATION (Lyn Alden) — leitura TEXTUAL p/ FREE (prêmio/desconto vs valor-justo, citável p/ IA/SEO);
-        //   a LINHA de valor-justo no gráfico + a investigação (DCF/cenários) ficam no Founder (🔒). Decisão do dono.
+        //   a LINHA de valor-justo no gráfico + a investigação (DCF/cenários) ficam no acesso completo (🔒). Decisão do dono.
         if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
-          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "Valuation line on chart in Founder" : "linha de Valuation no gráfico no Founder")) + '</span>') + '</div>'; }
-        else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "model & scenarios in Founder" : "modelo & cenários no Founder")) + '</span>') + '</div>';
+          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "Valuation line on chart in full access" : "linha de Valuation no gráfico no acesso completo")) + '</span>') + '</div>'; }
+        else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "model & scenarios in full access" : "modelo & cenários no acesso completo")) + '</span>') + '</div>';
         if (s.trend && s.trend.score != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
         h += analogBlock(s, nm, lang, gpaid);  // taxa-base nobre (P3)
         h += '<div class="rp-ml" style="margin-top:8px;opacity:.7">' + (L ? "descriptive, never a recommendation · distribution, not a forecast" : "descritivo, nunca recomendação · distribuição, não previsão") + '</div>';
