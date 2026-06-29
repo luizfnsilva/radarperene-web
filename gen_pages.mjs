@@ -73,7 +73,7 @@ const SEO_OVERRIDE = {
   "termos": { dPt: "Termos de uso do Radar Perene: serviço, camadas Free e Perene Semanal, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade." },
   "privacidade": { dEn: "Radar Perene privacy policy: data collected (Google/Apple login, email), how it is used, your LGPD/GDPR rights, retention and one-click deletion." },
   "api/docs": { dPt: "Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed." },
-  "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o Brasil em cinco dimensões regulatórias e de mercado. A Lente Vértice é o experimento cross-domínio; Intermercado é leitura paralela." },
+  "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o regime do mercado brasileiro por dimensão — macro/monetária, patrimonial, institucional, imobiliária, eleitoral. A Lente Vértice é o experimento cross-domínio." },
   "conceitos/regime-brasil": { tPt: "Regime Brasil — como o Radar lê o mercado brasileiro", tEn: "Brazil Regime — how the Radar reads Brazil's market", dPt: "Regime Brasil é a leitura agregada do mercado brasileiro em uma janela definida — defensivo, neutro ou pró-risco, com escala 0–100 auxiliar.", dEn: "Brazil Regime: the aggregate reading of the Brazilian market — defensive, neutral, or pro-risk. Categorical, with a 0–100 auxiliary scale." },
   "conceitos/regime-global": { dPt: "Regime Global é a leitura agregada do ambiente externo que pressiona o Brasil — volatilidade, dólar, juros longos americanos e câmbio." },
   "conceitos/analogos-historicos": { dPt: "Análogos Históricos: janelas do passado com perfil de regime semelhante ao atual e o que se seguiu — distribuição, não previsão." },
@@ -179,7 +179,7 @@ function normPath(url) {
 }
 // paths internos válidos (após normPath) → links p/ inexistentes viram TEXTO (mata 404 de conceito/lente citados na copy)
 const VALID_PATHS = new Set(["/", "/sobre", "/about", "/diario", "/diario/", "/ativos", "/api/leitura-do-dia.json", "/assine", "/subscribe", "/termos/", "/terms/", "/conceitos/indice-de-liquidez-imobiliaria/", "/concepts/real-estate-liquidity-index/", ...PAGES.map((p) => "/" + p.slug + "/")]);
-const OK_PREFIX = ["/ativo/", "/indicador/", "/diario/"];  // rotas dinâmicas do worker (não enumeráveis) — permite por prefixo
+const OK_PREFIX = ["/ativo/", "/indicador/", "/diario/", "/artigos/", "/articles/"];  // rotas dinâmicas do worker (não enumeráveis) — permite por prefixo
 function validInternal(p) {
   if (!p.startsWith("/") || p.includes("#") || /\.[a-z0-9]+$/i.test(p)) return true;  // âncora/arquivo/externo → não mexe
   if (VALID_PATHS.has(p)) return true;
