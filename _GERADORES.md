@@ -5,6 +5,25 @@
 > reverteria para o texto antigo — tivemos de portá-la para os bursts. Não repita isso, ainda mais com a
 > criação de páginas indo aos milhares.)
 
+> ## ⚠️ ALERTA REGEN-REVERT — NÃO RODE OS GERADORES SOZINHO (estado em 2026-06-29)
+> O reposicionamento jornal/institucional (jun-2026) corrigiu MUITA coisa **só no HTML vivo ou só no
+> código do gerador, sem reconciliar a fonte**. Hoje o HTML no ar está certo, mas **um `node gen_pages.mjs`
+> isolado HOJE reverteria** (verificado por git/grep, 2 workflows):
+> - **GRAVE:** ressuscita "Founder Access · R$ 149/mês · 100 vagas / R$ 500 / US$ 290" na lente **Vértice**
+>   (a fonte `RADAR-REGULATORIO/SITE_COPY_BURST_1.md:660-670` ainda tem o pitch antigo).
+> - CTA das **12 lentes** volta a `/#fundadores` (hardcode em `gen_pages.mjs:257` **e** fonte BURST_1).
+> - re-trunca **5+ metas de conceito** mid-frase (bug de chave: as descrições corretas estão no `SEO_OVERRIDE`
+>   sob chave **sem** o prefixo `conceitos/` → chave morta; o gerador busca `conceitos/<slug>` e cai no fallback `clampD`).
+> - **FAQPage** dos conceitos some (18 págs geradas) — `faqSchema()` só roda no ramo `type==="metodo"` (`:350`),
+>   nunca `conceito` (`:351`), e o `BURST_2` não tem pares `P:/R:`.
+> - some o **CTA "Perene Semanal R$ 29"** dos conceitos/metodologia/como-ler; somem os **~432 links internos**
+>   artigos→/conceitos (`gen_artigos` não tem auto-linker); some a **página do ILI** e seu link no hub
+>   (hand-written, fora do PAGES); volta o corpo R$149 de **/termos**, **/free** e **/api/docs**.
+> **Regra operacional até reconciliar:** (1) **nunca** rodar um gerador isolado; (2) reconciliar a FONTE
+> e a LÓGICA dos dois ANTES; (3) rodar **o par na ordem** `node gen_pages.mjs && node gen_artigos.mjs`;
+> (4) conferir `git diff` (deve ser no-op nos itens acima; /founder fora; ILI dentro; sitemaps iguais).
+> Mapa completo + sequência: `../RADAR-REGULATORIO/HANDOFF_2026-06-29_RECONCILIACAO_GERADORES_E_DEFERIDOS.md`.
+
 ## As duas esteiras estáticas (static-first; `wrangler` serve `./` via ASSETS)
 
 | Esteira | Gera | Fonte (no repo do cérebro `../RADAR-REGULATORIO/`) | Rodar |
