@@ -1009,7 +1009,7 @@ async function _route(request, env, ctx) {
         // exemplo de API: PT estático (.com.br) → EN no .com p/ crawler/no-JS (o JS deriva de location.origin no render vivo)
         rw = rw
           .on("#api-url", { element(e) { e.setInnerContent("GET https://radarperene.com/api/v1/digest?lang=en"); } })
-          .on("#api-embed", { element(e) { e.setInnerContent('<iframe src="https://radarperene.com/radar-embed" width="100%" height="1400" style="border:0"></iframe>'); } });
+          .on("#api-embed", { element(e) { e.setInnerContent('<iframe src="https://radarperene.com/radar-embed" width="100%" height="520" style="border:0"></iframe>'); } });
         rw = _enLibraryRw(_enDailyRw(rw)); // nav/footer/CTA do arquivo diário no .com → /daily + /biblioteca→/library (evita 301)
       } else if (_gdt) {
         // PT: o graph estático vive no index.html → data o Dataset via BUFFER do texto inline (chunks do
