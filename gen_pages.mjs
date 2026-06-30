@@ -532,6 +532,7 @@ for (const p of PAGES) {
 const HANDWRITTEN_SITEMAP = [
   { pt: "/termos/", en: "/terms/", pri: "0.5" },
   { pt: "/conceitos/indice-de-liquidez-imobiliaria/", en: "/concepts/real-estate-liquidity-index/", pri: "0.7" },
+  { pt: "/founder/", en: "/founder/", pri: "0.6" },   // 2026-06-30: institucional indexada (descoberta por parceiros)
 ];
 for (const h of HANDWRITTEN_SITEMAP) {
   const alt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${h.pt}"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com${h.en}"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com.br${h.pt}"/>`;
