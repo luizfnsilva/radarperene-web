@@ -51,7 +51,7 @@ const EN_BODY = (function () {
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4: "Principles",
     disc: "Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
-    ftnav: '<span class="ftcol"><b>Reading</b> <a href="/daily">Daily</a> · <a href="/articles">Articles</a></span><span class="ftcol"><b>The Radar</b> <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/concepts/">Concepts</a></span><span class="ftcol"><b>For institutions</b> <a href="/founder/">Institutional access</a> · <a href="/lenses/">Lenses</a> · <a href="/api/docs/">API</a> · <a href="/widgets/">Embeddable widget</a></span><span class="ftcol"><b>House &amp; legal</b> <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a></span>',
+    ftnav: '<span class="ftcol"><b>Reading</b> <a href="/daily">Daily</a> · <a href="/articles">Articles</a></span><span class="ftcol"><b>The Radar</b> <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">Methodology</a> · <a href="/concepts/">Concepts</a></span><span class="ftcol"><b>For institutions</b> <a href="/founder/">Institutional access</a> · <a href="/lenses/">Lenses</a> · <a href="/widgets/">Embeddable widget</a></span><span class="ftcol"><b>House &amp; legal</b> <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a></span>',
     lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings." },
       { n: "Electoral", d: "Electoral courts, eligibility, finance." },
       { n: "Macro / Rates", d: "Rates, inflation, fiscal, debt." },
@@ -657,10 +657,12 @@ function _applySec(resp, request) {
 async function _route(request, env, ctx) {
     const _url = new URL(request.url);
     const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
-    // ── Páginas de slug COMPARTILHADO (api/docs, founder, free): o PT vive em index.html (default no .com.br), o EN em
+    // ★ 2026-07-01: /api/docs consolidada em /widgets (menos "empresa de tecnologia"). 301 nos 2 domínios (antes de servir).
+    if (/^\/api\/docs(\/|$)/.test(_url.pathname)) return Response.redirect(_url.origin + "/widgets/", 301);
+    // ── Páginas de slug COMPARTILHADO (founder, free, widgets): o PT vive em index.html (default no .com.br), o EN em
     //    index.en.html. Sem isto, o build gerava só inglês nos 2 domínios (colisão de slug). No .com servimos a versão EN. ──
     if (_isEN) {
-      const _shm = _url.pathname.match(/^\/(api\/docs|founder|free|widgets)\/?$/);
+      const _shm = _url.pathname.match(/^\/(founder|free|widgets)\/?$/);
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
         if (_er.ok) return _enLibraryRw(_enDailyRw(_consentRw(new HTMLRewriter()))).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));

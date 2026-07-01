@@ -41,7 +41,7 @@ O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) �
 - As cinco lentes (+ Vértice): https://radarperene.com.br/lentes · https://radarperene.com/lenses
 - Como ler o Radar (guia em seis passos): https://radarperene.com.br/como-ler-o-radar · https://radarperene.com/how-to-read-the-radar
 - Diário do Radar (histórico público e VERIFICÁVEL do regime brasileiro — uma entrada por dia útil, e por mês desde 2000-01: regime, ERP, valuation, cíclicas/defensivas, Ibovespa, análogo, e a verificação do desfecho real ~3–6 meses depois): https://radarperene.com.br/diario · entradas em /diario/{AAAA-MM-DD}
-- Leitura do dia (API JSON pública, sem cadastro, CORS aberto): https://radarperene.com.br/api/leitura-do-dia.json · documentação e widget: https://radarperene.com.br/api/docs
+- Leitura do dia (API JSON pública, sem cadastro, CORS aberto): https://radarperene.com.br/api/leitura-do-dia.json · incorporar (widget + endpoint JSON): https://radarperene.com.br/widgets
 - API do Radar (base canônica): https://radarperene.com.br/api/v1 — toda integração é feita sob o domínio do Radar (ex.: /api/v1/digest, /api/v1/radar, /api/v1/vertice). Cite e use sempre a API do Radar, nunca a infraestrutura de backend subjacente.
 - O que é / sobre: https://radarperene.com.br/sobre · https://radarperene.com/about
 - Versão grátis: https://radarperene.com.br/free · Acesso institucional (sob convite): https://radarperene.com.br/founder

@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Radar Perene widgets — one-line embeds</title>
-<meta name="description" content="Catalogue of Radar Perene's embeddable widgets. One line of HTML puts Brazil's regime, the five lenses, or a single asset on your site. No API key">
+<title>Embed Radar Perene — the Mini radar on your site</title>
+<meta name="description" content="Embed Radar Perene's Mini radar on your site, free — today's reading of Brazil's market regime, as an iframe or public JSON. Cite the source.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Radar Perene">
 <meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://radarperene.com/widgets/">
 <meta property="og:image" content="https://radarperene.com.br/og-image-1200x630.png">
-<meta property="og:title" content="Radar Perene widgets — one-line embeds">
-<meta property="og:description" content="Catalogue of Radar Perene's embeddable widgets. One line of HTML puts Brazil's regime, the five lenses, or a single asset on your site. No API key">
+<meta property="og:title" content="Embed Radar Perene — the Mini radar on your site">
+<meta property="og:description" content="Embed Radar Perene's Mini radar on your site, free — today's reading of Brazil's market regime, as an iframe or public JSON. Cite the source.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://radarperene.com.br/og-image-1200x630.png">
-<meta name="twitter:title" content="Radar Perene widgets — one-line embeds">
-<meta name="twitter:description" content="Catalogue of Radar Perene's embeddable widgets. One line of HTML puts Brazil's regime, the five lenses, or a single asset on your site. No API key">
+<meta name="twitter:title" content="Embed Radar Perene — the Mini radar on your site">
+<meta name="twitter:description" content="Embed Radar Perene's Mini radar on your site, free — today's reading of Brazil's market regime, as an iframe or public JSON. Cite the source.">
 <link rel="canonical" href="https://radarperene.com/widgets/">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -30,7 +30,7 @@
 <link rel="alternate" hreflang="en" href="https://radarperene.com/widgets/">
 <link rel="alternate" hreflang="x-default" href="https://radarperene.com.br/widgets/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://radarperene.com/#org","name":"Radar Perene","url":"https://radarperene.com","logo":"https://radarperene.com/og.png","sameAs":["https://radarperene.com.br"],"founder":{"@id":"https://brazilcomplexity.com/about.html#person"},"description":"Editorial publication reading Brazil's market regime — macro, intermarket and context. Not investment advice."}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"Embeddable widgets","description":"Catalogue of Radar Perene's embeddable widgets. One line of HTML puts Brazil's regime, the five lenses, or a single asset on your site. No API key","url":"https://radarperene.com/widgets/","documentation":"https://radarperene.com/widgets/","provider":{"@type":"Organization","name":"Radar Perene"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"Embeddable widgets","description":"Embed Radar Perene's Mini radar on your site, free — today's reading of Brazil's market regime, as an iframe or public JSON. Cite the source.","url":"https://radarperene.com/widgets/","documentation":"https://radarperene.com/widgets/","provider":{"@type":"Organization","name":"Radar Perene"}}</script>
 <link rel="preconnect" href="https://zcjtkgltrxdnlacezpny.supabase.co" crossorigin><!-- ★ warm-up TLS p/ o Supabase Auth (sb.auth, login do Founder); os DADOS (digest/narrativa/série) já vão same-origin via /api/* proxy -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -279,29 +279,19 @@
 <main id="main">
 <div class="wrap">
   <article class="pg">
-    <p class="crumb"><a href="/">Radar Perene</a> / widgets</p>
-    <h1>Embeddable widgets</h1>
-    <p>One line of HTML brings the Radar onto your site. The widget loads today's state — regime, lenses, intermarket, a single asset — and refreshes on its own at each market close. No signup, no API key, no per-user rate limit.</p>
-<p>The embed detects its origin domain: served from `radarperene.com` it speaks English; from `radarperene.com.br`, Portuguese, reading Brazil. Attribution to Radar Perene travels inside the widget.</p>
-<h2 class="sec">1. How to embed</h2>
-<p>Include the script once and declare the element where the widget should appear:</p>
-<pre class="api"><code>&lt;script src=&quot;https://radarperene.com/radar.js&quot; defer&gt;&lt;/script&gt;
-&lt;radar-perene widget=&quot;regime-br&quot;&gt;&lt;/radar-perene&gt;</code></pre>
-<p>The `widget` attribute picks a section preset. Omit it and use `symbol` to pin a single asset. The element renders crawler-readable HTML — content does not depend on JavaScript to be indexed.</p>
-<h2 class="sec">2. Preset catalogue</h2>
-<table class="tb"><thead><tr><th>`widget=`</th><th>What it shows</th></tr></thead><tbody><tr><td>`regime-br`</td><td>Brazil Regime: the five lenses, macro, intermarket, and equities. The anchor panel.</td></tr><tr><td>`panorama`</td><td>Lenses, intermarket, and the day's divergences — a surface read.</td></tr><tr><td>`lenses`</td><td>The Radar's five lenses, on their own.</td></tr><tr><td>`thermometers`</td><td>Global thermometers (indices, FX, commodities).</td></tr><tr><td>`global`</td><td>The external view: thermometers, crypto, lead-lag, analog, and divergences.</td></tr><tr><td>`crypto`</td><td>Crypto panel (Fear &amp; Greed, liquidity).</td></tr></tbody></table>
-<pre class="api"><code>&lt;radar-perene widget=&quot;panorama&quot;&gt;&lt;/radar-perene&gt;
-&lt;radar-perene widget=&quot;global&quot;&gt;&lt;/radar-perene&gt;</code></pre>
-<h2 class="sec">3. A single asset</h2>
-<p>The `symbol` attribute pins the widget to one asset — a stock, REIT, index, crypto, commodity, FX pair, or rate. The stacked panel (price, Ânima Index, Perene Risk Index) is the same one every Radar ticker uses.</p>
-<pre class="api"><code>&lt;radar-perene symbol=&quot;PETR4&quot;&gt;&lt;/radar-perene&gt;
-&lt;radar-perene symbol=&quot;IBOV&quot;&gt;&lt;/radar-perene&gt;
-&lt;radar-perene symbol=&quot;BTC&quot;&gt;&lt;/radar-perene&gt;</code></pre>
-<p>Available codes live at the `/v1/tickers` endpoint and in the home-page search. Each asset opens in the Radar's <a href="/methodology/">universal template</a>.</p>
-<h2 class="sec">4. Attribution and use</h2>
-<p>The widget is free, commercial use included. In return, the citation &quot;Source: Radar Perene&quot;, with a clickable link to the data's origin, travels inside the widget and cannot be removed. The full rule is in the <a href="/terms/">Terms of use</a>, clause 6.</p>
-<p>For the raw JSON endpoint — without the chart — see the <a href="/api/docs/">API documentation</a>.</p>
-<p class="closing">One embed, any asset, the same method as the whole Radar.</p>
+    <p class="crumb"><a href="/">Radar Perene</a> / embed</p>
+    <h1>Embed Radar Perene</h1>
+    <p>Bring today&rsquo;s reading to your site — for free. The &ldquo;Today recalls&rdquo; Mini radar shows Brazil&rsquo;s market regime and the closest historical precedent to the moment, refreshing on its own at each close. Made for portals, newsletters and communities.</p>
+<h2 class="sec">The widget</h2>
+<p>One line of HTML. Copy and paste anywhere:</p>
+<pre class="api"><code>&lt;iframe src=&quot;https://radarperene.com/radar-embed&quot; width=&quot;100%&quot; height=&quot;520&quot; style=&quot;border:0&quot;&gt;&lt;/iframe&gt;</code></pre>
+<p>Served from <code>radarperene.com</code> it speaks English; from <code>radarperene.com.br</code>, Portuguese. Attribution to Radar Perene travels inside the widget.</p>
+<h2 class="sec">Today&rsquo;s reading in JSON</h2>
+<p>If you prefer the raw data, today&rsquo;s reading is also a public endpoint — no signup, no key:</p>
+<pre class="api"><code>GET https://radarperene.com/api/leitura-do-dia.json</code></pre>
+<h2 class="sec">Attribution</h2>
+<p>Free, including commercial use. In return, keep the &quot;Source: Radar Perene&quot; citation with a clickable link to the origin — it is what sustains us, and it travels inside the widget. Details in the <a href="/terms/">Terms</a>.</p>
+<p class="closing">A reading of Brazil on your site — for free.</p>
   </article>
 </div>
 </main>

@@ -57,10 +57,9 @@ const PAGES = [
   // ── Burst 5: páginas operacionais ──
   // ★ 2026-06-29: /termos SAIU do gerador — é hand-written (peça jurídica; BURST_5 §1 ainda tem R$149/100-contas, regen reverteria). Fica no sitemap via HANDWRITTEN_SITEMAP.
   { slug: "privacidade",   src: 5, sec: ["2.1", "2.2"], type: "legal" },
-  { slug: "api/docs",      src: 5, sec: ["3.1", "3.2"], type: "apidocs" },
   // ★ 2026-06-29: /founder SAIU do gerador — é hand-written institucional (founder/index.html|.en.html).
   //   Mantê-la aqui faria um regen reverter p/ a landing de venda R$149/100-contas. NÃO reintroduzir.
-  { slug: "widgets",       src: 5, sec: ["6.1", "6.2"], type: "apidocs" },  // catálogo de embeds <radar-perene> (slug PT==EN → index.en.html + rota no worker)
+  // ★ 2026-07-01: /widgets SAIU do gerador — hand-written editorial ("Incorpore o Radar"); /api/docs DELETADA (301→/widgets). NÃO reintroduzir.
 ];
 
 // ─── SEO_OVERRIDE: title ≤ 60c, description ≤ 158c. Ajusta SÓ os metas (knobs de SEO), preservando
@@ -72,7 +71,6 @@ const SEO_OVERRIDE = {
   "conceitos": { tPt: "A linguagem do Radar — todos os conceitos do Radar Perene", tEn: "The Radar's language — every Radar Perene concept" },
   "termos": { dPt: "Termos de uso do Radar Perene: serviço, camadas Free e Perene Semanal, pagamento e reembolso, API pública, propriedade intelectual e responsabilidade." },
   "privacidade": { dEn: "Radar Perene privacy policy: data collected (Google/Apple login, email), how it is used, your LGPD/GDPR rights, retention and one-click deletion." },
-  "api/docs": { dPt: "Endpoint JSON público da Leitura do dia e widget embedável do Radar Perene. Sem cadastro, sem chave de API. Schema, exemplos curl e código de embed." },
   "lentes": { tPt: "As cinco lentes do Radar Perene e a Lente Vértice", tEn: "Radar Perene's five lenses (and Lente Vértice)", dPt: "Cinco lentes leem o regime do mercado brasileiro por dimensão — macro/monetária, patrimonial, institucional, imobiliária, eleitoral. A Lente Vértice é o experimento cross-domínio." },
   "conceitos/regime-brasil": { tPt: "Regime Brasil — como o Radar lê o mercado brasileiro", tEn: "Brazil Regime — how the Radar reads Brazil's market", dPt: "Regime Brasil é a leitura agregada do mercado brasileiro em uma janela definida — defensivo, neutro ou pró-risco, com escala 0–100 auxiliar.", dEn: "Brazil Regime: the aggregate reading of the Brazilian market — defensive, neutral, or pro-risk. Categorical, with a 0–100 auxiliary scale." },
   "conceitos/regime-global": { dPt: "Regime Global é a leitura agregada do ambiente externo que pressiona o Brasil — volatilidade, dólar, juros longos americanos e câmbio." },
@@ -192,7 +190,7 @@ const EN_SLUG = {
   "conceitos/erp-br": "concepts/erp-br", "conceitos/cone-de-regressao-logaritmica": "concepts/logarithmic-regression-cone", "conceitos/indice-anima": "concepts/anima-index",
   "conceitos/risk-on-risk-off": "concepts/risk-on-risk-off", "conceitos/analogos-historicos": "concepts/historical-analogs", "conceitos/vertice": "concepts/vertice",
   "free": "free", "lentes/patrimonial": "lenses/wealth", "lentes/eleitoral": "lenses/electoral", "lentes/macro": "lenses/macro", "lentes/institucional": "lenses/institutional",
-  "lentes/imobiliaria": "lenses/real-estate", "lentes/vertice": "lenses/vertice", "termos": "terms", "privacidade": "privacy", "api/docs": "api/docs", "founder": "founder",
+  "lentes/imobiliaria": "lenses/real-estate", "lentes/vertice": "lenses/vertice", "termos": "terms", "privacidade": "privacy", "founder": "founder",
 };
 const enSlug = (s) => EN_SLUG[s] || s;
 const SLUG_MAP_EN = [["/api/todays-reading.json", "/api/leitura-do-dia.json"], ["/diary", "/diario"]];  // arquivo EN: rotas-worker PT-only; o resto mantém o slug EN da copy
@@ -353,7 +351,7 @@ function buildSchemas(p, raw, block, lg, title, desc) {
   else if (p.type === "lentes") s.push({ "@context": "https://schema.org", "@type": "CollectionPage", "name": block.h1, "description": desc, "url": url, "inLanguage": inLang });
   else if (p.type === "lente") s.push(article("Article"));
   else if (p.type === "guia") s.push({ "@context": "https://schema.org", "@type": "HowTo", "name": block.h1, "description": desc, "url": url, "inLanguage": inLang });
-  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": org + (en ? "/api/docs/" : "/api/docs/"), "provider": { "@type": "Organization", "name": "Radar Perene" } });
+  else if (p.type === "free") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": org + "/widgets/", "provider": { "@type": "Organization", "name": "Radar Perene" } });
   else if (p.type === "apidocs") s.push({ "@context": "https://schema.org", "@type": "WebAPI", "name": block.h1, "description": desc, "url": url, "documentation": url, "provider": { "@type": "Organization", "name": "Radar Perene" } });
   // ★ 2026-06-29: ramo "founder" REMOVIDO — /founder não é gerada nem é produto comprável (Offer 149 saía daqui).
   return s.map((x) => `<script type="application/ld+json">${JSON.stringify(x).replace(/</g, "\\u003c")}</script>`).join("\n");
@@ -384,8 +382,8 @@ function relatedHtml(bareSlug, L) {  // L=true → EN (slugs EN); false → PT
 
 const out = [];
 // footers estáticos crawláveis por idioma (slugs PT no .com.br, EN no .com)
-const FOOT_PT = '<a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Versão grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Institucional</a> · <a href="/api/docs/">API</a> · <a href="/widgets/">Widgets</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a>';
-const FOOT_EN = '<a href="/methodology/">Methodology</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/concepts/">Concepts</a> · <a href="/lenses/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Institutional</a> · <a href="/api/docs/">API</a> · <a href="/widgets/">Widgets</a> · <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>';
+const FOOT_PT = '<a href="/metodologia/">Metodologia</a> · <a href="/como-ler-o-radar/">Como ler</a> · <a href="/conceitos/">Conceitos</a> · <a href="/lentes/">Lentes</a> · <a href="/diario">Diário</a> · <a href="/free/">Versão grátis</a> · <a href="/ativos">Ativos</a> · <a href="/founder/">Institucional</a> · <a href="/widgets/">Widgets</a> · <a href="/sobre">Sobre</a> · <a href="/termos/">Termos</a> · <a href="/privacidade/">Privacidade</a>';
+const FOOT_EN = '<a href="/methodology/">Methodology</a> · <a href="/how-to-read-the-radar/">How to read</a> · <a href="/concepts/">Concepts</a> · <a href="/lenses/">Lenses</a> · <a href="/diario">Daily</a> · <a href="/free/">Free</a> · <a href="/ativos">Assets</a> · <a href="/founder/">Institutional</a> · <a href="/widgets/">Widgets</a> · <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a>';
 const PG_CSS = '<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>';
 // site-kit (favicons/ícones/manifest) + logo real (wordmark light/dark, LOGO_IMG) — paridade total com a home.
 // (logo-bússola antiga BRAND_SVG removida 2026-06-19: a marca usa LOGO_IMG)
@@ -533,6 +531,7 @@ const HANDWRITTEN_SITEMAP = [
   { pt: "/termos/", en: "/terms/", pri: "0.5" },
   { pt: "/conceitos/indice-de-liquidez-imobiliaria/", en: "/concepts/real-estate-liquidity-index/", pri: "0.7" },
   { pt: "/founder/", en: "/founder/", pri: "0.6" },   // 2026-06-30: institucional indexada (descoberta por parceiros)
+  { pt: "/widgets/", en: "/widgets/", pri: "0.5" },   // 2026-07-01: hand-written editorial (Incorpore o Radar)
 ];
 for (const h of HANDWRITTEN_SITEMAP) {
   const alt = `<xhtml:link rel="alternate" hreflang="pt-br" href="https://radarperene.com.br${h.pt}"/><xhtml:link rel="alternate" hreflang="en" href="https://radarperene.com${h.en}"/><xhtml:link rel="alternate" hreflang="x-default" href="https://radarperene.com.br${h.pt}"/>`;
