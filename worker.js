@@ -204,6 +204,9 @@ async function _proxyApi(request, _url, sub) {
   //   que são autenticados (pass-through, sem cache anon → não fragmenta). USD→.com, BRL→.com.br. O edge
   //   filtra a assinatura Stripe pela moeda → assinante USD só destrava o .com; BRL só o .com.br.
   let _search = _url.search;
+  // ★ 2026-07-01: default de idioma por DOMÍNIO no contrato público — .com => EN, .com.br => PT (a menos de ?lang explícito).
+  //   Antes o edge assumia pt sempre → embeds/consumidores diretos do .com recebiam PT. Chave de cache usa _search (com lang) → sem poluição cross-idioma.
+  if (!/\.com\.br$/i.test(_url.hostname) && !/[?&]lang=/i.test(_search)) _search = (_search ? _search + "&" : "?") + "lang=en";
   const _sl = sub.toLowerCase();
   if (_sl === "v1/me" || _sl.indexOf("v1/serie") === 0 || _sl.indexOf("v1/biblioteca") === 0) {
     const _cur = /\.com\.br$/i.test(_url.hostname) ? "brl" : "usd";
@@ -216,7 +219,7 @@ async function _proxyApi(request, _url, sub) {
   try {
     // GET anon = a esmagadora maioria do tráfego (free + embed) → cacheável na borda. Chave = sub+query ENCODADA (sem ? & = soltos).
     if (request.method === "GET" && isAnon) {
-      const body = await _cachedText(upstream, "api-" + encodeURIComponent(sub + _url.search), 900);
+      const body = await _cachedText(upstream, "api-" + encodeURIComponent(sub + _search), 900);
       if (body != null) return new Response(body, { status: 200, headers: Object.assign({ "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=900", "x-rp-proxy": "anon" }, _API_CORS) });
       // _cachedText null = upstream NÃO-200 (ex.: 404 estudo inexistente / 400 param ruim) OU down sem stale. NÃO mascarar
       //   como 503: repassa o status+corpo REAIS (sem cachear) → o cliente vê o mesmo que veria batendo o edge direto.
@@ -436,7 +439,9 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const refMes = (regime && regime.ref_mes) || null;  // congelados pré-rótulo não trazem ref_mes → rotula só a cadência (não inventa mês)
   const title = "Radar Perene — " + date + (en ? " · Brazil market regime" : " · regime do mercado BR");
   const _rl = regime ? (regime.classificacao || regime.leitura || "") : "", _rs = (regime && regime.valor != null) ? regime.valor + "/100" : "";
-  const _hum = function (s) { return _esc(String(s || "").replace(/_/g, " ").trim()); };  // classificacao "pessimismo_extremo" → "pessimismo extremo" (humor legível, sem jargão)
+  // classificacao "pessimismo_extremo" → "pessimismo extremo"; ★ 2026-07-01: lang-aware (Ânima/Perene chegam como enum cru PT → vazava no /daily EN)
+  const _CLSMAP = { pessimismo_extremo: "extreme pessimism", pessimismo: "pessimism", neutro: "neutral", otimismo: "optimism", otimismo_extremo: "extreme optimism", cautela: "caution", euforia: "euphoria", medo: "fear", medo_extremo: "extreme fear", ganancia: "greed", ganancia_extrema: "extreme greed", risk_on: "risk-on", risk_off: "risk-off", risk_on_moderado: "moderate risk-on", risk_off_moderado: "moderate risk-off", pro_risco: "pro-risk", defensivo: "defensive" };
+  const _hum = function (s) { const k = String(s || "").trim().toLowerCase(); return _esc(en && _CLSMAP[k] ? _CLSMAP[k] : k.replace(/_/g, " ").trim()); };
   const _pcls = perene && perene.classificacao ? " (" + _hum(perene.classificacao) + ")" : "";
   const _acls = anima && anima.classificacao ? " (" + _hum(anima.classificacao) + ")" : "";
   const _pulse = [perene && perene.valor != null ? (en ? "Perene Risk " : "Risco Perene ") + perene.valor + "/100" + _pcls : null,

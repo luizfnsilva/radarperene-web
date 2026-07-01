@@ -7,7 +7,7 @@ name: OG · Leitura do Radar
 
 on:
   schedule:
-    - cron: "10 0 * * *"   # 21:10 BRT (00:10 UTC) — depois do fechamento diário do pipeline
+    - cron: "0 13 * * *"   # 10:00 BRT (13:00 UTC) — ★ 2026-07-01: DEPOIS do recompute matinal do k-NN (~11:06 UTC). Antes (00:10) fotografava o análogo do dia anterior → cartão OG com sinal invertido vs o corpo da home
   workflow_dispatch: {}     # disparo manual (1ª geração / sob demanda)
 
 permissions:
