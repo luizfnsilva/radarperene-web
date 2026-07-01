@@ -629,6 +629,13 @@ function _renderHistorico(data, origin, lang) {
 
 export default {
   async fetch(request, env, ctx) {
+    // www → apex, 301 (canonical / ads.txt): as rotas www.* apontam para este worker; devolvemos o apex
+    // preservando caminho + querystring. Fecha a ponta do www (evita conteúdo duplicado e "ads.txt não encontrado").
+    const _wu = new URL(request.url);
+    if (_wu.hostname.startsWith("www.")) {
+      _wu.hostname = _wu.hostname.slice(4);
+      return Response.redirect(_wu.toString(), 301);
+    }
     let _resp;
     try { _resp = await _route(request, env, ctx); } catch (e) { _resp = new Response("", { status: 500 }); }
     return _applySec(_resp, request);
