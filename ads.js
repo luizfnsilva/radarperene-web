@@ -11,7 +11,16 @@
    lido também pelo rpIsPro() do radar.js.
 
    Política de densidade (plano do dono): por página, no máximo 1 In-article + 1 Multiplex;
-   o Diário usa In-feed entre registros. Slots excedentes são colapsados (display:none). */
+   o Diário usa In-feed entre registros. Slots excedentes são colapsados (display:none).
+
+   LGPD/AdSense (2026-07-02): o anúncio NÃO é gateado por consentimento — é fonte de renda e aparece
+   para todo leitor free. O que muda conforme o consentimento é a PERSONALIZAÇÃO (o rastreamento):
+     • sem "Aceitar" (padrão)  → requestNonPersonalizedAds=1 → anúncio contextual, sem cookie de perfil
+       → dispensa opt-in no Brasil (não há rastreamento). Receita preservada.
+     • com rp-consent="granted" → personalizado (sem o flag) → maior receita, para quem consentiu.
+   O sinal é o MESMO banner rp-consent do index.html (agora cobre medição E publicidade).
+   .com (UE/UK): a conformidade plena de anúncio personalizado exige a CMP certificada do Google
+   (gratuita, no console do AdSense) — o padrão não-personalizado aqui é o piso seguro até ativá-la. */
 (function () {
   "use strict";
   var PUB = "ca-pub-4470857367486011";
@@ -29,6 +38,15 @@
   var TYPE_BY_ID = { topo: "in-article", meio: "in-article", rodape: "multiplex" };
 
   function localPro() { try { return localStorage.getItem("rp_premium") === "1"; } catch (e) { return false; } }
+
+  // LGPD: personaliza o anúncio SÓ com consentimento explícito (rp-consent="granted", mesmo banner do GA4).
+  // Sem consentimento → não-personalizado (contextual, sem cookie de perfil): anúncio aparece igual, sem rastreio.
+  function adsPersonalized() { try { return localStorage.getItem("rp-consent") === "granted"; } catch (e) { return false; } }
+  var npaSet = false;
+  function applyNPA() {
+    if (npaSet) return; npaSet = true;
+    if (!adsPersonalized()) { try { (window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1; } catch (e) {} }
+  }
 
   // access_token da sessão Supabase SEM carregar o SDK (chave canônica do supabase-js v2)
   function sessionToken() {
@@ -70,6 +88,7 @@
       else if (type !== "in-feed") { el.style.display = "none"; return; }
       var html = UNITS[type];
       if (!html) { el.style.display = "none"; return; }
+      applyNPA();          // define não-personalizado ANTES do 1º push, se não houver consentimento (LGPD)
       loadLoader();
       el.innerHTML = html;
       el.style.minHeight = "";   // libera a altura reservada do placeholder (anúncio dimensiona sozinho)

@@ -407,7 +407,7 @@
 <!-- Consentimento LGPD: analytics/ads carregam SÓ após opt-in -->
 <div id="rp-cookie" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#13171c;border-top:1px solid #222a31;padding:14px 18px;font:13px/1.5 'Inter',system-ui,sans-serif;color:#e8ebee">
   <div style="max-width:1080px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center">
-    <span id="rp-ck-txt" style="flex:1;min-width:240px;color:#8b97a3">Usamos cookies de medição (analytics) para melhorar o site. Você escolhe — sem isso, nada é rastreado.</span>
+    <span id="rp-ck-txt" style="flex:1;min-width:240px;color:#8b97a3">Usamos cookies de medição e de publicidade personalizada para melhorar o site e sustentar o conteúdo gratuito. Você escolhe — sem o aceite, os anúncios ficam contextuais e nada é rastreado.</span>
     <button id="rp-ck-no" style="background:transparent;border:1px solid #222a31;color:#e8ebee;padding:13px 18px;border-radius:8px;font-weight:600;cursor:pointer">Recusar</button>
     <button id="rp-ck-yes" style="background:#c9a227;border:0;color:#0a0c0f;padding:13px 20px;border-radius:8px;font-weight:700;cursor:pointer">Aceitar</button>
   </div>
@@ -416,7 +416,7 @@
 (function(){
   var EN=/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname);
   var can=document.getElementById("rp-canonical"); if(can) can.href=location.origin+location.pathname;  // canonical self-referente NA forma servida (home "/" ou /ativo/{tk}) — NÃO força "/" (senão clobera o canonical do /ativo)
-  if(EN){var t=document.getElementById("rp-ck-txt");if(t)t.textContent="We use measurement (analytics) cookies to improve the site. Your choice — nothing is tracked without it.";
+  if(EN){var t=document.getElementById("rp-ck-txt");if(t)t.textContent="We use measurement and personalized-advertising cookies to improve the site and support free content. Your choice — without acceptance, ads stay contextual and nothing is tracked.";
     document.getElementById("rp-ck-no").textContent="Decline";document.getElementById("rp-ck-yes").textContent="Accept";}
   var KEY="rp-consent";
   window.rpTrack=function(name){ if(localStorage.getItem(KEY)!=="granted")return;
@@ -619,7 +619,24 @@
     {pt:"a-casa-as-escuras-2022",en:"the-house-in-the-dark-2022",yr:"2022",
      tp:"A casa às escuras, fim de 2022",te:"The house in the dark, late 2022",
      dp:"O fundo da estrutura precedeu um ano de discordância.",de:"The structure's floor preceded a year of discord.",
-     gp:"No fim de 2022, a estrutura tocou o piso enquanto a narrativa seguia sombria. O assoalho veio antes — e precedeu um ano inteiro de discordância.",ge:"In late 2022, structure touched its floor while the narrative stayed grim. The floor came first — and preceded a full year of discord."}
+     gp:"No fim de 2022, a estrutura tocou o piso enquanto a narrativa seguia sombria. O assoalho veio antes — e precedeu um ano inteiro de discordância.",ge:"In late 2022, structure touched its floor while the narrative stayed grim. The floor came first — and preceded a full year of discord."},
+    // ── leva jun/2026: comparativos que leem o presente contra um marco (rima passado×presente) ──
+    {pt:"dois-junhos-o-mesmo-desacordo",en:"two-junes-same-disagreement",yr:"2020 · 2026",
+     tp:"O juro sempre foi o suspeito. Dois junhos o inocentaram.",te:"The rate was always the suspect. Two Junes acquitted it.",
+     dp:"Dois junhos, seis anos de distância — o capital voltou nos dois, a confiança em nenhum.",de:"Two Junes, six years apart — capital returned in both, confidence in neither.",
+     gp:"Em junho de 2020 e em junho de 2026, o dinheiro cruzou para o apetite enquanto o humor ficava no fundo — sob juros opostos. A discordância não precisa de juro baixo nem alto; atravessa os regimes.",ge:"In June 2020 and June 2026, money crossed into appetite while mood stayed at the floor — under opposite rates. The discord needs neither cheap nor dear money; it cuts across regimes."},
+    {pt:"o-mesmo-juro-duas-casas",en:"the-same-rate-two-houses",yr:"2015 · 2026",
+     tp:"O mesmo juro presidiu o pânico e o apetite",te:"The same rate presided over panic and appetite",
+     dp:"Selic a 14,25% na porta dos dois meses — e o apetite por risco no piso e no topo.",de:"The Selic at 14.25% at the door of both months — with risk appetite at the floor and the ceiling.",
+     gp:"Agosto de 2015 fechou com o apetite por risco cravado no zero da escala; junho de 2026, no apetite declarado — o mesmo juro na porta dos dois. O juro é o palco, não o enredo.",ge:"August 2015 closed with risk appetite pinned at the scale's zero; June 2026, in declared appetite — the same rate at both doors. The rate is the stage, not the plot."},
+    {pt:"a-queda-de-quarenta-pontos",en:"the-forty-point-drop",yr:"2014 · 2026",
+     tp:"Quando o tombo é do humor — e quando é do capital",te:"When the drop is in the mood — and when it is in the capital",
+     dp:"Dois desabamentos de quarenta pontos, doze anos entre eles — e um só eixo tombou em cada.",de:"Two forty-point collapses, twelve years apart — and only one axis fell in each.",
+     gp:"Em maio de 2026 foi o humor que despencou enquanto o capital voltava; em janeiro de 2014, o capital que fugiu. Importa menos o tamanho do tombo e mais qual dos dois eixos tomba.",ge:"In May 2026 it was mood that plunged while capital returned; in January 2014, capital that fled. What matters is less the size of the fall than which of the two axes falls."},
+    {pt:"o-mesmo-sangramento-dois-humores",en:"the-same-bleeding-two-moods",yr:"2025 · 2026",
+     tp:"O mesmo setor sangrou duas vezes. O humor não notou nenhuma.",te:"The same sector bled twice. The mood noticed neither.",
+     dp:"As commodities perderam a dianteira sob euforia e sob desânimo — a estrutura sangra igual.",de:"Commodities lost the lead under euphoria and under gloom — the structure bleeds the same.",
+     gp:"Abril de 2025 e junho de 2026 registram o mesmo recuo das matérias-primas contra o índice — uma vez sob otimismo extremo, outra sob pessimismo profundo. Quem muda é a plateia.",ge:"April 2025 and June 2026 record the same retreat of raw materials against the index — once under extreme optimism, once under deep pessimism. What changes is the audience."}
   ];
   var _now=new Date(), _doy=Math.floor((_now-new Date(_now.getFullYear(),0,0))/864e5), _st=_doy%ARC.length;
   var _pick=[ARC[_st],ARC[(_st+1)%ARC.length],ARC[(_st+2)%ARC.length],ARC[(_st+3)%ARC.length]];  // ★ 2026-06-21 4 cards (Arquivo = segunda capa)
