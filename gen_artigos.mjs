@@ -83,16 +83,19 @@ const PERSONAGEM_NOME = {
   humor: "Humor", fluxo: "Fluxo (apetite por risco)", estrutura: "Estrutura (intermercado)",
   dolar: "Dólar", juros: "Juros (Selic)", anomalia: "Anomalia estatística",
   "ciclicos-defensivos": "Cíclicos × defensivos", commodities: "Commodities",
+  "renda-contratada": "Renda contratada", metodo: "Método",
 };
 // EN: chave-de-rota de personagem (humor→mood, …) + nome de exibição EN (espelha o mapeamento do brief §2)
 const PERSONAGEM_SLUG_EN = {
   humor: "mood", fluxo: "flow", estrutura: "structure", dolar: "dollar", juros: "rates",
   anomalia: "anomaly", "ciclicos-defensivos": "cyclicals-defensives", commodities: "commodities",
+  "renda-contratada": "contracted-income", metodo: "method",
 };
 const PERSONAGEM_NOME_EN = {
   humor: "Mood", fluxo: "Flow (risk appetite)", estrutura: "Structure (intermarket)",
   dolar: "Dollar", juros: "Rates (Selic)", anomalia: "Statistical anomaly",
   "ciclicos-defensivos": "Cyclicals × defensives", commodities: "Commodities",
+  "renda-contratada": "Contracted income", metodo: "Method",
 };
 // ── parágrafo-abertura de ESTUDO no topo do hub de personagem (transforma índice → página-estudo) ──
 const ESTUDO_INTRO = {
