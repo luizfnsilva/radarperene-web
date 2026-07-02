@@ -671,6 +671,27 @@ async function _route(request, env, ctx) {
     const _isEN = /radarperene\.com$/i.test(_url.hostname.toLowerCase()) && !/\.com\.br$/i.test(_url.hostname.toLowerCase());
     // ★ 2026-07-01: /api/docs consolidada em /widgets (menos "empresa de tecnologia"). 301 nos 2 domínios (antes de servir).
     if (/^\/api\/docs(\/|$)/.test(_url.pathname)) return Response.redirect(_url.origin + "/widgets/", 301);
+    // ★ 2026-07-02 Segunda edição G3: slugs que fossilizavam medida estatística → 301 (regra de slug v3/§9.9).
+    const _G3_SLUG_301 = {
+      "/artigos/o-dolar-em-anomalia-z346-dez-2024": "/artigos/o-dolar-em-anomalia-dez-2024",
+      "/artigos/o-salto-de-2-sigma-em-financas-ibov-mar-2016": "/artigos/o-salto-dos-bancos-mar-2016",
+      "/artigos/a-divida-publica-em-desvio-raro-ago-2015": "/artigos/a-divida-publica-em-anomalia-rara-ago-2015",
+      "/artigos/a-capitulacao-de-quatro-desvios-mai-2025": "/artigos/a-capitulacao-em-financas-mai-2025",
+      "/artigos/o-abrigo-a-dois-desvios-dez-2011": "/artigos/o-abrigo-que-cobrava-caro-dez-2011",
+      "/artigos/o-agio-dos-bancos-a-dois-desvios-nov-2010": "/artigos/o-agio-dos-bancos-esticado-nov-2010",
+      "/artigos/o-ciclo-e-os-bancos-a-quatro-sigmas-out-2018": "/artigos/o-ciclo-e-os-bancos-na-borda-da-escala-out-2018",
+      "/artigos/o-defensivo-a-quase-tres-desvios-fev-2024": "/artigos/o-defensivo-esticado-como-quase-nunca-fev-2024",
+      "/articles/the-dollar-in-anomaly-z346-dec-2024": "/articles/the-dollar-in-anomaly-dec-2024",
+      "/articles/the-2-sigma-leap-in-financials-ibov-mar-2016": "/articles/the-banks-leap-mar-2016",
+      "/articles/public-debt-in-a-rare-deviation-aug-2015": "/articles/public-debt-in-a-rare-anomaly-aug-2015",
+      "/articles/the-four-sigma-capitulation-may-2025": "/articles/the-capitulation-in-financials-may-2025",
+      "/articles/the-two-deviation-shelter-dec-2011": "/articles/the-shelter-that-charged-dearly-dec-2011",
+      "/articles/the-banks-premium-at-two-deviations-nov-2010": "/articles/the-banks-premium-stretched-nov-2010",
+      "/articles/the-cycle-and-the-banks-four-sigmas-out-oct-2018": "/articles/the-cycle-and-the-banks-at-the-edge-oct-2018",
+      "/articles/the-defensive-at-nearly-three-deviations-feb-2024": "/articles/the-defensive-stretched-as-almost-never-feb-2024",
+    };
+    const _g3old = _url.pathname.replace(/\/$/, "");
+    if (_G3_SLUG_301[_g3old]) return Response.redirect(_url.origin + _G3_SLUG_301[_g3old] + "/", 301);
     // ── Páginas de slug COMPARTILHADO (founder, free, widgets): o PT vive em index.html (default no .com.br), o EN em
     //    index.en.html. Sem isto, o build gerava só inglês nos 2 domínios (colisão de slug). No .com servimos a versão EN. ──
     if (_isEN) {

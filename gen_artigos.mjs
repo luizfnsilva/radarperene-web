@@ -171,8 +171,8 @@ function mdInline(s) {
 // ─── corpo markdown → HTML. Trata: AD_SLOT (→ div vazia CLS-safe), # H1 (ignora; vem do frontmatter), ### sub,
 //     ## sec, blockquote, listas, parágrafos. A linha *Continue a história:…* e o CTA *O Radar lê…* viram .rel/itálico. ───
 // ★ 2026-06-29: auto-link da 1ª menção dos conceitos proprietários → /conceitos (regen-safe; espelha os links manuais 2756f3f).
-const CONCEPT_LINKS_PT = [["Índice de Risco Perene","/conceitos/risk-on-risk-off/"],["Risco Perene","/conceitos/risk-on-risk-off/"],["Índice Ânima","/conceitos/indice-anima/"],["Ânima","/conceitos/indice-anima/"]];
-const CONCEPT_LINKS_EN = [["Perene Risk Index","/concepts/risk-on-risk-off/"],["Ânima Index","/concepts/anima-index/"],["Ânima","/concepts/anima-index/"]];
+const CONCEPT_LINKS_PT = [["Índice de Risco Perene","/conceitos/risk-on-risk-off/"],["Risco Perene","/conceitos/risk-on-risk-off/"],["Índice Ânima","/conceitos/indice-anima/"],["Ânima","/conceitos/indice-anima/"],["anomalia estatística","/artigos/anomalia-estatistica/"]];
+const CONCEPT_LINKS_EN = [["Perene Risk Index","/concepts/risk-on-risk-off/"],["Ânima Index","/concepts/anima-index/"],["Ânima","/concepts/anima-index/"],["statistical anomaly","/articles/statistical-anomaly/"]];
 function autoLinkConcepts(html, en) {
   const map = en ? CONCEPT_LINKS_EN : CONCEPT_LINKS_PT;
   const parts = html.split(/(<[^>]+>)/);
