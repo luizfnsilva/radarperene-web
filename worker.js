@@ -70,14 +70,14 @@ const EN_BODY = (function () {
   };
   const LSLUG = ["patrimonial", "eleitoral", "macro", "institucional", "imobiliaria", "vertice"];
   const ELEN = { patrimonial: "wealth", eleitoral: "electoral", institucional: "institutional", imobiliaria: "real-estate" };
-  const ECON = { "regime-brasil": "regime-brazil", "intermercado-br": "intermarket-br", "cone-de-regressao-logaritmica": "logarithmic-regression-cone", "indice-anima": "anima-index", "analogos-historicos": "historical-analogs" };
+  const ECON = { "regime-brasil": "regime-brazil", "intermercado-br": "intermarket-br", "indice-anima": "anima-index", "analogos-historicos": "historical-analogs" };
   const U_MET = "/methodology/", U_CON = "/concepts/", U_LEN = "/lenses/", U_HOW = "/how-to-read-the-radar/";
   const LP = (s) => U_LEN + (ELEN[s] || s) + "/";
   const CP = (s) => U_CON + (ECON[s] || s) + "/";
   const expTag = "experiment";
   const NAV = { met: "Methodology", con: "Concepts", len: "Lenses", dia: "Daily", howto: "How to read", free: "Free", ac: "All concepts →", al: "All lenses →" };
-  const CN = [["regime-brasil", "Brazil Regime"], ["regime-global", "Global Regime"], ["intermercado-br", "Intermarket BR"], ["erp-br", "ERP_BR"], ["cone-de-regressao-logaritmica", "Logarithmic Cone"], ["indice-anima", "Ânima Index"], ["risk-on-risk-off", "Perene Risk Index"], ["analogos-historicos", "Historical Analogs"], ["vertice", "Vértice"]];
-  const CD = ["Brazil's prevailing market state", "the external environment pressing on Brazil", "cross-reading of Brazilian wealth-sector ratios", "Brazilian equity risk premium in historical percentile", "frames price against the long-term trajectory", "reading of Brazilian market mood", "Brazil's risk-appetite gauge (0–100), stacked with Ânima", "past windows with a similar profile", "hypotheses where distant markets cross"];
+  const CN = [["regime-brasil", "Brazil Regime"], ["regime-global", "Global Regime"], ["intermercado-br", "Intermarket BR"], ["indice-anima", "Ânima Index"], ["risk-on-risk-off", "Perene Risk Index"], ["analogos-historicos", "Historical Analogs"], ["vertice", "Vértice"]];
+  const CD = ["Brazil's prevailing market state", "the external environment pressing on Brazil", "cross-reading of Brazilian wealth-sector ratios", "reading of Brazilian market mood", "Brazil's risk-appetite gauge (0–100), stacked with Ânima", "past windows with a similar profile", "hypotheses where distant markets cross"];
   const lenses = C.lenses.map((l, i) => '<a class="ln' + (l.v ? ' vx' : '') + '" href="' + LP(LSLUG[i]) + '"><div class="nm">' + (l.v ? '<span style="color:var(--gold-ink)">✦</span> ' : '') + l.n + (l.v ? '<span class="tag">' + expTag + '</span>' : '') + '</div><p>' + l.d + '</p>' + (l.m ? '<span class="micro">' + l.m + '</span>' : '') + '</a>').join("");
   const conDD = CN.map((c) => '<a href="' + CP(c[0]) + '">' + c[1] + '</a>').join("") + '<a href="' + U_CON + '" style="color:var(--gold-ink)">' + NAV.ac + '</a>';
   const lenDD = C.lenses.map((l, i) => '<a href="' + LP(LSLUG[i]) + '">' + l.n + '</a>').join("") + '<a href="' + U_LEN + '" style="color:var(--gold-ink)">' + NAV.al + '</a>';
@@ -492,7 +492,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
       " · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "how the analogs are built →" : "como os análogos são construídos →") + "</a></p></div>";
   }
   const pfHtml = casHtml || casFromInd || "";
-  const IND_OK = { "regime-br": 1, "erp-br": 1, "valuation-br": 1, "ciclicas-defensivas": 1, "ibovespa": 1, "analogo-br": 1 };  // slugs com página /indicador real
+  const IND_OK = { "regime-br": 1, "ciclicas-defensivas": 1, "ibovespa": 1, "analogo-br": 1 };  // slugs com página /indicador real (★ 2026-07-03: erp-br/valuation-br FORA do público — CVM)
   const CONC_MAP = { "regime-global": "regime-global", "intermercado-br": "intermercado-br" };  // reconstruídos → página de conceito (não /indicador, que 404ava)
   const _indLi = function (i) {
     const nm = IND_OK[i.slug] ? "<a href=\"/indicador/" + _esc(i.slug) + "\">" + _esc(i.nome) + "</a>" : (CONC_MAP[i.slug] ? "<a href=\"/conceitos/" + CONC_MAP[i.slug] + "/\">" + _esc(i.nome) + "</a>" : _esc(i.nome));
@@ -503,7 +503,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   // item 30: o regime SAI da lista diária → bloco próprio "Contexto do mês", rotulado mensal (+ ref. quando o snapshot traz)
   // ★ UX 2026-06-16: hierarquia em blocos. "O que chama atenção" = indicadores do dia MENOS os que têm bloco próprio
   //   (Pulso: Ânima/Perene/Ibovespa · Casos: analogo-br · Contexto mensal: regime-br) → 3-4 itens em vez de 8.
-  const _NO_ATENCAO = { "regime-br": 1, "analogo-br": 1, "indice-anima": 1, "indice-risco-perene": 1, "ibovespa": 1 };
+  const _NO_ATENCAO = { "regime-br": 1, "analogo-br": 1, "indice-anima": 1, "indice-risco-perene": 1, "ibovespa": 1, "erp-br": 1, "valuation-br": 1 };  // ★ 2026-07-03: valuation/ERP fora do diário público (CVM)
   const indHtml = inds.filter(function (i) { return !_NO_ATENCAO[i.slug]; }).map(_indLi).join("");
   const ibov = inds.find(function (i) { return i.slug === "ibovespa"; });
   const ibovHtml = ibov && ibov.leitura ? "<p class=\"casl\">Ibovespa — " + _esc(ibov.leitura) + "</p>" : "";
@@ -692,6 +692,10 @@ async function _route(request, env, ctx) {
     };
     const _g3old = _url.pathname.replace(/\/$/, "");
     if (_G3_SLUG_301[_g3old]) return Response.redirect(_url.origin + _G3_SLUG_301[_g3old] + "/", 301);
+    // ★ 2026-07-03 (dono): conceitos de valuation REMOVIDOS do público (CVM Res.20 — leitura de valor sobre a bolsa é
+    //   opinativa) → 301 p/ a umbrella de conceitos, no idioma do path. Público foca regime/intermercado/índices/análogo.
+    const _VAL_301 = { "/conceitos/erp-br": 1, "/concepts/erp-br": 1, "/conceitos/cone-de-regressao-logaritmica": 1, "/concepts/logarithmic-regression-cone": 1 };
+    if (_VAL_301[_g3old]) return Response.redirect(_url.origin + (_g3old.indexOf("/concepts/") === 0 ? "/concepts/" : "/conceitos/"), 301);
     // ── Páginas de slug COMPARTILHADO (founder, free, widgets): o PT vive em index.html (default no .com.br), o EN em
     //    index.en.html. Sem isto, o build gerava só inglês nos 2 domínios (colisão de slug). No .com servimos a versão EN. ──
     if (_isEN) {
@@ -768,7 +772,8 @@ async function _route(request, env, ctx) {
         const ir = await _fetchIndicadores(_isEN ? "en" : "pt");
         const ij = ir.ok ? await ir.json() : { indicadores: [] };
         const _ilm = ij.data_referencia ? "<lastmod>" + ij.data_referencia + "</lastmod>" : "";  // lastmod = data da leitura do catálogo (todas mudam juntas no pulso diário)
-        const urls = (ij.indicadores || []).filter(function (i) { return i && i.slug; }).map(function (i) { return "<url><loc>" + _url.origin + "/indicador/" + encodeURIComponent(i.slug) + "</loc>" + _ilm + "<changefreq>daily</changefreq></url>"; }).join("");
+        const _hide = { "erp-br": 1, "valuation-br": 1 };  // ★ 2026-07-03: valuation/ERP fora do público (CVM) — não vão ao sitemap
+        const urls = (ij.indicadores || []).filter(function (i) { return i && i.slug && !_hide[i.slug]; }).map(function (i) { return "<url><loc>" + _url.origin + "/indicador/" + encodeURIComponent(i.slug) + "</loc>" + _ilm + "<changefreq>daily</changefreq></url>"; }).join("");
         return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>", { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
@@ -777,6 +782,8 @@ async function _route(request, env, ctx) {
     if (_im) {
       const slug = _im[1];
       const lang = _isEN ? "en" : "pt";
+      // ★ 2026-07-03 (dono): valuation/ERP FORA do público (CVM Res.20) → 301 p/ a umbrella de conceitos
+      if (slug === "erp-br" || slug === "valuation-br") return Response.redirect(_url.origin + (_isEN ? "/concepts/" : "/conceitos/"), 301);
       try {
         const ir = await _fetchIndicadores(lang);
         if (ir.ok) {

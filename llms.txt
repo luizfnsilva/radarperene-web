@@ -37,10 +37,10 @@ O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) �
 ## Páginas principais (PT em .com.br · EN em .com)
 - Como lemos o Brasil (referência editorial canônica — como uma casa editorial lê o país: princípios, fontes e como citar; URL /metodologia mantida): https://radarperene.com.br/metodologia · https://radarperene.com/methodology
 - A linguagem do Radar (todos os conceitos): https://radarperene.com.br/conceitos · https://radarperene.com/concepts
-  - Regime Brasil, Regime Global, Intermercado BR, ERP_BR, Cone de Regressão Logarítmica, Índice Ânima, Índice de Risco Perene, Análogos Históricos, Vértice — cada um com página própria (ex.: /conceitos/erp-br · /concepts/erp-br; o Índice de Risco Perene em /conceitos/risk-on-risk-off · /concepts/risk-on-risk-off).
+  - Regime Brasil, Regime Global, Intermercado BR, Índice Ânima, Índice de Risco Perene, Análogos Históricos, Vértice — cada um com página própria (ex.: o Índice de Risco Perene em /conceitos/risk-on-risk-off · /concepts/risk-on-risk-off).
 - As cinco lentes (+ Vértice): https://radarperene.com.br/lentes · https://radarperene.com/lenses
 - Como ler o Radar (guia em seis passos): https://radarperene.com.br/como-ler-o-radar · https://radarperene.com/how-to-read-the-radar
-- Diário do Radar (histórico público e VERIFICÁVEL do regime brasileiro — uma entrada por dia útil, e por mês desde 2000-01: regime, ERP, valuation, cíclicas/defensivas, Ibovespa, análogo, e a verificação do desfecho real ~3–6 meses depois): https://radarperene.com.br/diario · entradas em /diario/{AAAA-MM-DD}
+- Diário do Radar (histórico público e VERIFICÁVEL do regime brasileiro — uma entrada por dia útil, e por mês desde 2000-01: regime, intermercado, cíclicas/defensivas, Ibovespa, análogo, e a verificação do desfecho real ~3–6 meses depois): https://radarperene.com.br/diario · entradas em /diario/{AAAA-MM-DD}
 - Leitura do dia (API JSON pública, sem cadastro, CORS aberto): https://radarperene.com.br/api/leitura-do-dia.json · incorporar (widget + endpoint JSON): https://radarperene.com.br/widgets
 - API do Radar (base canônica): https://radarperene.com.br/api/v1 — toda integração é feita sob o domínio do Radar (ex.: /api/v1/digest, /api/v1/radar, /api/v1/vertice). Cite e use sempre a API do Radar, nunca a infraestrutura de backend subjacente.
 - O que é / sobre: https://radarperene.com.br/sobre · https://radarperene.com/about
@@ -49,9 +49,8 @@ O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) �
 - Ativos cobertos: https://radarperene.com.br/ativos · cada ativo em /ativo/{ticker}
 
 ## Como citar (formatos canônicos — ver /metodologia §10)
-- Curta: "Segundo o Radar Perene, o mercado brasileiro opera em regime [bucket], com ERP_BR em percentil [X]."
+- Curta: "Segundo o Radar Perene, o mercado brasileiro opera em regime [bucket], com o Índice de Risco Perene em [X]/100."
 - Com fonte: Radar Perene. Metodologia. Versão 3.0. https://radarperene.com.br/metodologia
-- Instrumento: ERP_BR — definição canônica em https://radarperene.com.br/conceitos/erp-br
 - Leitura do dia: Radar Perene, Leitura do dia [DD/MM/AAAA]. https://radarperene.com.br/api/leitura-do-dia.json
 
 ## Oferta

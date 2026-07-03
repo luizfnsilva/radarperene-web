@@ -560,7 +560,7 @@
   var LSLUG=["patrimonial","eleitoral","macro","institucional","imobiliaria","vertice"];  // de-orphan: cada card linka pra sua página de lente (mesma ordem PT/EN)
   // ── slugs por idioma: no .com (EN) os links vão pras páginas EN (/methodology, /concepts/*, /lenses/*) ──
   var _ENH=LANG==="en";
-  var _ECON={"regime-brasil":"regime-brazil","intermercado-br":"intermarket-br","cone-de-regressao-logaritmica":"logarithmic-regression-cone","indice-anima":"anima-index","analogos-historicos":"historical-analogs"};
+  var _ECON={"regime-brasil":"regime-brazil","intermercado-br":"intermarket-br","indice-anima":"anima-index","analogos-historicos":"historical-analogs"};
   var _ELEN={"patrimonial":"wealth","eleitoral":"electoral","institucional":"institutional","imobiliaria":"real-estate"};
   var U_MET=_ENH?"/methodology/":"/metodologia/",U_CON=_ENH?"/concepts/":"/conceitos/",U_LEN=_ENH?"/lenses/":"/lentes/",U_HOW=_ENH?"/how-to-read-the-radar/":"/como-ler-o-radar/",U_DIA=_ENH?"/daily":"/diario",U_ART=_ENH?"/articles":"/artigos";  // /artigos·/articles = portal editorial (3º pilar, com ads) — destaque no topo  // slug do arquivo diário por idioma: .com (EN)=/daily evita o 301 /diario→/daily
   function CP(s){return U_CON+(_ENH&&_ECON[s]?_ECON[s]:s)+"/";}
@@ -569,7 +569,7 @@
   // ── menu superior de conteúdo educacional (Conceitos ▾ / Lentes ▾ + flat links) ──
   var _en=LANG==="en";
   var NAV=_en?{art:"Articles",inst:"Institutional",met:"Methodology",con:"Concepts",len:"Lenses",dia:"Daily",howto:"How to read",free:"Free",ac:"All concepts →",al:"All lenses →"}:{art:"Artigos",inst:"Institucional",met:"Metodologia",con:"Conceitos",len:"Lentes",dia:"Diário",howto:"Como ler",free:"Versão grátis",ac:"Todos os conceitos →",al:"Todas as lentes →"};
-  var CN=_en?[["regime-brasil","Brazil Regime"],["regime-global","Global Regime"],["intermercado-br","Intermarket BR"],["erp-br","ERP_BR"],["cone-de-regressao-logaritmica","Logarithmic Cone"],["indice-anima","Ânima Index"],["risk-on-risk-off","Perene Risk Index"],["analogos-historicos","Historical Analogs"],["vertice","Vértice"]]:[["regime-brasil","Regime Brasil"],["regime-global","Regime Global"],["intermercado-br","Intermercado BR"],["erp-br","ERP_BR"],["cone-de-regressao-logaritmica","Cone Logarítmico"],["indice-anima","Índice Ânima"],["risk-on-risk-off","Índice de Risco Perene"],["analogos-historicos","Análogos Históricos"],["vertice","Vértice"]];
+  var CN=_en?[["regime-brasil","Brazil Regime"],["regime-global","Global Regime"],["intermercado-br","Intermarket BR"],["indice-anima","Ânima Index"],["risk-on-risk-off","Perene Risk Index"],["analogos-historicos","Historical Analogs"],["vertice","Vértice"]]:[["regime-brasil","Regime Brasil"],["regime-global","Regime Global"],["intermercado-br","Intermercado BR"],["indice-anima","Índice Ânima"],["risk-on-risk-off","Índice de Risco Perene"],["analogos-historicos","Análogos Históricos"],["vertice","Vértice"]];
   var conDD=CN.map(function(c){return '<a href="'+CP(c[0])+'">'+c[1]+'</a>'}).join("")+'<a href="'+U_CON+'" style="color:var(--gold-ink)">'+NAV.ac+'</a>';
   var lenDD=C.lenses.map(function(l,i){return '<a href="'+LP(LSLUG[i])+'">'+l.n+'</a>'}).join("")+'<a href="'+U_LEN+'" style="color:var(--gold-ink)">'+NAV.al+'</a>';
   // ── topo ENXUTO, editorial-first (dono 2026-06-17): Artigos (portal/ads) · Conceitos · Diário · Lentes ▾.

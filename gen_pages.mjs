@@ -40,8 +40,8 @@ const PAGES = [
   { slug: "conceitos/regime-brasil",                  src: 2, sec: ["4.1:pt", "4.1:en"], type: "conceito" },
   { slug: "conceitos/regime-global",                  src: 2, sec: ["4.2:pt", "4.2:en"], type: "conceito" },
   { slug: "conceitos/intermercado-br",                src: 2, sec: ["4.3:pt", "4.3:en"], type: "conceito" },
-  { slug: "conceitos/erp-br",                         src: 2, sec: ["4.4:pt", "4.4:en"], type: "conceito" },
-  { slug: "conceitos/cone-de-regressao-logaritmica",  src: 2, sec: ["4.5:pt", "4.5:en"], type: "conceito" },
+  // ★ 2026-07-03 (dono): conceitos/erp-br + cone-de-regressao-logaritmica REMOVIDOS do público (CVM Res.20 — leitura de
+  //   valor sobre a bolsa é opinativa). Worker 301 → /conceitos/. Público foca regime/intermercado/índices/análogo.
   { slug: "conceitos/indice-anima",                   src: 2, sec: ["4.6:pt", "4.6:en"], type: "conceito" },
   { slug: "conceitos/risk-on-risk-off",               src: 2, sec: ["4.7:pt", "4.7:en"], type: "conceito" },
   { slug: "conceitos/analogos-historicos",            src: 2, sec: ["4.8:pt", "4.8:en"], type: "conceito" },
@@ -187,7 +187,7 @@ function validInternal(p) {
 const EN_SLUG = {
   "metodologia": "methodology", "como-ler-o-radar": "how-to-read-the-radar", "lentes": "lenses", "conceitos": "concepts",
   "conceitos/regime-brasil": "concepts/regime-brazil", "conceitos/regime-global": "concepts/regime-global", "conceitos/intermercado-br": "concepts/intermarket-br",
-  "conceitos/erp-br": "concepts/erp-br", "conceitos/cone-de-regressao-logaritmica": "concepts/logarithmic-regression-cone", "conceitos/indice-anima": "concepts/anima-index",
+  "conceitos/indice-anima": "concepts/anima-index",
   "conceitos/risk-on-risk-off": "concepts/risk-on-risk-off", "conceitos/analogos-historicos": "concepts/historical-analogs", "conceitos/vertice": "concepts/vertice",
   "free": "free", "lentes/patrimonial": "lenses/wealth", "lentes/eleitoral": "lenses/electoral", "lentes/macro": "lenses/macro", "lentes/institucional": "lenses/institutional",
   "lentes/imobiliaria": "lenses/real-estate", "lentes/vertice": "lenses/vertice", "termos": "terms", "privacidade": "privacy", "founder": "founder",
@@ -360,15 +360,15 @@ function buildSchemas(p, raw, block, lg, title, desc) {
 // ─── RelatedConcepts (briefing §5.2) — grafo hub-spoke + link bidirecional p/ a metodologia ───
 const CONCEPT_NAMES = {
   "regime-brasil": { pt: "Regime Brasil", en: "Brazil Regime" }, "regime-global": { pt: "Regime Global", en: "Global Regime" },
-  "intermercado-br": { pt: "Intermercado BR", en: "Intermarket BR" }, "erp-br": { pt: "ERP_BR", en: "ERP_BR" },
-  "cone-de-regressao-logaritmica": { pt: "Cone de Regressão Logarítmica", en: "Logarithmic Regression Cone" },
+  "intermercado-br": { pt: "Intermercado BR", en: "Intermarket BR" },
+  // ★ 2026-07-03: erp-br + cone-de-regressao-logaritmica REMOVIDOS (CVM) — sem entrada aqui, relatedHtml os filtra de TODOS os relacionados
   "indice-anima": { pt: "Índice Ânima", en: "Ânima Index" }, "risk-on-risk-off": { pt: "Risk-on / Risk-off", en: "Risk-on / Risk-off" },
   "analogos-historicos": { pt: "Análogos Históricos", en: "Historical Analogs" }, "vertice": { pt: "Vértice", en: "Vértice" },
 };
 const CONCEPT_GRAPH = {
-  "regime-brasil": ["intermercado-br", "erp-br", "analogos-historicos"], "regime-global": ["regime-brasil", "risk-on-risk-off"],
-  "intermercado-br": ["regime-brasil", "risk-on-risk-off", "indice-anima"], "erp-br": ["cone-de-regressao-logaritmica", "regime-brasil"],
-  "cone-de-regressao-logaritmica": ["erp-br", "analogos-historicos"], "indice-anima": ["risk-on-risk-off", "intermercado-br"],
+  "regime-brasil": ["intermercado-br", "analogos-historicos"], "regime-global": ["regime-brasil", "risk-on-risk-off"],
+  "intermercado-br": ["regime-brasil", "risk-on-risk-off", "indice-anima"],
+  "indice-anima": ["risk-on-risk-off", "intermercado-br"],
   "risk-on-risk-off": ["indice-anima", "regime-global", "regime-brasil"], "analogos-historicos": ["regime-brasil", "vertice"],
   "vertice": ["analogos-historicos", "intermercado-br", "regime-global"],
 };
