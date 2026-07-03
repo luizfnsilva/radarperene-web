@@ -1010,7 +1010,13 @@ async function _route(request, env, ctx) {
       //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
       // ★ 2026-06-21 (dono): OG do home = o CARTÃO da Leitura do Radar (gerado diariamente). Por IDIOMA e por TEMA (_ogDark, def. acima
       //   junto da chave de cache) — o botão de compartilhar anexa ?theme=dark quando o usuário está no escuro → a prévia casa com o tema.
-      const _ogImg = url.origin + "/og-leitura-" + (isEN ? "en" : "pt") + (_ogDark ? "-dark" : "") + ".png";
+      // ★ 2026-07-03 (dono): a URL do og:image era ESTÁTICA (/og-leitura-pt.png) → o X/LinkedIn cacheiam a prévia PELA URL
+      //   e nunca mais re-raspavam, mostrando o cartão de ~19/06 mesmo com o PNG fresco no ar (no-store só resolve a CDN CF,
+      //   não o cache dos scrapers sociais). Fix: versiona a URL pela DATA DA LEITURA (_gdt, o conteúdo do cartão) → cada dia
+      //   novo é uma URL nova → o X re-busca. Sem leitura (narr null) cai na data UTC do worker. A query é ignorada pelo ASSETS
+      //   (casa por pathname) e pelo handler /og-leitura-*.png (regex no pathname), então serve o mesmo PNG.
+      const _ogVer = _gdt || new Date().toISOString().slice(0, 10);
+      const _ogImg = url.origin + "/og-leitura-" + (isEN ? "en" : "pt") + (_ogDark ? "-dark" : "") + ".png?v=" + _ogVer;
       rw = rw
         .on("link#rp-canonical", { element(e) { e.setAttribute("href", url.origin + "/"); } })
         .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", url.origin + "/"); } })
