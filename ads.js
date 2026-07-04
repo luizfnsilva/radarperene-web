@@ -34,8 +34,8 @@
     "in-feed":    '<ins class="adsbygoogle" style="display:block" data-ad-format="fluid" data-ad-layout-key="-er+5o+5m-dh+4z" data-ad-client="' + PUB + '" data-ad-slot="6862270861"></ins>'
   };
 
-  // mapeamento dos placeholders herdados (corpus authora topo/meio/rodape; worker /ativos usa .adslot)
-  var TYPE_BY_ID = { topo: "in-article", meio: "in-article", rodape: "multiplex" };
+  // mapeamento dos placeholders herdados (corpus authora topo/meio/corpo/rodape; worker /ativos usa .adslot)
+  var TYPE_BY_ID = { topo: "in-article", meio: "in-article", corpo: "multiplex", rodape: "multiplex" };
 
   function localPro() { try { return localStorage.getItem("rp_premium") === "1"; } catch (e) { return false; } }
 
@@ -80,11 +80,13 @@
   function inject() {
     var els = Array.prototype.slice.call(document.querySelectorAll(".ad-slot,.adslot,[data-ad-type]"));
     if (!els.length) return;
-    var usedArticle = false, usedMultiplex = false;
+    // ★ 2026-07-04 (dono): densidade até 2 in-article + 2 multiplex por página. Só o hub /artigos (longo, 4 slots:
+    //   topo/meio in-article · corpo/rodape multiplex) chega nesse teto; capítulos/ativos têm 1 de cada → intactos.
+    var MAX_ARTICLE = 2, MAX_MULTIPLEX = 2, nArticle = 0, nMultiplex = 0;
     els.forEach(function (el) {
       var type = typeOf(el);
-      if (type === "in-article") { if (usedArticle) { el.style.display = "none"; return; } usedArticle = true; }
-      else if (type === "multiplex") { if (usedMultiplex) { el.style.display = "none"; return; } usedMultiplex = true; }
+      if (type === "in-article") { if (nArticle >= MAX_ARTICLE) { el.style.display = "none"; return; } nArticle++; }
+      else if (type === "multiplex") { if (nMultiplex >= MAX_MULTIPLEX) { el.style.display = "none"; return; } nMultiplex++; }
       else if (type !== "in-feed") { el.style.display = "none"; return; }
       var html = UNITS[type];
       if (!html) { el.style.display = "none"; return; }
