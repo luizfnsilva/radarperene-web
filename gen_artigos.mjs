@@ -447,9 +447,13 @@ for (const a of ARTS) {
 const marquees = ARTS.filter((a) => a.meta.camada === "marquee");
 const families = [...new Set(ARTS.map((a) => a.meta.familia))].filter(Boolean).sort();
 const FAMILIA_NOME = { "2011": "2011 — crise europeia", "2013": "2013 — taper tantrum", "2015": "2015 — os três alarmes",
-  "2016": "2016 — o fundo", "2018": "2018 — caminhoneiros e eleição", "2022": "2022 — a casa às escuras", covid: "COVID — março de 2020", transversal: "Conceitos transversais" };
+  "2016": "2016 — o fundo", "2018": "2018 — caminhoneiros e eleição", "2022": "2022 — a casa às escuras", covid: "COVID — março de 2020", transversal: "Conceitos transversais",
+  capitulacao: "Capitulação", divergencia: "Divergência", dolar: "Dólar", fundos: "Fundos", global: "Global", "humor-fluxo": "Humor e fluxo", intermercado: "Intermercado", juros: "Juros", macro: "Macro", metodo: "Método", "prestacao-de-contas": "Prestação de contas" };
 const FAMILIA_NOME_EN = { "2011": "2011 — European crisis", "2013": "2013 — taper tantrum", "2015": "2015 — the three alarms",
-  "2016": "2016 — the bottom", "2018": "2018 — truckers and election", "2022": "2022 — the house in the dark", covid: "COVID — March 2020", transversal: "Transversal concepts" };
+  "2016": "2016 — the bottom", "2018": "2018 — truckers and election", "2022": "2022 — the house in the dark", covid: "COVID — March 2020", transversal: "Transversal concepts",
+  capitulacao: "Capitulation", divergencia: "Divergence", dolar: "Dollar", fundos: "Funds", global: "Global", "humor-fluxo": "Mood & flow", intermercado: "Intermarket", juros: "Rates", macro: "Macro", metodo: "Method", "prestacao-de-contas": "Accountability" };
+// fallback: familia não-mapeada (slug futuro) → de-hifeniza + capitaliza (nunca cai cru minúsculo). Ano puro ("2010") passa direto.
+const famLabel = (fam, en) => (en ? FAMILIA_NOME_EN : FAMILIA_NOME)[fam] || (/^\d{4}$/.test(String(fam)) ? String(fam) : String(fam || "").replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
 // ★ 2026-07-04 (consultor · biblioteca, não índice): navegação-primeiro. O topo é MENU (coleção com contagem +
 //   fenômeno de regime + personagem), não uma pilha de artigos. O corpo lista por coleção E por fenômeno → o mesmo
 //   artigo é alcançável por vários caminhos (malha = + páginas/sessão, + SEO, + inventário de AdSense). 4 ad-slots.
@@ -466,7 +470,7 @@ function hubHtml() {
 
   // — MENU: por fenômeno de regime (família) —
   b += `<h2 class="sec">Explore por fenômeno de regime</h2>\n<ul class="chipnav">\n`;
-  for (const fam of families) { const n = ARTS.filter((a) => a.meta.familia === fam).length; if (!n) continue; b += `<li><a href="#fam-${esc(fam)}">${esc(FAMILIA_NOME[fam] || fam)} <span>${n}</span></a></li>\n`; }
+  for (const fam of families) { const n = ARTS.filter((a) => a.meta.familia === fam).length; if (!n) continue; b += `<li><a href="#fam-${esc(fam)}">${esc(famLabel(fam))} <span>${n}</span></a></li>\n`; }
   b += `</ul>\n`;
 
   // — MENU: por personagem → hubs existentes —
@@ -483,7 +487,7 @@ function hubHtml() {
   for (const { c, arts } of COLS) {
     b += `<h2 class="sec" id="col-${c}">${esc(CAMADA_LABEL[c] || c)}s <span class="cnt">${arts.length}</span></h2>\n<ul class="artlist">\n`;
     for (const a of arts) {
-      const fam = a.meta.familia ? `<span class="tag">${esc(FAMILIA_NOME[a.meta.familia] || a.meta.familia)}</span>` : "";
+      const fam = a.meta.familia ? `<span class="tag">${esc(famLabel(a.meta.familia))}</span>` : "";
       b += `<li>${fam}<a href="/artigos/${a.slug}/">${esc(a.meta.titulo)}</a><span class="ds">${esc(deriveDesc(a.body))}</span></li>\n`;
     }
     b += `</ul>\n`;
@@ -495,7 +499,7 @@ function hubHtml() {
   for (const fam of families) {
     const fa = ARTS.filter((a) => a.meta.familia === fam);
     if (!fa.length) continue;
-    b += `<h3 class="sub" id="fam-${esc(fam)}">${esc(FAMILIA_NOME[fam] || fam)}</h3>\n<ul class="artlist">\n`;
+    b += `<h3 class="sub" id="fam-${esc(fam)}">${esc(famLabel(fam))}</h3>\n<ul class="artlist">\n`;
     for (const a of fa) b += `<li><span class="tag">${esc(CAMADA_LABEL[a.meta.camada] || a.meta.tipo)}</span><a href="/artigos/${a.slug}/">${esc(a.meta.titulo)}</a></li>\n`;
     b += `</ul>\n`;
   }
@@ -527,7 +531,7 @@ function hubHtmlEn() {
 
   // — MENU: regime phenomenon (family) —
   b += `<h2 class="sec">Explore by regime phenomenon</h2>\n<ul class="chipnav">\n`;
-  for (const fam of families) { const n = ARTS.filter((a) => a.meta.familia === fam && ENL(a)).length; if (!n) continue; b += `<li><a href="#fam-${esc(fam)}">${esc(FAMILIA_NOME_EN[fam] || fam)} <span>${n}</span></a></li>\n`; }
+  for (const fam of families) { const n = ARTS.filter((a) => a.meta.familia === fam && ENL(a)).length; if (!n) continue; b += `<li><a href="#fam-${esc(fam)}">${esc(famLabel(fam, true))} <span>${n}</span></a></li>\n`; }
   b += `</ul>\n`;
 
   // — MENU: character → existing hubs —
@@ -543,7 +547,7 @@ function hubHtmlEn() {
   let ci = 0;
   for (const { c, arts } of COLS) {
     b += `<h2 class="sec" id="col-${c}">${esc(CAMADA_LABEL_EN[c] || c)}s <span class="cnt">${arts.length}</span></h2>\n<ul class="artlist">\n`;
-    for (const a of arts) { const e = ENL(a); const fam = a.meta.familia ? `<span class="tag">${esc(FAMILIA_NOME_EN[a.meta.familia] || a.meta.familia)}</span>` : ""; b += `<li>${fam}<a href="/articles/${e.slugEn}/">${esc(e.meta.title)}</a><span class="ds">${esc(deriveDescEn(e.body))}</span></li>\n`; }
+    for (const a of arts) { const e = ENL(a); const fam = a.meta.familia ? `<span class="tag">${esc(famLabel(a.meta.familia, true))}</span>` : ""; b += `<li>${fam}<a href="/articles/${e.slugEn}/">${esc(e.meta.title)}</a><span class="ds">${esc(deriveDescEn(e.body))}</span></li>\n`; }
     b += `</ul>\n`;
     if (++ci === 1) b += `<div class="ad-slot" data-ad-slot="corpo" style="min-height:90px;margin:18px 0"></div>\n`;
   }
@@ -553,7 +557,7 @@ function hubHtmlEn() {
   for (const fam of families) {
     const fa = ARTS.filter((a) => a.meta.familia === fam && ENL(a));
     if (!fa.length) continue;
-    b += `<h3 class="sub" id="fam-${esc(fam)}">${esc(FAMILIA_NOME_EN[fam] || fam)}</h3>\n<ul class="artlist">\n`;
+    b += `<h3 class="sub" id="fam-${esc(fam)}">${esc(famLabel(fam, true))}</h3>\n<ul class="artlist">\n`;
     for (const a of fa) { const e = ENL(a); b += `<li><span class="tag">${esc(CAMADA_LABEL_EN[a.meta.camada] || a.meta.tipo)}</span><a href="/articles/${e.slugEn}/">${esc(e.meta.title)}</a></li>\n`; }
     b += `</ul>\n`;
   }
