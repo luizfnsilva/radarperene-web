@@ -271,7 +271,7 @@
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 <script>/* 2026-06-30: /ativo + /ativos = só assinante logado (CVM) */(function(){var p=location.pathname;if(!/^\/ativo\//.test(p)&&!/^\/ativos\/?$/.test(p))return;var EN=(/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname))||location.search.indexOf("lang=en")>=0;var DEST=EN?"/subscribe":"/assine";function sub(){try{var t=localStorage.getItem("rp_tier");return t==="founder"||t==="semanal";}catch(e){return false;}}if(sub())return;if(/^\/ativos\/?$/.test(p)){location.replace(DEST);return;}var h=document.createElement("style");h.textContent="main#main,footer{visibility:hidden}";(document.head||document.documentElement).appendChild(h);var done=false;function go(){if(done)return;if(sub()){done=true;if(h.parentNode)h.parentNode.removeChild(h);}else{done=true;location.replace(DEST);}}if(window.addEventListener)window.addEventListener("rp-premium-change",go);setTimeout(go,9000);})();</script>
 
-<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h2.sub,.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold-ink)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
+<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h2.sub,.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold-ink)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.pg .colnav{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0;margin:10px 0 8px}.pg .colnav a{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:13px 15px;text-decoration:none;color:var(--txt)}.pg .colnav a:hover{border-color:var(--gold-ink)}.pg .colnav b{font-family:var(--serif);font-size:17px;font-weight:500}.pg .colnav>li>a>span{font-size:12.5px;color:var(--dim);white-space:nowrap}.pg .chipnav{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:8px 0 6px}.pg .chipnav a{display:inline-flex;align-items:baseline;gap:6px;font-size:13px;color:var(--txt2);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;text-decoration:none}.pg .chipnav a:hover{border-color:var(--gold-ink);color:var(--gold-ink)}.pg .chipnav a span{font-size:11px;color:var(--dim)}.pg .cnt{font-size:14px;color:var(--dim);font-weight:400}@media(max-width:520px){.pg .colnav{grid-template-columns:1fr}}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -285,8 +285,63 @@
     <p class="crumb"><a href="/">Radar Perene</a> / articles</p>
     <h1>The encyclopedia of regimes</h1>
     <div class="ad-slot" data-ad-slot="topo" style="min-height:90px;margin:18px 0"></div>
-<p>The Radar's archive read as an encyclopedia: what the reading registered at a moment of regime — and what the market did next. No forecast, no buy call. Only the extreme, with a date, and the honest verdict of what followed.</p>
-<h2 class="sec">The marquees — the major regimes</h2>
+<p>The Radar's archive read as an encyclopedia: what the reading registered at a moment of regime — and what the market did next. No forecast, no buy call. Start from a collection, a regime phenomenon, or a character.</p>
+<h2 class="sec">Start from a collection</h2>
+<ul class="colnav">
+<li><a href="#col-marquee"><b>Marquees</b><span>14 articles</span></a></li>
+<li><a href="#col-episodio"><b>Episodes</b><span>2 articles</span></a></li>
+<li><a href="#col-comparativo"><b>Comparisons</b><span>8 articles</span></a></li>
+<li><a href="#col-conceito"><b>Concepts</b><span>11 articles</span></a></li>
+<li><a href="#col-derivado"><b>Derivatives</b><span>21 articles</span></a></li>
+</ul>
+<h2 class="sec">Explore by regime phenomenon</h2>
+<ul class="chipnav">
+<li><a href="#fam-2010">2010 <span>10</span></a></li>
+<li><a href="#fam-2011">2011 — European crisis <span>13</span></a></li>
+<li><a href="#fam-2012">2012 <span>10</span></a></li>
+<li><a href="#fam-2013">2013 — taper tantrum <span>12</span></a></li>
+<li><a href="#fam-2014">2014 <span>13</span></a></li>
+<li><a href="#fam-2015">2015 — the three alarms <span>18</span></a></li>
+<li><a href="#fam-2016">2016 — the bottom <span>16</span></a></li>
+<li><a href="#fam-2017">2017 <span>10</span></a></li>
+<li><a href="#fam-2018">2018 — truckers and election <span>14</span></a></li>
+<li><a href="#fam-2019">2019 <span>10</span></a></li>
+<li><a href="#fam-2020">2020 <span>16</span></a></li>
+<li><a href="#fam-2021">2021 <span>10</span></a></li>
+<li><a href="#fam-2022">2022 — the house in the dark <span>14</span></a></li>
+<li><a href="#fam-2023">2023 <span>10</span></a></li>
+<li><a href="#fam-2024">2024 <span>15</span></a></li>
+<li><a href="#fam-2025">2025 <span>9</span></a></li>
+<li><a href="#fam-capitulacao">capitulacao <span>1</span></a></li>
+<li><a href="#fam-covid">COVID — March 2020 <span>8</span></a></li>
+<li><a href="#fam-divergencia">divergencia <span>9</span></a></li>
+<li><a href="#fam-dolar">dolar <span>6</span></a></li>
+<li><a href="#fam-fundos">fundos <span>5</span></a></li>
+<li><a href="#fam-global">global <span>1</span></a></li>
+<li><a href="#fam-humor-fluxo">humor-fluxo <span>6</span></a></li>
+<li><a href="#fam-intermercado">intermercado <span>13</span></a></li>
+<li><a href="#fam-juros">juros <span>6</span></a></li>
+<li><a href="#fam-macro">macro <span>5</span></a></li>
+<li><a href="#fam-metodo">metodo <span>1</span></a></li>
+<li><a href="#fam-prestacao-de-contas">prestacao-de-contas <span>4</span></a></li>
+<li><a href="#fam-transversal">Transversal concepts <span>11</span></a></li>
+</ul>
+<h2 class="sec">Or by character</h2>
+<p>The thermometers and ratios that recur in every regime — each gathers the episodes in which it was the protagonist.</p>
+<ul class="chipnav">
+<li><a href="/articles/character/mood/">Mood <span>51</span></a></li>
+<li><a href="/articles/character/flow/">Flow (risk appetite) <span>52</span></a></li>
+<li><a href="/articles/character/structure/">Structure (intermarket) <span>51</span></a></li>
+<li><a href="/articles/character/dollar/">Dollar <span>34</span></a></li>
+<li><a href="/articles/character/rates/">Rates (Selic) <span>45</span></a></li>
+<li><a href="/articles/character/anomaly/">Statistical anomaly <span>46</span></a></li>
+<li><a href="/articles/character/cyclicals-defensives/">Cyclicals × defensives <span>61</span></a></li>
+<li><a href="/articles/character/commodities/">Commodities <span>34</span></a></li>
+<li><a href="/articles/character/contracted-income/">Contracted income <span>1</span></a></li>
+<li><a href="/articles/character/method/">Method <span>2</span></a></li>
+</ul>
+<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:24px 0"></div>
+<h2 class="sec" id="col-marquee">Marquees <span class="cnt">14</span></h2>
 <ul class="artlist">
 <li><span class="tag">2014</span><a href="/articles/the-single-bet-on-banks-nov-2014/">The single bet on banks: when the market chose a single sector</a><span class="ds">Rebuild the scene from what the market did, not from what it said.</span></li>
 <li><span class="tag">2022 — the house in the dark</span><a href="/articles/the-house-in-the-dark-2022/">The house in the dark: the structure's floor at the end of 2022 preceded a year of discord</a><span class="ds">In December 2022, at the close of an election year, the entire market structure contracted in on itself.</span></li>
@@ -303,9 +358,63 @@
 <li><span class="tag">2010</span><a href="/articles/when-credit-lost-faith-first-may-2010/">When credit lost faith first — May 2010</a><span class="ds">The money that lends was the first to grow suspicious.</span></li>
 <li><span class="tag">2013 — taper tantrum</span><a href="/articles/the-2013-taper-tantrum-imported-shock/">The 2013 taper tantrum: the imported shock the Brazilian regime absorbed</a><span class="ds">In mid-2013, the Federal Reserve signaled it would scale back its stimulus, and emerging markets entered stress — the real lost ground along with them.</span></li>
 </ul>
-<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:18px 0"></div>
-<h2 class="sec">By regime family</h2>
-<h3 class="sub">2010</h3>
+<div class="ad-slot" data-ad-slot="corpo" style="min-height:90px;margin:18px 0"></div>
+<h2 class="sec" id="col-episodio">Episodes <span class="cnt">2</span></h2>
+<ul class="artlist">
+<li><span class="tag">2022 — the house in the dark</span><a href="/articles/december-in-reverse-jan-2023/">December in reverse, in thirty days</a><span class="ds">December 2022 closed the year with the entire structure shrunk: the intermarket at the absolute floor of the scale, the investor downcast, the regime in hard…</span></li>
+<li><span class="tag">2022 — the house in the dark</span><a href="/articles/a-year-of-discord-2023/">A year of discord: when mood and structure barely agreed</a><span class="ds">After December 2022 left the structure at the floor of the scale, 2023 should have been the year of reconciliation between what the investor feels and where…</span></li>
+</ul>
+<h2 class="sec" id="col-comparativo">Comparisons <span class="cnt">8</span></h2>
+<ul class="artlist">
+<li><span class="tag">2011 — European crisis</span><a href="/articles/2011-vs-2013-imported-shocks/">2011 vs 2013: two imported shocks, two different absorptions</a><span class="ds">Two external shocks, two years running early in the decade.</span></li>
+<li><span class="tag">2013 — taper tantrum</span><a href="/articles/2013-vs-2024-when-the-currency-leads/">2013 vs 2024: when the currency leads — and what that does (or doesn't) to the regime</a><span class="ds">There are episodes in which the currency stops being a supporting act and starts commanding the reading.</span></li>
+<li><span class="tag">2018 — truckers and election</span><a href="/articles/2018-vs-2020-capital-before-faith/">2018 vs 2020: the same order — money, then faith — on different clocks</a><span class="ds">The 2018 truckers' strike and COVID in 2020 are two shocks of different natures that left the same trail in the archive: capital came back before confidence…</span></li>
+<li><span class="tag">2022 — the house in the dark</span><a href="/articles/2022-vs-2015-two-slow-contractions/">2022 vs 2015: two slow domestic contractions</a><span class="ds">The end of 2022 and the year 2015 were, in the Radar's archive, two markets that contracted from inside the house — not from a scare arriving from outside.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/covid-vs-2022/">COVID × the 2022 election: the acute shock and the slow contraction</a><span class="ds">March 2020 and December 2022 were two moments when the Radar registered the Brazilian market contracted and on the defensive.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/covid-vs-august-2015/">COVID × August 2015: the same diagnosis, opposite anatomies</a><span class="ds">August 2015 and March 2020 are the two biggest shocks of the recent archive.</span></li>
+<li><span class="tag">2015 — the three alarms</span><a href="/articles/crisis-2015-vs-bottom-2016/">Crisis of 2015 × the 2016 bottom: what separates panic from inflection</a><span class="ds">August 2015 and March 2016 are two portraits of the same crisis — and both carry an axis at the extreme.</span></li>
+<li><span class="tag">2016 — the bottom</span><a href="/articles/bottom-2016-vs-2020/">The 2016 bottom × March 2020: two recompositions, two clocks</a><span class="ds">These are two recompositions coming out of a bottom, and the archive reads them with the same vocabulary.</span></li>
+</ul>
+<h2 class="sec" id="col-conceito">Concepts <span class="cnt">11</span></h2>
+<ul class="artlist">
+<li><span class="tag">Transversal concepts</span><a href="/articles/market-breadth/">What is market breadth?</a><span class="ds">There are two questions hidden in every trading session, and the index answers only the first.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/statistical-anomaly/">What is a statistical anomaly?</a><span class="ds">In the Radar, a statistical anomaly is a move so far out of the ordinary that the engine singles it out as unlikely to be mere noise — a reading far from the…</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/cyclicals-vs-defensives/">Cyclicals vs defensives: the duel that reveals appetite</a><span class="ds">Inside the stock market, two groups tell opposite stories.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/commodities-in-real/">Commodities in real: when the currency moves the ratio</a><span class="ds">Much of the commodity complex is quoted in dollars.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/the-dollar-as-regime-gauge/">The dollar as regime gauge</a><span class="ds">In the Radar, the dollar is not just a price — it is one of the most sensitive gauges of the regime.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/anima-index/">What is the Ânima Index?</a><span class="ds">The Ânima Index is the Radar Perene mood thermometer: a measure, from 0 to 100, of the state of spirit of the domestic investor.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/perene-risk-index/">What is the Perene Risk Index?</a><span class="ds">The Perene Risk Index is the Radar's appetite thermometer: a measure, from 0 to 100, of how willing domestic capital is to carry risk.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/intermarket/">What is the intermarket reading?</a><span class="ds">The intermarket reading is how the Radar reads the structure of the market from the inside: the ratios between classes and sectors — cyclical stocks against…</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/changing-level-is-not-changing-regime/">Changing level is not changing regime</a><span class="ds">The most common mistake in reading markets arrives dressed as good news: a thermometer jumps, and the temptation is to announce that the weather has turned…</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/contracted-income/">What is contracted income?</a><span class="ds">In the Radar's vocabulary, contracted income is the block of assets whose revenue does not depend on the mood of the cycle — it has already been signed.</span></li>
+<li><span class="tag">Transversal concepts</span><a href="/articles/rates-selic/">Rates (the Selic) in the Radar: the backdrop of the regimes</a><span class="ds">The Selic is Brazil's benchmark interest rate — and, in the Radar's archive, it works as the slow backdrop against which the regimes take shape.</span></li>
+</ul>
+<h2 class="sec" id="col-derivado">Derivatives <span class="cnt">21</span></h2>
+<ul class="artlist">
+<li><span class="tag">2011 — European crisis</span><a href="/articles/convergence-on-the-optimistic-side/">Convergence on the optimistic side: May 2012, the clocks strike together</a><span class="ds">For three months the house's two thermometers pointed in opposite directions: domestic confidence insisting on assumed risk, the intermarket structure…</span></li>
+<li><span class="tag">2016 — the bottom</span><a href="/articles/structure-leads-mood/">Structure leads mood: what 2016 taught about who arrives first</a><span class="ds">In March 2016 the structure of the market's relative prices turned first.</span></li>
+<li><span class="tag">2025</span><a href="/articles/the-selic-at-15-and-the-fading-euphoria-2025/">The Selic at 15% and the fading euphoria</a><span class="ds">All of the 2025 fever played out against the same backdrop: domestic rates at the top of the cycle.</span></li>
+<li><span class="tag">2015 — the three alarms</span><a href="/articles/the-selic-pinned-at-14-25/">The Selic pinned at 14.25%: the rate that never came to the rescue</a><span class="ds">Through the 2015 crisis, the base rate did not budge.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/the-april-2020-turn/">The April 2020 turn: cyclicals return to a table that held only defensives</a><span class="ds">After the March panic, April 2020 brought the first sign of a turn — but in only one place.</span></li>
+<li><span class="tag">2018 — truckers and election</span><a href="/articles/capital-before-confidence-2018/">Capital before confidence: when flow came back and mood lagged behind (2018)</a><span class="ds">In June 2018, right after the shock of the strike, the Radar recorded a rare divergence between the two sides of the same portrait.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/was-march-2020-the-bottom/">Was March 2020 the bottom?</a><span class="ds">In hindsight, it is tempting to call March 2020 the bottom of the pandemic.</span></li>
+<li><span class="tag">2013 — taper tantrum</span><a href="/articles/the-alarm-that-didnt-cross-the-border/">The alarm that didn't cross the border: when the shock is external and the regime stays standing</a><span class="ds">In September 2013, the stress coming from abroad reached the domestic readings as a loosening, not as panic.</span></li>
+<li><span class="tag">2024</span><a href="/articles/the-currency-that-took-command-2024/">The currency that took command: when the dollar became the protagonist of 2024</a><span class="ds">At the end of 2024, the dollar stopped being a backdrop and started commanding the equity market from within.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/the-dollar-never-came-back/">The dollar never came back: when an extreme redefines the floor</a><span class="ds">In March 2020, at the height of the panic, the dollar closed at R$ 4.88 and the Radar's engine flagged it as a statistical anomaly — a move too rare to be…</span></li>
+<li><span class="tag">2015 — the three alarms</span><a href="/articles/the-bottom-that-wasnt-the-bottom/">The bottom that wasn't the bottom: when August's extreme still had a basement</a><span class="ds">In August 2015, the Perene Risk Index closed at 0.0 — the absolute floor of the scale.</span></li>
+<li><span class="tag">2016 — the bottom</span><a href="/articles/the-first-rate-cut/">The first rate cut: the Selic confirmed what the market had already read</a><span class="ds">Through the whole 2016 bottom, the cost of money did not move.</span></li>
+<li><span class="tag">2018 — truckers and election</span><a href="/articles/the-two-clocks-after-the-2018-election/">The two clocks after the 2018 election: appetite at the top, structure at the floor (Dec 2018)</a><span class="ds">December 2018 arrived with the election already decided and tempers, in theory, clarified.</span></li>
+<li><span class="tag">2024</span><a href="/articles/real-rates-in-anomaly-2024/">Real rates in anomaly: the rare premium of late 2024</a><span class="ds">At the end of 2024, the Radar recorded in market real rates one of the rarest premiums in the entire archive.</span></li>
+<li><span class="tag">2013 — taper tantrum</span><a href="/articles/when-the-shock-only-raises-the-price-of-money/">When the shock only raises the price of money: the taper that became Selic, not crisis</a><span class="ds">In September 2013, with emerging markets in stress and the real pressured by the Federal Reserve's signal, the natural question was where the shock would…</span></li>
+<li><span class="tag">2011 — European crisis</span><a href="/articles/when-the-gauges-disagree/">When the gauges disagree: high appetite, defensive structure</a><span class="ds">The house has two thermometers that usually agree.</span></li>
+<li><span class="tag">2025</span><a href="/articles/when-the-three-axes-agree-on-defense-2025/">When the three axes agree on defense</a><span class="ds">The Radar reads the same market through three windows: surface mood, risk appetite, and the intermarket structure beneath the prices.</span></li>
+<li><span class="tag">2015 — the three alarms</span><a href="/articles/when-every-haven-fills-up/">When every haven fills up: the expensive shelter of November 2015</a><span class="ds">In November 2015, capital inside the market stopped debating the intensity of fear and began debating its internal geography.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/how-long-until-mood-catches-up-to-flow/">How long does it take for mood to catch up to flow?</a><span class="ds">One regularity shows up in nearly every episode of the archive: capital moves before confidence.</span></li>
+<li><span class="tag">2016 — the bottom</span><a href="/articles/who-bought-while-mood-screamed/">Who bought while mood screamed: March 2016 and the turn no one announced</a><span class="ds">In March 2016 the news flow was still grim, but inside the market capital made a rare gesture.</span></li>
+<li><span class="tag">COVID — March 2020</span><a href="/articles/when-the-three-clocks-aligned/">When the three clocks aligned (November 2020)</a><span class="ds">For almost the entire pandemic year, the Radar's three thermometers disagreed: risk appetite was recovering, mood stayed on the floor, the intermarket…</span></li>
+</ul>
+<h2 class="sec">By regime phenomenon</h2>
+<h3 class="sub" id="fam-2010">2010</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/when-credit-lost-faith-first-may-2010/">When credit lost faith first — May 2010</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-commodity-that-rose-and-fell-in-the-same-month-apr-2010/">The commodity that rose and fell in the same month — Apr 2010</a></li>
@@ -318,7 +427,7 @@
 <li><span class="tag">episodio</span><a href="/articles/the-cyclicals-stretch-jul-2010/">The cyclicals' stretch of July 2010 — the position too expensive to last</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-end-of-2010-confidence-and-credit/">The end of 2010: the gauge at 100, the lenders heading out</a></li>
 </ul>
-<h3 class="sub">2011 — European crisis</h3>
+<h3 class="sub" id="fam-2011">2011 — European crisis</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-2011-european-crisis-as-discord/">The 2011 European crisis reached Brazil as discord, not collapse</a></li>
 <li><span class="tag">Derivative</span><a href="/articles/convergence-on-the-optimistic-side/">Convergence on the optimistic side: May 2012, the clocks strike together</a></li>
@@ -334,7 +443,7 @@
 <li><span class="tag">Derivative</span><a href="/articles/when-the-gauges-disagree/">When the gauges disagree: high appetite, defensive structure</a></li>
 <li><span class="tag">Comparison</span><a href="/articles/2011-vs-2013-imported-shocks/">2011 vs 2013: two imported shocks, two different absorptions</a></li>
 </ul>
-<h3 class="sub">2012</h3>
+<h3 class="sub" id="fam-2012">2012</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-58-point-swing-dec-2012/">The 58-point swing of December 2012 — the appetite that came back too fast</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-shelter-with-a-currency-accent-jun-2012/">The shelter with a currency accent — June 2012</a></li>
@@ -347,7 +456,7 @@
 <li><span class="tag">episodio</span><a href="/articles/when-fear-learned-to-yield-apr-2012/">When fear learned to yield — Apr 2012</a></li>
 <li><span class="tag">episodio</span><a href="/articles/when-the-two-clocks-finally-strike-together-may-2012/">When the two clocks finally strike together — and the agreement lasted a quarter</a></li>
 </ul>
-<h3 class="sub">2013 — taper tantrum</h3>
+<h3 class="sub" id="fam-2013">2013 — taper tantrum</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-2013-taper-tantrum-imported-shock/">The 2013 taper tantrum: the imported shock the Brazilian regime absorbed</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-bet-that-fits-in-a-single-sector-feb-2013/">The bet that fits in a single sector — banks, Feb/2013</a></li>
@@ -362,7 +471,7 @@
 <li><span class="tag">Derivative</span><a href="/articles/when-the-shock-only-raises-the-price-of-money/">When the shock only raises the price of money: the taper that became Selic, not crisis</a></li>
 <li><span class="tag">Comparison</span><a href="/articles/2013-vs-2024-when-the-currency-leads/">2013 vs 2024: when the currency leads — and what that does (or doesn't) to the regime</a></li>
 </ul>
-<h3 class="sub">2014</h3>
+<h3 class="sub" id="fam-2014">2014</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-single-bet-on-banks-nov-2014/">The single bet on banks: when the market chose a single sector</a></li>
 <li><span class="tag">Marquee</span><a href="/articles/euphoria-at-the-top-mar-2014/">Euphoria at the top — March 2014, when appetite hit 100 and there was no follow-through</a></li>
@@ -378,7 +487,7 @@
 <li><span class="tag">episodio</span><a href="/articles/the-return-of-the-poor-relatives-feb-2014/">The return of the poor relatives of February 2014 — the end of a punishment, not the start of a reign</a></li>
 <li><span class="tag">episodio</span><a href="/articles/when-the-bet-becomes-conviction-may-2014/">The lonely conviction of May 2014 — a rare bet over lukewarm appetite</a></li>
 </ul>
-<h3 class="sub">2015 — the three alarms</h3>
+<h3 class="sub" id="fam-2015">2015 — the three alarms</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-three-alarms-of-august-2015/">The three alarms of August 2015 — and the bottom that wasn't the bottom</a></li>
 <li><span class="tag">episodio</span><a href="/articles/aversion-deepens-sep-2015/">September 2015: the risk index caught its breath, the banks did not</a></li>
@@ -399,7 +508,7 @@
 <li><span class="tag">Comparison</span><a href="/articles/crisis-2015-vs-bottom-2016/">Crisis of 2015 × the 2016 bottom: what separates panic from inflection</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/high-selic-vs-low-selic-the-mood-in-each-rate/">Selic at 14.25% and 3.75%: the rate that did not rule the mood</a></li>
 </ul>
-<h3 class="sub">2016 — the bottom</h3>
+<h3 class="sub" id="fam-2016">2016 — the bottom</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-2016-bottom-structure-before-mood/">The 2016 bottom: structure turned before mood — and long before rates</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-calm-that-hid-an-extreme-jul-2016/">The calm that hid an extreme — cyclicals stretched as never before, Jul/2016</a></li>
@@ -418,7 +527,7 @@
 <li><span class="tag">Comparison</span><a href="/articles/bottom-2016-vs-2020/">The 2016 bottom × March 2020: two recompositions, two clocks</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/the-floor-of-2016-vs-the-floor-of-2022/">Two floors, opposite directions — 2016 and 2022 read on the same axis</a></li>
 </ul>
-<h3 class="sub">2017</h3>
+<h3 class="sub" id="fam-2017">2017</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-confidence-that-capital-distrusts-oct-2017/">October 2017: mood nailed 69.2 while the structure collapsed to 8.2</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-financials-leave-the-table-nov-2017/">The financials leave the table in November 2017 — and the command that never settled</a></li>
@@ -431,7 +540,7 @@
 <li><span class="tag">episodio</span><a href="/articles/falling-rates-call-real-estate-back-feb-2017/">Falling rates call real estate back — and dismiss it months later</a></li>
 <li><span class="tag">episodio</span><a href="/articles/when-everything-agrees-jan-2017/">When everything agrees — January 2017 and the consensus that didn't last a quarter</a></li>
 </ul>
-<h3 class="sub">2018 — truckers and election</h3>
+<h3 class="sub" id="fam-2018">2018 — truckers and election</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-2018-truckers-strike-money-before-faith/">The 2018 truckers' strike: money came back before faith — and before the headline</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-chair-that-changed-hands-jan-2018/">The chair that changed hands — and the exile that lasted, Jan 2018</a></li>
@@ -448,7 +557,7 @@
 <li><span class="tag">Comparison</span><a href="/articles/2018-vs-2020-capital-before-faith/">2018 vs 2020: the same order — money, then faith — on different clocks</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/anima-vs-perene-risk-mood-against-appetite/">Ânima × Perene Risk: eighty points between capital and mood</a></li>
 </ul>
-<h3 class="sub">2019</h3>
+<h3 class="sub" id="fam-2019">2019</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-recovery-that-leaked-underneath-apr-2019/">The recovery that leaked underneath — April 2019</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-mood-came-back-but-the-money-left-sep-2019/">The mood came back, but the money left the room — September 2019</a></li>
@@ -461,7 +570,7 @@
 <li><span class="tag">episodio</span><a href="/articles/the-rally-on-the-eve-of-the-storm-dec-2019/">The rally on the eve of the storm — December 2019 and the −16.6% bill</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-costly-thermometer-moved-first-nov-2019/">The costly thermometer moved first — November 2019's 35 points</a></li>
 </ul>
-<h3 class="sub">2020</h3>
+<h3 class="sub" id="fam-2020">2020</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-rift-between-the-two-thermometers-oct-2020/">The rift between the two thermometers — October 2020</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-inflation-that-had-not-yet-reached-the-table-sep-2020/">The inflation that had not yet reached the table — the IGP-M surge of September 2020</a></li>
@@ -480,7 +589,7 @@
 <li><span class="tag">comparacao</span><a href="/articles/cyclicals-vs-defensives-who-leads-each-regime/">Cyclicals and defensives: who leads when fear is total — and when sentiment screams</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/ifix-vs-ibov-bricks-against-paper/">IFIX vs. IBOV: when bricks only rise because paper collapses</a></li>
 </ul>
-<h3 class="sub">2021</h3>
+<h3 class="sub" id="fam-2021">2021</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-money-that-fled-inward-sep-2021/">September 2021: Brazilian mood collapsed from 43.8 to 9.4 — and capital ran for cover at home</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-cyclical-bet-at-the-bottom-of-the-series-aug-2021/">The cyclical bet at the bottom of the series — August 2021</a></li>
@@ -493,7 +602,7 @@
 <li><span class="tag">episodio</span><a href="/articles/sold-the-banks-to-buy-the-barrel-feb-2021/">The market that sold the banks to buy the barrel — February 2021</a></li>
 <li><span class="tag">nota</span><a href="/articles/the-refuge-premium-utilities-ibov-sep-2021/">The refuge premium: utilities only pay when growth is called into question</a></li>
 </ul>
-<h3 class="sub">2022 — the house in the dark</h3>
+<h3 class="sub" id="fam-2022">2022 — the house in the dark</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-house-in-the-dark-2022/">The house in the dark: the structure's floor at the end of 2022 preceded a year of discord</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-leadership-no-one-celebrated-nov-2022/">The leadership no one celebrated — the mirrored rotation of November 2022</a></li>
@@ -510,7 +619,7 @@
 <li><span class="tag">Episode</span><a href="/articles/a-year-of-discord-2023/">A year of discord: when mood and structure barely agreed</a></li>
 <li><span class="tag">Comparison</span><a href="/articles/2022-vs-2015-two-slow-contractions/">2022 vs 2015: two slow domestic contractions</a></li>
 </ul>
-<h3 class="sub">2023</h3>
+<h3 class="sub" id="fam-2023">2023</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/euphoria-without-confirmation-jun-2023/">The celebration the prices never signed — June 2023</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-shelter-the-money-kept-sep-2023/">The shelter the money wouldn't let go of — September 2023</a></li>
@@ -523,7 +632,7 @@
 <li><span class="tag">episodio</span><a href="/articles/the-fear-the-prices-didnt-buy-feb-2023/">The fear the prices didn't buy — February 2023</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-telegram-the-mood-did-not-read-apr-2023/">The telegram the mood did not read — April 2023</a></li>
 </ul>
-<h3 class="sub">2024</h3>
+<h3 class="sub" id="fam-2024">2024</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-two-clocks-of-december-2024/">Two clocks telling different times: December 2024</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-stampede-that-emptied-its-own-shelter-apr-2024/">The stampede that emptied its own shelter — April 2024</a></li>
@@ -541,7 +650,7 @@
 <li><span class="tag">nota</span><a href="/articles/the-dollar-in-anomaly-dec-2024/">The dollar at R$ 6,097 and what an anomaly means</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/commodities-vs-utilities-the-duel-of-extremes/">Two nearly identical peaks — and why neither was strength</a></li>
 </ul>
-<h3 class="sub">2025</h3>
+<h3 class="sub" id="fam-2025">2025</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/the-fever-of-2025/">The fever of 2025 — when euphoria descended to meet the structure</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-capitulation-in-financials-may-2025/">The capitulation in Financials — May 2025</a></li>
@@ -553,11 +662,11 @@
 <li><span class="tag">episodio</span><a href="/articles/the-thermometer-rises-the-skeleton-stays-still-mar-2025/">The thermometer rises, the skeleton stays still — March 2025</a></li>
 <li><span class="tag">Derivative</span><a href="/articles/when-the-three-axes-agree-on-defense-2025/">When the three axes agree on defense</a></li>
 </ul>
-<h3 class="sub">capitulacao</h3>
+<h3 class="sub" id="fam-capitulacao">capitulacao</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/cheap-profitable-abandoned/">Cheap and profitable. And abandoned.</a></li>
 </ul>
-<h3 class="sub">COVID — March 2020</h3>
+<h3 class="sub" id="fam-covid">COVID — March 2020</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/articles/what-happened-after-fear-priced-everything/">What happened after fear priced everything</a></li>
 <li><span class="tag">Derivative</span><a href="/articles/the-april-2020-turn/">The April 2020 turn: cyclicals return to a table that held only defensives</a></li>
@@ -568,7 +677,7 @@
 <li><span class="tag">Comparison</span><a href="/articles/covid-vs-2022/">COVID × the 2022 election: the acute shock and the slow contraction</a></li>
 <li><span class="tag">Comparison</span><a href="/articles/covid-vs-august-2015/">COVID × August 2015: the same diagnosis, opposite anatomies</a></li>
 </ul>
-<h3 class="sub">divergencia</h3>
+<h3 class="sub" id="fam-divergencia">divergencia</h3>
 <ul class="artlist">
 <li><span class="tag">comparacao</span><a href="/articles/the-euphoria-that-ignored-the-breach/">Euphoria at its peak. The breach, too.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/two-clocks-two-winters/">Two winters, the same mismatch — never the same clocks</a></li>
@@ -580,7 +689,7 @@
 <li><span class="tag">comparacao</span><a href="/articles/when-both-currents-agree/">The disagreement protected. The agreement did not.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/when-the-two-axes-stop-disagreeing/">The disagreement said everything. The agreement, almost nothing.</a></li>
 </ul>
-<h3 class="sub">dolar</h3>
+<h3 class="sub" id="fam-dolar">dolar</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-shelter-that-didnt-pick-a-port/">The shelter that didn't pick a port</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/the-outside-bet-the-locals-didnt-make/">The world was buying the Brazil the locals were selling</a></li>
@@ -589,7 +698,7 @@
 <li><span class="tag">comparacao</span><a href="/articles/the-dollar-that-rose-and-quietly-unwound/">The rise made headlines. The return did not.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/every-fx-shock-leaves-the-same-question/">The exchange rate changes the price of everything. Not the question.</a></li>
 </ul>
-<h3 class="sub">fundos</h3>
+<h3 class="sub" id="fam-fundos">fundos</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/cheap-on-multiples-stretched-on-risk/">Cheap on multiples, stretched on risk</a></li>
 <li><span class="tag">episodio</span><a href="/articles/three-months-to-choose-again/">Three months for the market to choose again</a></li>
@@ -597,11 +706,11 @@
 <li><span class="tag">comparacao</span><a href="/articles/two-structural-bottoms-two-outcomes/">Two houses in the same dark. Only one was breathing.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/is-this-the-bottom/">The bottom is not where fear screams — it is where the floor stops giving way</a></li>
 </ul>
-<h3 class="sub">global</h3>
+<h3 class="sub" id="fam-global">global</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/aversion-with-no-foreign-accent/">The aversion with no foreign accent</a></li>
 </ul>
-<h3 class="sub">humor-fluxo</h3>
+<h3 class="sub" id="fam-humor-fluxo">humor-fluxo</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-day-mood-nearly-touched-zero/">The day mood nearly touched zero</a></li>
 <li><span class="tag">episodio</span><a href="/articles/three-readers-three-books/">Three readers, three books</a></li>
@@ -610,7 +719,7 @@
 <li><span class="tag">comparacao</span><a href="/articles/two-junes-same-disagreement/">The rate was always the suspect. Two Junes acquitted it.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/june-against-june-the-floors-swapped/">One year later, the house swapped its floors</a></li>
 </ul>
-<h3 class="sub">intermercado</h3>
+<h3 class="sub" id="fam-intermercado">intermercado</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-lull-that-preceded-the-extreme/">The only ratio that was improving</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-day-the-basket-came-apart/">The basket that wasn't a basket</a></li>
@@ -626,7 +735,7 @@
 <li><span class="tag">comparacao</span><a href="/articles/where-capital-shelters-when-it-doubts/">Appetite returned. Conviction did not.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/when-all-defenses-give-way-at-once/">The solitary fall has a culprit. The broad one does not.</a></li>
 </ul>
-<h3 class="sub">juros</h3>
+<h3 class="sub" id="fam-juros">juros</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-step-the-house-didnt-feel/">The Selic came down a step. The house didn't feel it.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/the-highest-euphoria-under-the-highest-rate/">Money has never been so expensive. The mood, never so high.</a></li>
@@ -635,7 +744,7 @@
 <li><span class="tag">comparacao</span><a href="/articles/the-carry-that-became-gravity/">The carry stopped competing. It began to pull.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/the-same-rate-two-houses/">The same rate presided over the panic and the appetite</a></li>
 </ul>
-<h3 class="sub">macro</h3>
+<h3 class="sub" id="fam-macro">macro</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-week-brick-paid-the-index/">The week brick paid the index</a></li>
 <li><span class="tag">episodio</span><a href="/articles/wholesale-shouted-first/">Wholesale shouted before retail</a></li>
@@ -643,29 +752,33 @@
 <li><span class="tag">comparacao</span><a href="/articles/deflation-and-inflation-in-neighboring-months/">Inflation was the anomaly. Months later, so was deflation.</a></li>
 <li><span class="tag">comparacao</span><a href="/articles/the-igpm-from-one-extreme-to-the-other/">The anomaly that flipped its sign</a></li>
 </ul>
-<h3 class="sub">prestacao-de-contas</h3>
+<h3 class="sub" id="fam-metodo">metodo</h3>
+<ul class="artlist">
+<li><span class="tag">conceito</span><a href="/articles/when-precedents-disagree/">When precedents disagree</a></li>
+</ul>
+<h3 class="sub" id="fam-prestacao-de-contas">prestacao-de-contas</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/articles/the-anomaly-the-engine-said-to-ignore/">The extreme number that wasn't news</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-question-april-left/">The question April left behind</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-month-that-broke-the-yardstick/">The month that broke the yardstick</a></li>
 <li><span class="tag">episodio</span><a href="/articles/the-verdict-that-never-came/">The verdict that never came</a></li>
 </ul>
-<h2 class="sec">Browse by character</h2>
-<p>The thermometers and ratios that recur in every regime. Each character gathers the episodes in which it was the protagonist.</p>
+<h3 class="sub" id="fam-transversal">Transversal concepts</h3>
 <ul class="artlist">
-<li><a href="/articles/character/mood/">Mood</a><span class="ds">51 pages</span></li>
-<li><a href="/articles/character/flow/">Flow (risk appetite)</a><span class="ds">52 pages</span></li>
-<li><a href="/articles/character/structure/">Structure (intermarket)</a><span class="ds">51 pages</span></li>
-<li><a href="/articles/character/dollar/">Dollar</a><span class="ds">34 pages</span></li>
-<li><a href="/articles/character/rates/">Rates (Selic)</a><span class="ds">45 pages</span></li>
-<li><a href="/articles/character/anomaly/">Statistical anomaly</a><span class="ds">46 pages</span></li>
-<li><a href="/articles/character/cyclicals-defensives/">Cyclicals × defensives</a><span class="ds">61 pages</span></li>
-<li><a href="/articles/character/commodities/">Commodities</a><span class="ds">34 pages</span></li>
-<li><a href="/articles/character/contracted-income/">Contracted income</a><span class="ds">1 page</span></li>
-<li><a href="/articles/character/method/">Method</a><span class="ds">2 pages</span></li>
+<li><span class="tag">Concept</span><a href="/articles/market-breadth/">What is market breadth?</a></li>
+<li><span class="tag">Concept</span><a href="/articles/statistical-anomaly/">What is a statistical anomaly?</a></li>
+<li><span class="tag">Concept</span><a href="/articles/cyclicals-vs-defensives/">Cyclicals vs defensives: the duel that reveals appetite</a></li>
+<li><span class="tag">Concept</span><a href="/articles/commodities-in-real/">Commodities in real: when the currency moves the ratio</a></li>
+<li><span class="tag">Concept</span><a href="/articles/the-dollar-as-regime-gauge/">The dollar as regime gauge</a></li>
+<li><span class="tag">Concept</span><a href="/articles/anima-index/">What is the Ânima Index?</a></li>
+<li><span class="tag">Concept</span><a href="/articles/perene-risk-index/">What is the Perene Risk Index?</a></li>
+<li><span class="tag">Concept</span><a href="/articles/intermarket/">What is the intermarket reading?</a></li>
+<li><span class="tag">Concept</span><a href="/articles/changing-level-is-not-changing-regime/">Changing level is not changing regime</a></li>
+<li><span class="tag">Concept</span><a href="/articles/contracted-income/">What is contracted income?</a></li>
+<li><span class="tag">Concept</span><a href="/articles/rates-selic/">Rates (the Selic) in the Radar: the backdrop of the regimes</a></li>
 </ul>
 <div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>
-<p class="rel" style="margin-top:24px">The Radar reads these regimes every day. <a href="/diario">See today's reading →</a> · <a href="/methodology/">How the method works →</a></p>
+<p class="rel" style="margin-top:24px">The Radar reads these regimes every day. <a href="/daily">See today's reading →</a> · <a href="/methodology/">How the method works →</a></p>
 <div class="ctarow" style="border-top:1px solid var(--line);margin-top:32px;padding-top:22px"><p class="closing" style="font-style:normal;margin:0 0 14px">This is the Radar&rsquo;s memory. Today&rsquo;s reading — regime, 5 lenses and the day&rsquo;s analogs — is live, free.</p><a class="btn" href="/">See today&rsquo;s reading</a><a class="btn ghost" href="/subscribe">Subscribe to Perene Semanal · US$ 29/mo →</a></div>
   </article>
 </div>

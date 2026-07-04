@@ -271,7 +271,7 @@
 <script>(function(){try{var t=localStorage.getItem("rp-theme");if(t!=="light"&&t!=="dark")t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
 <script>/* 2026-06-30: /ativo + /ativos = só assinante logado (CVM) */(function(){var p=location.pathname;if(!/^\/ativo\//.test(p)&&!/^\/ativos\/?$/.test(p))return;var EN=(/radarperene\.com$/i.test(location.hostname)&&!/\.com\.br$/i.test(location.hostname))||location.search.indexOf("lang=en")>=0;var DEST=EN?"/subscribe":"/assine";function sub(){try{var t=localStorage.getItem("rp_tier");return t==="founder"||t==="semanal";}catch(e){return false;}}if(sub())return;if(/^\/ativos\/?$/.test(p)){location.replace(DEST);return;}var h=document.createElement("style");h.textContent="main#main,footer{visibility:hidden}";(document.head||document.documentElement).appendChild(h);var done=false;function go(){if(done)return;if(sub()){done=true;if(h.parentNode)h.parentNode.removeChild(h);}else{done=true;location.replace(DEST);}}if(window.addEventListener)window.addEventListener("rp-premium-change",go);setTimeout(go,9000);})();</script>
 
-<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h2.sub,.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold-ink)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
+<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h2.sub,.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold-ink)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.pg .colnav{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0;margin:10px 0 8px}.pg .colnav a{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:13px 15px;text-decoration:none;color:var(--txt)}.pg .colnav a:hover{border-color:var(--gold-ink)}.pg .colnav b{font-family:var(--serif);font-size:17px;font-weight:500}.pg .colnav>li>a>span{font-size:12.5px;color:var(--dim);white-space:nowrap}.pg .chipnav{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:8px 0 6px}.pg .chipnav a{display:inline-flex;align-items:baseline;gap:6px;font-size:13px;color:var(--txt2);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;text-decoration:none}.pg .chipnav a:hover{border-color:var(--gold-ink);color:var(--gold-ink)}.pg .chipnav a span{font-size:11px;color:var(--dim)}.pg .cnt{font-size:14px;color:var(--dim);font-weight:400}@media(max-width:520px){.pg .colnav{grid-template-columns:1fr}}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>
 </head>
 <body>
 <a class="skip" href="#main">Pular para o conteúdo</a>
@@ -285,8 +285,63 @@
     <p class="crumb"><a href="/">Radar Perene</a> / artigos</p>
     <h1>A enciclopédia dos regimes</h1>
     <div class="ad-slot" data-ad-slot="topo" style="min-height:90px;margin:18px 0"></div>
-<p>O arquivo do Radar lido como uma enciclopédia: o que a leitura registrou num momento de regime — e o que o mercado fez depois. Sem previsão, sem chamada de compra. Apenas o extremo, com data, e o veredito honesto do que veio em seguida.</p>
-<h2 class="sec">Os marquees — os grandes regimes</h2>
+<p>O arquivo do Radar lido como uma enciclopédia: o que a leitura registrou num momento de regime — e o que o mercado fez depois. Sem previsão, sem chamada de compra. Comece por uma coleção, por um fenômeno de regime, ou por um personagem.</p>
+<h2 class="sec">Comece por uma coleção</h2>
+<ul class="colnav">
+<li><a href="#col-marquee"><b>Marquees</b><span>14 artigos</span></a></li>
+<li><a href="#col-episodio"><b>Episódios</b><span>2 artigos</span></a></li>
+<li><a href="#col-comparativo"><b>Comparativos</b><span>8 artigos</span></a></li>
+<li><a href="#col-conceito"><b>Conceitos</b><span>11 artigos</span></a></li>
+<li><a href="#col-derivado"><b>Derivados</b><span>21 artigos</span></a></li>
+</ul>
+<h2 class="sec">Explore por fenômeno de regime</h2>
+<ul class="chipnav">
+<li><a href="#fam-2010">2010 <span>10</span></a></li>
+<li><a href="#fam-2011">2011 — crise europeia <span>13</span></a></li>
+<li><a href="#fam-2012">2012 <span>10</span></a></li>
+<li><a href="#fam-2013">2013 — taper tantrum <span>12</span></a></li>
+<li><a href="#fam-2014">2014 <span>13</span></a></li>
+<li><a href="#fam-2015">2015 — os três alarmes <span>18</span></a></li>
+<li><a href="#fam-2016">2016 — o fundo <span>16</span></a></li>
+<li><a href="#fam-2017">2017 <span>10</span></a></li>
+<li><a href="#fam-2018">2018 — caminhoneiros e eleição <span>14</span></a></li>
+<li><a href="#fam-2019">2019 <span>10</span></a></li>
+<li><a href="#fam-2020">2020 <span>16</span></a></li>
+<li><a href="#fam-2021">2021 <span>10</span></a></li>
+<li><a href="#fam-2022">2022 — a casa às escuras <span>14</span></a></li>
+<li><a href="#fam-2023">2023 <span>10</span></a></li>
+<li><a href="#fam-2024">2024 <span>15</span></a></li>
+<li><a href="#fam-2025">2025 <span>9</span></a></li>
+<li><a href="#fam-capitulacao">capitulacao <span>1</span></a></li>
+<li><a href="#fam-covid">COVID — março de 2020 <span>8</span></a></li>
+<li><a href="#fam-divergencia">divergencia <span>9</span></a></li>
+<li><a href="#fam-dolar">dolar <span>6</span></a></li>
+<li><a href="#fam-fundos">fundos <span>5</span></a></li>
+<li><a href="#fam-global">global <span>1</span></a></li>
+<li><a href="#fam-humor-fluxo">humor-fluxo <span>6</span></a></li>
+<li><a href="#fam-intermercado">intermercado <span>13</span></a></li>
+<li><a href="#fam-juros">juros <span>6</span></a></li>
+<li><a href="#fam-macro">macro <span>5</span></a></li>
+<li><a href="#fam-metodo">metodo <span>1</span></a></li>
+<li><a href="#fam-prestacao-de-contas">prestacao-de-contas <span>4</span></a></li>
+<li><a href="#fam-transversal">Conceitos transversais <span>11</span></a></li>
+</ul>
+<h2 class="sec">Ou por personagem</h2>
+<p>Os termômetros e razões que se repetem em todo regime — cada um reúne os episódios em que foi protagonista.</p>
+<ul class="chipnav">
+<li><a href="/artigos/personagem/humor/">Humor <span>51</span></a></li>
+<li><a href="/artigos/personagem/fluxo/">Fluxo (apetite por risco) <span>52</span></a></li>
+<li><a href="/artigos/personagem/estrutura/">Estrutura (intermercado) <span>51</span></a></li>
+<li><a href="/artigos/personagem/dolar/">Dólar <span>34</span></a></li>
+<li><a href="/artigos/personagem/juros/">Juros (Selic) <span>45</span></a></li>
+<li><a href="/artigos/personagem/anomalia/">Anomalia estatística <span>46</span></a></li>
+<li><a href="/artigos/personagem/ciclicos-defensivos/">Cíclicos × defensivos <span>61</span></a></li>
+<li><a href="/artigos/personagem/commodities/">Commodities <span>34</span></a></li>
+<li><a href="/artigos/personagem/renda-contratada/">Renda contratada <span>1</span></a></li>
+<li><a href="/artigos/personagem/metodo/">Método <span>2</span></a></li>
+</ul>
+<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:24px 0"></div>
+<h2 class="sec" id="col-marquee">Marquees <span class="cnt">14</span></h2>
 <ul class="artlist">
 <li><span class="tag">2014</span><a href="/artigos/a-aposta-unica-em-bancos-nov-2014/">A aposta única em bancos: quando o mercado escolheu um só setor</a><span class="ds">Reconstrua a cena a partir do que a bolsa fez, não do que ela disse.</span></li>
 <li><span class="tag">2022 — a casa às escuras</span><a href="/artigos/a-casa-as-escuras-2022/">A casa às escuras: o fundo da estrutura no fim de 2022 precedeu um ano de discordância</a><span class="ds">Em dezembro de 2022, ao fim de um ano eleitoral, a estrutura de mercado inteira se contraiu sobre si mesma.</span></li>
@@ -303,9 +358,63 @@
 <li><span class="tag">2010</span><a href="/artigos/quando-o-credito-perdeu-a-fe-mai-2010/">Quando o crédito perdeu a fé primeiro — maio/2010</a><span class="ds">O dinheiro que empresta foi o primeiro a desconfiar.</span></li>
 <li><span class="tag">2013 — taper tantrum</span><a href="/artigos/taper-tantrum-2013-susto-importado/">O taper tantrum de 2013: o susto importado que o regime brasileiro absorveu</a><span class="ds">Em meados de 2013, o Federal Reserve sinalizou que reduziria seus estímulos, e os mercados emergentes entraram em estresse — o real perdeu força junto.</span></li>
 </ul>
-<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:18px 0"></div>
-<h2 class="sec">Por família de regime</h2>
-<h3 class="sub">2010</h3>
+<div class="ad-slot" data-ad-slot="corpo" style="min-height:90px;margin:18px 0"></div>
+<h2 class="sec" id="col-episodio">Episódios <span class="cnt">2</span></h2>
+<ul class="artlist">
+<li><span class="tag">2022 — a casa às escuras</span><a href="/artigos/o-dezembro-as-avessas-jan-2023/">O dezembro às avessas, em trinta dias</a><span class="ds">Dezembro de 2022 fechou o ano com a estrutura inteira encolhida: o intermercado no fundo absoluto da escala, o investidor abatido, o regime em risk-off…</span></li>
+<li><span class="tag">2022 — a casa às escuras</span><a href="/artigos/um-ano-de-discordancia-2023/">Um ano de discordância: quando o humor e a estrutura quase não concordaram</a><span class="ds">Depois que dezembro de 2022 deixou a estrutura no fundo da escala, 2023 deveria ter sido o ano da reconciliação entre o que o investidor sente e onde o…</span></li>
+</ul>
+<h2 class="sec" id="col-comparativo">Comparativos <span class="cnt">8</span></h2>
+<ul class="artlist">
+<li><span class="tag">2011 — crise europeia</span><a href="/artigos/2011-x-2013-sustos-importados/">2011 × 2013: dois sustos importados, duas absorções diferentes</a><span class="ds">Dois choques externos, dois anos seguidos no início da década.</span></li>
+<li><span class="tag">2013 — taper tantrum</span><a href="/artigos/2013-x-2024-quando-o-cambio-dita/">2013 × 2024: quando o câmbio dita o tom — e o que isso faz (ou não) com o regime</a><span class="ds">Há episódios em que o câmbio deixa de ser coadjuvante e passa a comandar a leitura.</span></li>
+<li><span class="tag">2018 — caminhoneiros e eleição</span><a href="/artigos/2018-x-2020-capital-antes-da-fe/">2018 × 2020: a mesma ordem — dinheiro, depois fé — em tempos diferentes</a><span class="ds">A greve dos caminhoneiros de 2018 e a COVID de 2020 são dois choques de naturezas distintas que deixaram o mesmo rastro no arquivo: o capital voltou antes da…</span></li>
+<li><span class="tag">2022 — a casa às escuras</span><a href="/artigos/2022-x-2015-duas-contracoes-lentas/">2022 × 2015: duas contrações domésticas lentas</a><span class="ds">O fim de 2022 e o ano de 2015 foram, no arquivo do Radar, dois mercados que se contraíram por dentro de casa — não por um susto vindo de fora.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/covid-x-2022/">COVID × eleições de 2022: o susto agudo e a contração lenta</a><span class="ds">Março de 2020 e dezembro de 2022 foram dois momentos em que o Radar registrou o mercado brasileiro contraído e na defensiva.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/covid-x-agosto-2015/">COVID × agosto de 2015: o mesmo diagnóstico, anatomias opostas</a><span class="ds">Agosto de 2015 e março de 2020 são os dois maiores sustos do arquivo recente.</span></li>
+<li><span class="tag">2015 — os três alarmes</span><a href="/artigos/crise-2015-x-fundo-2016/">Crise de 2015 × o fundo de 2016: o que separa o pânico da inflexão</a><span class="ds">Agosto de 2015 e março de 2016 são dois retratos da mesma crise — e ambos trazem um eixo no extremo.</span></li>
+<li><span class="tag">2016 — o fundo</span><a href="/artigos/fundo-2016-x-2020/">Fundo de 2016 × março de 2020: duas recomposições, dois relógios</a><span class="ds">São duas recomposições saídas de um fundo, e o arquivo as lê com o mesmo vocabulário.</span></li>
+</ul>
+<h2 class="sec" id="col-conceito">Conceitos <span class="cnt">11</span></h2>
+<ul class="artlist">
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/amplitude-de-mercado/">O que é amplitude de mercado?</a><span class="ds">Há duas perguntas escondidas em cada pregão, e o índice responde só à primeira.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/anomalia-estatistica/">O que é uma anomalia estatística?</a><span class="ds">No Radar, uma anomalia estatística é um movimento tão fora do comum que o motor o destaca como improvável de ser apenas ruído — uma leitura muito distante da…</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/ciclicos-defensivos/">Cíclicos × defensivos: o duelo que revela o apetite</a><span class="ds">Dentro da bolsa, dois grupos contam histórias opostas.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/commodities-em-real/">Commodities em real: quando o câmbio move a razão</a><span class="ds">Boa parte das commodities é cotada em dólar.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/dolar-termometro/">O dólar como termômetro de regime</a><span class="ds">No Radar, o dólar não é só um preço — é um dos termômetros mais sensíveis do regime.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/indice-anima/">O que é o Índice Ânima?</a><span class="ds">O Índice Ânima é o termômetro de humor do Radar Perene: uma medida, de 0 a 100, do estado de ânimo do investidor doméstico.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/indice-risco-perene/">O que é o Índice de Risco Perene?</a><span class="ds">O Índice de Risco Perene é o termômetro de apetite do Radar: uma medida, de 0 a 100, de quanto o capital doméstico está disposto a carregar risco.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/intermercado/">O que é a leitura de intermercado?</a><span class="ds">A leitura de intermercado é como o Radar lê a estrutura do mercado por dentro: as razões entre classes e setores — ações cíclicas contra defensivas…</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/mudar-de-nivel-nao-e-mudar-de-regime/">Mudar de nível não é mudar de regime</a><span class="ds">O engano mais comum na leitura de mercado tem a forma de uma boa notícia: um termômetro dispara, e a tentação é anunciar que o tempo virou.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/renda-contratada/">O que é renda contratada?</a><span class="ds">No vocabulário do Radar, renda contratada é o bloco de ativos cuja receita não depende do humor do ciclo — ela já está assinada.</span></li>
+<li><span class="tag">Conceitos transversais</span><a href="/artigos/selic-juros/">Os juros (Selic) no Radar: o pano de fundo dos regimes</a><span class="ds">A Selic é a taxa básica de juro da economia brasileira — e, no arquivo do Radar, ela funciona como o pano de fundo lento contra o qual os regimes se…</span></li>
+</ul>
+<h2 class="sec" id="col-derivado">Derivados <span class="cnt">21</span></h2>
+<ul class="artlist">
+<li><span class="tag">2011 — crise europeia</span><a href="/artigos/a-convergencia-pelo-lado-otimista/">A convergência pelo lado otimista: maio/2012, os relógios batem juntos</a><span class="ds">Por três meses os dois termômetros da casa apontaram para lados opostos: a confiança doméstica insistindo no risco assumido, a estrutura de intermercado…</span></li>
+<li><span class="tag">2016 — o fundo</span><a href="/artigos/a-estrutura-lidera-o-humor/">A estrutura lidera o humor: o que 2016 ensinou sobre quem chega primeiro</a><span class="ds">Em março de 2016 a estrutura dos preços relativos da bolsa virou primeiro.</span></li>
+<li><span class="tag">2025</span><a href="/artigos/a-selic-a-15-e-a-euforia-que-cede-2025/">A Selic a 15% e a euforia que cede</a><span class="ds">Toda a febre de 2025 aconteceu sobre o mesmo pano de fundo: o juro doméstico no topo do ciclo.</span></li>
+<li><span class="tag">2015 — os três alarmes</span><a href="/artigos/a-selic-travada-em-14-25/">A Selic travada em 14,25%: o juro que não veio socorrer</a><span class="ds">Durante a crise de 2015, o juro básico não se mexeu.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/a-virada-de-abril-2020/">A virada de abril de 2020: os cíclicos voltam à mesa onde só havia defensivos</a><span class="ds">Depois do pânico de março, abril de 2020 trouxe o primeiro sinal de virada — mas só num lugar.</span></li>
+<li><span class="tag">2018 — caminhoneiros e eleição</span><a href="/artigos/capital-antes-da-confianca-2018/">Capital antes da confiança: quando o fluxo voltou e o humor ficou para trás (2018)</a><span class="ds">Em junho de 2018, logo depois do choque da greve, o Radar registrou uma divergência rara entre os dois lados do mesmo retrato.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/marco-2020-foi-fundo/">Março de 2020 foi fundo?</a><span class="ds">Em retrospecto, é tentador apontar março de 2020 como o fundo da pandemia.</span></li>
+<li><span class="tag">2013 — taper tantrum</span><a href="/artigos/o-alarme-que-nao-atravessou-a-fronteira/">O alarme que não atravessou a fronteira: quando o susto é externo e o regime fica de pé</a><span class="ds">Em setembro/2013, o estresse vindo de fora chegou às leituras domésticas como um afrouxamento, não como pânico.</span></li>
+<li><span class="tag">2024</span><a href="/artigos/o-cambio-que-comandou-2024/">O câmbio que comandou: quando o dólar virou o protagonista de 2024</a><span class="ds">No fim de 2024, o dólar deixou de ser pano de fundo e passou a comandar a bolsa por dentro.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/o-dolar-nunca-voltou/">O dólar nunca voltou: quando um extremo redefine o patamar</a><span class="ds">Em março de 2020, no auge do pânico, o dólar fechou a R$ 4,88 e o motor do Radar o marcou como anomalia estatística — um movimento raro demais para ser…</span></li>
+<li><span class="tag">2015 — os três alarmes</span><a href="/artigos/o-fundo-que-nao-era-fundo/">O fundo que não era fundo: quando o extremo de agosto ainda tinha porão</a><span class="ds">Em agosto de 2015, o Índice de Risco Perene fechou em 0,0 — o fundo absoluto da escala.</span></li>
+<li><span class="tag">2016 — o fundo</span><a href="/artigos/o-primeiro-corte-de-juro/">O primeiro corte de juro: a Selic confirmou o que o mercado já tinha lido</a><span class="ds">Durante todo o fundo de 2016, o custo do dinheiro não se mexeu.</span></li>
+<li><span class="tag">2018 — caminhoneiros e eleição</span><a href="/artigos/os-dois-relogios-pos-eleicao-2018-12/">Os dois relógios pós-eleição: apetite no máximo, estrutura no fundo (dez/2018)</a><span class="ds">Dezembro de 2018 chegou com a eleição já decidida e os ânimos, em tese, esclarecidos.</span></li>
+<li><span class="tag">2024</span><a href="/artigos/os-juros-reais-em-anomalia-2024/">Os juros reais em anomalia: o prêmio raro do fim de 2024</a><span class="ds">No fim de 2024, o Radar registrou nos juros reais de mercado um dos prêmios mais raros de todo o arquivo.</span></li>
+<li><span class="tag">2013 — taper tantrum</span><a href="/artigos/quando-o-susto-so-encarece-o-dinheiro/">Quando o susto só encarece o dinheiro: o taper que virou Selic, não crise</a><span class="ds">Em setembro/2013, com os emergentes em estresse e o real pressionado pela sinalização do Federal Reserve, a pergunta natural era onde o choque cobraria seu…</span></li>
+<li><span class="tag">2011 — crise europeia</span><a href="/artigos/quando-os-termometros-discordam/">Quando os termômetros discordam: apetite alto, estrutura defensiva</a><span class="ds">A casa tem dois termômetros que costumam concordar.</span></li>
+<li><span class="tag">2025</span><a href="/artigos/quando-os-tres-eixos-concordam-na-defesa-2025/">Quando os três eixos concordam na defesa</a><span class="ds">O Radar lê o mesmo mercado por três janelas: o humor de superfície, o apetite por risco e a estrutura de intermercado por baixo dos preços.</span></li>
+<li><span class="tag">2015 — os três alarmes</span><a href="/artigos/quando-todo-defensivo-lota/">Quando todo defensivo lota: o refúgio caro de novembro de 2015</a><span class="ds">Em novembro de 2015, o capital dentro da bolsa parou de discutir a intensidade do medo e passou a discutir sua geografia interna.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/quanto-tempo-humor-alcanca-fluxo/">Quanto tempo leva para o humor alcançar o fluxo?</a><span class="ds">Uma regularidade aparece em quase todo episódio do arquivo: o capital se move antes da confiança.</span></li>
+<li><span class="tag">2016 — o fundo</span><a href="/artigos/quem-comprou-no-grito/">Quem comprou no grito: março de 2016 e a virada que ninguém anunciou</a><span class="ds">Em março de 2016 o noticiário ainda era sombrio, mas por dentro da bolsa o capital fez um gesto raro.</span></li>
+<li><span class="tag">COVID — março de 2020</span><a href="/artigos/tres-relogios-mesma-hora/">Quando os três relógios marcaram a mesma hora (novembro de 2020)</a><span class="ds">Durante quase todo o ano da pandemia, os três termômetros do Radar discordaram: o apetite por risco recuperava, o humor seguia no chão, a estrutura de…</span></li>
+</ul>
+<h2 class="sec">Por fenômeno de regime</h2>
+<h3 class="sub" id="fam-2010">2010</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/quando-o-credito-perdeu-a-fe-mai-2010/">Quando o crédito perdeu a fé primeiro — maio/2010</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-commodity-que-subiu-e-caiu-no-mesmo-mes-abr-2010/">A commodity que subiu e caiu no mesmo mês — abr 2010</a></li>
@@ -318,7 +427,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/o-esticao-dos-ciclicos-jul-2010/">O esticão dos cíclicos de julho de 2010 — a posição cara demais para durar</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-fim-de-2010-confianca-e-credito/">O fim de 2010: o termômetro em 100, o crédito de saída</a></li>
 </ul>
-<h3 class="sub">2011 — crise europeia</h3>
+<h3 class="sub" id="fam-2011">2011 — crise europeia</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/crise-europeia-2011-discordia/">A crise europeia de 2011 chegou ao Brasil como discórdia, não como colapso</a></li>
 <li><span class="tag">Derivado</span><a href="/artigos/a-convergencia-pelo-lado-otimista/">A convergência pelo lado otimista: maio/2012, os relógios batem juntos</a></li>
@@ -334,7 +443,7 @@
 <li><span class="tag">Derivado</span><a href="/artigos/quando-os-termometros-discordam/">Quando os termômetros discordam: apetite alto, estrutura defensiva</a></li>
 <li><span class="tag">Comparativo</span><a href="/artigos/2011-x-2013-sustos-importados/">2011 × 2013: dois sustos importados, duas absorções diferentes</a></li>
 </ul>
-<h3 class="sub">2012</h3>
+<h3 class="sub" id="fam-2012">2012</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-virada-de-58-pontos-dez-2012/">A virada de 58 pontos de dezembro de 2012 — o apetite que voltou rápido demais</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-abrigo-com-sotaque-cambial-jun-2012/">O abrigo com sotaque cambial — junho de 2012</a></li>
@@ -347,7 +456,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/quando-o-medo-aprendeu-a-render-abr-2012/">Quando o medo aprendeu a render — abr/2012</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/quando-os-dois-relogios-enfim-batem-juntos-mai-2012/">Quando os dois relógios enfim batem juntos — e o acordo durou um trimestre</a></li>
 </ul>
-<h3 class="sub">2013 — taper tantrum</h3>
+<h3 class="sub" id="fam-2013">2013 — taper tantrum</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/taper-tantrum-2013-susto-importado/">O taper tantrum de 2013: o susto importado que o regime brasileiro absorveu</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-aposta-que-cabe-num-so-setor-fev-2013/">A aposta que cabe num só setor — bancos, fev/2013</a></li>
@@ -362,7 +471,7 @@
 <li><span class="tag">Derivado</span><a href="/artigos/quando-o-susto-so-encarece-o-dinheiro/">Quando o susto só encarece o dinheiro: o taper que virou Selic, não crise</a></li>
 <li><span class="tag">Comparativo</span><a href="/artigos/2013-x-2024-quando-o-cambio-dita/">2013 × 2024: quando o câmbio dita o tom — e o que isso faz (ou não) com o regime</a></li>
 </ul>
-<h3 class="sub">2014</h3>
+<h3 class="sub" id="fam-2014">2014</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/a-aposta-unica-em-bancos-nov-2014/">A aposta única em bancos: quando o mercado escolheu um só setor</a></li>
 <li><span class="tag">Marquee</span><a href="/artigos/a-euforia-no-topo-mar-2014/">A euforia no topo — março/2014, quando o apetite cravou 100 e não houve continuação</a></li>
@@ -378,7 +487,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/o-retorno-dos-parentes-pobres-fev-2014/">O retorno dos parentes pobres de fevereiro de 2014 — o fim de uma punição, não o início de um reinado</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/quando-a-aposta-vira-conviccao-mai-2014/">A convicção solitária de maio de 2014 — uma aposta rara sobre apetite morno</a></li>
 </ul>
-<h3 class="sub">2015 — os três alarmes</h3>
+<h3 class="sub" id="fam-2015">2015 — os três alarmes</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/os-tres-alarmes-de-agosto-2015/">Os três alarmes de agosto de 2015 — e o fundo que não era fundo</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-aversao-se-aprofunda-set-2015/">Setembro de 2015: o índice de risco respirou, os bancos não</a></li>
@@ -399,7 +508,7 @@
 <li><span class="tag">Comparativo</span><a href="/artigos/crise-2015-x-fundo-2016/">Crise de 2015 × o fundo de 2016: o que separa o pânico da inflexão</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/selic-alta-x-selic-baixa-o-humor-em-cada-juro/">Selic a 14,25% e a 3,75%: o juro que não mandava no humor</a></li>
 </ul>
-<h3 class="sub">2016 — o fundo</h3>
+<h3 class="sub" id="fam-2016">2016 — o fundo</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/fundo-de-2016-estrutura-antes-do-humor/">O fundo de 2016: a estrutura virou antes do humor — e muito antes dos juros</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-calma-que-escondia-um-extremo-jul-2016/">A calma que escondia um extremo — os cíclicos esticados como nunca, jul/2016</a></li>
@@ -418,7 +527,7 @@
 <li><span class="tag">Comparativo</span><a href="/artigos/fundo-2016-x-2020/">Fundo de 2016 × março de 2020: duas recomposições, dois relógios</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/o-fundo-de-2016-x-o-fundo-de-2022/">Dois fundos, direções opostas — 2016 e 2022 lidos no mesmo eixo</a></li>
 </ul>
-<h3 class="sub">2017</h3>
+<h3 class="sub" id="fam-2017">2017</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/a-confianca-que-o-capital-desconfia-out-2017/">Outubro de 2017: o humor cravou 69,2 enquanto a estrutura desabou para 8,2</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/as-financeiras-saem-da-mesa-nov-2017/">As financeiras saem da mesa em novembro de 2017 — e o comando que nunca assentou</a></li>
@@ -431,7 +540,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/o-juro-em-queda-rechama-os-imoveis-fev-2017/">O juro em queda rechama os imóveis — e os dispensa meses depois</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/quando-tudo-concorda-jan-2017/">Quando tudo concorda — janeiro de 2017 e o consenso que não durou um trimestre</a></li>
 </ul>
-<h3 class="sub">2018 — caminhoneiros e eleição</h3>
+<h3 class="sub" id="fam-2018">2018 — caminhoneiros e eleição</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/caminhoneiros-2018-dinheiro-antes-da-fe/">A greve dos caminhoneiros de 2018: o dinheiro voltou antes da fé — e antes da manchete</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-cadeira-que-trocou-de-dono-jan-2018/">A cadeira que trocou de dono — e o exílio que durou, jan/2018</a></li>
@@ -448,7 +557,7 @@
 <li><span class="tag">Comparativo</span><a href="/artigos/2018-x-2020-capital-antes-da-fe/">2018 × 2020: a mesma ordem — dinheiro, depois fé — em tempos diferentes</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/anima-x-risco-perene-humor-contra-apetite/">Ânima × Risco Perene: oitenta pontos entre o capital e o humor</a></li>
 </ul>
-<h3 class="sub">2019</h3>
+<h3 class="sub" id="fam-2019">2019</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-recomposicao-que-vazava-por-baixo-abr-2019/">A recomposição que vazava por baixo — abril de 2019</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-animo-voltou-mas-o-dinheiro-saiu-set-2019/">O ânimo voltou, mas o dinheiro saiu da sala — setembro de 2019</a></li>
@@ -461,7 +570,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/o-rali-as-vesperas-da-tempestade-dez-2019/">O rali às vésperas da tempestade — dezembro de 2019 e a conta de −16,6%</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-termometro-caro-se-moveu-nov-2019/">O termômetro caro se moveu primeiro — os 35 pontos de novembro de 2019</a></li>
 </ul>
-<h3 class="sub">2020</h3>
+<h3 class="sub" id="fam-2020">2020</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-fenda-entre-os-dois-termometros-out-2020/">A fenda entre os dois termômetros — outubro de 2020</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-inflacao-que-ainda-nao-chegou-a-mesa-set-2020/">A inflação que ainda não tinha chegado à mesa — o salto do IGP-M de setembro de 2020</a></li>
@@ -480,7 +589,7 @@
 <li><span class="tag">comparacao</span><a href="/artigos/ciclicos-x-defensivos-quem-lidera-cada-regime/">Cíclicos e defensivos: quem lidera quando o medo é total — e quando o ânimo grita</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/ifix-x-ibov-o-tijolo-contra-o-papel/">IFIX × IBOV: quando o tijolo só sobe porque o papel desaba</a></li>
 </ul>
-<h3 class="sub">2021</h3>
+<h3 class="sub" id="fam-2021">2021</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/o-dinheiro-que-fugiu-para-dentro-set-2021/">Setembro de 2021: o humor brasileiro despencou de 43,8 para 9,4 — e o capital correu para dentro de casa</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-aposta-ciclica-no-fundo-da-serie-ago-2021/">A aposta cíclica no fundo da série — agosto de 2021</a></li>
@@ -493,7 +602,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/vendeu-os-bancos-para-comprar-o-barril-fev-2021/">A bolsa que vendeu os bancos para comprar o barril — fevereiro de 2021</a></li>
 <li><span class="tag">nota</span><a href="/artigos/o-premio-do-refugio-utilities-ibov-set-2021/">O ágio do refúgio: as utilities só pagam quando o crescimento é posto em dúvida</a></li>
 </ul>
-<h3 class="sub">2022 — a casa às escuras</h3>
+<h3 class="sub" id="fam-2022">2022 — a casa às escuras</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/a-casa-as-escuras-2022/">A casa às escuras: o fundo da estrutura no fim de 2022 precedeu um ano de discordância</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-lideranca-que-ninguem-comemorou-nov-2022/">A liderança que ninguém comemorou — a rotação espelhada de novembro de 2022</a></li>
@@ -510,7 +619,7 @@
 <li><span class="tag">Episódio</span><a href="/artigos/um-ano-de-discordancia-2023/">Um ano de discordância: quando o humor e a estrutura quase não concordaram</a></li>
 <li><span class="tag">Comparativo</span><a href="/artigos/2022-x-2015-duas-contracoes-lentas/">2022 × 2015: duas contrações domésticas lentas</a></li>
 </ul>
-<h3 class="sub">2023</h3>
+<h3 class="sub" id="fam-2023">2023</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/euforia-sem-confirmacao-jun-2023/">A comemoração que os preços não assinaram — junho de 2023</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-abrigo-nao-o-aplauso-set-2023/">O abrigo que o dinheiro não largou — setembro de 2023</a></li>
@@ -523,7 +632,7 @@
 <li><span class="tag">episodio</span><a href="/artigos/o-medo-que-os-precos-nao-compraram-fev-2023/">O medo que os preços não compraram — fevereiro de 2023</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-telegrama-que-o-humor-nao-leu-abr-2023/">O telegrama que o humor não leu — abril de 2023</a></li>
 </ul>
-<h3 class="sub">2024</h3>
+<h3 class="sub" id="fam-2024">2024</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/dois-relogios-dezembro-2024/">Dois relógios marcando horas diferentes: dezembro de 2024</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-debandada-que-esvaziou-o-abrigo-abr-2024/">A debandada que esvaziou o próprio abrigo — abril de 2024</a></li>
@@ -541,7 +650,7 @@
 <li><span class="tag">nota</span><a href="/artigos/o-dolar-em-anomalia-dez-2024/">O dólar a R$ 6,097 e o que uma anomalia quer dizer</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/commodities-x-utilities-o-duelo-dos-extremos/">Dois topos quase idênticos — e por que nenhum era força</a></li>
 </ul>
-<h3 class="sub">2025</h3>
+<h3 class="sub" id="fam-2025">2025</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/a-febre-de-2025/">A febre de 2025 — quando a euforia desceu para encontrar a estrutura</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-capitulacao-em-financas-mai-2025/">A capitulação em Finanças — maio de 2025</a></li>
@@ -553,11 +662,11 @@
 <li><span class="tag">episodio</span><a href="/artigos/o-termometro-sobe-o-esqueleto-nao-se-mexe-mar-2025/">O termômetro sobe, o esqueleto não se mexe — março de 2025</a></li>
 <li><span class="tag">Derivado</span><a href="/artigos/quando-os-tres-eixos-concordam-na-defesa-2025/">Quando os três eixos concordam na defesa</a></li>
 </ul>
-<h3 class="sub">capitulacao</h3>
+<h3 class="sub" id="fam-capitulacao">capitulacao</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/baratos-lucrativos-abandonados/">Baratas e lucrativas. E abandonadas.</a></li>
 </ul>
-<h3 class="sub">COVID — março de 2020</h3>
+<h3 class="sub" id="fam-covid">COVID — março de 2020</h3>
 <ul class="artlist">
 <li><span class="tag">Marquee</span><a href="/artigos/o-que-aconteceu-depois-medo-precificou-tudo/">O que aconteceu depois que o medo precificou tudo</a></li>
 <li><span class="tag">Derivado</span><a href="/artigos/a-virada-de-abril-2020/">A virada de abril de 2020: os cíclicos voltam à mesa onde só havia defensivos</a></li>
@@ -568,7 +677,7 @@
 <li><span class="tag">Comparativo</span><a href="/artigos/covid-x-2022/">COVID × eleições de 2022: o susto agudo e a contração lenta</a></li>
 <li><span class="tag">Comparativo</span><a href="/artigos/covid-x-agosto-2015/">COVID × agosto de 2015: o mesmo diagnóstico, anatomias opostas</a></li>
 </ul>
-<h3 class="sub">divergencia</h3>
+<h3 class="sub" id="fam-divergencia">divergencia</h3>
 <ul class="artlist">
 <li><span class="tag">comparacao</span><a href="/artigos/a-euforia-que-ignorava-o-rombo/">A euforia no auge. O rombo, também.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/dois-relogios-dois-invernos/">Dois invernos, o mesmo desencontro — nunca os mesmos relógios</a></li>
@@ -580,7 +689,7 @@
 <li><span class="tag">comparacao</span><a href="/artigos/quando-as-duas-correntes-concordam/">O desacordo protegia. A concordância, não.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/quando-os-dois-eixos-param-de-discordar/">O desacordo dizia tudo. A concordância, quase nada.</a></li>
 </ul>
-<h3 class="sub">dolar</h3>
+<h3 class="sub" id="fam-dolar">dolar</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/o-abrigo-que-nao-escolheu-porto/">O abrigo que não escolheu porto</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/a-aposta-de-fora-que-a-praca-nao-fez/">O mundo comprava o Brasil que a praça vendia</a></li>
@@ -589,7 +698,7 @@
 <li><span class="tag">comparacao</span><a href="/artigos/o-dolar-que-subiu-e-desmontou-em-silencio/">A alta teve manchete. A volta, não.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/todo-choque-de-cambio-deixa-a-mesma-pergunta/">O câmbio muda o preço de tudo. A pergunta, não.</a></li>
 </ul>
-<h3 class="sub">fundos</h3>
+<h3 class="sub" id="fam-fundos">fundos</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/barata-nos-multiplos-esticada-no-risco/">Barata nos múltiplos, esticada no risco</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/tres-meses-para-voltar-a-escolher/">Três meses para o mercado voltar a escolher</a></li>
@@ -597,11 +706,11 @@
 <li><span class="tag">comparacao</span><a href="/artigos/dois-fundos-de-estrutura-dois-desfechos/">Duas casas no mesmo escuro. Só uma respirava.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/sera-que-este-e-o-fundo/">O fundo não é onde o medo grita — é onde o chão para de ceder</a></li>
 </ul>
-<h3 class="sub">global</h3>
+<h3 class="sub" id="fam-global">global</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-aversao-sem-sotaque-estrangeiro/">A aversão sem sotaque estrangeiro</a></li>
 </ul>
-<h3 class="sub">humor-fluxo</h3>
+<h3 class="sub" id="fam-humor-fluxo">humor-fluxo</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/o-humor-a-dois-pontos-do-zero/">O dia em que o humor quase tocou o zero</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/tres-leitores-tres-livros/">Três leitores, três livros</a></li>
@@ -610,7 +719,7 @@
 <li><span class="tag">comparacao</span><a href="/artigos/dois-junhos-o-mesmo-desacordo/">O juro sempre foi o suspeito. Dois junhos o inocentaram.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/junho-contra-junho-os-andares-trocados/">Um ano depois, a casa trocou os andares</a></li>
 </ul>
-<h3 class="sub">intermercado</h3>
+<h3 class="sub" id="fam-intermercado">intermercado</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-tregua-que-precedeu-o-extremo/">A única razão que melhorava</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-dia-em-que-a-cesta-se-desfez/">A cesta que não era uma cesta</a></li>
@@ -626,7 +735,7 @@
 <li><span class="tag">comparacao</span><a href="/artigos/onde-o-capital-se-abriga-quando-duvida/">O apetite voltou. A convicção, não.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/quando-todas-as-defesas-cedem-juntas/">A queda solitária tem um culpado. A geral, não.</a></li>
 </ul>
-<h3 class="sub">juros</h3>
+<h3 class="sub" id="fam-juros">juros</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/o-degrau-que-a-casa-nao-sentiu/">A Selic desceu um degrau. A casa não sentiu.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/a-euforia-mais-alta-sob-o-juro-mais-alto/">O dinheiro nunca esteve tão caro. O humor, nunca tão alto.</a></li>
@@ -635,7 +744,7 @@
 <li><span class="tag">comparacao</span><a href="/artigos/o-carrego-que-virou-gravidade/">O carrego parou de competir. Passou a puxar.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/o-mesmo-juro-duas-casas/">O mesmo juro presidiu o pânico e o apetite</a></li>
 </ul>
-<h3 class="sub">macro</h3>
+<h3 class="sub" id="fam-macro">macro</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-semana-em-que-o-tijolo-pagou-o-indice/">A semana em que o tijolo pagou o índice</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-atacado-gritou-primeiro/">O atacado gritou antes do varejo</a></li>
@@ -643,26 +752,30 @@
 <li><span class="tag">comparacao</span><a href="/artigos/a-deflacao-e-a-inflacao-em-meses-vizinhos/">A inflação foi a anomalia. Meses depois, a deflação também.</a></li>
 <li><span class="tag">comparacao</span><a href="/artigos/o-igpm-de-um-extremo-a-outro/">A anomalia que trocou de sinal</a></li>
 </ul>
-<h3 class="sub">prestacao-de-contas</h3>
+<h3 class="sub" id="fam-metodo">metodo</h3>
+<ul class="artlist">
+<li><span class="tag">conceito</span><a href="/artigos/quando-os-precedentes-discordam/">Quando os precedentes discordam</a></li>
+</ul>
+<h3 class="sub" id="fam-prestacao-de-contas">prestacao-de-contas</h3>
 <ul class="artlist">
 <li><span class="tag">episodio</span><a href="/artigos/a-anomalia-que-o-motor-mandou-ignorar/">O número extremo que não era notícia</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-pergunta-que-abril-deixou/">A pergunta que abril deixou</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/a-surpresa-que-estourou-a-regua/">O mês que saiu da régua</a></li>
 <li><span class="tag">episodio</span><a href="/artigos/o-veredito-que-nao-veio/">O veredito que não veio</a></li>
 </ul>
-<h2 class="sec">Navegue por personagem</h2>
-<p>Os termômetros e razões que se repetem em todo regime. Cada personagem reúne os episódios em que foi protagonista.</p>
+<h3 class="sub" id="fam-transversal">Conceitos transversais</h3>
 <ul class="artlist">
-<li><a href="/artigos/personagem/humor/">Humor</a><span class="ds">51 páginas</span></li>
-<li><a href="/artigos/personagem/fluxo/">Fluxo (apetite por risco)</a><span class="ds">52 páginas</span></li>
-<li><a href="/artigos/personagem/estrutura/">Estrutura (intermercado)</a><span class="ds">51 páginas</span></li>
-<li><a href="/artigos/personagem/dolar/">Dólar</a><span class="ds">34 páginas</span></li>
-<li><a href="/artigos/personagem/juros/">Juros (Selic)</a><span class="ds">45 páginas</span></li>
-<li><a href="/artigos/personagem/anomalia/">Anomalia estatística</a><span class="ds">46 páginas</span></li>
-<li><a href="/artigos/personagem/ciclicos-defensivos/">Cíclicos × defensivos</a><span class="ds">61 páginas</span></li>
-<li><a href="/artigos/personagem/commodities/">Commodities</a><span class="ds">34 páginas</span></li>
-<li><a href="/artigos/personagem/renda-contratada/">Renda contratada</a><span class="ds">1 página</span></li>
-<li><a href="/artigos/personagem/metodo/">Método</a><span class="ds">2 páginas</span></li>
+<li><span class="tag">Conceito</span><a href="/artigos/amplitude-de-mercado/">O que é amplitude de mercado?</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/anomalia-estatistica/">O que é uma anomalia estatística?</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/ciclicos-defensivos/">Cíclicos × defensivos: o duelo que revela o apetite</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/commodities-em-real/">Commodities em real: quando o câmbio move a razão</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/dolar-termometro/">O dólar como termômetro de regime</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/indice-anima/">O que é o Índice Ânima?</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/indice-risco-perene/">O que é o Índice de Risco Perene?</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/intermercado/">O que é a leitura de intermercado?</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/mudar-de-nivel-nao-e-mudar-de-regime/">Mudar de nível não é mudar de regime</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/renda-contratada/">O que é renda contratada?</a></li>
+<li><span class="tag">Conceito</span><a href="/artigos/selic-juros/">Os juros (Selic) no Radar: o pano de fundo dos regimes</a></li>
 </ul>
 <div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>
 <p class="rel" style="margin-top:24px">O Radar lê esses regimes todos os dias. <a href="/diario">Veja a leitura de hoje →</a> · <a href="/metodologia/">Como o método funciona →</a></p>

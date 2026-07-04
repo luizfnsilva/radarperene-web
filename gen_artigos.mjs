@@ -252,7 +252,7 @@ function deriveDesc(body) {
 }
 
 // ─── chrome estático (copiado verbatim de gen_pages.mjs p/ paridade visual total) ───
-const PG_CSS = '<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h2.sub,.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold-ink)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>';
+const PG_CSS = '<style>.pg{max-width:760px;margin:0 auto;padding:8px 0 20px}.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,42px);line-height:1.14;margin:18px 0 22px;letter-spacing:-.01em}.pg h2.sec{margin-top:30px;font-size:clamp(19px,2.6vw,24px)}.pg h2.sub,.pg h3.sub{margin-top:22px;font-size:16.5px;color:var(--txt)}.pg p{font-size:15.5px;color:var(--txt2);margin:0 0 15px}.pg .rel{font-size:13px;color:var(--dim)}.pg .rel a:not(.btn),.pg p a:not(.btn){color:var(--gold-ink)}.pg .livestate{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px}.pg .ctarow{margin:22px 0 6px}.pg ol,.pg ul{color:var(--txt2);font-size:15px;padding-left:22px;margin:0 0 15px}.pg ol li,.pg ul li{margin:5px 0}.pg blockquote.ex{margin:6px 0 16px;padding:12px 15px;border-left:2px solid var(--gold);background:var(--surface2);border-radius:0 9px 9px 0;font-size:14px;color:var(--txt2);font-style:italic}.pg table.tb{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:13.5px}.pg table.tb th,.pg table.tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--txt2);vertical-align:top}.pg table.tb th{color:var(--txt);font-weight:600;border-bottom:1.5px solid var(--line)}.pg .closing{font-family:var(--serif);font-size:17px;color:var(--txt);margin-top:24px;font-style:italic}.pg pre.api{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;overflow:auto;font-size:12px}.pg .ad-slot{}.pg .artlist{list-style:none;padding:0;margin:8px 0 22px}.pg .artlist li{margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}.pg .artlist a{color:var(--txt);font-family:var(--serif);font-size:18px;text-decoration:none}.pg .artlist a:hover{color:var(--gold-ink)}.pg .artlist .ds{display:block;font-size:13.5px;color:var(--dim);margin-top:4px}.pg .tag{display:inline-block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}.pg .colnav{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0;margin:10px 0 8px}.pg .colnav a{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:13px 15px;text-decoration:none;color:var(--txt)}.pg .colnav a:hover{border-color:var(--gold-ink)}.pg .colnav b{font-family:var(--serif);font-size:17px;font-weight:500}.pg .colnav>li>a>span{font-size:12.5px;color:var(--dim);white-space:nowrap}.pg .chipnav{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:8px 0 6px}.pg .chipnav a{display:inline-flex;align-items:baseline;gap:6px;font-size:13px;color:var(--txt2);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;text-decoration:none}.pg .chipnav a:hover{border-color:var(--gold-ink);color:var(--gold-ink)}.pg .chipnav a span{font-size:11px;color:var(--dim)}.pg .cnt{font-size:14px;color:var(--dim);font-weight:400}@media(max-width:520px){.pg .colnav{grid-template-columns:1fr}}.crumb{font-size:12px;color:var(--dim);margin:6px 0 0}.crumb a{color:var(--gold-ink)}footer .ftnav{font-size:12.5px;line-height:2;color:var(--dim);margin:0 0 12px}footer .ftnav a{color:var(--dim);text-decoration:none}footer .ftnav a:hover{color:var(--gold-ink)}.brand .logo-w{display:block;height:35px;width:auto}:root[data-theme="dark"] .logo-w-light{display:none}:root:not([data-theme="dark"]) .logo-w-dark{display:none}</style>';
 // site-kit (favicons/ícones/manifest) + logo real (wordmark light/dark, LOGO_IMG) — paridade total com a home.
 // (logo-bússola antiga BRAND_SVG removida 2026-06-19: a marca usa LOGO_IMG)
 const SITE_KIT = '<link rel="icon" href="/favicon.ico" sizes="48x48">\n<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n<link rel="icon" type="image/svg+xml" href="/icon-light.svg" media="(prefers-color-scheme: light)">\n<link rel="icon" type="image/svg+xml" href="/icon-dark.svg" media="(prefers-color-scheme: dark)">\n<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">\n<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#131521">\n<link rel="manifest" href="/site.webmanifest">';
@@ -450,32 +450,56 @@ const FAMILIA_NOME = { "2011": "2011 — crise europeia", "2013": "2013 — tape
   "2016": "2016 — o fundo", "2018": "2018 — caminhoneiros e eleição", "2022": "2022 — a casa às escuras", covid: "COVID — março de 2020", transversal: "Conceitos transversais" };
 const FAMILIA_NOME_EN = { "2011": "2011 — European crisis", "2013": "2013 — taper tantrum", "2015": "2015 — the three alarms",
   "2016": "2016 — the bottom", "2018": "2018 — truckers and election", "2022": "2022 — the house in the dark", covid: "COVID — March 2020", transversal: "Transversal concepts" };
+// ★ 2026-07-04 (consultor · biblioteca, não índice): navegação-primeiro. O topo é MENU (coleção com contagem +
+//   fenômeno de regime + personagem), não uma pilha de artigos. O corpo lista por coleção E por fenômeno → o mesmo
+//   artigo é alcançável por vários caminhos (malha = + páginas/sessão, + SEO, + inventário de AdSense). 4 ad-slots.
+const CAMADAS_ORD = ["marquee", "episodio", "comparativo", "conceito", "derivado"];
 function hubHtml() {
+  const COLS = CAMADAS_ORD.map((c) => ({ c, arts: ARTS.filter((a) => (a.meta.camada || a.meta.tipo) === c) })).filter((x) => x.arts.length);
   let b = `<div class="ad-slot" data-ad-slot="topo" style="min-height:90px;margin:18px 0"></div>\n`;
-  b += `<p>O arquivo do Radar lido como uma enciclopédia: o que a leitura registrou num momento de regime — e o que o mercado fez depois. Sem previsão, sem chamada de compra. Apenas o extremo, com data, e o veredito honesto do que veio em seguida.</p>\n`;
+  b += `<p>O arquivo do Radar lido como uma enciclopédia: o que a leitura registrou num momento de regime — e o que o mercado fez depois. Sem previsão, sem chamada de compra. Comece por uma coleção, por um fenômeno de regime, ou por um personagem.</p>\n`;
 
-  b += `<h2 class="sec">Os marquees — os grandes regimes</h2>\n<ul class="artlist">\n`;
-  for (const a of marquees) {
-    b += `<li><span class="tag">${esc(FAMILIA_NOME[a.meta.familia] || a.meta.familia)}</span><a href="/artigos/${a.slug}/">${esc(a.meta.titulo)}</a><span class="ds">${esc(deriveDesc(a.body))}</span></li>\n`;
+  // — MENU: por coleção (com contagem) → âncoras —
+  b += `<h2 class="sec">Comece por uma coleção</h2>\n<ul class="colnav">\n`;
+  for (const { c, arts } of COLS) b += `<li><a href="#col-${c}"><b>${esc(CAMADA_LABEL[c] || c)}s</b><span>${arts.length} ${arts.length === 1 ? "artigo" : "artigos"}</span></a></li>\n`;
+  b += `</ul>\n`;
+
+  // — MENU: por fenômeno de regime (família) —
+  b += `<h2 class="sec">Explore por fenômeno de regime</h2>\n<ul class="chipnav">\n`;
+  for (const fam of families) { const n = ARTS.filter((a) => a.meta.familia === fam).length; if (!n) continue; b += `<li><a href="#fam-${esc(fam)}">${esc(FAMILIA_NOME[fam] || fam)} <span>${n}</span></a></li>\n`; }
+  b += `</ul>\n`;
+
+  // — MENU: por personagem → hubs existentes —
+  const pers = Object.keys(PERSONAGEM_NOME).filter((p) => (POR_PERSONAGEM[p] || []).length);
+  if (pers.length) {
+    b += `<h2 class="sec">Ou por personagem</h2>\n<p>Os termômetros e razões que se repetem em todo regime — cada um reúne os episódios em que foi protagonista.</p>\n<ul class="chipnav">\n`;
+    for (const p of pers) b += `<li><a href="/artigos/personagem/${p}/">${esc(PERSONAGEM_NOME[p])} <span>${(POR_PERSONAGEM[p] || []).length}</span></a></li>\n`;
+    b += `</ul>\n`;
   }
-  b += `</ul>\n<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:18px 0"></div>\n`;
+  b += `<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:24px 0"></div>\n`;
 
-  b += `<h2 class="sec">Por família de regime</h2>\n`;
+  // — CORPO: por coleção (cartão com badge de fenômeno) —
+  let ci = 0;
+  for (const { c, arts } of COLS) {
+    b += `<h2 class="sec" id="col-${c}">${esc(CAMADA_LABEL[c] || c)}s <span class="cnt">${arts.length}</span></h2>\n<ul class="artlist">\n`;
+    for (const a of arts) {
+      const fam = a.meta.familia ? `<span class="tag">${esc(FAMILIA_NOME[a.meta.familia] || a.meta.familia)}</span>` : "";
+      b += `<li>${fam}<a href="/artigos/${a.slug}/">${esc(a.meta.titulo)}</a><span class="ds">${esc(deriveDesc(a.body))}</span></li>\n`;
+    }
+    b += `</ul>\n`;
+    if (++ci === 1) b += `<div class="ad-slot" data-ad-slot="corpo" style="min-height:90px;margin:18px 0"></div>\n`;  // entre a 1ª coleção e as demais
+  }
+
+  // — CORPO: por fenômeno de regime (âncoras dos chips) —
+  b += `<h2 class="sec">Por fenômeno de regime</h2>\n`;
   for (const fam of families) {
-    const fa = ARTS.filter((a) => a.meta.familia === fam && a.meta.tipo !== "conceito");
+    const fa = ARTS.filter((a) => a.meta.familia === fam);
     if (!fa.length) continue;
-    b += `<h3 class="sub">${esc(FAMILIA_NOME[fam] || fam)}</h3>\n<ul class="artlist">\n`;
+    b += `<h3 class="sub" id="fam-${esc(fam)}">${esc(FAMILIA_NOME[fam] || fam)}</h3>\n<ul class="artlist">\n`;
     for (const a of fa) b += `<li><span class="tag">${esc(CAMADA_LABEL[a.meta.camada] || a.meta.tipo)}</span><a href="/artigos/${a.slug}/">${esc(a.meta.titulo)}</a></li>\n`;
     b += `</ul>\n`;
   }
-
-  b += `<h2 class="sec">Navegue por personagem</h2>\n<p>Os termômetros e razões que se repetem em todo regime. Cada personagem reúne os episódios em que foi protagonista.</p>\n<ul class="artlist">\n`;
-  for (const p of Object.keys(PERSONAGEM_NOME)) {
-    const list = POR_PERSONAGEM[p] || [];
-    if (!list.length) continue;
-    b += `<li><a href="/artigos/personagem/${p}/">${esc(PERSONAGEM_NOME[p])}</a><span class="ds">${list.length} ${list.length === 1 ? "página" : "páginas"}</span></li>\n`;
-  }
-  b += `</ul>\n<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
+  b += `<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
   b += `<p class="rel" style="margin-top:24px">O Radar lê esses regimes todos os dias. <a href="/diario">Veja a leitura de hoje →</a> · <a href="/metodologia/">Como o método funciona →</a></p>`;
   b += `\n${CTA_PT}`;
   return b;
@@ -492,35 +516,49 @@ urls.push({ path: "/artigos/", pri: "0.8", altEn: hubAlt.en });
 const ENL = (a) => EN_BY_SLUG[a.slug];   // artigo PT que tem espelho
 function hubHtmlEn() {
   CUR_LANG = "en";
+  const COLS = CAMADAS_ORD.map((c) => ({ c, arts: ARTS.filter((a) => (a.meta.camada || a.meta.tipo) === c && ENL(a)) })).filter((x) => x.arts.length);
   let b = `<div class="ad-slot" data-ad-slot="topo" style="min-height:90px;margin:18px 0"></div>\n`;
-  b += `<p>The Radar's archive read as an encyclopedia: what the reading registered at a moment of regime — and what the market did next. No forecast, no buy call. Only the extreme, with a date, and the honest verdict of what followed.</p>\n`;
-  const marqueesEn = marquees.filter(ENL);
-  if (marqueesEn.length) {
-    b += `<h2 class="sec">The marquees — the major regimes</h2>\n<ul class="artlist">\n`;
-    for (const a of marqueesEn) { const e = ENL(a); b += `<li><span class="tag">${esc(FAMILIA_NOME_EN[a.meta.familia] || a.meta.familia)}</span><a href="/articles/${e.slugEn}/">${esc(e.meta.title)}</a><span class="ds">${esc(deriveDescEn(e.body))}</span></li>\n`; }
+  b += `<p>The Radar's archive read as an encyclopedia: what the reading registered at a moment of regime — and what the market did next. No forecast, no buy call. Start from a collection, a regime phenomenon, or a character.</p>\n`;
+
+  // — MENU: collections (with counts) → anchors —
+  b += `<h2 class="sec">Start from a collection</h2>\n<ul class="colnav">\n`;
+  for (const { c, arts } of COLS) b += `<li><a href="#col-${c}"><b>${esc(CAMADA_LABEL_EN[c] || c)}s</b><span>${arts.length} ${arts.length === 1 ? "article" : "articles"}</span></a></li>\n`;
+  b += `</ul>\n`;
+
+  // — MENU: regime phenomenon (family) —
+  b += `<h2 class="sec">Explore by regime phenomenon</h2>\n<ul class="chipnav">\n`;
+  for (const fam of families) { const n = ARTS.filter((a) => a.meta.familia === fam && ENL(a)).length; if (!n) continue; b += `<li><a href="#fam-${esc(fam)}">${esc(FAMILIA_NOME_EN[fam] || fam)} <span>${n}</span></a></li>\n`; }
+  b += `</ul>\n`;
+
+  // — MENU: character → existing hubs —
+  const persEn = Object.keys(PERSONAGEM_NOME).filter((p) => (POR_PERSONAGEM[p] || []).some(ENL));
+  if (persEn.length) {
+    b += `<h2 class="sec">Or by character</h2>\n<p>The thermometers and ratios that recur in every regime — each gathers the episodes in which it was the protagonist.</p>\n<ul class="chipnav">\n`;
+    for (const p of persEn) { const n = (POR_PERSONAGEM[p] || []).filter(ENL).length; b += `<li><a href="/articles/character/${PERSONAGEM_SLUG_EN[p]}/">${esc(PERSONAGEM_NOME_EN[p])} <span>${n}</span></a></li>\n`; }
     b += `</ul>\n`;
   }
-  b += `<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:18px 0"></div>\n`;
-  b += `<h2 class="sec">By regime family</h2>\n`;
+  b += `<div class="ad-slot" data-ad-slot="meio" style="min-height:90px;margin:24px 0"></div>\n`;
+
+  // — BODY: by collection —
+  let ci = 0;
+  for (const { c, arts } of COLS) {
+    b += `<h2 class="sec" id="col-${c}">${esc(CAMADA_LABEL_EN[c] || c)}s <span class="cnt">${arts.length}</span></h2>\n<ul class="artlist">\n`;
+    for (const a of arts) { const e = ENL(a); const fam = a.meta.familia ? `<span class="tag">${esc(FAMILIA_NOME_EN[a.meta.familia] || a.meta.familia)}</span>` : ""; b += `<li>${fam}<a href="/articles/${e.slugEn}/">${esc(e.meta.title)}</a><span class="ds">${esc(deriveDescEn(e.body))}</span></li>\n`; }
+    b += `</ul>\n`;
+    if (++ci === 1) b += `<div class="ad-slot" data-ad-slot="corpo" style="min-height:90px;margin:18px 0"></div>\n`;
+  }
+
+  // — BODY: by regime phenomenon (chip anchors) —
+  b += `<h2 class="sec">By regime phenomenon</h2>\n`;
   for (const fam of families) {
-    const fa = ARTS.filter((a) => a.meta.familia === fam && a.meta.tipo !== "conceito" && ENL(a));
+    const fa = ARTS.filter((a) => a.meta.familia === fam && ENL(a));
     if (!fa.length) continue;
-    b += `<h3 class="sub">${esc(FAMILIA_NOME_EN[fam] || fam)}</h3>\n<ul class="artlist">\n`;
+    b += `<h3 class="sub" id="fam-${esc(fam)}">${esc(FAMILIA_NOME_EN[fam] || fam)}</h3>\n<ul class="artlist">\n`;
     for (const a of fa) { const e = ENL(a); b += `<li><span class="tag">${esc(CAMADA_LABEL_EN[a.meta.camada] || a.meta.tipo)}</span><a href="/articles/${e.slugEn}/">${esc(e.meta.title)}</a></li>\n`; }
     b += `</ul>\n`;
   }
-  // personagens com pelo menos 1 episódio EN
-  const persWithEn = Object.keys(PERSONAGEM_NOME).filter((p) => (POR_PERSONAGEM[p] || []).some(ENL));
-  if (persWithEn.length) {
-    b += `<h2 class="sec">Browse by character</h2>\n<p>The thermometers and ratios that recur in every regime. Each character gathers the episodes in which it was the protagonist.</p>\n<ul class="artlist">\n`;
-    for (const p of persWithEn) {
-      const n = (POR_PERSONAGEM[p] || []).filter(ENL).length;
-      b += `<li><a href="/articles/character/${PERSONAGEM_SLUG_EN[p]}/">${esc(PERSONAGEM_NOME_EN[p])}</a><span class="ds">${n} ${n === 1 ? "page" : "pages"}</span></li>\n`;
-    }
-    b += `</ul>\n`;
-  }
   b += `<div class="ad-slot" data-ad-slot="rodape" style="min-height:90px;margin:18px 0"></div>\n`;
-  b += `<p class="rel" style="margin-top:24px">The Radar reads these regimes every day. <a href="/diario">See today's reading →</a> · <a href="/methodology/">How the method works →</a></p>`;
+  b += `<p class="rel" style="margin-top:24px">The Radar reads these regimes every day. <a href="/daily">See today's reading →</a> · <a href="/methodology/">How the method works →</a></p>`;
   b += `\n${CTA_EN}`;
   return b;
 }
