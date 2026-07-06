@@ -119,6 +119,7 @@ const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-ap
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
 const SNAP_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshot";
 const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshots";
+const ATLAS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/atlas";  // agregação do acervo p/ a /atlas
 const HIST_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/historico";  // track record (leituras maturadas vs desfecho)
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
@@ -764,6 +765,157 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
+// client-side do /atlas — paisagem SVG + gavetas + respira, localizado por window.ATLAS.en, links p/ edições (fim-de-mês)
+const _ATLAS_JS = '<script>(function(){' +
+'var A=window.ATLAS||{};var EN=!!A.en,DP=A.dpath||"/diario";' +
+'var L=function(pt,en){return EN?en:pt;};' +
+'var fmt=function(n){return Number(n).toLocaleString(EN?"en-US":"pt-BR");};' +
+'var css=function(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();};' +
+'var REGpt={risk_on:"risco ligado",risk_on_amplo:"risco ligado amplo",neutro:"neutro",defensivo:"defensivo"};' +
+'var REGen={risk_on:"risk-on",risk_on_amplo:"broad risk-on",neutro:"neutral",defensivo:"defensive"};' +
+'var REG=function(k){return (EN?REGen:REGpt)[k]||k;};' +
+'var RCOL={risk_on:"var(--terra)",risk_on_amplo:"var(--terra)",neutro:"var(--oliva)",defensivo:"var(--slate)"};' +
+'var MES=EN?["January","February","March","April","May","June","July","August","September","October","November","December"]:["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];' +
+'function ym(i){var y=2000+Math.floor(i/12),m=i%12;return{y:y,m:m,label:MES[m]+(EN?" ":" de ")+y};}' +
+'function edLink(y,m){var d=new Date(y,m+1,0);var mm=("0"+(m+1)).slice(-2),dd=("0"+d.getDate()).slice(-2);return DP+"/"+y+"-"+mm+"-"+dd;}' +
+// ---- respira ----
+'var respira=EN?[' +
+'{t:"A year ago, the market entered this same <b>defensive regime</b>. What followed: the Ibovespa rose <b>+36%</b> in six months.",d:"July 2025",y:2025,m:6},' +
+'{t:"In March 2020, the Perene Risk Index touched <b>5.7</b> — the floor of the whole archive. In the six months that followed, the market’s mood doubled.",d:"March 2020",y:2020,m:2},' +
+'{t:"November 2016 marked <b>8.3</b>: the second-deepest capitulation on record. The regime had read defensive for three months.",d:"November 2016",y:2016,m:10},' +
+'{t:"For <b>35 straight months</b> — 2010 to 2013 — the archive read risk-on without a break. The longest regime in the whole collection.",d:"June 2010",y:2010,m:5}' +
+']:[' +
+'{t:"Há um ano, o mercado entrou neste mesmo <b>regime defensivo</b>. O que se seguiu: o Ibovespa fez <b>+36%</b> em seis meses.",d:"julho de 2025",y:2025,m:6},' +
+'{t:"Em março de 2020, o Índice de Risco Perene tocou <b>5,7</b> — o fundo de todo o arquivo. Nos seis meses seguintes, o mercado dobrou de humor.",d:"março de 2020",y:2020,m:2},' +
+'{t:"Novembro de 2016 marcou <b>8,3</b>: a segunda maior capitulação já registrada. O regime já lia defensivo havia três meses.",d:"novembro de 2016",y:2016,m:10},' +
+'{t:"Por <b>35 meses seguidos</b> — de 2010 a 2013 — o arquivo leu risco ligado sem interrupção. O regime mais longo de todo o acervo.",d:"junho de 2010",y:2010,m:5}' +
+'];' +
+'var ri=0,dots=document.getElementById("r-dots");respira.forEach(function(){var i=document.createElement("i");dots.appendChild(i);});' +
+'function showR(){var r=respira[ri];document.getElementById("r-body").innerHTML=r.t;var c=document.getElementById("r-cta");c.textContent=L("Reler a edição de "+r.d+" →","Reread the "+r.d+" edition →");c.href=edLink(r.y,r.m);var ds=dots.children;for(var i=0;i<ds.length;i++)ds[i].className=i===ri?"on":"";}' +
+'showR();var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;if(!reduce)setInterval(function(){ri=(ri+1)%respira.length;showR();},6500);' +
+// ---- gavetas ----
+'var dist=A.dist||{},ult=A.ultimas||[];' +
+'var drawersData=[' +
+'{k:L("Por regime","By regime"),h:L("como cada regime se resolveu","how each regime resolved"),r:function(){' +
+'var ord=["defensivo","neutro","risk_on","risk_on_amplo"];var chips=ord.map(function(x){return "<button class=\\"qchip\\">"+REG(x)+"<span class=\\"n\\">"+(dist[x]||0)+L(" meses"," mo")+"</span></button>";}).join("");' +
+'return "<div class=\\"qrow\\">"+chips+"</div><ul class=\\"plist\\"><li><span class=\\"sym re\\">◐</span><span class=\\"yr\\">"+L("35 meses","35 mo")+"</span><span class=\\"desc\\">"+L("o regime mais longo: risco ligado, de jun/2010 a mai/2013","the longest regime: risk-on, Jun 2010 to May 2013")+"</span><span class=\\"val\\">"+L("média 55","avg 55")+"</span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">"+L("18 meses","18 mo")+"</span><span class=\\"desc\\">"+L("defensivo contínuo, de mai/2024 em diante","continuous defensive, from May 2024")+"</span><span class=\\"val\\">"+L("o atual","current")+"</span></li><li><span class=\\"sym fi\\">○</span><span class=\\"yr\\">jun/2014</span><span class=\\"desc\\">"+L("primeira vez que o arquivo leu defensivo","first time the archive read defensive")+"</span><span class=\\"val\\"><a href=\\""+edLink(2014,5)+"\\">"+L("reler →","reread →")+"</a></span></li></ul>";}},' +
+'{k:L("Por extremo","By extreme"),h:L("euforia e capitulação","euphoria and capitulation"),r:function(){' +
+'return "<div class=\\"qrow\\"><button class=\\"qchip\\">"+L("Perene ≥ 90","Perene ≥ 90")+"<span class=\\"n\\">"+fmt(A.ge90)+L(" dias"," days")+"</span></button><button class=\\"qchip\\">Perene ≤ 10<span class=\\"n\\">"+fmt(A.le10)+L(" dias"," days")+"</span></button></div><ul class=\\"plist\\"><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">"+L("mar/2020","Mar 2020")+"</span><span class=\\"desc\\">"+L("o fundo de todo o arquivo — pânico da pandemia","the floor of the whole archive — pandemic panic")+"</span><span class=\\"val\\"><a href=\\""+edLink(2020,2)+"\\">"+L("Perene 5,7 · reler →","Perene 5.7 · reread →")+"</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">"+L("nov/2016","Nov 2016")+"</span><span class=\\"desc\\">"+L("capitulação — a economia em recessão","capitulation — the economy in recession")+"</span><span class=\\"val\\"><a href=\\""+edLink(2016,10)+"\\">"+L("Perene 8,3 · reler →","Perene 8.3 · reread →")+"</a></span></li></ul>";}},' +
+'{k:L("Por virada","By turn"),h:L("as mudanças de ciclo","the cycle changes"),r:function(){' +
+'var rows=ult.slice().reverse().map(function(v){var p=v.quando.split("-");return "<li><span class=\\"sym re\\">◐</span><span class=\\"yr\\">"+p[1]+"/"+p[0]+"</span><span class=\\"desc\\">"+REG(v.de)+" <span style=\\"color:var(--dim)\\">→</span> "+REG(v.para)+"</span><span class=\\"val\\"><a href=\\""+edLink(+p[0],+p[1]-1)+"\\">"+L("reler →","reread →")+"</a></span></li>";}).join("");' +
+'return "<div class=\\"qrow\\"><button class=\\"qchip\\">"+L("Total de viradas","Total turns")+"<span class=\\"n\\">"+A.viradas+"</span></button></div><ul class=\\"plist\\">"+rows+"</ul>";}},' +
+'{k:L("Por crise","By crisis"),h:L("a história por acontecimento","history by event"),r:function(){' +
+'return "<ul class=\\"plist\\"><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">2008</span><span class=\\"desc\\">"+L("Crise do subprime — o Perene despencou de 82 a 16","Subprime crisis — Perene plunged from 82 to 16")+"</span><span class=\\"val\\"><a href=\\""+edLink(2008,9)+"\\">"+L("out","Oct")+" →</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">2015–16</span><span class=\\"desc\\">"+L("Recessão e impeachment de Dilma","Recession and Dilma’s impeachment")+"</span><span class=\\"val\\"><a href=\\""+edLink(2016,3)+"\\">"+L("reler →","reread →")+"</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">mai/2017</span><span class=\\"desc\\">"+L("Joesley Day — o choque de um dia","Joesley Day — the one-day shock")+"</span><span class=\\"val\\"><a href=\\""+edLink(2017,4)+"\\">"+L("reler →","reread →")+"</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">mar/2020</span><span class=\\"desc\\">"+L("Pandemia — o fundo do arquivo","Pandemic — the archive’s floor")+"</span><span class=\\"val\\"><a href=\\""+edLink(2020,2)+"\\">"+L("reler →","reread →")+"</a></span></li></ul>";}},' +
+'{k:L("Por ano","By year"),h:"2000 – 2026",r:function(){return "<p style=\\"font-size:14px;color:var(--dim);font-style:italic;margin:0\\">"+L("A grade completa dos 27 anos está logo abaixo, em \\u201CExplorar por período\\u201D — cada ano abre um capítulo.","The full 27-year grid is right below, in \\u201CExplore by period\\u201D — each year opens a chapter.")+"</p>";}},' +
+'{k:L("Pesquisar","Search"),h:L("por índice, valor ou data","by index, value or date"),r:function(){return "<div class=\\"qrow\\"><button class=\\"qchip\\">"+L("\\u201Cquando o Perene passou de 95\\u201D","\\u201Cwhen the Perene passed 95\\u201D")+"</button><button class=\\"qchip\\">"+L("\\u201Cregime defensivo mais longo\\u201D","\\u201Clongest defensive regime\\u201D")+"</button><button class=\\"qchip\\">"+L("\\u201Cmarço de 2020\\u201D","\\u201CMarch 2020\\u201D")+"</button></div><p style=\\"font-size:14px;color:var(--dim);font-style:italic;margin:0\\">"+L("A busca do acervo: pergunte em linguagem natural; a data vem como resposta. (Em breve.)","The archive search: ask in natural language; the date comes as the answer. (Soon.)")+"</p>";}}' +
+'];' +
+'var dc=document.getElementById("drawers");' +
+'drawersData.forEach(function(d,i){var el=document.createElement("div");el.className="drawer";' +
+'el.innerHTML="<button type=\\"button\\"><span class=\\"idx\\">"+("0"+(i+1)).slice(-2)+"</span><span class=\\"dt\\">"+d.k+"</span><span class=\\"hint\\">"+d.h+"</span><span class=\\"chev\\">\\u203A</span></button><div class=\\"panel\\"><div class=\\"panel-in\\">"+d.r()+"</div></div>";' +
+'el.querySelector("button").onclick=function(){var was=el.classList.contains("open");Array.prototype.forEach.call(dc.children,function(c){c.classList.remove("open");});if(!was)el.classList.add("open");};dc.appendChild(el);});' +
+// ---- casos clássicos ----
+'var CLASS=EN?[["Subprime crisis","2008"],["Recession","2015"],["Impeachment","2016"],["Joesley Day","2017"],["Truckers’ strike","2018"],["Elections","2018"],["Pandemic","2020"],["Monetary tightening","2022"]]:[["Crise do subprime","2008"],["Recessão","2015"],["Impeachment","2016"],["Joesley Day","2017"],["Greve dos caminhoneiros","2018"],["Eleições","2018"],["Pandemia","2020"],["Aperto monetário","2022"]];' +
+'document.getElementById("classics").innerHTML=CLASS.map(function(c){return "<span>"+c[0]+"<span class=\\"m\\">"+c[1]+"</span></span>";}).join("");' +
+// ---- anos ----
+'var yl=document.getElementById("years");(A.years||[]).forEach(function(y){var reg=y.mean>=60?"risk_on":(y.mean<=48?"defensivo":"neutro");var el=document.createElement("a");el.className="yr-cell";el.href=edLink(+y.y,11);el.innerHTML="<div class=\\"y\\">"+y.y+"</div><div class=\\"m\\">"+y.n+L(" leituras · Perene médio "," readings · avg Perene ")+Math.round(y.mean)+"</div><div class=\\"bar\\" style=\\"background:"+RCOL[reg]+";opacity:.55;width:"+Math.round(y.mean)+"%\\"></div>";yl.appendChild(el);});' +
+// ---- comece por aqui ----
+'var ENTR=EN?[["First edition","31 Jan 2000",2000,0],["Greatest euphoria","Perene 100",2019,0],["Greatest capitulation","Mar 2020 · 5.7",2020,2],["Longest regime","35 mo · 2010",2010,5],["Last turn","Dec 2025",2025,11],["The full archive","6,566 →",-1,-1]]:[["Primeira edição","31 jan 2000",2000,0],["Maior euforia","Perene 100",2019,0],["Maior capitulação","mar 2020 · 5,7",2020,2],["Regime mais longo","35 meses · 2010",2010,5],["Última virada","dez 2025",2025,11],["O acervo completo","6.566 →",-1,-1]];' +
+'document.getElementById("entries").innerHTML=ENTR.map(function(e){var href=e[2]<0?DP:edLink(e[2],e[3]);return "<a class=\\"entry\\" href=\\""+href+"\\"><div class=\\"e-k\\">"+e[0]+"</div><div class=\\"e-v\\">"+e[1]+"</div></a>";}).join("");' +
+// ---- paisagem (SVG relief) ----
+'var pais=document.getElementById("pais"),tip=document.getElementById("tip");' +
+'function paint(){var W=1080,H=300,pad=6,base=H-34;var P=A.P||[],n=P.length;if(!n)return;var step=(W-pad*2)/(n-1);' +
+'var x=function(i){return pad+i*step;},yy=function(v){return pad+(1-v/100)*(base-pad);};' +
+'var d="M"+x(0)+" "+yy(P[0]);for(var i=1;i<n;i++)d+=" L"+x(i).toFixed(1)+" "+yy(P[i]).toFixed(1);' +
+'var area=d+" L"+x(n-1)+" "+base+" L"+x(0)+" "+base+" Z";' +
+'var RCr={risk_on:css("--terra"),risk_on_amplo:css("--terra"),neutro:css("--oliva"),defensivo:css("--slate")};' +
+'var bandY=base+6,bandH=10,bands="";for(var b=0;b<(A.bands||[]).length;b++){var i0=A.bands[b][0],lab=A.bands[b][1],i1=(b+1<A.bands.length?A.bands[b+1][0]:n);if(!lab)continue;bands+="<rect x=\\""+x(i0).toFixed(1)+"\\" y=\\""+bandY+"\\" width=\\""+((i1-i0)*step).toFixed(1)+"\\" height=\\""+bandH+"\\" fill=\\""+RCr[lab]+"\\" opacity=\\"0.5\\"/>";}' +
+'var ticks="";[0,60,120,180,240,300].forEach(function(i){if(i>=n)return;ticks+="<text x=\\""+x(i).toFixed(1)+"\\" y=\\""+(H-4)+"\\" fill=\\""+css("--dim")+"\\" font-size=\\"10\\" text-anchor=\\"middle\\">"+(2000+Math.floor(i/12))+"</text>";});' +
+'var cr=[[104,L("Subprime","Subprime")],[202,L("Recessão","Recession")],[242,"COVID"]],cm="";cr.forEach(function(c){if(c[0]>=n)return;var xi=x(c[0]);cm+="<line x1=\\""+xi.toFixed(1)+"\\" y1=\\""+yy(P[c[0]]).toFixed(1)+"\\" x2=\\""+xi.toFixed(1)+"\\" y2=\\""+(base-2)+"\\" stroke=\\""+css("--terra")+"\\" stroke-width=\\"1\\" stroke-dasharray=\\"2 2\\" opacity=\\"0.6\\"/><text x=\\""+xi.toFixed(1)+"\\" y=\\""+(yy(P[c[0]])-6).toFixed(1)+"\\" fill=\\""+css("--terra")+"\\" font-size=\\"10.5\\" text-anchor=\\"middle\\">"+c[1]+"</text>";});' +
+'var mid=yy(50);var old=pais.querySelector("svg");if(old)old.remove();' +
+'var svg="<svg viewBox=\\"0 0 "+W+" "+H+"\\" role=\\"img\\" aria-label=\\""+L("Índice de Risco Perene, 2000 a 2026","Perene Risk Index, 2000 to 2026")+"\\"><defs><linearGradient id=\\"pg\\" x1=\\"0\\" y1=\\"0\\" x2=\\"0\\" y2=\\"1\\"><stop offset=\\"0\\" stop-color=\\""+css("--gold")+"\\" stop-opacity=\\"0.22\\"/><stop offset=\\"1\\" stop-color=\\""+css("--gold")+"\\" stop-opacity=\\"0.02\\"/></linearGradient></defs><line x1=\\""+pad+"\\" y1=\\""+mid+"\\" x2=\\""+(W-pad)+"\\" y2=\\""+mid+"\\" stroke=\\""+css("--line")+"\\" stroke-width=\\"1\\" stroke-dasharray=\\"3 4\\"/><path d=\\""+area+"\\" fill=\\"url(#pg)\\"/><path d=\\""+d+"\\" fill=\\"none\\" stroke=\\""+css("--gold")+"\\" stroke-width=\\"1.4\\" stroke-linejoin=\\"round\\"/>"+bands+cm+ticks+"</svg>";' +
+'pais.insertAdjacentHTML("beforeend",svg);var s=pais.querySelector("svg");' +
+'function at(e){var r=s.getBoundingClientRect();return Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left)/r.width*(n-1))));}' +
+'s.style.cursor="pointer";' +
+'s.addEventListener("mousemove",function(e){var i=at(e),t=ym(i),r=s.getBoundingClientRect();tip.innerHTML=t.label+" · Perene <b>"+Math.round(P[i])+"</b>";tip.style.left=(i/(n-1)*100)+"%";tip.style.top=(yy(P[i])/H*r.height)+"px";tip.style.opacity="1";});' +
+'s.addEventListener("mouseleave",function(){tip.style.opacity="0";});' +
+'s.addEventListener("click",function(e){var i=at(e),t=ym(i);location.href=edLink(t.y,t.m);});}' +
+'paint();' +
+'})();<\/script>';
+// ── /atlas — Atlas do Mercado Brasileiro: a /diario "index" reimaginada como INSTRUMENTO de pesquisa (navegação
+//    por fenômeno, não por data). Consome /v1/atlas (agregação do acervo). Determinístico, público, citável.
+//    O /diario cronológico continua existindo (crawl/SEO das edições). Editorial: marfim/serifa/ouro + azul/terra/oliva.
+function _renderAtlas(atlas, origin, lang) {
+  const en = lang === "en";
+  const A = atlas || {};
+  const dpath = en ? "/daily" : "/diario";
+  const canon = origin + "/atlas";
+  const total = A.total || 0;
+  const anos = A.years ? A.years.length : 0;
+  const title = (en ? "Atlas of the Brazilian Market" : "Atlas do Mercado Brasileiro") + " — Radar Perene";
+  const desc = en
+    ? "Radar Perene's public, citable archive of the Brazilian market — " + total + " daily readings since 2000, navigable by phenomenon: regimes, extremes, cycle turns, crises. Descriptive, never a forecast."
+    : "O arquivo público e citável do Radar Perene sobre o mercado brasileiro — " + total + " leituras diárias desde 2000, navegável por fenômeno: regimes, extremos, viradas, crises. Descritivo, nunca previsão.";
+  // dados + flags para o cliente (paisagem/gavetas/respira). Localização e link de edição vão embutidos.
+  const client = { start: A.start, P: A.P || [], bands: A.bands || [], years: A.years || [], total: total,
+    ge90: A.ge90 || 0, le10: A.le10 || 0, viradas: A.viradas || 0, dist: A.dist || {}, ultimas: A.ultimas || [],
+    en: en, dpath: dpath };
+  const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
+  const CSS =
+    ':root{--azul:#2c4a6e;--terra:#a85336;--oliva:#6b6a2e;--slate:#5b6b7a}' +
+    ':root[data-theme="dark"]{--azul:#7aa6d6;--terra:#d68a6e;--oliva:#b6b46e;--slate:#8a98a8}' +
+    '.atlas{max-width:1080px;margin:0 auto;padding:0 6px}' +
+    '.eyb{font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}' +
+    '.a-hero{padding:22px 0 8px}.a-hero .eyb{display:block;margin-bottom:14px}.a-hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,6vw,62px);line-height:1.03;letter-spacing:-.018em;color:var(--txt);max-width:16ch;margin:0}' +
+    '.a-hero .sub{font-family:var(--serif);font-size:clamp(16px,2vw,20px);color:var(--txt2);font-style:italic;margin:14px 0 0;max-width:46ch}' +
+    '.thesis{font-family:var(--serif);font-size:clamp(18px,2.4vw,24px);line-height:1.4;color:var(--txt);max-width:30ch;margin:26px 0 0}.thesis b{color:var(--gold-ink);font-weight:500}' +
+    '.a-stats{font-family:var(--sans);font-size:13px;color:var(--dim);margin:18px 0 0;display:flex;flex-wrap:wrap;align-items:center}.a-stats span{white-space:nowrap}.a-stats .sep{margin:0 11px;color:var(--line)}.a-stats b{color:var(--txt2);font-weight:600}' +
+    '.a-rule{height:1px;background:var(--line);border:0;margin:38px 0}' +
+    '.a-sec{padding:4px 0}.a-sec h2{font-family:var(--serif);font-weight:500;font-size:clamp(21px,3vw,28px);letter-spacing:-.01em;color:var(--txt);margin:0}.a-lead{font-family:var(--serif);font-size:15.5px;color:var(--dim);font-style:italic;max-width:56ch;margin:.3rem 0 1.5rem}' +
+    '.respira{border-top:2px solid var(--gold);padding:16px 0 4px}.respira .lb{font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);display:flex;align-items:center;gap:8px}.respira .body{font-family:var(--serif);font-size:clamp(19px,2.6vw,25px);line-height:1.4;color:var(--txt);max-width:34ch;margin:13px 0 6px}.respira .body b{color:var(--terra);font-weight:500}.respira .cta{font-family:var(--sans);font-size:13.5px}.respira .cta a{color:var(--gold-ink)}.respira .dots{display:inline-flex;gap:5px}.respira .dots i{width:5px;height:5px;border-radius:50%;background:var(--line);display:inline-block;transition:background .3s}.respira .dots i.on{background:var(--gold)}' +
+    '.drawers{border-top:1px solid var(--line)}.drawer{border-bottom:1px solid var(--line)}.drawer>button{width:100%;display:flex;align-items:center;gap:16px;background:none;border:0;cursor:pointer;padding:17px 2px;text-align:left;font-family:inherit;color:var(--txt)}.drawer .idx{font-family:var(--mono);font-size:12px;color:var(--dim);width:26px;flex:none}.drawer .dt{font-family:var(--serif);font-size:clamp(18px,2.3vw,23px);flex:1;color:var(--txt)}.drawer .hint{font-family:var(--sans);font-size:12.5px;color:var(--dim);display:none}@media(min-width:720px){.drawer .hint{display:block}}.drawer .chev{font-family:var(--sans);color:var(--dim);font-size:16px;transition:transform .25s;flex:none}.drawer.open .chev{transform:rotate(90deg);color:var(--gold-ink)}.drawer .panel{overflow:hidden;max-height:0;transition:max-height .35s ease}.drawer.open .panel{max-height:900px}.drawer .panel-in{padding:2px 2px 24px 44px}@media(max-width:520px){.drawer .panel-in{padding-left:2px}}' +
+    '.qrow{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}.qchip{font-family:var(--sans);font-size:13px;color:var(--txt2);border:1px solid var(--line);border-radius:2px;padding:7px 13px;background:var(--bg)}.qchip .n{font-family:var(--mono);color:var(--dim);margin-left:7px}' +
+    '.plist{list-style:none;padding:0;margin:0}.plist li{display:flex;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px dotted var(--line);font-size:14.5px}.plist .sym{font-size:11px;flex:none;width:14px}.plist .sym.ex{color:var(--terra)}.plist .sym.re{color:var(--gold-ink)}.plist .sym.fi{color:var(--dim)}.plist .yr{font-family:var(--mono);font-size:13px;color:var(--txt);width:84px;flex:none}.plist .desc{color:var(--txt2);flex:1}.plist .val{font-family:var(--mono);color:var(--dim);white-space:nowrap}.plist a{color:var(--gold-ink)}' +
+    '.paisagem{margin:6px 0 0}.pais-scale{display:flex;justify-content:space-between;font-family:var(--sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}.pais-box{position:relative;width:100%;overflow:hidden}.pais-box svg{display:block;width:100%;height:auto}.pais-tip{position:absolute;pointer-events:none;background:var(--txt);color:var(--bg);font-family:var(--mono);font-size:11px;padding:5px 9px;border-radius:3px;opacity:0;transform:translate(-50%,-130%);transition:opacity .12s;white-space:nowrap;z-index:5}.pais-tip b{color:var(--gold)}.pais-legend{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--sans);font-size:11.5px;color:var(--dim);margin-top:12px}.pais-legend i{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:6px}.pais-legend .foot{width:100%;font-style:italic;margin-top:2px}' +
+    '.cols{display:grid;grid-template-columns:1fr;border-top:1px solid var(--line)}@media(min-width:760px){.cols{grid-template-columns:1fr 1fr}}.col{padding:22px 0;border-bottom:1px solid var(--line)}@media(min-width:760px){.col{padding:22px 34px 22px 0}.col.r{padding:22px 0 22px 34px;border-left:1px solid var(--line)}}.col .k{font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:8px}.col h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--txt);margin:0 0 4px}.col .big{font-family:var(--serif);font-size:40px;color:var(--terra);line-height:1;font-variant-numeric:tabular-nums}.col .big.blue{color:var(--azul)}.col p{font-size:14.5px;color:var(--dim);margin:8px 0 10px;max-width:46ch}.col p b{color:var(--txt2)}.col .go{font-family:var(--sans);font-size:13px}.col .go a{color:var(--gold-ink)}.classics{display:flex;flex-wrap:wrap;gap:8px}.classics span{font-family:var(--serif);font-size:15px;color:var(--txt2);border-bottom:1px solid var(--line);padding-bottom:1px}.classics span .m{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:5px}' +
+    '.years{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}.yr-cell{background:var(--bg);padding:12px 13px;text-decoration:none;display:block}.yr-cell:hover{background:var(--surface2)}.yr-cell .y{font-family:var(--mono);font-size:17px;color:var(--txt)}.yr-cell .m{font-family:var(--sans);font-size:11px;color:var(--dim);margin-top:3px;line-height:1.5}.yr-cell .bar{height:3px;margin-top:7px;border-radius:2px;background:var(--line)}' +
+    '.entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));border-top:1px solid var(--line)}.entry{padding:15px 20px 15px 0;border-bottom:1px solid var(--line);text-decoration:none;display:block}.entry .e-k{font-family:var(--serif);font-size:16px;color:var(--txt)}.entry:hover .e-k{color:var(--gold-ink)}.entry .e-v{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:3px}' +
+    '.a-note{font-family:var(--sans);font-size:11.5px;color:var(--dim);background:var(--surface2);border-left:2px solid var(--gold);padding:8px 12px;margin:24px 0 0;border-radius:0 3px 3px 0}' +
+    '.legend-sym{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:18px}.legend-sym b.ex{color:var(--terra)}.legend-sym b.re{color:var(--gold-ink)}.legend-sym b.fi{color:var(--dim)}';
+  const head = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
+    "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
+    "<link rel=\"canonical\" href=\"" + canon + "\">" +
+    "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/atlas\"><link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/atlas\"><link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/atlas\">" +
+    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<script type=\"application/ld+json\">" + ld + "</script>" +
+    _chromeCss(CSS) + "</head><body>" + _header(en) + "<main id=\"main\"><div class=\"atlas\">";
+  // corpo: as seções são preenchidas pelo cliente a partir de window.ATLAS (paisagem interativa, gavetas accordion)
+  const body =
+    "<section class=\"a-hero\"><span class=\"eyb\">" + (en ? "Radar Perene · the archive" : "Radar Perene · o arquivo") + "</span>" +
+    "<h1>" + (en ? "Atlas of the Brazilian Market" : "Atlas do Mercado Brasileiro") + "</h1>" +
+    "<p class=\"sub\">" + (en ? "The market seen through time — each edition, a portrait of the market’s state that day." : "O mercado visto através do tempo — cada edição, um retrato do estado do mercado naquele dia.") + "</p>" +
+    "<p class=\"thesis\"><b id=\"a-total\">" + total.toLocaleString(en ? "en-US" : "pt-BR") + "</b> " + (en ? "readings of the Brazilian market since the year 2000." : "leituras do mercado brasileiro desde o ano 2000.") + "</p>" +
+    "<p class=\"a-stats\"><span><b>" + anos + "</b> " + (en ? "years observed" : "anos observados") + "</span><span class=\"sep\">·</span><span><b>" + total.toLocaleString(en ? "en-US" : "pt-BR") + "</b> " + (en ? "readings" : "leituras") + "</span><span class=\"sep\">·</span><span><b>" + (A.viradas || 0) + "</b> " + (en ? "cycle turns" : "grandes viradas") + "</span><span class=\"sep\">·</span><span><b>100%</b> " + (en ? "public" : "públicas") + "</span><span class=\"sep\">·</span><span>" + (en ? "citable archive" : "arquivo citável") + "</span></p></section>" +
+    "<section class=\"respira\" aria-live=\"polite\"><div class=\"lb\">◎ " + (en ? "from the archive" : "do arquivo") + " <span class=\"dots\" id=\"r-dots\"></span></div><p class=\"body\" id=\"r-body\"></p><p class=\"cta\"><a href=\"#\" id=\"r-cta\"></a></p></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "What do you want to discover?" : "O que você quer descobrir?") + "</h2><p class=\"a-lead\">" + (en ? "The archive isn’t browsed by date — it’s browsed by question. The date is just the consequence of the query." : "O arquivo não se navega por data — se navega por pergunta. A data é só a consequência da consulta.") + "</p><div class=\"drawers\" id=\"drawers\"></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "The landscape of risk" : "A paisagem do risco") + "</h2><p class=\"a-lead\">" + (en ? "Twenty-six years of the Perene Risk Index, month by month. Each ridge is a state of the market; each valley, an episode of fear. Hover — click to open the edition." : "Vinte e seis anos do Índice de Risco Perene, mês a mês. Cada relevo é um estado do mercado; cada vale, um episódio de medo. Passe o mouse — clique para abrir a edição.") + "</p><div class=\"paisagem\"><div class=\"pais-scale\"><span>" + (en ? "euphoria · risk-on" : "euforia · risco ligado") + "</span><span>" + (en ? "fear · capitulation" : "medo · capitulação") + "</span></div><div class=\"pais-box\" id=\"pais\"><div class=\"pais-tip\" id=\"tip\"></div></div><div class=\"pais-legend\"><span><i style=\"background:var(--terra)\"></i>" + (en ? "risk-on" : "risco ligado") + "</span><span><i style=\"background:var(--slate)\"></i>" + (en ? "defensive" : "defensivo") + "</span><span><i style=\"background:var(--oliva)\"></i>" + (en ? "neutral" : "neutro") + "</span><span class=\"foot\">" + (en ? "The monthly regime shows in the lower strip; the line is the daily Perene Risk Index, aggregated by month." : "O regime (mensal) aparece na faixa inferior; a linha é o Índice de Risco Perene diário, agregado por mês.") + "</span></div></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "Collections" : "Coleções") + "</h2><p class=\"a-lead\">" + (en ? "The archive organized by phenomenon — not by calendar. This is where the edge lives: how many times it has already happened." : "O arquivo organizado por fenômeno — não por calendário. É aqui que mora o diferencial: quantas vezes já aconteceu.") + "</p>" +
+    "<div class=\"cols\"><div class=\"col\"><span class=\"k\">" + (en ? "Extreme regimes" : "Regimes extremos") + "</span><div class=\"big blue\">" + (A.ge90 || 0).toLocaleString(en ? "en-US" : "pt-BR") + "</div><h3>" + (en ? "times the Perene Index passed 90" : "vezes o Índice Perene passou de 90") + "</h3><p>" + (en ? "Risk appetite at the top of the scale — from January 2000 to today. And <b>" + (A.le10 || 0).toLocaleString('en-US') + "</b> times it hit the floor (≤10): capitulation." : "O apetite ao risco no topo da escala — de janeiro de 2000 à edição de hoje. E <b>" + (A.le10 || 0).toLocaleString('pt-BR') + "</b> vezes ele tocou o piso (≤10): a capitulação.") + "</p><a class=\"go\" href=\"#drawers\">" + (en ? "Explore the extremes →" : "Explorar os extremos →") + "</a></div>" +
+    "<div class=\"col r\"><span class=\"k\">" + (en ? "Cycle turns" : "Viradas de ciclo") + "</span><div class=\"big\">" + (A.viradas || 0) + "</div><h3>" + (en ? "regime changes since 2010" : "mudanças de regime desde 2010") + "</h3><p>" + (en ? "When the market changed its structural mood." : "Quando o mercado trocou de humor estrutural.") + "</p><a class=\"go\" href=\"#drawers\">" + (en ? "Explore the turns →" : "Explorar as viradas →") + "</a></div>" +
+    "<div class=\"col\" style=\"grid-column:1/-1;border-left:0;padding-right:0\"><span class=\"k\">" + (en ? "Classic cases" : "Casos clássicos") + "</span><h3 style=\"margin-bottom:10px\">" + (en ? "The market’s history, by event" : "A história do mercado, por acontecimento") + "</h3><div class=\"classics\" id=\"classics\"></div></div></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "Explore by period" : "Explorar por período") + "</h2><p class=\"a-lead\">" + (en ? "Twenty-six years, not six thousand lines. Each year is a chapter." : "Vinte e seis anos, não seis mil linhas. Cada ano é um capítulo.") + "</p><div class=\"years\" id=\"years\"></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "Start here" : "Comece por aqui") + "</h2><p class=\"a-lead\">" + (en ? "Doors in for those who don’t yet know what to look for." : "Portas de entrada para quem não sabe o que procurar.") + "</p><div class=\"entries\" id=\"entries\"></div>" +
+    "<p class=\"legend-sym\"><b class=\"ex\">●</b> " + (en ? "extreme" : "extremo") + " · <b class=\"re\">◐</b> " + (en ? "recurring" : "recorrente") + " · <b class=\"fi\">○</b> " + (en ? "first occurrence" : "primeira ocorrência") + " — " + (en ? "the reader learns the symbols over time, without a legend." : "o leitor aprende os símbolos com o tempo, sem legenda.") + "</p></section>" +
+    "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:30px 0 0\"></div>" +
+    "<p class=\"a-note\">" + (en ? "Public, citable archive · daily Perene Risk Index 2000–2026, monthly regime 2010–2026. Descriptive, never a forecast or recommendation. Public sources." : "Arquivo público e citável · Índice de Risco Perene diário 2000–2026, regime mensal 2010–2026. Descritivo, nunca previsão ou recomendação. Fontes públicas.") + "</p>" +
+    "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← All daily editions" : "← Todas as edições diárias") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · <a href=\"/\">" + (en ? "Full radar" : "Radar completo") + "</a></footer>";
+  const script = "<script>window.ATLAS=" + JSON.stringify(client).replace(/</g, "\\u003c") + ";</script>" + _ATLAS_JS + "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT;
+  return new Response(head + body + script + "</body></html>", { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+}
 function _renderDiarioIndex(data, origin, lang) {
   const en = lang === "en";
   const itens = data.itens || [];
@@ -796,6 +948,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}ul.dlist .mn{color:var(--dim)}") +
     "</head><body>" + _header(en) + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
+    "<p class=\"atlasl\" style=\"margin:.2rem 0 1rem\"><a href=\"/atlas\" style=\"color:var(--gold-ink);font-weight:600;text-decoration:none\">" + (en ? "◎ Explore the archive as an Atlas — by regime, extreme, crisis, landscape →" : "◎ Explore o arquivo como Atlas — por regime, extremo, crise, paisagem →") + "</a></p>" +
     "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on. The BR regime score is monthly by construction — it only moves at month-end, so it repeats within a month; the daily variation (Perene Risk Index, Ânima, intermarket) lives inside each day’s page." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí. O score do regime BR é mensal por construção — só se move no fecho do mês, então repete dentro do mês; a variação diária (Índice de Risco Perene, Ânima, intermercado) está dentro da página de cada dia.") + "</p>" +
     "<ul class=\"dlist\">" + rows + "</ul>" +
     "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 0\"></div>" +
@@ -1044,6 +1197,14 @@ async function _route(request, env, ctx) {
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
     // ── /diario | /daily — índice cronológico do arquivo diário citável (EN usa /daily) ──
+    // ── /atlas — Atlas do Mercado Brasileiro (navegação por fenômeno; /diario cronológico continua existindo) ──
+    if (_url.pathname === "/atlas") {
+      try {
+        const r = await _diarioFetch(ATLAS_API + "?lang=" + (_isEN ? "en" : "pt"));
+        if (!r.ok) return env.ASSETS.fetch(request);
+        return _renderAtlas(await r.json(), _url.origin, _isEN ? "en" : "pt");
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
     if (_url.pathname === "/diario" || _url.pathname === "/daily") {
       try {
         const r = await _diarioFetch(SNAPS_API + "?lang=" + (_isEN ? "en" : "pt"));
@@ -1254,6 +1415,8 @@ async function _route(request, env, ctx) {
 
       let rw = new HTMLRewriter();
       rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
+      // ★ barra de topo → Atlas do Mercado Brasileiro (o arquivo como instrumento). Aditiva, no topo do body, lang-aware.
+      rw = rw.on("body", { element(e) { e.prepend('<a href="/atlas" style="display:block;background:#1a1a2e;color:#faf9f6;text-decoration:none;font-family:Inter,system-ui,sans-serif;font-size:13px;text-align:center;padding:9px 16px;line-height:1.4">' + (isEN ? '<b style="color:#d9a441;font-weight:600">New</b> &middot; <b>Atlas of the Brazilian Market</b> — 26 years of the archive, navigable by phenomenon <span style="color:#d9a441">&rarr;</span>' : '<b style="color:#d9a441;font-weight:600">Novo</b> &middot; <b>Atlas do Mercado Brasileiro</b> — 26 anos do acervo, navegável por fenômeno <span style="color:#d9a441">&rarr;</span>') + '</a>', { html: true }); } });
       // canonical/og:url da home POR HOST no HTML cru: o index.html estático nasce com ".com" fixo e só o JS
       //   corrigia em runtime — crawler sem JS (Bing 1ª passada, bots de IA) via o .com.br se declarar duplicata
       //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
