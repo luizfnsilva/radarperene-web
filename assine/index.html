@@ -103,7 +103,6 @@
   @media(max-width:680px){.plans{grid-template-columns:1fr}}
   .plan{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--surface)}
   .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface))}  /* ★ editorial: destaque pelo traço dourado + fundo, sem glow de SaaS (a home reserva sombra a menus, nunca a card de conteúdo) */
-  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold-ink);border-radius:3px;padding:3px 11px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
   .plan .pname{font-family:var(--serif);font-weight:600;font-size:22px;margin:0}
   .plan .amt{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,40px);margin:4px 0 2px}
   .plan .amt small{font-size:.42em;color:var(--dim);font-weight:400}
@@ -138,13 +137,12 @@
     <div class="eyebrow">Assinaturas</div>
     <h1>Escolha como acompanhar o <span class="g">Radar Perene</span></h1>
     <p class="lead">Uma publicação sobre os regimes do mercado brasileiro.</p>
-    <a class="regime-note" id="live-regime" href="/" title="ver ao vivo">Regime do dia · <span class="go">ler a edição aberta →</span></a>
+    <a class="regime-note" id="live-regime" href="/">A leitura de hoje está aberta — <span class="go">leia antes de decidir →</span></a>
   </section>
 
   <section>
     <div class="plans">
       <div class="plan feat">
-        <div class="badge">Edição semanal</div>
         <h2 class="pname">Perene Semanal</h2>
         <div class="amt">R$ 29<small>/mês</small></div>
         <p class="ptag">Uma leitura semanal do mercado brasileiro.</p>
@@ -215,11 +213,6 @@
       if(val&&val.valor!=null)cells.push('<div class="st"><b>'+nf(val.valor,1)+'<small style="font-size:.5em;color:var(--dim)">/100</small></b><span>valuation (abaixo do justo)</span></div>');
       cells.push('<div class="st"><b>26 anos</b><span>de memória, desde 2000</span></div>');
       if(cells.length)live.innerHTML=cells.join("");
-    }
-    // nota de regime no hero (.regime-note)
-    if(rg&&rg.valor!=null){
-      var q=document.getElementById("live-regime");
-      if(q)q.innerHTML='Regime BR hoje · <b>'+nf(rg.valor,1)+'/100 · '+(rg.classificacao||"")+'</b> · <span class="go">ver ao vivo →</span>';
     }
   }).catch(function(){});
 })();
