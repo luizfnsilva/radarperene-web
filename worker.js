@@ -121,6 +121,7 @@ const SNAP_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-ap
 const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshots";
 const ATLAS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/atlas";  // agregação do acervo p/ a /atlas
 const HIST_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/historico";  // track record (leituras maturadas vs desfecho)
+const RECORR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/recorrencia";  // recorrência descritiva por ESTADO (Perene) — o MESMO número da home
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
 
@@ -449,15 +450,14 @@ function _regimeColor(regRaw) {
 //    acervo (Há um ano · Há cinco anos · Primeira vez), via /v1/historico (leituras maturadas × desfecho, Ibov em pontos).
 //    O diário público NÃO reescreve. Regra dura: indicava×aconteceu SEMPRE na MESMA janela (6m). Baixas em tom NEUTRO,
 //    nunca vermelho — "78% confirmada, nem sempre pra cima" constrói mais confiança. Degrada gracioso (sem dado → ""). ──
-function _arquivoLembraHtml(hist, regimeToday, todayDate, en, dpath, regimeColor) {
+function _arquivoLembraHtml(hist, todayPerene, todayDate, en, dpath, regimeColor, rec) {
   const items = (hist && hist.itens) || [];
   if (!items.length) return "";
-  const norm = function (s) { return String(s == null ? "" : s).trim().toLowerCase(); };
-  const rt = norm(regimeToday);
   const matured = function (x) { return x && x.realizado_6m_pct != null && String(x.data).slice(0, 10) < todayDate; };
-  let same = items.filter(function (x) { return matured(x) && (norm(x.regime) === rt || norm(x.regime_key) === rt); });  // casa por rótulo localizado OU cru (regime_key) — robusto em EN reconstruído
-  const mesmoRegime = same.length > 0;
-  if (!mesmoRegime) same = items.filter(matured);   // fallback: acervo maturado (qualquer regime)
+  // similaridade por ESTADO (Índice de Risco Perene ~ igual), não por regime — coerente com o Atlas e a recorrência.
+  const _P0 = (todayPerene != null) ? Number(todayPerene) : null, BANDA = 10;
+  let same = (_P0 != null) ? items.filter(function (x) { return matured(x) && x.perene != null && Math.abs(Number(x.perene) - _P0) <= BANDA; }) : [];
+  if (!same.length) same = items.filter(matured);   // fallback: acervo maturado (qualquer estado)
   if (!same.length) return "";
   same.sort(function (a, b) { return String(a.data) < String(b.data) ? -1 : 1; });  // asc por data
   const ym = function (d) { return parseInt(String(d).slice(0, 4), 10) * 12 + parseInt(String(d).slice(5, 7), 10); };
@@ -503,16 +503,14 @@ function _arquivoLembraHtml(hist, regimeToday, todayDate, en, dpath, regimeColor
     return "<li class=\"arq-no arq-one\"><div class=\"arq-top\"><span class=\"arq-sym o\">○</span><span class=\"arq-quando o\">" + _esc(p.lbl) + "</span><span class=\"arq-data\">" + edate(d, false) + "</span></div>" +
       "<div class=\"arq-oneline\">" + traj + " · <a href=\"" + dpath + "/" + d + "\">" + (en ? "reread →" : "reler →") + "</a></div></li>";
   }).join("");
-  const _rlab = regimeToday ? (en ? "<b>" + _esc(regimeToday) + "</b> regime" : "<b>regime " + _esc(regimeToday) + "</b>") : (en ? "regime" : "regime");
-  const intro = en ? "Other times in this same " + _rlab + " — what the Radar read, and what followed."
-                   : "Outras vezes neste mesmo " + _rlab + " — o que o Radar leu, e o que veio depois.";
-  // track record honesto: o MESMO número da casa (/historico = 36 recentes), recomputado das 36 leituras mais
-  //   novas do próprio payload (o fetch traz até 600 p/ os nós antigos; o stat fica estável em ~78%, não 63% do acervo inteiro).
-  const _rec = (items || []).slice(0, 36).filter(function (x) { return x && x.direcao_confirmou != null; });
-  const nComp = _rec.length, conf = nComp ? Math.round(_rec.filter(function (x) { return x.direcao_confirmou; }).length / nComp * 100) : null;
-  const foot = (nComp && conf != null)
-    ? (en ? "Across <b>" + nComp + "</b> matured readings, the reading’s direction held <b>" + conf + "%</b> of the time — <em>not always upward</em>. "
-          : "Em <b>" + nComp + "</b> fechamentos já maturados, a direção da leitura se confirmou em <b>" + conf + "%</b> das vezes — <em>nem sempre para cima</em>. ")
+  const intro = en ? "Other times the archive saw the market in a state like today’s — what came next."
+                   : "Outras vezes em que o arquivo viu o mercado num estado como o de hoje — o que veio depois.";
+  // RECORRÊNCIA (descritiva, o MESMO número da home): "de N vezes num estado como hoje, o Ibov subiu em X%". Sujeito = o
+  //   MERCADO (não o Radar); o arquivo é a testemunha. O "78% direção confirmada" (acurácia) vive só no /historico.
+  const _m = rec && rec.mediana_6m != null ? (en ? " — median " : " — mediana ") + (rec.mediana_6m >= 0 ? "+" : "") + (en ? rec.mediana_6m : String(rec.mediana_6m).replace(".", ",")) + "%" : "";
+  const foot = (rec && rec.n && rec.alta_pct != null)
+    ? (en ? "In <b>" + rec.n + "</b> times the archive saw the market in a state like today’s since 2000, the Ibovespa was higher six months later <b>" + rec.alta_pct + "%</b> of the time" + _m + " — <em>not always upward</em>. "
+          : "Em <b>" + rec.n + "</b> vezes que o arquivo viu o mercado num estado como o de hoje, desde 2000, o Ibovespa esteve mais alto seis meses depois em <b>" + rec.alta_pct + "%</b> delas" + _m + " — <em>nem sempre para cima</em>. ")
     : "";
   const style = regimeColor ? " style=\"border-left-color:" + regimeColor + "\"" : "";
   return "<section class=\"arquivo\" id=\"arquivo\"" + style + "><div class=\"arq-h\">" + (en ? "The Archive Remembers" : "O Arquivo Lembra") + " <span class=\"arq-mk\">◎</span></div>" +
@@ -712,7 +710,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     if (_first && _first.slice(0, 30).toLowerCase() !== _mm.slice(0, 30).toLowerCase()) deckHtml = "<p class=\"deck\">" + _esc(_first) + "</p>";
   }
   // O Arquivo Lembra — timeline do MESMO regime (via nav.historico); degrada p/ os 2 links estáticos se sem dado
-  const arquivoHtml = _arquivoLembraHtml(nav.historico, regimeToday, date, en, dpath, regimeColor) || _lembraHtml(date, en);
+  const arquivoHtml = _arquivoLembraHtml(nav.historico, _pP, date, en, dpath, regimeColor, nav.recorrencia) || _lembraHtml(date, en);
   const arquivoIsTimeline = arquivoHtml.indexOf('class="arquivo"') >= 0;
   // O Que Costuma Vir Depois (casos análogos) + O Que Chamou Atenção Hoje (voz) — rótulos de coluna
   const costumaHtml = pfHtml ? "<section id=\"depois\"><span class=\"sec-lb\">" + (en ? "What Usually Comes Next" : "O Que Costuma Vir Depois") + "</span>" + pfHtml + "</section>" : "";
@@ -1252,6 +1250,8 @@ async function _route(request, env, ctx) {
         } catch (e) { /* opcional */ }
         // "O Arquivo Lembra" — acervo maturado inteiro p/ a timeline do mesmo regime (degrada gracioso se falhar)
         try { const hr = await _diarioFetch(HIST_API + "?limit=600&lang=" + (_isEN ? "en" : "pt")); if (hr.ok) nav.historico = await hr.json(); } catch (e) { /* opcional */ }
+        // recorrência por ESTADO (Perene) daquela data — o rodapé do Arquivo casa 1:1 com a home; date-parametrizada, determinística
+        try { const rr = await _diarioFetch(RECORR_API + "?date=" + _dm[1]); if (rr.ok) { const rj = await rr.json(); if (rj && rj.n) nav.recorrencia = rj; } } catch (e) { /* opcional */ }
         return _renderDiarioDia(await r.json(), _dm[1], _url.origin, _isEN ? "en" : "pt", nav);
       } catch (e) { return env.ASSETS.fetch(request); }
     }

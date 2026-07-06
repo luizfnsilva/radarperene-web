@@ -1788,7 +1788,12 @@
               : (L ? 'A <b>' + esc(g.brasil.regime) + '</b> regime in Brazil.' : 'Regime <b>' + esc(g.brasil.regime) + '</b> no Brasil.');
           }
           var _sub = '';
-          if (_ab0 && _ab0.mediana_ret_pct != null) { var _m0 = (_ab0.mediana_ret_pct >= 0 ? '+' : '') + esc(_ab0.mediana_ret_pct) + '%';
+          // sub do herói: recorrência do ACERVO por estado (mesmo nº do herói/Diário) quando houver; senão o k-NN
+          var _r0 = rr.recorrencia && rr.recorrencia.n ? rr.recorrencia : null;
+          if (_r0) { var _m0r = (_r0.mediana_6m >= 0 ? '+' : '') + (L ? esc(_r0.mediana_6m) : esc(String(_r0.mediana_6m).replace('.', ','))) + '%';
+            _sub = (L ? 'Across the archive, the Ibovespa was higher six months later <b>' + _r0.alta_pct + '%</b> of the times in a state like today&rsquo;s — median <b>' + _m0r + '</b>.'
+                      : 'No acervo, em <b>' + _r0.alta_pct + '%</b> das vezes num estado como o de hoje o Ibovespa esteve mais alto seis meses depois — mediana <b>' + _m0r + '</b>.'); }
+          else if (_ab0 && _ab0.mediana_ret_pct != null) { var _m0 = (_ab0.mediana_ret_pct >= 0 ? '+' : '') + esc(_ab0.mediana_ret_pct) + '%';
             _sub = (L ? 'Comparable regimes delivered a <b>' + _m0 + '</b> median for the Ibovespa over six months' + (_ab0.hit_rate_pct != null ? ', <b>' + esc(_ab0.hit_rate_pct) + '%</b> of them positive.' : '.')
                       : 'Regimes semelhantes entregaram mediana de <b>' + _m0 + '</b> para o Ibovespa em seis meses' + (_ab0.hit_rate_pct != null ? ', <b>' + esc(_ab0.hit_rate_pct) + '%</b> deles positivos.' : '.')); }
           _heroTxt = '<div class="rp-hero"><div class="rp-hero-lead">' + _lead + '</div>' + (_sub ? '<div class="rp-hero-sub">' + _sub + '</div>' : '') + '</div>';
@@ -1871,12 +1876,19 @@
     // ★ "Hoje lembra" (analogo_br) — SOBE para o núcleo (clímax do Cérebro 1: onde estamos → por quê → com o que se parece)
     var _hojelembra = '';
     if (show("analogo_br") && rr.analogo_br) { var ab = rr.analogo_br;
+      // ★ RECORRÊNCIA (2026-07-06, dono): a estatística vem do ACERVO INTEIRO por ESTADO (Perene), varia por dia e é o
+      //   MESMO número do rodapé do Diário. As datas-análogas (k-NN) permanecem como TEXTURA ("hoje lembra") + capítulo nomeado.
+      //   Sem recorrência no payload → cai no k-NN (n fixo). Voz = HISTÓRIA ("o que aconteceu"), não acerto do Radar.
+      var _rec = rr.recorrencia && rr.recorrencia.n ? rr.recorrencia : null;
+      var _rn = _rec ? _rec.n : ab.n_analogos, _rhit = _rec ? _rec.alta_pct : ab.hit_rate_pct, _rmed = _rec ? _rec.mediana_6m : ab.mediana_ret_pct;
       // ★ P1 (2026-06-18): "Hoje lembra" UNIFICADO como herói editorial — em TODO contexto (mini + radar completo).
       //   Ordem do mock do dono: HOJE LEMBRA → datas → frase-líder (números em destaque, subordinados) → assinatura → "Ver episódios →".
-      var _med = (ab.mediana_ret_pct >= 0 ? "+" : "") + esc(ab.mediana_ret_pct) + "%";
-      var _lead = L
-        ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(ab.hit_rate_pct) + '%</b> positive episodes (n=' + esc(ab.n_analogos) + ').')
-        : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(ab.hit_rate_pct) + '%</b> de episódios positivos (n=' + esc(ab.n_analogos) + ').');
+      var _med = (_rmed >= 0 ? "+" : "") + (L ? esc(_rmed) : esc(String(_rmed).replace(".", ","))) + "%";  // PT usa vírgula decimal
+      var _lead = _rec
+        ? (L ? ('In <b>' + _rn + '</b> times the archive saw the market in a state like today&rsquo;s since 2000, the Ibovespa was higher six months later <b>' + _rhit + '%</b> of the time — median <b>' + _med + '</b>. Not always upward.')
+             : ('De <b>' + _rn + '</b> vezes que o arquivo viu o mercado num estado como o de hoje, desde 2000, o Ibovespa esteve mais alto seis meses depois em <b>' + _rhit + '%</b> delas — mediana <b>' + _med + '</b>. Nem sempre para cima.'))
+        : (L ? ('Regimes resembling today&rsquo;s produced a <b>' + _med + '</b> median for the Ibovespa over six months, with <b>' + esc(_rhit) + '%</b> positive episodes (n=' + esc(_rn) + ').')
+             : ('Regimes semelhantes ao atual produziram mediana de <b>' + _med + '</b> para o Ibovespa em seis meses, com <b>' + esc(_rhit) + '%</b> de episódios positivos (n=' + esc(_rn) + ').'));
       // ★ P4/teia 2026-06-18: máquina de precedentes — Hoje lembra → episódio NOMEADO. Lê o registro DINÂMICO (RP_EP_DYN, de
       //   /artigos/episodes-index.json, que o pipeline regenera com os 140) e cai no mapa inline (7 marquee) como fallback.
       var RP_EP = { "2011": { pt: "crise-europeia-2011-discordia", en: "the-2011-european-crisis-as-discord", tp: "A crise europeia de 2011", te: "The 2011 European crisis" }, "2013": { pt: "taper-tantrum-2013-susto-importado", en: "the-2013-taper-tantrum-imported-shock", tp: "O taper tantrum de 2013", te: "The 2013 taper tantrum" }, "2015": { pt: "os-tres-alarmes-de-agosto-2015", en: "the-three-alarms-of-august-2015", tp: "Os três alarmes de agosto de 2015", te: "The three alarms of August 2015" }, "2016": { pt: "fundo-de-2016-estrutura-antes-do-humor", en: "the-2016-bottom-structure-before-mood", tp: "O fundo de 2016", te: "The 2016 bottom" }, "2018": { pt: "caminhoneiros-2018-dinheiro-antes-da-fe", en: "the-2018-truckers-strike-money-before-faith", tp: "A greve dos caminhoneiros de 2018", te: "The 2018 truckers' strike" }, "2020": { pt: "o-que-aconteceu-depois-medo-precificou-tudo", en: "what-happened-after-fear-priced-everything", tp: "Quando o medo precificou tudo", te: "When fear priced everything" }, "2022": { pt: "a-casa-as-escuras-2022", en: "the-house-in-the-dark-2022", tp: "A casa às escuras, fim de 2022", te: "The house in the dark, late 2022" } };
@@ -1892,8 +1904,8 @@
         // ★ 2026-06-21 (dono): CARTAZ vertical — número gigante (hit-rate) protagonista, mediana subordinada, "Hoje lembra" entre
         //   filetes (coluna do Economist). Auto-intitulado ("Leitura do Radar") p/ o screenshot viajar sozinho. Honesto em qualquer
         //   regime: o % é dos episódios POSITIVOS (se vier baixo, o cartaz conta a verdade do regime negativo).
-        var _pwarn = (ab.n_analogos && ab.n_analogos < 20)
-          ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ')</div>' : '';
+        var _pwarn = (_rn && _rn < 20)
+          ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(_rn) + ')</div>' : '';
         // ★ 2026-06-21 v7 (dono): "página do Economist". Citação estatística — a FRASE é protagonista (Newsreader grande, 2 períodos),
         //   números dentro do texto. Byline discreto. Rodapé HUMANO ("N episódios observados"). Marca d'água = ÍCONE OFICIAL (mapa do
         //   Brasil pontilhado) preenchendo o vazio à direita, na mesma faixa da porta (não um carimbo genérico embaixo → economiza altura).
@@ -1904,17 +1916,23 @@
           var MES = L ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
           var mo = parseInt(m[2], 10) - 1, dd = parseInt(m[3], 10);
           _pdt = L ? (" · reading of " + MES[mo] + " " + dd + ", " + m[1]) : (" · leitura de " + dd + " de " + MES[mo] + " de " + m[1]); })();
-        var _pnote = esc(ab.n_analogos) + (L ? " episodes observed" : " episódios observados") + esc(_pdt) + (L ? " · historical distribution, not a forecast." : " · distribuição histórica, não previsão.");
+        var _pnote = (_rec ? (esc(_rn) + (L ? " episodes in the archive since 2000" : " episódios no acervo desde 2000")) : (esc(_rn) + (L ? " episodes observed" : " episódios observados"))) + esc(_pdt) + (L ? " · historical distribution, not a forecast." : " · distribuição histórica, não previsão.");
         var _qn = function (s) { return '<b class="rp-qn">' + s + '</b>'; };
-        var _q1 = L ? (_qn(esc(ab.hit_rate_pct) + '%') + ' of comparable episodes ended positive.') : (_qn(esc(ab.hit_rate_pct) + '%') + ' dos episódios semelhantes terminaram positivos.');
-        var _q2 = L ? ('When that happened, the median for the Ibovespa over six months was ' + _qn(_med) + '.') : ('Quando isso aconteceu, a mediana do Ibovespa em seis meses foi ' + _qn(_med) + '.');
+        var _q1 = _rec
+          ? (L ? (_qn(_rhit + '%') + ' of the times the market was in a state like today&rsquo;s, the Ibovespa was higher six months later.') : (_qn(_rhit + '%') + ' das vezes em que o mercado esteve num estado como o de hoje, o Ibovespa estava mais alto seis meses depois.'))
+          : (L ? (_qn(esc(_rhit) + '%') + ' of comparable episodes ended positive.') : (_qn(esc(_rhit) + '%') + ' dos episódios semelhantes terminaram positivos.'));
+        var _q2 = _rec
+          ? (L ? ('The median was ' + _qn(_med) + ' — not always upward.') : ('A mediana foi ' + _qn(_med) + ' — nem sempre para cima.'))
+          : (L ? ('When that happened, the median for the Ibovespa over six months was ' + _qn(_med) + '.') : ('Quando isso aconteceu, a mediana do Ibovespa em seis meses foi ' + _qn(_med) + '.'));
         // ★ 2026-06-21 (dono): o botão de compartilhar NÃO fica no card (caía sobre a logo) — vive no home, na faixa de CTAs (oposto
         //   ao "Assinar"). Aqui só EXPOMOS os dados da descoberta de hoje num global; o home monta o menu com os links diretos das redes.
         var _sdts = (ab.datas_analogas && ab.datas_analogas.length) ? ab.datas_analogas.join(" · ") : "";
         var _shareUrl = chrome ? rpBacklink(mkt, lang) : ((typeof location !== "undefined" && location.origin) ? (location.origin + location.pathname) : rpBacklink(mkt, lang));
-        var _shareText = L
-          ? ("Today resembles " + _sdts + " — " + ab.hit_rate_pct + "% of comparable episodes ended positive; median " + _med + " over six months. — Radar Perene")
-          : ("Hoje lembra " + _sdts + " — " + ab.hit_rate_pct + "% dos episódios semelhantes terminaram positivos; mediana " + _med + " em seis meses. — Radar Perene");
+        var _shareText = _rec
+          ? (L ? ("In " + _rn + " times the market was in a state like today's since 2000, the Ibovespa was higher six months later " + _rhit + "% of the time; median " + _med + ". — Radar Perene")
+               : ("De " + _rn + " vezes num estado como o de hoje desde 2000, o Ibovespa esteve mais alto seis meses depois em " + _rhit + "%; mediana " + _med + ". — Radar Perene"))
+          : (L ? ("Today resembles " + _sdts + " — " + _rhit + "% of comparable episodes ended positive; median " + _med + " over six months. — Radar Perene")
+               : ("Hoje lembra " + _sdts + " — " + _rhit + "% dos episódios semelhantes terminaram positivos; mediana " + _med + " em seis meses. — Radar Perene"));
         if (typeof window !== "undefined") { window.RP_LEITURA_SHARE = { url: _shareUrl, text: _shareText, title: (L ? "Radar Perene — The Radar Reading" : "Radar Perene — Leitura do Radar"), lang: lang };
           try { window.dispatchEvent(new Event("rp-leitura-share")); } catch (e) {} }
         _hojelembra += '<div class="rp-hle rp-poster">' +
@@ -1933,7 +1951,7 @@
         (_dts ? '<div class="hl-d">' + _dts + '</div>' : '') +
         '<p class="hl-lead">' + _lead + '</p>' +
         _epLine +
-        (ab.n_analogos && ab.n_analogos < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(ab.n_analogos) + ') · ±' + Math.round(200 * Math.sqrt((ab.hit_rate_pct / 100) * (1 - ab.hit_rate_pct / 100) / ab.n_analogos)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
+        (_rn && _rn < 20 ? '<div class="hl-warn">⚠ ' + (L ? "small sample (n=" : "amostra pequena (n=") + esc(_rn) + ') · ±' + Math.round(200 * Math.sqrt((_rhit / 100) * (1 - _rhit / 100) / _rn)) + 'pp — ' + (L ? "wide uncertainty, distribution not a forecast" : "incerteza larga, distribuição não previsão") + '</div>' : '') +
         '<div class="hl-s">' + _foot + '</div>' +
         '<a class="hl-ep" href="' + _epHref + '">' + _epTxt + '</a>' +
         '</div>';
