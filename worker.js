@@ -6,7 +6,8 @@
 // Amostras semanais públicas (free) — datas que têm página estática /semanal/<data> (·/weekly no .com).
 // Manual: o dono publica uma amostra vez ou outra p/ girar X/LinkedIn e gerar credibilidade. Para cada nova:
 //   1) criar /semanal/<data>/index.html (+ /weekly/<data>/index.html EN); 2) adicionar "<data>" aqui.
-// Na /diario/<data> dessas datas, visitante FREE vê um link p/ a amostra; ASSINANTE não (já recebe o semanal completo → sem duplicar).
+// Na /diario/<data>, visitante FREE vê um link p/ a amostra — a da própria semana quando existir, senão a mais
+// recente da lista (a estante fica sempre visível); ASSINANTE não (já recebe o semanal completo → sem duplicar).
 const WEEKLY_SAMPLE_DATES = ["2026-06-12"];
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
 const EN_DESC = "A living archive of Brazil's markets: daily, weekly and monthly reports and a library of precedents — to read the present in light of the past.";
@@ -387,19 +388,20 @@ function _diarioFetch(url) {
 //    dos números (server-rendered). Anon/free → gancho + CTA. DEFENSIVO: try/catch — se o script
 //    falhar, a página numérica (já no HTML) fica intacta. A página é edge-cacheada; o conteúdo
 //    gateado vem por fetch per-user (não cacheado), casando com o Vary:Authorization do edge.
-function _memoGate(date, hasWeekly) {
+function _memoGate(date, sampleDate) {
   const J = JSON.stringify;
   // #rp-weekly: banner client-side p/ a amostra semanal FREE (/semanal/<data> ·/weekly no .com). Só aparece
   //   p/ visitante NÃO-assinante (assinante recebe o semanal completo → não duplica). Default oculto; revelado
   //   por JS conforme o status da sessão (mesma detecção do memo: corpo_md no /v1/biblioteca/item ⇒ assinante).
+  //   sampleDate = data da amostra a linkar (a da semana do diário ou a mais recente); null → sem banner.
   return '<div id="rp-weekly" class="wsamplebox" style="display:none"></div>' +
     '<div id="rp-memo" class="memo"></div>' +
     '<script src="/vendor/supabase-js/supabase.min.js"></script>' +
     '<script>(function(){if(!window.supabase)return;' +
     'var box=document.getElementById("rp-memo");if(!box)return;' +
     'var EN=/radarperene\\.com$/i.test(location.hostname)&&!/\\.com\\.br$/i.test(location.hostname);' +
-    'var ANON=' + J(NARR_ANON) + ',DATE=' + J(date) + ',HASW=' + (hasWeekly ? "true" : "false") + ';' +
-    'function showW(){if(!HASW)return;var w=document.getElementById("rp-weekly");if(!w)return;var u=(EN?"/weekly/":"/semanal/")+DATE+"/";w.innerHTML=\'<a class="wsample" href="\'+u+\'"><span class="wt">\'+(EN?"Weekly report \\u00b7 free sample":"Relat\\u00f3rio semanal \\u00b7 amostra aberta")+\'</span><span class="wd">\'+(EN?"The week on one page \\u2014 read the free sample \\u2192":"A semana em uma p\\u00e1gina \\u2014 leia a amostra gratuita \\u2192")+\'</span></a>\';w.style.display="block";}' +
+    'var ANON=' + J(NARR_ANON) + ',DATE=' + J(date) + ',WDATE=' + J(sampleDate || null) + ';' +
+    'function showW(){if(!WDATE)return;var w=document.getElementById("rp-weekly");if(!w)return;var u=(EN?"/weekly/":"/semanal/")+WDATE+"/";w.innerHTML=\'<a class="wsample" href="\'+u+\'"><span class="wt">\'+(EN?"Weekly report \\u00b7 free sample":"Relat\\u00f3rio semanal \\u00b7 amostra aberta")+\'</span><span class="wd">\'+(EN?"The week on one page \\u2014 read the free sample \\u2192":"A semana em uma p\\u00e1gina \\u2014 leia a amostra gratuita \\u2192")+\'</span></a>\';w.style.display="block";}' +
     'function hideW(){var w=document.getElementById("rp-weekly");if(w)w.style.display="none";}' +
     'var sb=window.supabase.createClient("https://zcjtkgltrxdnlacezpny.supabase.co",ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});' +
     'function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}' +
@@ -551,8 +553,8 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     inArticleSlot +
     pfHtml +
     multiplexSlot +
-    _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0) +
-    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a></p>" +
+    _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0 ? date : (WEEKLY_SAMPLE_DATES[WEEKLY_SAMPLE_DATES.length - 1] || null)) +
+    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a></p>" +
     ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " →</a>" : "<span></span>") + "</p>" : "") +
     "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
     "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT + "</body></html>";
