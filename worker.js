@@ -448,7 +448,7 @@ function _regimeColor(regRaw) {
 //    acervo (Há um ano · Há cinco anos · Primeira vez), via /v1/historico (leituras maturadas × desfecho, Ibov em pontos).
 //    O diário público NÃO reescreve. Regra dura: indicava×aconteceu SEMPRE na MESMA janela (6m). Baixas em tom NEUTRO,
 //    nunca vermelho — "78% confirmada, nem sempre pra cima" constrói mais confiança. Degrada gracioso (sem dado → ""). ──
-function _arquivoLembraHtml(hist, regimeToday, todayDate, en, dpath) {
+function _arquivoLembraHtml(hist, regimeToday, todayDate, en, dpath, regimeColor) {
   const items = (hist && hist.itens) || [];
   if (!items.length) return "";
   const norm = function (s) { return String(s == null ? "" : s).trim().toLowerCase(); };
@@ -474,51 +474,81 @@ function _arquivoLembraHtml(hist, regimeToday, todayDate, en, dpath) {
   add(en ? "Five years ago" : "Há cinco anos", nearest(60, 24));  // ±2 anos do alvo de 5 anos (marco grosso)
   add(en ? "First time in the archive" : "Primeira vez no arquivo", same[0]);
   if (!picks.length) return "";
-  const nf = function (v) { return v == null ? null : Math.round(Number(v)).toLocaleString(en ? "en-US" : "pt-BR"); };  // Ibov em pontos, separador de milhar local
-  const sgn = function (v) { return v == null ? "—" : (v >= 0 ? "+" : "") + v + "%"; };
-  const nodes = picks.map(function (p) {
-    const x = p.n, d = String(x.data).slice(0, 10);
-    const anc = nf(x.ibov_ancora), fim6 = nf(x.ibov_nivel_6m);
-    const estado = (en ? "Regime " : "Regime ") + _esc(x.regime || "—") + (anc ? " · Ibov " + anc + " pts" : "");
-    const linInd = x.previsto_6m_pct != null
-      ? "<div class=\"arq-lin\"><span>" + (en ? "the archive suggested" : "o arquivo indicava") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + (en ? "median " : "mediana ") + sgn(x.previsto_6m_pct) + "</span></div>"
-      : "";
-    const linAcc = "<div class=\"arq-lin\"><span>" + (en ? "what happened" : "o que aconteceu") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + (fim6 ? "Ibov " + fim6 + " pts · " : "") + sgn(x.realizado_6m_pct) + "</span></div>";
-    return "<li class=\"arq-no\"><div class=\"arq-top\"><span class=\"arq-quando\">" + _esc(p.lbl) + "</span><span class=\"arq-data\">" + d + "</span></div>" +
-      "<div class=\"arq-estado\">" + estado + "</div>" + linInd + linAcc +
-      "<a class=\"arq-reler\" href=\"" + dpath + "/" + d + "\">" + (en ? "reread this edition →" : "reler a edição →") + "</a></li>";
+  const _MPT = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  const _MEN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const edate = function (d, full) {   // data editorial: full → "31 de julho de 2025"; senão "julho de 2025"
+    const q = String(d).split("-"), mo = (en ? _MEN : _MPT)[(+q[1]) - 1] || q[1];
+    if (!full) return en ? mo + " " + q[0] : mo + " de " + q[0];
+    return en ? mo + " " + (+q[2]) + ", " + q[0] : (+q[2]) + " de " + mo + " de " + q[0];
+  };
+  const nf = function (v) { return v == null ? null : Math.round(Number(v)).toLocaleString(en ? "en-US" : "pt-BR"); };  // Ibov em pontos, separador local
+  const pct = function (v) { return v == null ? null : Math.round(Number(v)); };  // % ARREDONDADO ao inteiro (editorial)
+  const sgnv = function (v) { const r = pct(v); return r == null ? "—" : (r >= 0 ? "+" : "") + r + "%"; };
+  const gain = function (v) {   // ganho em terracota (warm), baixa em tom NEUTRO — nunca vermelho
+    const r = pct(v); if (r == null) return "—";
+    return "<span class=\"arq-pct" + (r >= 0 ? " up" : "") + "\">" + (r >= 0 ? "+" : "") + r + "%</span>";
+  };
+  // FEATURED = picks[0] (Há um ano, quando existe) — foto detalhada; os demais = one-liners (○).
+  const feat = picks[0], fx = feat.n, fd = String(fx.data).slice(0, 10);
+  const fAnc = nf(fx.ibov_ancora), fFim = nf(fx.ibov_nivel_6m);
+  const featHtml = "<li class=\"arq-no arq-feat\"><div class=\"arq-top\"><span class=\"arq-sym\">●</span><span class=\"arq-quando\">" + _esc(feat.lbl) + "</span><span class=\"arq-data\">" + edate(fd, true) + "</span></div>" +
+    (fAnc ? "<div class=\"arq-lin\"><span>" + (en ? "Ibovespa that day" : "Ibovespa no dia") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + fAnc + " pts</span></div>" : "") +
+    (fx.previsto_6m_pct != null ? "<div class=\"arq-lin\"><span>" + (en ? "the archive suggested" : "o arquivo indicava") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + sgnv(fx.previsto_6m_pct) + (en ? " in 6m" : " em 6 meses") + " <em>" + (en ? "hist. median" : "mediana histórica") + "</em></span></div>" : "") +
+    "<div class=\"arq-lin\"><span>" + (en ? "what happened in 6 months" : "o que aconteceu em 6 meses") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + (fFim ? fFim + " pts " : "") + "(" + gain(fx.realizado_6m_pct) + ")</span></div>" +
+    "<a class=\"arq-reler\" href=\"" + dpath + "/" + fd + "\">" + (en ? "Reread the edition of " : "Reler a edição de ") + edate(fd, true) + " →</a></li>";
+  const oneHtml = picks.slice(1).map(function (p) {
+    const x = p.n, d = String(x.data).slice(0, 10), a = nf(x.ibov_ancora), f = nf(x.ibov_nivel_6m);
+    const traj = (a && f) ? "Ibovespa " + a + " → " + f + " pts (" + gain(x.realizado_6m_pct) + (en ? " in 6m)" : " em 6m)") : "(" + gain(x.realizado_6m_pct) + (en ? " in 6m)" : " em 6m)");
+    return "<li class=\"arq-no arq-one\"><div class=\"arq-top\"><span class=\"arq-sym o\">○</span><span class=\"arq-quando o\">" + _esc(p.lbl) + "</span><span class=\"arq-data\">" + edate(d, false) + "</span></div>" +
+      "<div class=\"arq-oneline\">" + traj + " · <a href=\"" + dpath + "/" + d + "\">" + (en ? "reread →" : "reler →") + "</a></div></li>";
   }).join("");
-  const sub = mesmoRegime
-    ? (en ? "The same regime, through the archive — what the reading suggested and what the Ibovespa actually did (6-month window)."
-          : "O mesmo regime, através do acervo — o que a leitura indicava e o que o Ibovespa de fato fez (janela de 6 meses).")
-    : (en ? "From the matured archive — what each reading suggested and what the Ibovespa actually did (6-month window)."
-          : "Do acervo já maturado — o que cada leitura indicava e o que o Ibovespa de fato fez (janela de 6 meses).");
-  return "<section class=\"arquivo\" id=\"arquivo\"><h2 class=\"arq-h\"><span class=\"arq-mk\">◎</span> " + (en ? "The Archive Remembers" : "O Arquivo Lembra") + "</h2>" +
-    "<p class=\"arq-sub\">" + sub + "</p><ol class=\"arq-tl\">" + nodes + "</ol>" +
-    "<a class=\"arq-more\" href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Explore the archive →" : "Explorar o arquivo →") + "</a></section>";
+  const _rlab = regimeToday ? (en ? "<b>" + _esc(regimeToday) + "</b> regime" : "<b>regime " + _esc(regimeToday) + "</b>") : (en ? "regime" : "regime");
+  const intro = en ? "Other times the Radar found this same " + _rlab + " — what it read, and what the market did next."
+                   : "Outras vezes em que o Radar encontrou este mesmo " + _rlab + " — o que leu, e o que o mercado fez depois.";
+  // track record honesto: o MESMO número da casa (/historico = 36 recentes), recomputado das 36 leituras mais
+  //   novas do próprio payload (o fetch traz até 600 p/ os nós antigos; o stat fica estável em ~78%, não 63% do acervo inteiro).
+  const _rec = (items || []).slice(0, 36).filter(function (x) { return x && x.direcao_confirmou != null; });
+  const nComp = _rec.length, conf = nComp ? Math.round(_rec.filter(function (x) { return x.direcao_confirmou; }).length / nComp * 100) : null;
+  const foot = (nComp && conf != null)
+    ? (en ? "Across <b>" + nComp + "</b> matured readings, the reading’s direction held <b>" + conf + "%</b> of the time — <em>not always upward</em>. "
+          : "Em <b>" + nComp + "</b> fechamentos já maturados, a direção da leitura se confirmou em <b>" + conf + "%</b> das vezes — <em>nem sempre para cima</em>. ")
+    : "";
+  const style = regimeColor ? " style=\"border-left-color:" + regimeColor + "\"" : "";
+  return "<section class=\"arquivo\" id=\"arquivo\"" + style + "><div class=\"arq-h\">" + (en ? "The Archive Remembers" : "O Arquivo Lembra") + " <span class=\"arq-mk\">◎</span></div>" +
+    "<p class=\"arq-intro\">" + intro + "</p><ol class=\"arq-tl\">" + featHtml + oneHtml + "</ol>" +
+    "<p class=\"arq-foot\">" + foot + "<a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Explore the archive →" : "Explorar o arquivo →") + "</a></p></section>";
 }
 // ★ Direção Editorial do Diário v1.0 (CONGELADA) — CSS das colunas permanentes. Escopado ao /diario (injetado como
 //   'extra' do _chromeCss só aqui): não regride as outras páginas. Paleta base (marfim/serif) é a compartilhada.
 const _DIARIO_CSS_V1 =
   ":root{--azul:#2c4a6e;--terra:#a85336;--oliva:#6b6a2e}" +
   ':root[data-theme="dark"]{--azul:#7aa6d6;--terra:#d68a6e;--oliva:#b6b46e}' +
-  ".regime-rule{height:2px;border:0;margin:.9rem 0 1.5rem;opacity:.85}" +
+  ".regime-rule{height:3px;border:0;margin:.9rem 0 1.4rem;background:repeating-linear-gradient(90deg,currentColor 0 16px,transparent 16px 24px)}" +   /* cicatrizes: segmentos na cor do regime (currentColor = regimeColor via style inline) */
   ".deck{font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--txt2);max-width:54ch;margin:.2rem 0 1.5rem}" +
   ".sumario{margin:0 0 1.9rem}.sum-lb{font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:.55rem}" +
   ".sumario ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:.35rem 1.5rem}.sumario li{font-family:var(--serif);font-size:15.5px}.sumario a{color:var(--txt);text-decoration:none}.sumario a:hover{color:var(--gold-ink)}.sumario .dot{font-size:8px;vertical-align:.2em;margin-right:.45rem}" +
-  ".pulse-i{max-width:16rem}.pulse-id{font-family:var(--serif);font-size:13px;color:var(--dim);font-style:italic;margin:.12rem 0 .35rem;line-height:1.35}" +
+  ".pulse-i{max-width:16rem;border-top:2px solid var(--line);padding-top:.7rem}.pulse-i.perene{border-top-color:var(--azul)}.pulse-i.anima{border-top-color:var(--terra)}.pulse-i.curto{border-top-color:var(--oliva)}" +
+  ".pulse-id{font-family:var(--serif);font-size:13px;color:var(--dim);font-style:italic;margin:.12rem 0 .35rem;line-height:1.35}" +
   ".pulse-i.perene .pulse-nm{color:var(--azul)}.pulse-i.anima .pulse-nm{color:var(--terra)}.pulse-i.curto .pulse-nm{color:var(--oliva)}" +
-  ".pulse-d{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:.35rem}.pulse-d .arw{font-weight:600}.pulse-i.perene .arw{color:var(--azul)}.pulse-i.anima .arw{color:var(--terra)}.pulse-i.curto .arw{color:var(--oliva)}" +
+  ".pulse-int{font-family:var(--serif);font-size:14px;color:var(--txt2);margin:.4rem 0 0;line-height:1.4}" +
+  ".pulse-d{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:.3rem;letter-spacing:.02em}.pulse-d .arw{font-weight:600}.pulse-i.perene .arw{color:var(--azul)}.pulse-i.anima .arw{color:var(--terra)}.pulse-i.curto .arw{color:var(--oliva)}" +
   ".diverg{font-family:var(--serif);font-size:16px;color:var(--txt2);border-top:1px solid var(--line);margin:1.4rem 0 0;padding-top:1.1rem;max-width:60ch}" +
   ".pub{margin:2.2rem 0;border-top:1px solid var(--line);padding-top:.55rem}.pub-lb{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);opacity:.55;margin-bottom:.8rem}" +
   ".sec-lb{font-family:var(--sans);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);display:block;margin:2.2rem 0 .55rem}.sec-body{font-family:var(--serif);font-size:16.5px;line-height:1.7;color:var(--txt2);max-width:64ch}" +
-  ".arquivo{margin:2.6rem 0;border-top:2px solid var(--gold);padding-top:1.3rem}.arq-h{font-family:var(--serif);font-weight:500;font-size:22px;color:var(--txt);display:flex;align-items:center;gap:.5rem;margin:0}.arq-mk{color:var(--gold-ink)}" +
-  ".arq-sub{font-family:var(--serif);font-size:14.5px;color:var(--dim);margin:.35rem 0 1.2rem;max-width:60ch;font-style:italic}.arq-tl{list-style:none;padding:0;margin:0}.arq-no{margin:0 0 1.5rem;padding:0}" +
-  ".arq-top{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.2rem}.arq-quando{font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}.arq-data{font-family:var(--mono);font-size:12px;color:var(--dim)}" +
-  ".arq-estado{font-family:var(--serif);font-size:15.5px;color:var(--txt);margin:.15rem 0 .4rem}.arq-lin{display:flex;align-items:baseline;gap:.5rem;font-size:14px;color:var(--txt2);margin:.22rem 0}.arq-lin .dl{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-.22em);min-width:1.5rem}.arq-v{font-variant-numeric:tabular-nums;color:var(--txt);white-space:nowrap}" +
-  ".arq-reler{display:inline-block;margin-top:.5rem;font-size:13px;color:var(--gold-ink);text-decoration:none}.arq-reler:hover{text-decoration:underline}.arq-more{display:inline-block;margin-top:.4rem;font-size:13.5px;color:var(--gold-ink);text-decoration:none;font-weight:500}.arq-more:hover{text-decoration:underline}" +
+  ".arquivo{margin:2.6rem 0;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;padding:1.3rem 1.4rem}" +
+  ".arq-h{font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 .1rem}.arq-mk{color:var(--gold-ink);font-size:14px}" +
+  ".arq-intro{font-family:var(--serif);font-size:18px;line-height:1.5;color:var(--txt);max-width:56ch;margin:.35rem 0 1.3rem}.arq-intro b{font-weight:600}" +
+  ".arq-tl{list-style:none;padding:0;margin:0}.arq-no{margin:0 0 1.1rem;padding:0}.arq-feat{margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}" +
+  ".arq-top{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.35rem;flex-wrap:wrap}.arq-sym{color:var(--gold-ink);font-size:11px}.arq-sym.o{color:var(--dim)}.arq-quando{font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}.arq-quando.o{color:var(--dim)}.arq-data{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}" +
+  ".arq-lin{display:flex;align-items:baseline;gap:.5rem;font-size:14.5px;color:var(--txt2);margin:.28rem 0}.arq-lin .dl{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-.22em);min-width:1.5rem}.arq-v{font-variant-numeric:tabular-nums;color:var(--txt);white-space:nowrap}.arq-v em{color:var(--dim);font-style:italic;font-size:12.5px}" +
+  ".arq-pct{color:var(--txt);font-weight:600}.arq-pct.up{color:var(--terra)}" +
+  ".arq-oneline{font-size:14.5px;color:var(--txt2);font-variant-numeric:tabular-nums;line-height:1.5}.arq-oneline a{color:var(--gold-ink);text-decoration:none}.arq-oneline a:hover{text-decoration:underline}" +
+  ".arq-reler{display:inline-block;margin-top:.55rem;font-size:13.5px;color:var(--gold-ink);text-decoration:none}.arq-reler:hover{text-decoration:underline}" +
+  ".arq-foot{font-size:13px;color:var(--dim);margin:1.2rem 0 0;line-height:1.6;max-width:60ch}.arq-foot b{color:var(--txt2)}.arq-foot em{font-style:italic}.arq-foot a{color:var(--gold-ink);text-decoration:none}.arq-foot a:hover{text-decoration:underline}" +
   ".voz{margin:.4rem 0 0}.cas{background:none;border:0;border-radius:0;padding:0}.cas>b{display:none}.cas ul{list-style:none;padding:0;margin:.3rem 0 0}.cas .casm{margin-top:.5rem}" +
-  ".colofon{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:1.6rem;letter-spacing:.02em}.colofon .reg{color:var(--txt2)}";
+  ".colofon{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:1.6rem;letter-spacing:.02em}.colofon .reg{color:var(--txt2)}" +
+  ".dt{font-family:var(--sans);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--dim)}.dt b{color:var(--txt2);font-weight:600}" +
+  ".sumario .sum-gate{font-style:italic;color:var(--dim)}.sumario .sum-gate a{color:var(--dim);text-decoration:none}.sumario .sum-gate a:hover{color:var(--gold-ink)}";
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
   const en = lang === "en";
@@ -623,11 +653,20 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   // ★ v1.0: cada índice é um PERSONAGEM — nome + identidade de 1 linha + COR própria (Perene=azul, Ânima estrutural=
   //   terracota, curto=oliva) + movimento sutil ▴/▾/→ com delta "Hoje +N" (Perene/Ânima têm série diária no SNAPS).
   //   Número grande fica em --txt (calma=autoridade); só a marca de direção e o nome levam a cor. Zero gauge/barra.
-  const _arw = (dv) => dv == null ? "" : (dv > 0 ? "▴" : dv < 0 ? "▾" : "→");
-  const _pItem = (nm, ident, n, cls, dv) => n == null ? "" :
-    "<div class=\"pulse-i " + cls + "\"><span class=\"pulse-nm\">" + nm + "</span><span class=\"pulse-id\">" + ident + "</span>" +
-    "<span class=\"pulse-n\">" + n + "<span class=\"pulse-u\">/100</span></span>" +
-    (dv != null ? "<span class=\"pulse-d\"><span class=\"arw\">" + _arw(dv) + "</span> " + (en ? "Today " : "Hoje ") + (dv > 0 ? "+" : "") + dv + "</span>" : "") + "</div>";
+  // movimento: ▲/▾/→ (filled) + delta; nos extremos, "NO TETO"/"NO PISO" em vez do número
+  const _mov = (n, dv) => {
+    if (n >= 100) return "<span class=\"arw\">→</span> <b>" + (en ? "AT THE TOP" : "NO TETO") + "</b>";
+    if (n <= 0) return "<span class=\"arw\">→</span> <b>" + (en ? "AT THE FLOOR" : "NO PISO") + "</b>";
+    if (dv == null) return "";
+    return "<span class=\"arw\">" + (dv > 0 ? "▲" : dv < 0 ? "▾" : "→") + "</span> " + (dv > 0 ? "+" : "") + dv;
+  };
+  const _pItem = (nm, ident, n, cls, dv) => {
+    if (n == null) return "";
+    const mv = _mov(n, dv);
+    return "<div class=\"pulse-i " + cls + "\"><span class=\"pulse-nm\">" + nm + "</span><span class=\"pulse-id\">" + ident + "</span>" +
+      "<span class=\"pulse-n\">" + n + "<span class=\"pulse-u\">/100</span></span>" +
+      (mv ? "<span class=\"pulse-d\">" + (en ? "Today " : "Hoje ") + mv + "</span>" : "") + "</div>";
+  };
   const _pItems =
     _pItem(en ? "Perene Risk Index" : "Índice de Risco Perene", en ? "the market’s structural state" : "o estado estrutural do mercado", _pP, "perene", (nav.dPerene != null ? nav.dPerene : null)) +
     _pItem(en ? "Ânima · structural" : "Índice Ânima · estrutural", en ? "investors’ prevailing mood" : "o humor predominante dos investidores", _pA, "anima", (nav.dAnima != null ? nav.dAnima : null)) +
@@ -661,7 +700,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   // ── ★ Direção Editorial v1.0 (CONGELADA): colunas permanentes, ordem fixa, assinatura de regime. Determinístico. ──
   const regimeToday = regime ? (regime.classificacao || "") : "";
   const regimeColor = _regimeColor(regime && (regime.classificacao || regime.leitura || ""));
-  const fileteHtml = "<div class=\"regime-rule\" style=\"background:" + regimeColor + "\" aria-hidden=\"true\"></div>";
+  const fileteHtml = "<div class=\"regime-rule\" style=\"color:" + regimeColor + "\" aria-hidden=\"true\"></div>";
   // deck (subtítulo) — reusa narr.resumo quando distinto da manchete; senão omite (zero-LLM, sem duplicar)
   let deckHtml = "";
   if (narr.resumo) {
@@ -672,7 +711,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     if (_first && _first.slice(0, 30).toLowerCase() !== _mm.slice(0, 30).toLowerCase()) deckHtml = "<p class=\"deck\">" + _esc(_first) + "</p>";
   }
   // O Arquivo Lembra — timeline do MESMO regime (via nav.historico); degrada p/ os 2 links estáticos se sem dado
-  const arquivoHtml = _arquivoLembraHtml(nav.historico, regimeToday, date, en, dpath) || _lembraHtml(date, en);
+  const arquivoHtml = _arquivoLembraHtml(nav.historico, regimeToday, date, en, dpath, regimeColor) || _lembraHtml(date, en);
   const arquivoIsTimeline = arquivoHtml.indexOf('class="arquivo"') >= 0;
   // O Que Costuma Vir Depois (casos análogos) + O Que Chamou Atenção Hoje (voz) — rótulos de coluna
   const costumaHtml = pfHtml ? "<section id=\"depois\"><span class=\"sec-lb\">" + (en ? "What Usually Comes Next" : "O Que Costuma Vir Depois") + "</span>" + pfHtml + "</section>" : "";
@@ -689,7 +728,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   if (costumaHtml) _sum.push(["#depois", en ? "What Usually Comes Next" : "O Que Costuma Vir Depois"]);
   if (hojeHtml) _sum.push(["#hoje", en ? "Today’s Read" : "O Que Chamou Atenção Hoje"]);
   _sum.push(["#proxima", en ? "For the Next Edition" : "Para a Próxima Edição"]);
-  const sumarioHtml = _sum.length >= 3 ? "<nav class=\"sumario\" aria-label=\"" + (en ? "In this edition" : "Nesta edição") + "\"><span class=\"sum-lb\">" + (en ? "In this edition" : "Nesta edição") + "</span><ul>" + _sum.map(function (s) { return "<li><span class=\"dot\" style=\"color:" + regimeColor + "\">●</span> <a href=\"" + s[0] + "\">" + _esc(s[1]) + "</a></li>"; }).join("") + "</ul></nav>" : "";
+  const sumarioHtml = _sum.length >= 3 ? "<nav class=\"sumario\" aria-label=\"" + (en ? "In this edition" : "Nesta edição") + "\"><span class=\"sum-lb\">" + (en ? "In this edition" : "Nesta edição") + "</span><ul>" + _sum.map(function (s) { return "<li><span class=\"dot\" style=\"color:" + regimeColor + "\">●</span> <a href=\"" + s[0] + "\">" + _esc(s[1]) + "</a></li>"; }).join("") + "<li class=\"sum-gate\"><em><a href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Full reading — subscribers" : "Leitura completa — assinantes") + "</a></em></li>" + "</ul></nav>" : "";
   // cólofon — "regime · há N dias" (persistência do regime); nav.regimeDias vem do dispatch (série SNAPS)
   const colofonHtml = regimeToday ? "<p class=\"colofon\"><span class=\"reg\">" + (en ? "Regime " : "Regime ") + _esc(regimeToday) + "</span>" + (nav.regimeDias != null && nav.regimeDias > 0 ? " · " + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") : "") + "</p>" : "";
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "dateModified": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
@@ -705,7 +744,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}" + _DIARIO_CSS_V1) +
     "</head><body>" + _header(en) + "<div class=\"wrap\">" +
     (_pm ? '<h1 class="h1m">' + _pm.manchete + "</h1>" : "<h1>" + (en ? "Brazil market regime" : "Regime do mercado brasileiro") + "</h1>") +
-    "<p class=\"dt\">" + (_pm ? (en ? "Brazil market regime · " : "Regime do mercado brasileiro · ") : "") + (nav.num ? (en ? "Edition no. " : "Edição nº ") + nav.num + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + " · Radar Perene" + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
+    "<p class=\"dt\">" + (nav.num ? (en ? "Edition no. " : "Edição nº ") + nav.num + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + (regimeToday ? " · " + (en ? "Regime " : "Regime ") + _esc(regimeToday) : "") + (nav.regimeDias != null && nav.regimeDias > 0 ? " · <b>" + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") + "</b>" : "") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     fileteHtml +
     deckHtml +
     sumarioHtml +
