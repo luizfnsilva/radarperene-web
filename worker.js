@@ -504,8 +504,8 @@ function _arquivoLembraHtml(hist, regimeToday, todayDate, en, dpath, regimeColor
       "<div class=\"arq-oneline\">" + traj + " · <a href=\"" + dpath + "/" + d + "\">" + (en ? "reread →" : "reler →") + "</a></div></li>";
   }).join("");
   const _rlab = regimeToday ? (en ? "<b>" + _esc(regimeToday) + "</b> regime" : "<b>regime " + _esc(regimeToday) + "</b>") : (en ? "regime" : "regime");
-  const intro = en ? "Other times the Radar found this same " + _rlab + " — what it read, and what the market did next."
-                   : "Outras vezes em que o Radar encontrou este mesmo " + _rlab + " — o que leu, e o que o mercado fez depois.";
+  const intro = en ? "Other times in this same " + _rlab + " — what the Radar read, and what followed."
+                   : "Outras vezes neste mesmo " + _rlab + " — o que o Radar leu, e o que veio depois.";
   // track record honesto: o MESMO número da casa (/historico = 36 recentes), recomputado das 36 leituras mais
   //   novas do próprio payload (o fetch traz até 600 p/ os nós antigos; o stat fica estável em ~78%, não 63% do acervo inteiro).
   const _rec = (items || []).slice(0, 36).filter(function (x) { return x && x.direcao_confirmou != null; });
@@ -671,14 +671,14 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const _pItems =
     _pItem(en ? "Perene Risk Index" : "Índice de Risco Perene", en ? "the market’s structural state" : "o estado estrutural do mercado", _pP, "perene", (nav.dPerene != null ? nav.dPerene : null)) +
     _pItem(en ? "Ânima · structural" : "Índice Ânima · estrutural", en ? "investors’ prevailing mood" : "o humor predominante dos investidores", _pA, "anima", (nav.dAnima != null ? nav.dAnima : null)) +
-    _pItem(en ? "Ânima · short-term" : "Ânima · curto prazo", en ? "the market’s recent move" : "o movimento recente do mercado", _pAc, "curto", null);
+    _pItem(en ? "Ânima · short-term" : "Ânima · curto prazo", en ? "the market’s recent move" : "o movimento recente do mercado", _pAc, "curto", (nav.dCurto != null ? nav.dCurto : null));
   const mancheteHtml = _pItems ? "<section class=\"pulse\" id=\"pulso\"><div class=\"pulse-eyb\">" + (en ? "The Pulse" : "O Pulso") + "</div><div class=\"pulse-g\">" + _pItems + "</div><a class=\"pulse-help\" href=\"" + (en ? "/how-to-read-the-radar/" : "/como-ler-o-radar/") + "\">" + (en ? "how to read?" : "como interpretar?") + "</a></section>" : "";
   // chamada de divergência (com respiro) — determinística, do próprio snapshot: a tensão mais saliente do dia.
   let divergHtml = "";
   if (_pA != null && _pAc != null && Math.abs(_pA - _pAc) >= 20) {
     divergHtml = en
-      ? "The structural mood (Ânima " + _pA + ") and the recent move (short-term " + _pAc + ") are pulling apart."
-      : "O humor estrutural (Ânima " + _pA + ") e o movimento recente (curto prazo " + _pAc + ") divergem.";
+      ? "Structural mood (Ânima " + _pA + ") and recent move (" + _pAc + ") diverge."
+      : "Humor estrutural (Ânima " + _pA + ") e movimento recente (" + _pAc + ") divergem.";
   } else if (_pP != null && _rl && /defens/i.test(_rl) && _pP >= 70) {
     divergHtml = en
       ? "The Perene Risk Index is stretched (" + _pP + ") while the month regime still reads defensive."
@@ -718,8 +718,8 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const costumaHtml = pfHtml ? "<section id=\"depois\"><span class=\"sec-lb\">" + (en ? "What Usually Comes Next" : "O Que Costuma Vir Depois") + "</span>" + pfHtml + "</section>" : "";
   const hojeHtml = vozHtml ? "<section id=\"hoje\"><span class=\"sec-lb\">" + (en ? "Today’s Read" : "O Que Chamou Atenção Hoje") + "</span>" + vozHtml + "</section>" : "";
   const proximaHtml = "<section id=\"proxima\"><span class=\"sec-lb\">" + (en ? "For the Next Edition" : "Para a Próxima Edição") + "</span><p class=\"sec-body\">" + (en
-    ? "The next reading arrives on the following business day. The month regime updates only at month-end — the daily pulse carries the change until then."
-    : "A próxima leitura chega no próximo dia útil. O regime do mês só se atualiza no fecho do mês — o pulso diário carrega a variação até lá.") + "</p></section>";
+    ? "The next reading arrives on the next business day — the regime is monthly, and the daily pulse carries the change until month-end."
+    : "A próxima leitura chega no próximo dia útil — o regime é mensal, e o pulso diário carrega a variação até o fecho do mês.") + "</p></section>";
   // Publicidade editorial revestindo os slots AdSense (INVARIANTE: os 2 slots FICAM; só ganham rótulo "Publicidade")
   const _pub = function (slot) { return slot ? "<div class=\"pub\"><span class=\"pub-lb\">" + (en ? "Advertisement" : "Publicidade") + "</span>" + slot + "</div>" : ""; };
   // Nesta edição (sumário) — ● na cor do regime; só as seções presentes
@@ -1239,6 +1239,7 @@ async function _route(request, env, ctx) {
               if (cur && prv) {  // deltas do Pulso (Perene/Ânima pulsam por dia; o SNAPS já traz por data)
                 if (cur.perene != null && prv.perene != null) nav.dPerene = Math.round(cur.perene - prv.perene);
                 if (cur.anima != null && prv.anima != null) nav.dAnima = Math.round(cur.anima - prv.anima);
+                if (cur.curto != null && prv.curto != null) nav.dCurto = Math.round(cur.curto - prv.curto);
               }
               const rl = cur && cur.regime_label;  // "regime · há N dias": corre p/ trás enquanto o label do regime não muda
               if (rl != null) {
