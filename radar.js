@@ -1897,7 +1897,14 @@
         // ★ 2026-06-21 v7 (dono): "página do Economist". Citação estatística — a FRASE é protagonista (Newsreader grande, 2 períodos),
         //   números dentro do texto. Byline discreto. Rodapé HUMANO ("N episódios observados"). Marca d'água = ÍCONE OFICIAL (mapa do
         //   Brasil pontilhado) preenchendo o vazio à direita, na mesma faixa da porta (não um carimbo genérico embaixo → economiza altura).
-        var _pnote = esc(ab.n_analogos) + (L ? " episodes observed · historical distribution, not a forecast." : " episódios observados · distribuição histórica, não previsão.");
+        // ★ datação (dono 2026-07-06, eco do A2-01/A3-02): a comparação é ancorada numa LEITURA DATADA — o card
+        //   carimba a data de referência do dado (por extenso, padrão da casa; determinístico do ISO, sem Date()).
+        var _pdt = "";
+        (function () { var s = d.data_referencia; if (!s) return; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s)); if (!m) return;
+          var MES = L ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+          var mo = parseInt(m[2], 10) - 1, dd = parseInt(m[3], 10);
+          _pdt = L ? (" · reading of " + MES[mo] + " " + dd + ", " + m[1]) : (" · leitura de " + dd + " de " + MES[mo] + " de " + m[1]); })();
+        var _pnote = esc(ab.n_analogos) + (L ? " episodes observed" : " episódios observados") + esc(_pdt) + (L ? " · historical distribution, not a forecast." : " · distribuição histórica, não previsão.");
         var _qn = function (s) { return '<b class="rp-qn">' + s + '</b>'; };
         var _q1 = L ? (_qn(esc(ab.hit_rate_pct) + '%') + ' of comparable episodes ended positive.') : (_qn(esc(ab.hit_rate_pct) + '%') + ' dos episódios semelhantes terminaram positivos.');
         var _q2 = L ? ('When that happened, the median for the Ibovespa over six months was ' + _qn(_med) + '.') : ('Quando isso aconteceu, a mediana do Ibovespa em seis meses foi ' + _qn(_med) + '.');
