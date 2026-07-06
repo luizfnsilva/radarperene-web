@@ -428,6 +428,10 @@
   if(EN){var t=document.getElementById("rp-ck-txt");if(t)t.textContent="We use measurement and personalized-advertising cookies to improve the site and support free content. Your choice — without acceptance, ads stay contextual and nothing is tracked.";
     document.getElementById("rp-ck-no").textContent="Decline";document.getElementById("rp-ck-yes").textContent="Accept";}
   var KEY="rp-consent";
+  // ★ Ahrefs Web Analytics — cookieless (LGPD-ok, NÃO precisa de consentimento). A HOME faltava: as subpáginas
+  //   recebiam via _CONSENT do worker, mas a home (isRoot) pula esse caminho → a página #1 ficava fora do analytics
+  //   (o Ahrefs só via as visitas raras de subpágina = "1 página"). Mesmas data-keys do worker. (fix 2026-07-06)
+  (function(){var AH=/\.com\.br$/i.test(location.hostname)?"4LbsuoMGfXN4azVzHW6wPQ":"m9HGU5S9vnFEBS9K4J62rg";var sa=document.createElement("script");sa.async=1;sa.src="https://analytics.ahrefs.com/analytics.js";sa.setAttribute("data-key",AH);document.head.appendChild(sa);})();
   window.rpTrack=function(name){ if(localStorage.getItem(KEY)!=="granted")return;
     try{if(window.gtag)gtag("event",name);if(window.fbq)fbq("track",name==="Lead"?"Lead":"ViewContent");}catch(e){} };
   function loadAnalytics(){
