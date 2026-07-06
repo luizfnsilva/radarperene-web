@@ -97,7 +97,6 @@
   @media(max-width:680px){.plans{grid-template-columns:1fr}}
   .plan{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--surface)}
   .plan.feat{border-color:var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface))}  /* ★ editorial: highlight via the gold rule + tint, no SaaS glow (the home reserves shadow for menus, never content cards) */
-  .plan .badge{display:inline-block;border:1px solid var(--gold);color:var(--gold-ink);border-radius:3px;padding:3px 11px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
   .plan .pname{font-family:var(--serif);font-weight:600;font-size:22px;margin:0}
   .plan .amt{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.4vw,40px);margin:4px 0 2px}
   .plan .amt small{font-size:.42em;color:var(--dim);font-weight:400}
@@ -133,20 +132,11 @@
   </section>
 
   <section>
-    <div class="plans">
-      <div class="plan feat">
-        <div class="badge">Weekly edition</div>
-        <h2 class="pname">Perene Semanal</h2>
-        <div class="amt">US$ 29<small>/mo</small></div>
-        <p class="ptag">A weekly read of the Brazilian market.</p>
-        <ul class="pl">
-          <li>the weekly Brazil edition, every Friday</li>
-          <li>the archive of weekly editions</li>
-          <li>access to each day's open edition</li>
-        </ul>
-        <a class="herolink lead" id="cta-semanal" href="https://buy.stripe.com/cNi8wObaW9kv6TFeILb3q07" target="_blank" rel="noopener">Get the Friday edition →</a>
-        <p class="micro" style="margin-top:12px">Want a look first? <a href="/weekly/2026-06-12/" style="color:var(--gold)">Read an open edition of the Weekly →</a></p>
-      </div>
+    <div style="max-width:62ch;margin:0 auto">
+      <h2 class="pname" style="font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.6vw,34px);margin:0 0 10px">Perene Semanal</h2>
+      <p style="color:var(--txt2);font-size:16px;line-height:1.7;margin:0 0 14px">The Friday edition of the Brazilian market — what changed, what held, what the archive remembers. The subscription includes the Friday edition, the archive of editions and each day&rsquo;s open edition.</p>
+      <p style="font-size:17px;margin:0 0 10px"><b>US$ 29 per month.</b> <a class="herolink lead" id="cta-semanal" href="https://buy.stripe.com/cNi8wObaW9kv6TFeILb3q07" target="_blank" rel="noopener">Get the Friday edition →</a></p>
+      <p class="micro" style="margin-top:0">Want a look first? <a href="/weekly/2026-06-12/" style="color:var(--gold)">Read an open edition of the Weekly →</a></p>
     </div>
     <p class="micro" style="text-align:center;margin-top:20px">Payment via Stripe · 7-day full automatic refund · cancel anytime, in 1 click.</p>
   </section>
@@ -154,6 +144,14 @@
   <section>
     <div class="free-note">
       <b>The open edition stays open to everyone, always:</b> today's live read of Brazil's market regime and the public daily snapshots <b>since January 2000 (26 years)</b>. <a href="/" style="color:var(--gold)">Read today's edition →</a></div>
+  </section>
+
+  <section>
+    <div style="max-width:62ch;margin:0 auto">
+      <h2 class="sec" style="text-align:center">One publication, four depths</h2>
+      <p class="secsub" style="max-width:none">The <b>Daily</b> is the cover: each day&rsquo;s regime reading, open to all, since 2000. <b><a href="/subscribe" style="color:inherit">Perene Semanal</a></b> (US$ 29/mo) is the Friday edition — what changed, what held, what the archive remembers — with its own archive. The <b>Monthly</b> and the library since 2010 are part of <a href="/founder/" style="color:inherit">institutional access</a>, together with the full observatory — granted in conversation, to credentialed partners. The <b>Vértice</b> letter circulates as a pilot, to a small group of readers.</p>
+      <p class="micro" style="margin-top:14px;text-align:center"><a href="/" style="color:var(--gold-ink)">Read today&rsquo;s open edition →</a> · <a href="/subscribe" style="color:var(--gold-ink)">Get the Friday edition →</a> · <a href="/founder/" style="color:var(--gold-ink)">Institutional access →</a></p>
+    </div>
   </section>
 
   <section>
