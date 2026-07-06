@@ -8,7 +8,7 @@
 //   1) criar /semanal/<data>/index.html (+ /weekly/<data>/index.html EN); 2) adicionar "<data>" aqui.
 // Na /diario/<data>, visitante FREE vê um link p/ a amostra — a da própria semana quando existir, senão a mais
 // recente da lista (a estante fica sempre visível); ASSINANTE não (já recebe o semanal completo → sem duplicar).
-const WEEKLY_SAMPLE_DATES = ["2026-06-12"];
+const WEEKLY_SAMPLE_DATES = ["2026-06-26"];
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
 const EN_DESC = "A living archive of Brazil's markets: daily, weekly and monthly reports and a library of precedents — to read the present in light of the past.";
 const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, inflation, IPCA, study library, historical analogs, market regime analysis"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
