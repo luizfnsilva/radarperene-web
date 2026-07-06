@@ -75,7 +75,7 @@ const EN_BODY = (function () {
   const lenses = C.lenses.map((l, i) => '<a class="ln' + (l.v ? ' vx' : '') + '" href="' + LP(LSLUG[i]) + '"><div class="nm">' + (l.v ? '<span style="color:var(--gold-ink)">✦</span> ' : '') + l.n + (l.v ? '<span class="tag">' + expTag + '</span>' : '') + '</div><p>' + l.d + '</p>' + (l.m ? '<span class="micro">' + l.m + '</span>' : '') + '</a>').join("");
   const conDD = CN.map((c) => '<a href="' + CP(c[0]) + '">' + c[1] + '</a>').join("") + '<a href="' + U_CON + '" style="color:var(--gold-ink)">' + NAV.ac + '</a>';
   const lenDD = C.lenses.map((l, i) => '<a href="' + LP(LSLUG[i]) + '">' + l.n + '</a>').join("") + '<a href="' + U_LEN + '" style="color:var(--gold-ink)">' + NAV.al + '</a>';
-  const topnav = '<a href="/articles">Articles</a><a href="' + U_CON + '">' + NAV.con + '</a><a href="/daily">' + NAV.dia + '</a><a href="/library/">Archive</a>';
+  const topnav = '<a href="/articles">Articles</a><a href="' + U_CON + '">' + NAV.con + '</a><a href="/daily">' + NAV.dia + '</a>';
   const cgrid = CN.map((c, i) => '<a href="' + CP(c[0]) + '"><span class="cn">' + c[1] + '</span><span class="cd">' + CD[i] + '</span></a>').join("");
   const princ = C.princ.map((p) => '<div><b>' + p[0] + '.</b> ' + p[1] + '</div>').join("");
   const faqbox = C.faq.map((f) => '<div style="border-top:1px solid #222a31;padding:13px 0"><b style="display:block;margin-bottom:5px">' + f[0] + '</b><p style="margin:0;color:#8b97a3;font-size:14px;line-height:1.6">' + f[1] + '</p></div>').join("");
