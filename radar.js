@@ -883,12 +883,12 @@
   function animaSelHTML(aSel, lang) {
     if (!aSel.estr || !aSel.curt) return "";
     var L = lang === "en";
-    var btn = function (m, lab, on, lock) { return '<button type="button" class="rp-asel' + (on ? " on" : "") + (lock ? " lock" : "") + '" data-am="' + m + '" data-lbl="' + esc(lab) + '"' + (lock ? ' data-lock="1"' : '') + '>' + (lock ? "🔒 " : on ? "● " : "○ ") + esc(lab) + '</button>'; };
+    var btn = function (m, lab, on, lock) { var lab2 = lab + (lock ? (L ? " · institutional" : " · institucional") : ""); return '<button type="button" class="rp-asel' + (on ? " on" : "") + (lock ? " lock" : "") + '" data-am="' + m + '" data-lbl="' + esc(lab2) + '"' + (lock ? ' data-lock="1"' : '') + '>' + (on ? "● " : "○ ") + esc(lab2) + '</button>'; };
     return '<div class="rp-asel-row" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:9px">'
       + '<span class="rp-ml" style="opacity:.7;margin-right:1px">' + (L ? "Mood" : "Ânima") + '</span>'
       + btn("estr", L ? "Structural" : "Estrutural", aSel.mode === "estr", false)
       + btn("curto", L ? "Short" : "Curto", aSel.mode === "curto", !aSel.canCurto)
-      + (aSel.canCurto ? '' : '<span class="rp-asel-up rp-ml" style="display:none;flex-basis:100%;opacity:.92;margin-top:3px"><span style="color:var(--_accent)">🔒</span> ' + (L ? "Short-term mood (63d) is a Founder lens — " : "O humor curto (63d) é lente do Founder — ") + '<a href="' + checkoutURL(lang) + '" target="_blank" rel="noopener">' + (L ? "unlock →" : "destravar →") + '</a></span>')
+      + (aSel.canCurto ? '' : '<span class="rp-asel-up rp-ml" style="display:none;flex-basis:100%;opacity:.92;margin-top:3px">' + (L ? "The short-term mood (63d) is part of institutional access — " : "O humor curto (63d) integra o acesso institucional — ") + '<a href="' + checkoutURL(lang) + '" target="_blank" rel="noopener">' + (L ? "in conversation →" : "em conversa →") + '</a></span>')
       + '</div>';
   }
   // Liga o seletor: troca o horizonte → re-monta o oscilador (mesmo grupo de sync do preço) + atualiza legenda/botões.
@@ -902,7 +902,7 @@
       var act = animaActive(s, mode, pro); mode = act.mode;       // normaliza (free nunca fica em curto)
       mountOsc(animaEl, act.obj, s, syncKey, big, hasRisk, "anima", pro);        // re-monta com o horizonte escolhido (re-entra no sync)
       if (capEl) capEl.textContent = animaCap(act.obj, lang, mode);
-      sel.forEach(function (b) { var on = (b.getAttribute("data-am") === mode), lock = !!b.getAttribute("data-lock"); b.className = "rp-asel" + (on ? " on" : "") + (lock ? " lock" : ""); b.textContent = (lock ? "🔒 " : on ? "● " : "○ ") + b.getAttribute("data-lbl"); });
+      sel.forEach(function (b) { var on = (b.getAttribute("data-am") === mode), lock = !!b.getAttribute("data-lock"); b.className = "rp-asel" + (on ? " on" : "") + (lock ? " lock" : ""); b.textContent = (on ? "● " : "○ ") + b.getAttribute("data-lbl"); });
     }
     sel.forEach(function (b) { b.addEventListener("click", function () {
       if (b.getAttribute("data-lock")) { var up = scope.querySelector(".rp-asel-up"); if (up) up.style.display = "block"; return; }  // free → upsell, sem trocar
@@ -941,7 +941,7 @@
     if (s.fair) chips.push({ on: pro, lock: !pro, lbl: "Valuation" });
     return '<div class="rp-obar" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px">' + chips.map(function (c) {
       var st = c.lock ? "background:transparent;border:1px dashed var(--_line);color:var(--_dim);opacity:.85" : c.on ? "background:var(--_accent);border:1px solid var(--_accent);color:var(--_card)" : "background:var(--_card2);border:1px solid var(--_line);color:var(--_dim)";
-      return '<button class="rp-ob" type="button" style="font-family:var(--_mono);font-size:10px;border-radius:6px;padding:3px 9px;cursor:pointer;' + st + '">' + (c.lock ? "🔒 " : c.on ? "● " : "○ ") + esc(c.lbl) + '</button>';
+      return '<button class="rp-ob" type="button"' + (c.lock ? ' title="' + (L ? "Institutional access" : "Acesso institucional") + '"' : '') + ' style="font-family:var(--_mono);font-size:10px;border-radius:6px;padding:3px 9px;cursor:pointer;' + st + '">' + (c.on ? "● " : "○ ") + esc(c.lbl) + '</button>';
     }).join("") + '</div>';
   }
   // bloco-análogo NOBRE (P3): a taxa-base como resumo do ativo, não como gráfico solto. Free=3m; Founder=3/6/12m.
@@ -966,7 +966,7 @@
     }).join("");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</div>' + rows
-      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6m & 12m horizons in full access" : "horizontes 6m e 12m no acesso completo")) + '</div>' : '')
+      + (!pro ? '<div class="rp-ml" style="margin-top:8px;opacity:.85">' + lockA(L, '' + (L ? "6m & 12m horizons in full access" : "horizontes 6m e 12m no acesso completo")) + '</div>' : '')
       + '<div class="rp-ml" style="margin-top:5px;opacity:.6">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div></div>';
   }
   // ★ MOAT — bloco-análogo no FREE = só TEASER (existência + nº de casos + leitura qualitativa); a DISTRIBUIÇÃO (probabilidade
@@ -981,13 +981,13 @@
     if (N == null) return "";  // sem casos → não mostra (degrada honesto)
     var biasLab = function (k) { return k === "alta" ? (L ? "historically leaned up" : "viés histórico de alta") : k === "baixa" ? (L ? "historically leaned down" : "viés histórico de baixa") : (L ? "historically neutral" : "viés histórico neutro"); };
     var bias = br.classificacao ? biasLab(br.classificacao) : (medSign == null ? null : biasLab(medSign > 2 ? "alta" : medSign < -2 ? "baixa" : "neutro"));
-    var suf = (br.suficiente != null) ? br.suficiente : (N >= 8), src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
+    var suf = (br.suficiente != null) ? br.suficiente : (N >= 8), src = (br.fonte === "knn") ? (L ? "historical analog windows" : "janelas históricas análogas") : (L ? "broad base" : "base ampla");
     var ck = checkoutURL(L ? "en" : "pt");
     return '<div class="rp-analog" style="margin-top:10px;border:1px solid var(--_line);border-radius:9px;padding:10px 12px;background:var(--_card2)">'
       + '<div class="rp-ml" style="font-weight:700;letter-spacing:.03em">' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + ' <span style="opacity:.55;font-weight:400">(' + src + ')</span></div>'
       + '<div class="rp-ml" style="margin-top:5px;color:var(--_txt)"><b style="font-family:var(--_mono)">' + N.toLocaleString(L ? "en-US" : "pt-BR") + '</b> ' + (L ? "analogous cases found" : "casos análogos encontrados") + '</div>'
       + '<div class="rp-ml" style="opacity:.85">' + (suf ? (L ? "✓ enough for analysis" : "✓ amostra suficiente para análise") : (L ? "· limited sample" : "· amostra limitada")) + (bias ? ' · ' + (L ? "reading: " : "leitura: ") + bias : '') + '</div>'
-      + '<div class="rp-ml" style="margin-top:8px;opacity:.95">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "probability of rising · median return · case range (50% / 80%) · 3 / 6 / 12 months" : "probabilidade de alta · retorno mediano · faixa dos casos (50% / 80%) · 3 / 6 / 12 meses")) + '</div>'
+      + '<div class="rp-ml" style="margin-top:8px;opacity:.95">' + lockA(L, '' + (L ? "probability of rising · median return · case range (50% / 80%) · 3 / 6 / 12 months" : "probabilidade de alta · retorno mediano · faixa dos casos (50% / 80%) · 3 / 6 / 12 meses")) + '</div>'
       + '<a href="' + ck + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--_accent);text-decoration:none">' + (L ? "What historically happened next? → Founder" : "O que historicamente aconteceu depois? → Founder") + '</a>'
       + '<div class="rp-ml" style="opacity:.55;margin-top:6px">' + (L ? "empirical distribution of past outcomes — never a forecast" : "distribuição empírica de desfechos passados — nunca previsão") + '</div>'
       + '</div>';
@@ -1108,7 +1108,7 @@
         '<span class="num" style="font-family:var(--_mono);font-size:9.5px;color:var(--_dim);width:26px;flex:none;text-align:right">' + (hit == null ? "—" : hit + "%") + '</span></div>';
     }
     if (!rows) return "";
-    var src = (br.fonte === "knn") ? (L ? "k-NN analogs" : "análogos k-NN") : (L ? "broad base" : "base ampla");
+    var src = (br.fonte === "knn") ? (L ? "historical analog windows" : "janelas históricas análogas") : (L ? "broad base" : "base ampla");
     var out = '<div class="rp-ml" style="margin-top:11px"><b>' + (L ? "SIMILAR HISTORICAL CASES" : "CASOS HISTÓRICOS SEMELHANTES") + '</b>' +
       (br.alvo ? ' · <span style="color:var(--_dim)">' + esc(br.alvo) + '</span>' : '') +
       ' <span style="color:var(--_dim);opacity:.7">(' + src + ')</span></div>';
@@ -1119,7 +1119,7 @@
     var _openAll = br.h && br.h["6m"] && br.h["12m"];
     if (!pro) out += _openAll
       ? '<div class="rp-ml" style="margin-top:5px;opacity:.92"><span style="color:var(--_accent)">★</span> ' + (L ? "all three horizons open — a free sample" : "os três prazos liberados como amostra de cortesia") + '</div>'
-      : '<div class="rp-ml" style="margin-top:5px;opacity:.92">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "6-month & 12-month horizons in full access" : "prazos de 6 e 12 meses no acesso completo")) + '</div>';
+      : '<div class="rp-ml" style="margin-top:5px;opacity:.92">' + lockA(L, '' + (L ? "6-month & 12-month horizons in full access" : "prazos de 6 e 12 meses no acesso completo")) + '</div>';
     out += '<div class="rp-ml" style="opacity:.6;margin-top:6px">' + (L ? "empirical distribution of past analogous cases — not a forecast" : "distribuição de casos análogos passados — não é previsão") + '</div>';
     return out;
   }
@@ -1150,7 +1150,7 @@
     var checkout = (window.RP_CHECKOUT || "/founder");  // ★ 2026-06-28: profundidade per-ativo = acesso institucional → /founder (apresentação), sem checkout Stripe de varejo
     var chartHTML = function (frac) { var n = s.hist.length, k = Math.max(8, Math.round(n * frac));
       return bigChart({ hist: s.hist.slice(n - k), proj: s.proj, cone: s.cone, bands: (frac >= 0.99 ? s.bands : null) }, { big: true, pro: gpaid }); };
-    var lockHTML = '<div class="rp-lock"><b>' + (L ? "🔒 Manipulate & project the future" : "🔒 Manipular & projetar o futuro") + '</b><small>' + (L ? "Free range (drag-zoom), compare A×B and toggle overlays — plus the full asymmetric cone (p10–p90) with the past analogs overlaid. This per-asset depth is part of institutional access." : "Período livre (arrasta-zoom), comparar A×B e ligar/desligar overlays — e o cone assimétrico completo (p10–p90) com os análogos passados sobrepostos. Essa profundidade por ativo integra o acesso institucional.") + '</small><a class="cta" href="' + checkout + '">' + (L ? "Institutional access →" : "Acesso institucional →") + '</a></div>';
+    var lockHTML = '<div class="rp-lock" style="border:0;background:transparent;box-shadow:none;text-align:left;min-height:0;padding:12px 2px"><small style="font-size:12px;line-height:1.55;color:var(--_dim)">' + (L ? "The free-range chart, the A×B comparisons and the full distribution of past analogs are part of institutional access — " : "O gráfico livre, as comparações A×B e a distribuição completa dos análogos passados integram o acesso institucional — ") + '<a href="' + checkout + '" style="color:var(--_accent);text-decoration:none">' + (L ? "in conversation →" : "em conversa →") + '</a>.</small></div>';  // A17 Ato 2.7: nota editorial, sem card/cadeado
     var h = '<div class="rp rp-mc" role="dialog" aria-modal="true"><button class="rp-x" aria-label="' + (L ? "close" : "fechar") + '">×</button>';
     h += '<div class="rp-mt">' + esc(title) + '</div>';
     if (fund) h += '<div class="rp-ml" style="margin-top:2px"><b>' + (L ? "Fundamentals · " : "Fundamentos · ") + '</b>' + esc(fund) + '</div>';
@@ -1185,7 +1185,7 @@
     h += '<div class="rp-per">' + [["3", "3M"], ["6", "6M"], ["12", L ? "1Y" : "1A"], ["36", L ? "3Y" : "3A"], ["0", "MAX"]].map(function (p) {
       var m = parseFloat(p[0]); var locked = false; void m;  // períodos livres p/ todos (ver acima)
       var cls = (p[0] === "3" ? "on" : "") + (locked ? " lock" : "");
-      return '<button data-m="' + p[0] + '"' + (locked ? ' data-max="1"' : '') + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + esc(p[1]) + (locked ? " 🔒" : "") + '</button>';
+      return '<button data-m="' + p[0] + '"' + (locked ? ' data-max="1" title="' + (L ? "Institutional access" : "Acesso institucional") + '"' : '') + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + esc(p[1]) + '</button>';
     }).join("") + '</div>';
     var useUp = uplotOn() && RP_UP.price;  // herói em uPlot? (flag on + engine pronta + price migrado)
     var hasStack = useUp && !!((s.anima && s.anima.serie && s.anima.serie.length > 1) || (s.risco && s.risco.serie && s.risco.serie.length > 1));  // tem oscilador empilhado? (preço esconde o eixo-X, datas vão p/ o painel de baixo)
@@ -1200,11 +1200,11 @@
     if (cone) { var dmid = dp(cone.mid[cone.mid.length - 1]);
       if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = (cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null), dhi2 = (cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null);  // bandas só se a data trouxe (token); gateado → cai p/ a mediana abaixo (sem quebrar)
         if (dmid != null) lead += '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "Median case " : "Caso mediano ") + sgn(dmid) + '</b>' + (dlo != null && dhi != null ? ' · ' + (L ? "50% of cases " : "50% dos casos ") + sgn(dlo) + ' … ' + sgn(dhi) : '') + (dlo2 != null && dhi2 != null ? ' · ' + (L ? "80% of cases " : "80% dos casos ") + sgn(dlo2) + ' … ' + sgn(dhi2) : '') + ' · ' + (L ? "in similar situations in the past — not a forecast" : "em situações parecidas no passado — não é previsão") + '</div>'; }
-      else if (dmid != null) lead += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "median case & 50% / 80% ranges in full access" : "caso mediano & faixas 50% / 80% no acesso completo")) + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
+      else if (dmid != null) lead += '<div class="rp-ml">' + (L ? "Analog projection available" : "Projeção de casos análogos disponível") + ' · <span style="opacity:.78">' + lockA(L, '' + (L ? "median case & 50% / 80% ranges in full access" : "caso mediano & faixas 50% / 80% no acesso completo")) + '</span></div>'; }  // ★ free NÃO vê o número (prognóstico = moat); a linha mediana no gráfico fica como gancho visual
     else { var dpct = dp((s.proj && s.proj.length > 1) ? s.proj[s.proj.length - 1] : null);
       if (dpct != null) lead += gpaid
         ? '<div class="rp-ml"><b style="color:var(--_warm)">' + (L ? "projection " : "projeção ") + sgn(dpct) + '</b> · ' + (L ? "linear, under current conditions — not a forecast" : "linear, sob condições atuais — não é previsão") + '</div>'
-        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "value in full access" : "valor no acesso completo")) + '</span></div>'; }
+        : '<div class="rp-ml">' + (L ? "Projection under current conditions" : "Projeção sob condições atuais") + ' · <span style="opacity:.78">' + lockA(L, '' + (L ? "value in full access" : "valor no acesso completo")) + '</span></div>'; }
     if (s.base_rate) lead += baseRatePanel(s.base_rate, L, gpaid);  // casos análogos — free: teaser (existência+nº+leitura) / Founder: distribuição completa
     if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
       depth += '<div class="rp-ml" style="margin-top:6px">' + (isFii ? (L ? "Net asset value (NAV) " : "Valor patrimonial (NAV) ") : "Valuation ") + '<b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (isFii ? ((L ? "vs price · P/NAV " : "vs preço · P/VP ") + esc(s.fair.pvp) + ' · ' + (L ? "anchored on the fund’s book value, descriptive" : "ancorado no patrimônio do fundo, descritivo")) : ((L ? "vs price · earnings × normal P/E " : "vs preço · lucro × P/L normal ") + esc(s.fair.pe_normal) + ' (' + (L ? "now " : "hoje ") + esc(s.fair.pe_now) + ') · ' + (L ? "anchored on the company’s own earnings, descriptive" : "ancorado no próprio lucro da empresa, descritivo"))) + '</div>'; }
@@ -1486,7 +1486,7 @@
               chartEl.innerHTML = cc.svg;
               yax.innerHTML = [[5, cc.mx], [50, (cc.mn + cc.mx) / 2], [95, cc.mn]].map(function (p) { return '<span class="rp-yl" style="top:' + p[0] + '%">' + esc(Math.round(p[1])) + '</span>'; }).join("");
               chartEl.appendChild(yax);
-              legF.innerHTML = (meta ? '<div class="rp-ml" style="margin-top:3px"><b style="color:var(--_accent)">Lead-lag</b> — ' + esc(meta) + '</div>' : '') + '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs && cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c; }).join(" · ") : '') + '</div><div class="rp-ml" style="margin-top:4px"><span style="color:var(--_accent)">🔒</span> ' + (L ? "cross any series & drag-zoom in full access" : "cruzar qualquer série & zoom no acesso completo") + '</div>';
+              legF.innerHTML = (meta ? '<div class="rp-ml" style="margin-top:3px"><b style="color:var(--_accent)">Lead-lag</b> — ' + esc(meta) + '</div>' : '') + '<div class="rp-ml" style="margin-top:3px">' + cc.leg.map(function (x) { return '<span style="white-space:nowrap;margin-right:9px"><b style="color:' + x.color + '">▬</b> ' + esc(x.nome) + (x.fim != null ? ' <span style="opacity:.7">' + (x.fim >= 100 ? "+" : "") + Math.round(x.fim - 100) + '%</span>' : '') + '</span>'; }).join("") + '</div><div class="rp-ml" style="opacity:.75">' + (L ? "rebased to 100 · monthly · since " : "rebaseado a 100 · mensal · desde ") + esc(cc.desde) + (cc.pairs && cc.pairs.length ? ' · ' + cc.pairs.map(function (p) { return esc(p.a) + '×' + esc(p.b) + ' corr ' + p.c; }).join(" · ") : '') + '</div><div class="rp-ml" style="margin-top:4px">' + (L ? "cross any series & drag-zoom in full access" : "cruzar qualquer série & zoom no acesso completo") + '</div>';
             }
           }).catch(function () { });
       });
@@ -1544,13 +1544,8 @@
     }
     for (var pi = 0; pi < perBtns.length; pi++) { (function (btn) {
       btn.addEventListener("click", function (e) { e.stopPropagation();
-        if (btn.getAttribute("data-max")) {  // item 6: período TRAVADO (free) → gráfico real BORRADO + lock ancorado. NÃO marca este botão como ativo: senão dblclick(onReset)/sair-do-compare liam o botão travado e liberavam o período pago sem gate.
-          if (useUp) {  // canvas perde o bitmap se serializado via innerHTML → move os nós p/ dentro do blur sem re-serializar
-            var gate = document.createElement("div"); gate.className = "rp-gate";
-            var blur = document.createElement("div"); blur.className = "rp-blur";
-            while (chartEl.firstChild) blur.appendChild(chartEl.firstChild);
-            gate.appendChild(blur); gate.insertAdjacentHTML("beforeend", lockHTML); chartEl.appendChild(gate);
-          } else { chartEl.innerHTML = '<div class="rp-gate"><div class="rp-blur">' + chartEl.innerHTML + '</div>' + lockHTML + '</div>'; }
+        if (btn.getAttribute("data-max")) {  // item 6: período TRAVADO (free) → nota editorial no lugar (A17: sem blur). NÃO marca este botão como ativo: senão dblclick(onReset)/sair-do-compare liam o botão travado e liberavam o período pago sem gate.
+          chartEl.innerHTML = lockHTML;  // A17 2.7: sem blur teatral — o travado não se desenha; entra a nota editorial
           return;
         }
         for (var b = 0; b < perBtns.length; b++) perBtns[b].classList.remove("on"); btn.classList.add("on");
@@ -1587,7 +1582,7 @@
     var dmid = dp(cone.mid[cone.mid.length - 1]);
     if (gpaid && cone.lo && cone.hi) { var dlo = dp(cone.lo[cone.lo.length - 1]), dhi = dp(cone.hi[cone.hi.length - 1]), dlo2 = cone.lo2 ? dp(cone.lo2[cone.lo2.length - 1]) : null, dhi2 = cone.hi2 ? dp(cone.hi2[cone.hi2.length - 1]) : null;
       return '<div class="rp-ml" style="margin-top:6px"><b style="color:var(--_warm)">' + (L ? "Median " : "Mediana ") + sgn(dmid) + '</b>' + (dlo != null ? ' · 50% ' + sgn(dlo) + '…' + sgn(dhi) : '') + (dlo2 != null ? ' · 80% ' + sgn(dlo2) + '…' + sgn(dhi2) : '') + '</div>'; }
-    return dmid != null ? '<div class="rp-ml" style="margin-top:6px;opacity:.8"><span style="color:var(--_accent)">🔒</span> ' + (L ? "median & ranges in full access" : "mediana & faixas no acesso completo") + '</div>' : "";
+    return dmid != null ? '<div class="rp-ml" style="margin-top:6px;opacity:.8">' + (L ? "median & ranges in full access" : "mediana & faixas no acesso completo") + '</div>' : "";
   }
   function _cmpCol(s, x, L, gpaid) {
     if (!s || !s.hist || s.hist.length < 2) return '<div class="rp-cmpcol"><div class="rp-mt2">' + esc(x.nome) + '</div><div class="rp-ml" style="opacity:.7;padding:22px 0;text-align:center">' + (L ? "series unavailable" : "série indisponível") + '</div></div>';
@@ -1613,7 +1608,7 @@
       row(L ? "Hit rate 6m" : "Taxa de alta 6m", num(h6(sA, "hit")), num(h6(sB, "hit")), function (v) { return v + "%"; }, true);
       var disp = function (s) { var p7 = h6(s, "p75"), p2 = h6(s, "p25"); return (p7 != null && p2 != null) ? Math.round((p7 - p2) * 10) / 10 : null; };
       row(L ? "Dispersion 6m (p25–p75)" : "Dispersão 6m (p25–p75)", num(disp(sA)), num(disp(sB)), pp, mixed ? null : true);
-    } else { rows.push('<tr><td>' + (L ? "Median · hit · dispersion 6m" : "Mediana · alta · dispersão 6m") + '</td><td colspan="2" style="text-align:center;opacity:.65"><span style="color:var(--_accent)">🔒</span> Founder</td></tr>'); }
+    } else { rows.push('<tr><td>' + (L ? "Median · hit · dispersion 6m" : "Mediana · alta · dispersão 6m") + '</td><td colspan="2" style="text-align:center;opacity:.65">Founder</td></tr>'); }
     // vol/Sharpe são domínio de RAZÃO → lado diff abstém (IPCA marcava vol 651%)
     row(L ? "Volatility" : "Volatilidade", num(!serieDiff(sA) && sA && sA.stats && sA.stats.vol), num(!serieDiff(sB) && sB && sB.stats && sB.stats.vol), function (v) { return v + "%"; }, false);
     row("Sharpe", num(!serieDiff(sA) && sA && sA.stats && sA.stats.sharpe), num(!serieDiff(sB) && sB && sB.stats && sB.stats.sharpe), function (v) { return "" + v; }, true);
@@ -1714,7 +1709,7 @@
     var _foldLbl1 = L ? "See the mechanism" : "Ver o mecanismo";  // ★ 2026-06-20 vocabulário editorial (consultor): era "Explorar o panorama completo" (genérico)
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
     var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
-    var glock = function () { return lockA(L, '<span style="font-size:.6em;opacity:.55;vertical-align:middle">🔒</span>'); };  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
+    var glock = function () { return lockA(L, '<span style="font-size:.72em;opacity:.6;vertical-align:super" title="' + (L ? "Institutional access" : "Acesso institucional") + '">†</span>'); };  // A17: adaga de nota de rodapé, não cadeado de app  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
     var _fcta = '<a class="rp-fcta" href="' + (L ? "/subscribe" : "/assine") + '">' + (L ? "Subscribe to Perene Semanal · US$ 29/mo →" : "Assinar o Perene Semanal · R$ 29/mês →") + '</a>';  // ★ 2026-06-29: fecho público funila p/ o varejo (Semanal R$29); só renderiza no FOLD&GATED same-origin (embeds usam o ramo chrome), então link relativo ok
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
@@ -1941,7 +1936,7 @@
     if (show("scatter") && rr.regime_scatter && rr.regime_scatter.points) { var sct = rr.regime_scatter; var dist = distChart(sct);
       _scatter += '<h4>' + esc(sct.titulo) + '</h4><div class="legend"><span style="color:var(--_accent)">▮</span> ' + (L ? "today's regime band" : "faixa do regime de hoje") + ' · <span style="color:var(--_warm)">●</span> ' + (L ? "up" : "alta") + ' <span style="color:var(--_cool)">●</span> ' + (L ? "down" : "queda") + ' · ' + (L ? "x = regime · y = IBOV next 6m" : "x = regime · y = IBOV em 6m") + '</div>' +
         '<div style="display:flex;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:230px">' + scatterChart(sct) + '<div class="legend" style="margin-top:3px">' + (L ? "the cloud · today highlighted" : "a nuvem · hoje em destaque") + '</div></div>' +
-        (dist ? '<div style="flex:1;min-width:230px">' + dist.svg + '<div class="legend" style="margin-top:3px">' + (L ? "outcomes within today's band (scatter cut — a different method from the k-NN analog above) · most between " : "desfechos na faixa de hoje (recorte do scatter — método distinto do análogo k-NN acima) · maioria entre ") + (dist.p25 >= 0 ? "+" : "") + dist.p25 + '% ' + (L ? "and " : "e ") + (dist.p75 >= 0 ? "+" : "") + dist.p75 + '% (' + (L ? "median " : "mediana ") + (dist.p50 >= 0 ? "+" : "") + dist.p50 + '%, n=' + dist.n + ')</div></div>' : '') +
+        (dist ? '<div style="flex:1;min-width:230px">' + dist.svg + '<div class="legend" style="margin-top:3px">' + (L ? "outcomes within today's band (an independent cut, distinct from the analog study above) · most between " : "desfechos na faixa de hoje (recorte independente, distinto do estudo de análogos acima) · maioria entre ") + (dist.p25 >= 0 ? "+" : "") + dist.p25 + '% ' + (L ? "and " : "e ") + (dist.p75 >= 0 ? "+" : "") + dist.p75 + '% (' + (L ? "median " : "mediana ") + (dist.p50 >= 0 ? "+" : "") + dist.p50 + '%, n=' + dist.n + ')</div></div>' : '') +
         '</div>' + (sct.leitura ? '<div class="legend" style="margin-top:4px">' + esc(sct.leitura) + '</div>' : ''); }
 
     // ════ CÉREBRO 2 — Vértice · experimento (cross-asset, hipótese contextual) ════
@@ -2141,8 +2136,8 @@
         // ★ VALUATION (Lyn Alden) — leitura TEXTUAL p/ FREE (prêmio/desconto vs valor-justo, citável p/ IA/SEO);
         //   a LINHA de valor-justo no gráfico + a investigação (DCF/cenários) ficam no acesso completo (🔒). Decisão do dono.
         if (s.fair && s.fair.premio_pct != null) { var isFii = s.fair.tipo === "fii";
-          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "Valuation line on chart in full access" : "linha de Valuation no gráfico no acesso completo")) + '</span>') + '</div>'; }
-        else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '<span style="color:var(--_accent)">🔒</span> ' + (L ? "model & scenarios in full access" : "modelo & cenários no acesso completo")) + '</span>') + '</div>';
+          h += '<div class="rp-ml" style="margin-top:8px"><b>' + (isFii ? (L ? "Net asset value " : "Valor patrimonial ") : "Valuation ") + '</b><b style="color:var(--_warm)">' + (s.fair.premio_pct >= 0 ? "+" : "") + esc(s.fair.premio_pct) + '%</b> ' + (L ? "vs price" : "vs preço") + (isFii ? ' · P/VP ' + esc(s.fair.pvp) : (' · ' + (L ? "P/E " : "P/L ") + esc(s.fair.pe_now) + ' vs ' + esc(s.fair.pe_normal) + (L ? " normal" : " normal"))) + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '' + (L ? "Valuation line on chart in full access" : "linha de Valuation no gráfico no acesso completo")) + '</span>') + '</div>'; }
+        else if (s.dcf && s.dcf.iv != null) h += '<div class="rp-ml" style="margin-top:8px"><b>' + (L ? "DCF intrinsic " : "DCF intrínseco ") + '</b>R$ ' + esc(s.dcf.iv) + ' · ' + (L ? "price " : "preço ") + '<b style="color:var(--_' + (s.dcf.premio_pct >= 0 ? "warm" : "cool") + ')">' + (s.dcf.premio_pct >= 0 ? "+" : "") + esc(s.dcf.premio_pct) + '%</b>' + (gpaid ? '' : ' · <span style="opacity:.72">' + lockA(L, '' + (L ? "model & scenarios in full access" : "modelo & cenários no acesso completo")) + '</span>') + '</div>';
         if (s.trend && s.trend.score != null) h += '<div class="rp-ml" style="margin-top:4px">' + (L ? "Trend score " : "Score de tendência ") + '<b>' + esc(s.trend.score) + '/10</b></div>';
         h += analogBlock(s, nm, lang, gpaid);  // taxa-base nobre (P3)
         h += '<div class="rp-ml" style="margin-top:8px;opacity:.7">' + (L ? "descriptive, never a recommendation · distribution, not a forecast" : "descritivo, nunca recomendação · distribuição, não previsão") + '</div>';
