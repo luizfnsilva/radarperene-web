@@ -1900,7 +1900,7 @@
         // ★ datação (dono 2026-07-06, eco do A2-01/A3-02): a comparação é ancorada numa LEITURA DATADA — o card
         //   carimba a data de referência do dado (por extenso, padrão da casa; determinístico do ISO, sem Date()).
         var _pdt = "";
-        (function () { var s = d.data_referencia; if (!s) return; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s)); if (!m) return;
+        (function () { var s = (ab && ab.data) || d.data_referencia; if (!s) return; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s)); if (!m) return;
           var MES = L ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] : ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
           var mo = parseInt(m[2], 10) - 1, dd = parseInt(m[3], 10);
           _pdt = L ? (" · reading of " + MES[mo] + " " + dd + ", " + m[1]) : (" · leitura de " + dd + " de " + MES[mo] + " de " + m[1]); })();
