@@ -543,6 +543,11 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const _vozCorpo = _pm ? _pm.html : narr.texto_html;
   const vozHtml = _vozCorpo ? "<div class=\"voz\">" + _vozCorpo + "</div>" : "";
   void indHtml; void ibovHtml; void ctxHtml; // subsumidos pela voz (mantidos calculados p/ fallback futuro)
+  // Anúncios (gateados pelo /ads.js — Founder não vê): igual aos capítulos. In-article entre a prosa e os
+  //   "casos semelhantes" (só quando há prosa, p/ não anunciar em snapshot magro); Multiplex DEPOIS dos casos
+  //   e ANTES do _memoGate (mantém o anúncio longe do CTA de conversão). SEO alto + leitor do Google = quase sempre free.
+  const inArticleSlot = vozHtml ? "<div class=\"ad-slot\" data-ad-type=\"in-article\" style=\"margin:18px 0\"></div>" : "";
+  const multiplexSlot = "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 4px\"></div>";
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "dateModified": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">" +
@@ -559,7 +564,9 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<p class=\"dt\">" + (_pm ? (en ? "Brazil market regime · " : "Regime do mercado brasileiro · ") : "") + (nav.num ? (en ? "Edition no. " : "Edição nº ") + nav.num + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + " · Radar Perene" + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
     mancheteHtml +
     vozHtml +
+    inArticleSlot +
     pfHtml +
+    multiplexSlot +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0 ? date : (WEEKLY_SAMPLE_DATES[WEEKLY_SAMPLE_DATES.length - 1] || null)) +
     _lembraHtml(date, en) +
     "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a></p>" +
