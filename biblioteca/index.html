@@ -96,6 +96,11 @@
   if(["diario","semanal","mensal"].indexOf(atual)<0) atual="diario";
   var cache={};
 
+  // ★ GATE (o acervo é o OURO): a página só se abre para ASSINANTE LOGADO. Sem login → prompt, sem lista,
+  //   sem sequer buscar o catálogo. Tier 'semanal' vê SÓ a aba Semanal; 'founder' (institucional) vê tudo.
+  //   O conteúdo já é gated server-side (/v1/biblioteca/item → 'assinantes'); aqui fechamos a PÁGINA/catálogo.
+  function tier(){ try{ return localStorage.getItem("rp_tier"); }catch(e){ return null; } }
+
   function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   function render(tipo){
@@ -123,9 +128,34 @@
     try{ history.replaceState(null,"", location.pathname.split("?")[0]+"?tipo="+tipo+(EN?"&lang=en":"")); }catch(e){}  /* slug-aware: mantém /library no .com, /biblioteca no .com.br */
     render(tipo); carregar(tipo);
   }
-  elTabs.innerHTML = TIPOS.map(function(t){ return '<button data-k="'+t.k+'">'+(EN?t.en:t.pt)+'</button>'; }).join("");
-  [].forEach.call(elTabs.children,function(b){ b.addEventListener("click",function(){ selecionar(b.dataset.k); }); });
-  selecionar(atual);
+  function montarTabs(tipos){
+    var ini = (new URLSearchParams(location.search).get("tipo"))||tipos[0].k;
+    if(!tipos.some(function(t){return t.k===ini;})) ini=tipos[0].k;
+    elTabs.innerHTML = tipos.map(function(t){ return '<button data-k="'+t.k+'">'+(EN?t.en:t.pt)+'</button>'; }).join("");
+    [].forEach.call(elTabs.children,function(b){ b.addEventListener("click",function(){ selecionar(b.dataset.k); }); });
+    selecionar(ini);
+  }
+
+  function gate(){
+    var tr=tier();
+    if(tr!=="founder" && tr!=="semanal"){  // não logado / não-assinante → prompt, SEM lista nem catálogo
+      elTabs.innerHTML="";
+      elLista.innerHTML='<div style="border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:18px 20px;max-width:60ch">'
+        +'<p style="margin:0 0 8px;font-family:var(--serif);font-size:18px;color:var(--txt)">'+(EN?"The archive is for subscribers.":"O acervo é para assinantes.")+'</p>'
+        +'<p style="margin:0 0 14px;color:var(--dim);font-size:14.5px">'+(EN?"Sign in to read the editions. The daily regime reading stays open to all.":"Entre para ler as edições. A leitura diária do regime segue aberta a todos.")+'</p>'
+        +'<a href="#" id="bib-login" style="color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:15px">'+(EN?"Sign in →":"Entrar →")+'</a> '
+        +'<a href="/assine" style="color:var(--dim);font-size:13.5px;margin-left:14px">'+(EN?"See subscriptions →":"Ver assinaturas →")+'</a></div>';
+      var lg=document.getElementById("bib-login"); if(lg) lg.onclick=function(e){ e.preventDefault(); try{ (window.RP_AUTH&&window.RP_AUTH.login||function(){})(); }catch(x){} };
+      return;
+    }
+    // assinante logado: 'semanal' vê só Semanal; 'founder' (institucional) vê tudo
+    var tipos = (tr==="semanal") ? TIPOS.filter(function(t){return t.k==="semanal";}) : TIPOS;
+    cache={};                       // troca de estado (login/logout/plano) invalida o cache
+    montarTabs(tipos);
+  }
+  window.addEventListener("rp-premium-change", gate);   // re-render em login/logout/mudança de plano
+  gate();                                                // estado imediato via localStorage rp_tier
+  if(window.RP_AUTH && window.RP_AUTH.ready && window.RP_AUTH.ready.then) window.RP_AUTH.ready.then(gate);  // confirma após /v1/me
 })();
 </script>
 </body>
