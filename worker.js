@@ -119,7 +119,9 @@ const NARR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-ap
 const IND_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/indicadores";
 const SNAP_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshot";
 const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/snapshots";
+const ATLAS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/atlas";  // agregação do acervo p/ a /atlas
 const HIST_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/historico";  // track record (leituras maturadas vs desfecho)
+const RECORR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/recorrencia";  // recorrência descritiva por ESTADO (Perene) — o MESMO número da home
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
 
@@ -435,6 +437,117 @@ function _lembraHtml(date, en) {
   const pick = [_LEMBRA[i], _LEMBRA[(i + 1) % _LEMBRA.length]].map(function (e) { const a = en ? e.en : e.pt; return '<a href="' + base + a[0] + '/">' + a[1] + "</a>"; });
   return '<p class="lembra"><span class="lb">' + (en ? "The archive remembers" : "O arquivo lembra") + "</span> " + pick.join(" · ") + "</p>";
 }
+// ── v1.0: cor do filete de assinatura do regime (defensivo=ardósia fria; risk_on=terracota apagada; neutro=dourado
+//    apagado). Editorial, NUNCA verde/vermelho. Muda com o regime (mensal) — a assinatura que o leitor aprende. ──
+function _regimeColor(regRaw) {
+  const r = String(regRaw == null ? "" : regRaw).toLowerCase();
+  if (/defens/.test(r)) return "#5b6b7a";           // ardósia fria
+  if (/risk[_ ]?on|otimis|exuber|amplo/.test(r)) return "#a86b4a";  // terracota apagada (risco ligado)
+  if (/neutr/.test(r)) return "#9a8c6e";            // dourado/ardósia quente
+  return "#8a7f70";                                  // default discreto
+}
+// ── ★ v1.0 "O Arquivo Lembra" — a COLUNA fixa, o maior patrimônio. Timeline DETERMINÍSTICA do MESMO regime através do
+//    acervo (Há um ano · Há cinco anos · Primeira vez), via /v1/historico (leituras maturadas × desfecho, Ibov em pontos).
+//    O diário público NÃO reescreve. Regra dura: indicava×aconteceu SEMPRE na MESMA janela (6m). Baixas em tom NEUTRO,
+//    nunca vermelho — "78% confirmada, nem sempre pra cima" constrói mais confiança. Degrada gracioso (sem dado → ""). ──
+function _arquivoLembraHtml(hist, todayPerene, todayDate, en, dpath, regimeColor, rec) {
+  const items = (hist && hist.itens) || [];
+  if (!items.length) return "";
+  const matured = function (x) { return x && x.realizado_6m_pct != null && String(x.data).slice(0, 10) < todayDate; };
+  // similaridade por ESTADO (Índice de Risco Perene ~ igual), não por regime — coerente com o Atlas e a recorrência.
+  const _P0 = (todayPerene != null) ? Number(todayPerene) : null, BANDA = 10;
+  let same = (_P0 != null) ? items.filter(function (x) { return matured(x) && x.perene != null && Math.abs(Number(x.perene) - _P0) <= BANDA; }) : [];
+  if (!same.length) same = items.filter(matured);   // fallback: acervo maturado (qualquer estado)
+  if (!same.length) return "";
+  same.sort(function (a, b) { return String(a.data) < String(b.data) ? -1 : 1; });  // asc por data
+  const ym = function (d) { return parseInt(String(d).slice(0, 4), 10) * 12 + parseInt(String(d).slice(5, 7), 10); };
+  const tgt = ym(todayDate);
+  //  tolerância: o nó só recebe o rótulo temporal se estiver DENTRO da janela (o rótulo não pode mentir a data —
+  //  a coluna é patrimônio). Fora da janela → null → o marco simplesmente não aparece (degrada p/ "Primeira vez").
+  const nearest = function (months, tol) {
+    let best = null, bd = 1e9;
+    for (let i = 0; i < same.length; i++) { const dd = Math.abs(ym(same[i].data) - (tgt - months)); if (dd < bd) { bd = dd; best = same[i]; } }
+    return (best && bd <= tol) ? best : null;
+  };
+  const seen = {}, picks = [];
+  const add = function (lbl, node) { if (node && !seen[node.data]) { seen[node.data] = 1; picks.push({ lbl: lbl, n: node }); } };
+  add(en ? "A year ago" : "Há um ano", nearest(12, 5));       // ±5 meses do alvo de 1 ano
+  add(en ? "Five years ago" : "Há cinco anos", nearest(60, 24));  // ±2 anos do alvo de 5 anos (marco grosso)
+  add(en ? "First time in the archive" : "Primeira vez no arquivo", same[0]);
+  if (!picks.length) return "";
+  const _MPT = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  const _MEN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const edate = function (d, full) {   // data editorial: full → "31 de julho de 2025"; senão "julho de 2025"
+    const q = String(d).split("-"), mo = (en ? _MEN : _MPT)[(+q[1]) - 1] || q[1];
+    if (!full) return en ? mo + " " + q[0] : mo + " de " + q[0];
+    return en ? mo + " " + (+q[2]) + ", " + q[0] : (+q[2]) + " de " + mo + " de " + q[0];
+  };
+  const nf = function (v) { return v == null ? null : Math.round(Number(v)).toLocaleString(en ? "en-US" : "pt-BR"); };  // Ibov em pontos, separador local
+  const pct = function (v) { return v == null ? null : Math.round(Number(v)); };  // % ARREDONDADO ao inteiro (editorial)
+  const sgnv = function (v) { const r = pct(v); return r == null ? "—" : (r >= 0 ? "+" : "") + r + "%"; };
+  const gain = function (v) {   // ganho em terracota (warm), baixa em tom NEUTRO — nunca vermelho
+    const r = pct(v); if (r == null) return "—";
+    return "<span class=\"arq-pct" + (r >= 0 ? " up" : "") + "\">" + (r >= 0 ? "+" : "") + r + "%</span>";
+  };
+  // FEATURED = picks[0] (Há um ano, quando existe) — foto detalhada; os demais = one-liners (○).
+  const feat = picks[0], fx = feat.n, fd = String(fx.data).slice(0, 10);
+  const fAnc = nf(fx.ibov_ancora), fFim = nf(fx.ibov_nivel_6m);
+  const featHtml = "<li class=\"arq-no arq-feat\"><div class=\"arq-top\"><span class=\"arq-sym\">●</span><span class=\"arq-quando\">" + _esc(feat.lbl) + "</span><span class=\"arq-data\">" + edate(fd, true) + "</span></div>" +
+    (fAnc ? "<div class=\"arq-lin\"><span>" + (en ? "Ibovespa that day" : "Ibovespa no dia") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + fAnc + " pts</span></div>" : "") +
+    (fx.previsto_6m_pct != null ? "<div class=\"arq-lin\"><span>" + (en ? "the archive suggested" : "o arquivo indicava") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + sgnv(fx.previsto_6m_pct) + (en ? " in 6m" : " em 6 meses") + " <em>" + (en ? "hist. median" : "mediana histórica") + "</em></span></div>" : "") +
+    "<div class=\"arq-lin\"><span>" + (en ? "what happened in 6 months" : "o que aconteceu em 6 meses") + "</span><span class=\"dl\"></span><span class=\"arq-v\">" + (fFim ? fFim + " pts " : "") + "(" + gain(fx.realizado_6m_pct) + ")</span></div>" +
+    "<a class=\"arq-reler\" href=\"" + dpath + "/" + fd + "\">" + (en ? "Reread the edition of " : "Reler a edição de ") + edate(fd, true) + " →</a></li>";
+  const oneHtml = picks.slice(1).map(function (p) {
+    const x = p.n, d = String(x.data).slice(0, 10), a = nf(x.ibov_ancora), f = nf(x.ibov_nivel_6m);
+    const traj = (a && f) ? "Ibovespa " + a + " → " + f + " pts (" + gain(x.realizado_6m_pct) + (en ? " in 6m)" : " em 6m)") : "(" + gain(x.realizado_6m_pct) + (en ? " in 6m)" : " em 6m)");
+    return "<li class=\"arq-no arq-one\"><div class=\"arq-top\"><span class=\"arq-sym o\">○</span><span class=\"arq-quando o\">" + _esc(p.lbl) + "</span><span class=\"arq-data\">" + edate(d, false) + "</span></div>" +
+      "<div class=\"arq-oneline\">" + traj + " · <a href=\"" + dpath + "/" + d + "\">" + (en ? "reread →" : "reler →") + "</a></div></li>";
+  }).join("");
+  const intro = en ? "Other times the archive saw the market in a state like today’s — what came next."
+                   : "Outras vezes em que o arquivo viu o mercado num estado como o de hoje — o que veio depois.";
+  // RECORRÊNCIA (descritiva, o MESMO número da home): "de N vezes num estado como hoje, o Ibov subiu em X%". Sujeito = o
+  //   MERCADO (não o Radar); o arquivo é a testemunha. O "78% direção confirmada" (acurácia) vive só no /historico.
+  const _m = rec && rec.mediana_6m != null ? (en ? " — median " : " — mediana ") + (rec.mediana_6m >= 0 ? "+" : "") + (en ? rec.mediana_6m : String(rec.mediana_6m).replace(".", ",")) + "%" : "";
+  const foot = (rec && rec.n && rec.alta_pct != null)
+    ? (en ? "In <b>" + rec.n + "</b> times the archive saw the market in a state like today’s since 2000, the Ibovespa was higher six months later <b>" + rec.alta_pct + "%</b> of the time" + _m + " — <em>not always upward</em>. "
+          : "Em <b>" + rec.n + "</b> vezes que o arquivo viu o mercado num estado como o de hoje, desde 2000, o Ibovespa esteve mais alto seis meses depois em <b>" + rec.alta_pct + "%</b> delas" + _m + " — <em>nem sempre para cima</em>. ")
+    : "";
+  const style = regimeColor ? " style=\"border-left-color:" + regimeColor + "\"" : "";
+  return "<section class=\"arquivo\" id=\"arquivo\"" + style + "><div class=\"arq-h\">" + (en ? "The Archive Remembers" : "O Arquivo Lembra") + " <span class=\"arq-mk\">◎</span></div>" +
+    "<p class=\"arq-intro\">" + intro + "</p><ol class=\"arq-tl\">" + featHtml + oneHtml + "</ol>" +
+    "<p class=\"arq-foot\">" + foot + "<a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Explore the archive →" : "Explorar o arquivo →") + "</a></p></section>";
+}
+// ★ Direção Editorial do Diário v1.0 (CONGELADA) — CSS das colunas permanentes. Escopado ao /diario (injetado como
+//   'extra' do _chromeCss só aqui): não regride as outras páginas. Paleta base (marfim/serif) é a compartilhada.
+const _DIARIO_CSS_V1 =
+  ":root{--azul:#2c4a6e;--terra:#a85336;--oliva:#6b6a2e}" +
+  ':root[data-theme="dark"]{--azul:#7aa6d6;--terra:#d68a6e;--oliva:#b6b46e}' +
+  ".regime-rule{height:3px;border:0;margin:.9rem 0 1.4rem;background:repeating-linear-gradient(90deg,currentColor 0 16px,transparent 16px 24px)}" +   /* cicatrizes: segmentos na cor do regime (currentColor = regimeColor via style inline) */
+  ".deck{font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--txt2);max-width:54ch;margin:.2rem 0 1.5rem}" +
+  ".sumario{margin:0 0 1.9rem}.sum-lb{font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:.55rem}" +
+  ".sumario ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:.35rem 1.5rem}.sumario li{font-family:var(--serif);font-size:15.5px}.sumario a{color:var(--txt);text-decoration:none}.sumario a:hover{color:var(--gold-ink)}.sumario .dot{font-size:8px;vertical-align:.2em;margin-right:.45rem}" +
+  ".pulse-i{max-width:16rem;border-top:2px solid var(--line);padding-top:.7rem}.pulse-i.perene{border-top-color:var(--azul)}.pulse-i.anima{border-top-color:var(--terra)}.pulse-i.curto{border-top-color:var(--oliva)}" +
+  ".pulse-id{font-family:var(--serif);font-size:13px;color:var(--dim);font-style:italic;margin:.12rem 0 .35rem;line-height:1.35}" +
+  ".pulse-i.perene .pulse-nm{color:var(--azul)}.pulse-i.anima .pulse-nm{color:var(--terra)}.pulse-i.curto .pulse-nm{color:var(--oliva)}" +
+  ".pulse-int{font-family:var(--serif);font-size:14px;color:var(--txt2);margin:.4rem 0 0;line-height:1.4}" +
+  ".pulse-d{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:.3rem;letter-spacing:.02em}.pulse-d .arw{font-weight:600}.pulse-i.perene .arw{color:var(--azul)}.pulse-i.anima .arw{color:var(--terra)}.pulse-i.curto .arw{color:var(--oliva)}" +
+  ".diverg{font-family:var(--serif);font-size:16px;color:var(--txt2);border-top:1px solid var(--line);margin:1.4rem 0 0;padding-top:1.1rem;max-width:60ch}" +
+  ".pub{margin:2.2rem 0;border-top:1px solid var(--line);padding-top:.55rem}.pub-lb{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);opacity:.55;margin-bottom:.8rem}" +
+  ".sec-lb{font-family:var(--sans);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);display:block;margin:2.2rem 0 .55rem}.sec-body{font-family:var(--serif);font-size:16.5px;line-height:1.7;color:var(--txt2);max-width:64ch}" +
+  ".arquivo{margin:2.6rem 0;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;padding:1.3rem 1.4rem}" +
+  ".arq-h{font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 .1rem}.arq-mk{color:var(--gold-ink);font-size:14px}" +
+  ".arq-intro{font-family:var(--serif);font-size:18px;line-height:1.5;color:var(--txt);max-width:56ch;margin:.35rem 0 1.3rem}.arq-intro b{font-weight:600}" +
+  ".arq-tl{list-style:none;padding:0;margin:0}.arq-no{margin:0 0 1.1rem;padding:0}.arq-feat{margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}" +
+  ".arq-top{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.35rem;flex-wrap:wrap}.arq-sym{color:var(--gold-ink);font-size:11px}.arq-sym.o{color:var(--dim)}.arq-quando{font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}.arq-quando.o{color:var(--dim)}.arq-data{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}" +
+  ".arq-lin{display:flex;align-items:baseline;gap:.5rem;font-size:14.5px;color:var(--txt2);margin:.28rem 0}.arq-lin .dl{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-.22em);min-width:1.5rem}.arq-v{font-variant-numeric:tabular-nums;color:var(--txt);white-space:nowrap}.arq-v em{color:var(--dim);font-style:italic;font-size:12.5px}" +
+  ".arq-pct{color:var(--txt);font-weight:600}.arq-pct.up{color:var(--terra)}" +
+  ".arq-oneline{font-size:14.5px;color:var(--txt2);font-variant-numeric:tabular-nums;line-height:1.5}.arq-oneline a{color:var(--gold-ink);text-decoration:none}.arq-oneline a:hover{text-decoration:underline}" +
+  ".arq-reler{display:inline-block;margin-top:.55rem;font-size:13.5px;color:var(--gold-ink);text-decoration:none}.arq-reler:hover{text-decoration:underline}" +
+  ".arq-foot{font-size:13px;color:var(--dim);margin:1.2rem 0 0;line-height:1.6;max-width:60ch}.arq-foot b{color:var(--txt2)}.arq-foot em{font-style:italic}.arq-foot a{color:var(--gold-ink);text-decoration:none}.arq-foot a:hover{text-decoration:underline}" +
+  ".voz{margin:.4rem 0 0}.cas{background:none;border:0;border-radius:0;padding:0}.cas>b{display:none}.cas ul{list-style:none;padding:0;margin:.3rem 0 0}.cas .casm{margin-top:.5rem}" +
+  ".colofon{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:1.6rem;letter-spacing:.02em}.colofon .reg{color:var(--txt2)}" +
+  ".dt{font-family:var(--sans);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--dim)}.dt b{color:var(--txt2);font-weight:600}" +
+  ".sumario .sum-gate{font-style:italic;color:var(--dim)}.sumario .sum-gate a{color:var(--dim);text-decoration:none}.sumario .sum-gate a:hover{color:var(--gold-ink)}";
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
   const en = lang === "en";
@@ -536,9 +649,40 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   // ★ 2026-07-04 (consultor · Canônico G2): o "Pulso do dia" é OBJETO EDITORIAL, não continuação da frase — a temperatura
   //   na capa de um jornal. Nome pequeno em cima, NÚMERO grande embaixo, "/100" quase invisível; sem cor/barra/ícone/badge.
   //   Calma = autoridade; reconhecível em <1s. A prosa do regime (voz) vem depois, como texto. "Como interpretar?" discreto.
-  const _pItem = (nm, n) => n == null ? "" : "<div class=\"pulse-i\"><span class=\"pulse-nm\">" + nm + "</span><span class=\"pulse-n\">" + n + "<span class=\"pulse-u\">/100</span></span></div>";
-  const _pItems = _pItem(en ? "Perene Risk Index" : "Índice de Risco Perene", _pP) + _pItem(en ? "Ânima Index · structural" : "Índice Ânima · estrutural", _pA) + _pItem(en ? "Ânima · short-term" : "Ânima · curto prazo", _pAc);
-  const mancheteHtml = _pItems ? "<div class=\"pulse\"><div class=\"pulse-eyb\">" + (en ? "Today’s pulse" : "O pulso do dia") + "</div><div class=\"pulse-g\">" + _pItems + "</div><a class=\"pulse-help\" href=\"" + (en ? "/how-to-read-the-radar/" : "/como-ler-o-radar/") + "\">" + (en ? "how to read?" : "como interpretar?") + "</a></div>" : "";
+  // ★ v1.0: cada índice é um PERSONAGEM — nome + identidade de 1 linha + COR própria (Perene=azul, Ânima estrutural=
+  //   terracota, curto=oliva) + movimento sutil ▴/▾/→ com delta "Hoje +N" (Perene/Ânima têm série diária no SNAPS).
+  //   Número grande fica em --txt (calma=autoridade); só a marca de direção e o nome levam a cor. Zero gauge/barra.
+  // movimento: ▲/▾/→ (filled) + delta; nos extremos, "NO TETO"/"NO PISO" em vez do número
+  const _mov = (n, dv) => {
+    if (n >= 100) return "<span class=\"arw\">→</span> <b>" + (en ? "AT THE TOP" : "NO TETO") + "</b>";
+    if (n <= 0) return "<span class=\"arw\">→</span> <b>" + (en ? "AT THE FLOOR" : "NO PISO") + "</b>";
+    if (dv == null) return "";
+    return "<span class=\"arw\">" + (dv > 0 ? "▲" : dv < 0 ? "▾" : "→") + "</span> " + (dv > 0 ? "+" : "") + dv;
+  };
+  const _pItem = (nm, ident, n, cls, dv) => {
+    if (n == null) return "";
+    const mv = _mov(n, dv);
+    return "<div class=\"pulse-i " + cls + "\"><span class=\"pulse-nm\">" + nm + "</span><span class=\"pulse-id\">" + ident + "</span>" +
+      "<span class=\"pulse-n\">" + n + "<span class=\"pulse-u\">/100</span></span>" +
+      (mv ? "<span class=\"pulse-d\">" + (en ? "Today " : "Hoje ") + mv + "</span>" : "") + "</div>";
+  };
+  const _pItems =
+    _pItem(en ? "Perene Risk Index" : "Índice de Risco Perene", en ? "the market’s structural state" : "o estado estrutural do mercado", _pP, "perene", (nav.dPerene != null ? nav.dPerene : null)) +
+    _pItem(en ? "Ânima · structural" : "Índice Ânima · estrutural", en ? "investors’ prevailing mood" : "o humor predominante dos investidores", _pA, "anima", (nav.dAnima != null ? nav.dAnima : null)) +
+    _pItem(en ? "Ânima · short-term" : "Ânima · curto prazo", en ? "the market’s recent move" : "o movimento recente do mercado", _pAc, "curto", (nav.dCurto != null ? nav.dCurto : null));
+  const mancheteHtml = _pItems ? "<section class=\"pulse\" id=\"pulso\"><div class=\"pulse-eyb\">" + (en ? "The Pulse" : "O Pulso") + "</div><div class=\"pulse-g\">" + _pItems + "</div><a class=\"pulse-help\" href=\"" + (en ? "/how-to-read-the-radar/" : "/como-ler-o-radar/") + "\">" + (en ? "how to read?" : "como interpretar?") + "</a></section>" : "";
+  // chamada de divergência (com respiro) — determinística, do próprio snapshot: a tensão mais saliente do dia.
+  let divergHtml = "";
+  if (_pA != null && _pAc != null && Math.abs(_pA - _pAc) >= 20) {
+    divergHtml = en
+      ? "Structural mood (Ânima " + _pA + ") and recent move (" + _pAc + ") diverge."
+      : "Humor estrutural (Ânima " + _pA + ") e movimento recente (" + _pAc + ") divergem.";
+  } else if (_pP != null && _rl && /defens/i.test(_rl) && _pP >= 70) {
+    divergHtml = en
+      ? "The Perene Risk Index is stretched (" + _pP + ") while the month regime still reads defensive."
+      : "O Índice de Risco Perene está esticado (" + _pP + ") enquanto o regime do mês ainda lê defensivo.";
+  }
+  divergHtml = divergHtml ? "<p class=\"diverg\">" + _esc(divergHtml) + "</p>" : "";
   const ctxHtml = regime ? "<div class=\"mctx\"><b>" + (en ? "Month context — BR regime (monthly" : "Contexto do mês — regime BR (mensal") + (refMes ? " · ref. " + _esc(refMes) : "") + ")</b><ul>" + _indLi(regime) + "</ul><p class=\"casm\">" + (en ? "Monthly by construction — the score only moves at month-end; the daily variation lives in the indices above." : "Mensal por construção — o score só se move no fecho do mês; a variação diária está nos índices acima.") + "</p></div>" : "";
   // ★ A VOZ DO MOTOR (2026-06-17): a leitura canônica do dia em prosa editorial (2 parágrafos + 3 bullets
   //   dinâmicos), vinda do snapshot CONGELADO (narr.texto_html, zero LLM). É o HERÓI do diário — conclusão
@@ -552,6 +696,40 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   //   e ANTES do _memoGate (mantém o anúncio longe do CTA de conversão). SEO alto + leitor do Google = quase sempre free.
   const inArticleSlot = vozHtml ? "<div class=\"ad-slot\" data-ad-type=\"in-article\" style=\"margin:18px 0\"></div>" : "";
   const multiplexSlot = "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 4px\"></div>";
+  // ── ★ Direção Editorial v1.0 (CONGELADA): colunas permanentes, ordem fixa, assinatura de regime. Determinístico. ──
+  const regimeToday = regime ? (regime.classificacao || "") : "";
+  const regimeColor = _regimeColor(regime && (regime.classificacao || regime.leitura || ""));
+  const fileteHtml = "<div class=\"regime-rule\" style=\"color:" + regimeColor + "\" aria-hidden=\"true\"></div>";
+  // deck (subtítulo) — reusa narr.resumo quando distinto da manchete; senão omite (zero-LLM, sem duplicar)
+  let deckHtml = "";
+  if (narr.resumo) {
+    const _rz = String(narr.resumo).replace(/<[^>]+>/g, "").trim();
+    const _dot = _rz.indexOf(". ");                                   // deck = 1ª frase LIMPA (não o resumo inteiro)
+    const _first = (_dot > 0 ? _rz.slice(0, _dot + 1) : _clampDesc(_rz, 200));
+    const _mm = _pm ? String(_pm.manchete).replace(/<[^>]+>/g, "").trim() : "";
+    if (_first && _first.slice(0, 30).toLowerCase() !== _mm.slice(0, 30).toLowerCase()) deckHtml = "<p class=\"deck\">" + _esc(_first) + "</p>";
+  }
+  // O Arquivo Lembra — timeline do MESMO regime (via nav.historico); degrada p/ os 2 links estáticos se sem dado
+  const arquivoHtml = _arquivoLembraHtml(nav.historico, _pP, date, en, dpath, regimeColor, nav.recorrencia) || _lembraHtml(date, en);
+  const arquivoIsTimeline = arquivoHtml.indexOf('class="arquivo"') >= 0;
+  // O Que Costuma Vir Depois (casos análogos) + O Que Chamou Atenção Hoje (voz) — rótulos de coluna
+  const costumaHtml = pfHtml ? "<section id=\"depois\"><span class=\"sec-lb\">" + (en ? "What Usually Comes Next" : "O Que Costuma Vir Depois") + "</span>" + pfHtml + "</section>" : "";
+  const hojeHtml = vozHtml ? "<section id=\"hoje\"><span class=\"sec-lb\">" + (en ? "Today’s Read" : "O Que Chamou Atenção Hoje") + "</span>" + vozHtml + "</section>" : "";
+  const proximaHtml = "<section id=\"proxima\"><span class=\"sec-lb\">" + (en ? "For the Next Edition" : "Para a Próxima Edição") + "</span><p class=\"sec-body\">" + (en
+    ? "The next reading arrives on the next business day — the regime is monthly, and the daily pulse carries the change until month-end."
+    : "A próxima leitura chega no próximo dia útil — o regime é mensal, e o pulso diário carrega a variação até o fecho do mês.") + "</p></section>";
+  // Publicidade editorial revestindo os slots AdSense (INVARIANTE: os 2 slots FICAM; só ganham rótulo "Publicidade")
+  const _pub = function (slot) { return slot ? "<div class=\"pub\"><span class=\"pub-lb\">" + (en ? "Advertisement" : "Publicidade") + "</span>" + slot + "</div>" : ""; };
+  // Nesta edição (sumário) — ● na cor do regime; só as seções presentes
+  const _sum = [];
+  if (mancheteHtml) _sum.push(["#pulso", en ? "The Pulse" : "O Pulso"]);
+  if (arquivoIsTimeline) _sum.push(["#arquivo", en ? "The Archive Remembers" : "O Arquivo Lembra"]);
+  if (costumaHtml) _sum.push(["#depois", en ? "What Usually Comes Next" : "O Que Costuma Vir Depois"]);
+  if (hojeHtml) _sum.push(["#hoje", en ? "Today’s Read" : "O Que Chamou Atenção Hoje"]);
+  _sum.push(["#proxima", en ? "For the Next Edition" : "Para a Próxima Edição"]);
+  const sumarioHtml = _sum.length >= 3 ? "<nav class=\"sumario\" aria-label=\"" + (en ? "In this edition" : "Nesta edição") + "\"><span class=\"sum-lb\">" + (en ? "In this edition" : "Nesta edição") + "</span><ul>" + _sum.map(function (s) { return "<li><span class=\"dot\" style=\"color:" + regimeColor + "\">●</span> <a href=\"" + s[0] + "\">" + _esc(s[1]) + "</a></li>"; }).join("") + "<li class=\"sum-gate\"><em><a href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Full reading — subscribers" : "Leitura completa — assinantes") + "</a></em></li>" + "</ul></nav>" : "";
+  // cólofon — "regime · há N dias" (persistência do regime); nav.regimeDias vem do dispatch (série SNAPS)
+  const colofonHtml = regimeToday ? "<p class=\"colofon\"><span class=\"reg\">" + (en ? "Regime " : "Regime ") + _esc(regimeToday) + "</span>" + (nav.regimeDias != null && nav.regimeDias > 0 ? " · " + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") : "") + "</p>" : "";
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Dataset", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "datePublished": date, "dateModified": date, "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">" +
@@ -562,22 +740,179 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     "<script type=\"application/ld+json\">" + JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": en ? "Home" : "Início", "item": origin + "/" }, { "@type": "ListItem", "position": 2, "name": en ? "Daily archive" : "Arquivo diário", "item": origin + dpath }, { "@type": "ListItem", "position": 3, "name": date, "item": canon } ] }).replace(/</g, "\\u003c") + "</script>" +
-    _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}") +
+    _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}" + _DIARIO_CSS_V1) +
     "</head><body>" + _header(en) + "<div class=\"wrap\">" +
     (_pm ? '<h1 class="h1m">' + _pm.manchete + "</h1>" : "<h1>" + (en ? "Brazil market regime" : "Regime do mercado brasileiro") + "</h1>") +
-    "<p class=\"dt\">" + (_pm ? (en ? "Brazil market regime · " : "Regime do mercado brasileiro · ") : "") + (nav.num ? (en ? "Edition no. " : "Edição nº ") + nav.num + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + " · Radar Perene" + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
+    "<p class=\"dt\">" + (nav.num ? (en ? "Edition no. " : "Edição nº ") + nav.num + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + (regimeToday ? " · " + (en ? "Regime " : "Regime ") + _esc(regimeToday) : "") + (nav.regimeDias != null && nav.regimeDias > 0 ? " · <b>" + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") + "</b>" : "") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
+    fileteHtml +
+    deckHtml +
+    sumarioHtml +
     mancheteHtml +
-    vozHtml +
-    inArticleSlot +
-    pfHtml +
-    multiplexSlot +
+    divergHtml +
+    _pub(inArticleSlot) +
+    arquivoHtml +
+    costumaHtml +
+    hojeHtml +
+    _pub(multiplexSlot) +
+    proximaHtml +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0 ? date : (WEEKLY_SAMPLE_DATES[WEEKLY_SAMPLE_DATES.length - 1] || null)) +
-    _lembraHtml(date, en) +
+    colofonHtml +
     "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a></p>" +
     ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + (en ? "previous edition · " : "edição anterior · ") + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " · " + (en ? "next edition" : "edição seguinte") + " →</a>" : "<span></span>") + "</p>" : "") +
     "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
     "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+}
+// client-side do /atlas — paisagem SVG + gavetas + respira, localizado por window.ATLAS.en, links p/ edições (fim-de-mês)
+const _ATLAS_JS = '<script>(function(){' +
+'var A=window.ATLAS||{};var EN=!!A.en,DP=A.dpath||"/diario";' +
+'var L=function(pt,en){return EN?en:pt;};' +
+'var fmt=function(n){return Number(n).toLocaleString(EN?"en-US":"pt-BR");};' +
+'var css=function(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();};' +
+'var REGpt={risk_on:"risco ligado",risk_on_amplo:"risco ligado amplo",neutro:"neutro",defensivo:"defensivo"};' +
+'var REGen={risk_on:"risk-on",risk_on_amplo:"broad risk-on",neutro:"neutral",defensivo:"defensive"};' +
+'var REG=function(k){return (EN?REGen:REGpt)[k]||k;};' +
+'var RCOL={risk_on:"var(--terra)",risk_on_amplo:"var(--terra)",neutro:"var(--oliva)",defensivo:"var(--slate)"};' +
+'var MES=EN?["January","February","March","April","May","June","July","August","September","October","November","December"]:["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];' +
+'function ym(i){var y=2000+Math.floor(i/12),m=i%12;return{y:y,m:m,label:MES[m]+(EN?" ":" de ")+y};}' +
+'function edLink(y,m){var d=new Date(y,m+1,0);var mm=("0"+(m+1)).slice(-2),dd=("0"+d.getDate()).slice(-2);return DP+"/"+y+"-"+mm+"-"+dd;}' +
+// ---- respira ----
+'var respira=EN?[' +
+'{t:"A year ago, the market entered this same <b>defensive regime</b>. What followed: the Ibovespa rose <b>+36%</b> in six months.",d:"July 2025",y:2025,m:6},' +
+'{t:"In March 2020, the Perene Risk Index touched <b>5.7</b> — the floor of the whole archive. In the six months that followed, the market’s mood doubled.",d:"March 2020",y:2020,m:2},' +
+'{t:"November 2016 marked <b>8.3</b>: the second-deepest capitulation on record. The regime had read defensive for three months.",d:"November 2016",y:2016,m:10},' +
+'{t:"For <b>35 straight months</b> — 2010 to 2013 — the archive read risk-on without a break. The longest regime in the whole collection.",d:"June 2010",y:2010,m:5}' +
+']:[' +
+'{t:"Há um ano, o mercado entrou neste mesmo <b>regime defensivo</b>. O que se seguiu: o Ibovespa fez <b>+36%</b> em seis meses.",d:"julho de 2025",y:2025,m:6},' +
+'{t:"Em março de 2020, o Índice de Risco Perene tocou <b>5,7</b> — o fundo de todo o arquivo. Nos seis meses seguintes, o mercado dobrou de humor.",d:"março de 2020",y:2020,m:2},' +
+'{t:"Novembro de 2016 marcou <b>8,3</b>: a segunda maior capitulação já registrada. O regime já lia defensivo havia três meses.",d:"novembro de 2016",y:2016,m:10},' +
+'{t:"Por <b>35 meses seguidos</b> — de 2010 a 2013 — o arquivo leu risco ligado sem interrupção. O regime mais longo de todo o acervo.",d:"junho de 2010",y:2010,m:5}' +
+'];' +
+'var ri=0,dots=document.getElementById("r-dots");respira.forEach(function(){var i=document.createElement("i");dots.appendChild(i);});' +
+'function showR(){var r=respira[ri];document.getElementById("r-body").innerHTML=r.t;var c=document.getElementById("r-cta");c.textContent=L("Reler a edição de "+r.d+" →","Reread the "+r.d+" edition →");c.href=edLink(r.y,r.m);var ds=dots.children;for(var i=0;i<ds.length;i++)ds[i].className=i===ri?"on":"";}' +
+'showR();var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;if(!reduce)setInterval(function(){ri=(ri+1)%respira.length;showR();},6500);' +
+// ---- gavetas ----
+'var dist=A.dist||{},ult=A.ultimas||[];' +
+'var drawersData=[' +
+'{k:L("Por regime","By regime"),h:L("como cada regime se resolveu","how each regime resolved"),r:function(){' +
+'var ord=["defensivo","neutro","risk_on","risk_on_amplo"];var chips=ord.map(function(x){return "<button class=\\"qchip\\">"+REG(x)+"<span class=\\"n\\">"+(dist[x]||0)+L(" meses"," mo")+"</span></button>";}).join("");' +
+'return "<div class=\\"qrow\\">"+chips+"</div><ul class=\\"plist\\"><li><span class=\\"sym re\\">◐</span><span class=\\"yr\\">"+L("35 meses","35 mo")+"</span><span class=\\"desc\\">"+L("o regime mais longo: risco ligado, de jun/2010 a mai/2013","the longest regime: risk-on, Jun 2010 to May 2013")+"</span><span class=\\"val\\">"+L("média 55","avg 55")+"</span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">"+L("18 meses","18 mo")+"</span><span class=\\"desc\\">"+L("defensivo contínuo, de mai/2024 em diante","continuous defensive, from May 2024")+"</span><span class=\\"val\\">"+L("o atual","current")+"</span></li><li><span class=\\"sym fi\\">○</span><span class=\\"yr\\">jun/2014</span><span class=\\"desc\\">"+L("primeira vez que o arquivo leu defensivo","first time the archive read defensive")+"</span><span class=\\"val\\"><a href=\\""+edLink(2014,5)+"\\">"+L("reler →","reread →")+"</a></span></li></ul>";}},' +
+'{k:L("Por extremo","By extreme"),h:L("euforia e capitulação","euphoria and capitulation"),r:function(){' +
+'return "<div class=\\"qrow\\"><button class=\\"qchip\\">"+L("Perene ≥ 90","Perene ≥ 90")+"<span class=\\"n\\">"+fmt(A.ge90)+L(" dias"," days")+"</span></button><button class=\\"qchip\\">Perene ≤ 10<span class=\\"n\\">"+fmt(A.le10)+L(" dias"," days")+"</span></button></div><ul class=\\"plist\\"><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">"+L("mar/2020","Mar 2020")+"</span><span class=\\"desc\\">"+L("o fundo de todo o arquivo — pânico da pandemia","the floor of the whole archive — pandemic panic")+"</span><span class=\\"val\\"><a href=\\""+edLink(2020,2)+"\\">"+L("Perene 5,7 · reler →","Perene 5.7 · reread →")+"</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">"+L("nov/2016","Nov 2016")+"</span><span class=\\"desc\\">"+L("capitulação — a economia em recessão","capitulation — the economy in recession")+"</span><span class=\\"val\\"><a href=\\""+edLink(2016,10)+"\\">"+L("Perene 8,3 · reler →","Perene 8.3 · reread →")+"</a></span></li></ul>";}},' +
+'{k:L("Por virada","By turn"),h:L("as mudanças de ciclo","the cycle changes"),r:function(){' +
+'var rows=ult.slice().reverse().map(function(v){var p=v.quando.split("-");return "<li><span class=\\"sym re\\">◐</span><span class=\\"yr\\">"+p[1]+"/"+p[0]+"</span><span class=\\"desc\\">"+REG(v.de)+" <span style=\\"color:var(--dim)\\">→</span> "+REG(v.para)+"</span><span class=\\"val\\"><a href=\\""+edLink(+p[0],+p[1]-1)+"\\">"+L("reler →","reread →")+"</a></span></li>";}).join("");' +
+'return "<div class=\\"qrow\\"><button class=\\"qchip\\">"+L("Total de viradas","Total turns")+"<span class=\\"n\\">"+A.viradas+"</span></button></div><ul class=\\"plist\\">"+rows+"</ul>";}},' +
+'{k:L("Por crise","By crisis"),h:L("a história por acontecimento","history by event"),r:function(){' +
+'return "<ul class=\\"plist\\"><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">2008</span><span class=\\"desc\\">"+L("Crise do subprime — o Perene despencou de 82 a 16","Subprime crisis — Perene plunged from 82 to 16")+"</span><span class=\\"val\\"><a href=\\""+edLink(2008,9)+"\\">"+L("out","Oct")+" →</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">2015–16</span><span class=\\"desc\\">"+L("Recessão e impeachment de Dilma","Recession and Dilma’s impeachment")+"</span><span class=\\"val\\"><a href=\\""+edLink(2016,3)+"\\">"+L("reler →","reread →")+"</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">mai/2017</span><span class=\\"desc\\">"+L("Joesley Day — o choque de um dia","Joesley Day — the one-day shock")+"</span><span class=\\"val\\"><a href=\\""+edLink(2017,4)+"\\">"+L("reler →","reread →")+"</a></span></li><li><span class=\\"sym ex\\">●</span><span class=\\"yr\\">mar/2020</span><span class=\\"desc\\">"+L("Pandemia — o fundo do arquivo","Pandemic — the archive’s floor")+"</span><span class=\\"val\\"><a href=\\""+edLink(2020,2)+"\\">"+L("reler →","reread →")+"</a></span></li></ul>";}},' +
+'{k:L("Por ano","By year"),h:"2000 – 2026",r:function(){return "<p style=\\"font-size:14px;color:var(--dim);font-style:italic;margin:0\\">"+L("A grade completa dos 27 anos está logo abaixo, em \\u201CExplorar por período\\u201D — cada ano abre um capítulo.","The full 27-year grid is right below, in \\u201CExplore by period\\u201D — each year opens a chapter.")+"</p>";}},' +
+'{k:L("Pesquisar","Search"),h:L("por índice, valor ou data","by index, value or date"),r:function(){return "<div class=\\"qrow\\"><button class=\\"qchip\\">"+L("\\u201Cquando o Perene passou de 95\\u201D","\\u201Cwhen the Perene passed 95\\u201D")+"</button><button class=\\"qchip\\">"+L("\\u201Cregime defensivo mais longo\\u201D","\\u201Clongest defensive regime\\u201D")+"</button><button class=\\"qchip\\">"+L("\\u201Cmarço de 2020\\u201D","\\u201CMarch 2020\\u201D")+"</button></div><p style=\\"font-size:14px;color:var(--dim);font-style:italic;margin:0\\">"+L("A busca do acervo: pergunte em linguagem natural; a data vem como resposta. (Em breve.)","The archive search: ask in natural language; the date comes as the answer. (Soon.)")+"</p>";}}' +
+'];' +
+'var dc=document.getElementById("drawers");' +
+'drawersData.forEach(function(d,i){var el=document.createElement("div");el.className="drawer";' +
+'el.innerHTML="<button type=\\"button\\"><span class=\\"idx\\">"+("0"+(i+1)).slice(-2)+"</span><span class=\\"dt\\">"+d.k+"</span><span class=\\"hint\\">"+d.h+"</span><span class=\\"chev\\">\\u203A</span></button><div class=\\"panel\\"><div class=\\"panel-in\\">"+d.r()+"</div></div>";' +
+'el.querySelector("button").onclick=function(){var was=el.classList.contains("open");Array.prototype.forEach.call(dc.children,function(c){c.classList.remove("open");});if(!was)el.classList.add("open");};dc.appendChild(el);});' +
+// ---- casos clássicos ----
+'var CLASS=EN?[["Subprime crisis","2008"],["Recession","2015"],["Impeachment","2016"],["Joesley Day","2017"],["Truckers’ strike","2018"],["Elections","2018"],["Pandemic","2020"],["Monetary tightening","2022"]]:[["Crise do subprime","2008"],["Recessão","2015"],["Impeachment","2016"],["Joesley Day","2017"],["Greve dos caminhoneiros","2018"],["Eleições","2018"],["Pandemia","2020"],["Aperto monetário","2022"]];' +
+'document.getElementById("classics").innerHTML=CLASS.map(function(c){return "<span>"+c[0]+"<span class=\\"m\\">"+c[1]+"</span></span>";}).join("");' +
+// ---- anos ----
+'var yl=document.getElementById("years");(A.years||[]).forEach(function(y){var reg=y.mean>=60?"risk_on":(y.mean<=48?"defensivo":"neutro");var el=document.createElement("a");el.className="yr-cell";el.href=edLink(+y.y,11);el.innerHTML="<div class=\\"y\\">"+y.y+"</div><div class=\\"m\\">"+y.n+L(" leituras · Perene médio "," readings · avg Perene ")+Math.round(y.mean)+"</div><div class=\\"bar\\" style=\\"background:"+RCOL[reg]+";opacity:.55;width:"+Math.round(y.mean)+"%\\"></div>";yl.appendChild(el);});' +
+// ---- comece por aqui ----
+'var ENTR=EN?[["First edition","31 Jan 2000",2000,0],["Greatest euphoria","Perene 100",2019,0],["Greatest capitulation","Mar 2020 · 5.7",2020,2],["Longest regime","35 mo · 2010",2010,5],["Last turn","Dec 2025",2025,11],["The full archive","6,566 →",-1,-1]]:[["Primeira edição","31 jan 2000",2000,0],["Maior euforia","Perene 100",2019,0],["Maior capitulação","mar 2020 · 5,7",2020,2],["Regime mais longo","35 meses · 2010",2010,5],["Última virada","dez 2025",2025,11],["O acervo completo","6.566 →",-1,-1]];' +
+'document.getElementById("entries").innerHTML=ENTR.map(function(e){var href=e[2]<0?DP:edLink(e[2],e[3]);return "<a class=\\"entry\\" href=\\""+href+"\\"><div class=\\"e-k\\">"+e[0]+"</div><div class=\\"e-v\\">"+e[1]+"</div></a>";}).join("");' +
+// ---- paisagem (SVG relief) ----
+'var pais=document.getElementById("pais"),tip=document.getElementById("tip");' +
+'function paint(){var W=1080,H=300,pad=6,base=H-34;var P=A.P||[],n=P.length;if(!n)return;var step=(W-pad*2)/(n-1);' +
+'var x=function(i){return pad+i*step;},yy=function(v){return pad+(1-v/100)*(base-pad);};' +
+'var d="M"+x(0)+" "+yy(P[0]);for(var i=1;i<n;i++)d+=" L"+x(i).toFixed(1)+" "+yy(P[i]).toFixed(1);' +
+'var area=d+" L"+x(n-1)+" "+base+" L"+x(0)+" "+base+" Z";' +
+'var RCr={risk_on:css("--terra"),risk_on_amplo:css("--terra"),neutro:css("--oliva"),defensivo:css("--slate")};' +
+'var bandY=base+6,bandH=10,bands="";for(var b=0;b<(A.bands||[]).length;b++){var i0=A.bands[b][0],lab=A.bands[b][1],i1=(b+1<A.bands.length?A.bands[b+1][0]:n);if(!lab)continue;bands+="<rect x=\\""+x(i0).toFixed(1)+"\\" y=\\""+bandY+"\\" width=\\""+((i1-i0)*step).toFixed(1)+"\\" height=\\""+bandH+"\\" fill=\\""+RCr[lab]+"\\" opacity=\\"0.5\\"/>";}' +
+'var ticks="";[0,60,120,180,240,300].forEach(function(i){if(i>=n)return;ticks+="<text x=\\""+x(i).toFixed(1)+"\\" y=\\""+(H-4)+"\\" fill=\\""+css("--dim")+"\\" font-size=\\"10\\" text-anchor=\\"middle\\">"+(2000+Math.floor(i/12))+"</text>";});' +
+'var cr=[[104,L("Subprime","Subprime")],[202,L("Recessão","Recession")],[242,"COVID"]],cm="";cr.forEach(function(c){if(c[0]>=n)return;var xi=x(c[0]);cm+="<line x1=\\""+xi.toFixed(1)+"\\" y1=\\""+yy(P[c[0]]).toFixed(1)+"\\" x2=\\""+xi.toFixed(1)+"\\" y2=\\""+(base-2)+"\\" stroke=\\""+css("--terra")+"\\" stroke-width=\\"1\\" stroke-dasharray=\\"2 2\\" opacity=\\"0.6\\"/><text x=\\""+xi.toFixed(1)+"\\" y=\\""+(yy(P[c[0]])-6).toFixed(1)+"\\" fill=\\""+css("--terra")+"\\" font-size=\\"10.5\\" text-anchor=\\"middle\\">"+c[1]+"</text>";});' +
+'var mid=yy(50);var old=pais.querySelector("svg");if(old)old.remove();' +
+'var svg="<svg viewBox=\\"0 0 "+W+" "+H+"\\" role=\\"img\\" aria-label=\\""+L("Índice de Risco Perene, 2000 a 2026","Perene Risk Index, 2000 to 2026")+"\\"><defs><linearGradient id=\\"pg\\" x1=\\"0\\" y1=\\"0\\" x2=\\"0\\" y2=\\"1\\"><stop offset=\\"0\\" stop-color=\\""+css("--gold")+"\\" stop-opacity=\\"0.22\\"/><stop offset=\\"1\\" stop-color=\\""+css("--gold")+"\\" stop-opacity=\\"0.02\\"/></linearGradient></defs><line x1=\\""+pad+"\\" y1=\\""+mid+"\\" x2=\\""+(W-pad)+"\\" y2=\\""+mid+"\\" stroke=\\""+css("--line")+"\\" stroke-width=\\"1\\" stroke-dasharray=\\"3 4\\"/><path d=\\""+area+"\\" fill=\\"url(#pg)\\"/><path d=\\""+d+"\\" fill=\\"none\\" stroke=\\""+css("--gold")+"\\" stroke-width=\\"1.4\\" stroke-linejoin=\\"round\\"/>"+bands+cm+ticks+"</svg>";' +
+'pais.insertAdjacentHTML("beforeend",svg);var s=pais.querySelector("svg");' +
+'function at(e){var r=s.getBoundingClientRect();return Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left)/r.width*(n-1))));}' +
+'s.style.cursor="pointer";' +
+'s.addEventListener("mousemove",function(e){var i=at(e),t=ym(i),r=s.getBoundingClientRect();tip.innerHTML=t.label+" · Perene <b>"+Math.round(P[i])+"</b>";tip.style.left=(i/(n-1)*100)+"%";tip.style.top=(yy(P[i])/H*r.height)+"px";tip.style.opacity="1";});' +
+'s.addEventListener("mouseleave",function(){tip.style.opacity="0";});' +
+'s.addEventListener("click",function(e){var i=at(e),t=ym(i);location.href=edLink(t.y,t.m);});}' +
+'paint();' +
+'})();<\/script>';
+// ── /atlas — Atlas do Mercado Brasileiro: a /diario "index" reimaginada como INSTRUMENTO de pesquisa (navegação
+//    por fenômeno, não por data). Consome /v1/atlas (agregação do acervo). Determinístico, público, citável.
+//    O /diario cronológico continua existindo (crawl/SEO das edições). Editorial: marfim/serifa/ouro + azul/terra/oliva.
+function _renderAtlas(atlas, origin, lang) {
+  const en = lang === "en";
+  const A = atlas || {};
+  const dpath = en ? "/daily" : "/diario";
+  const canon = origin + "/atlas";
+  const total = A.total || 0;
+  const anos = A.years ? A.years.length : 0;
+  const title = (en ? "Atlas of the Brazilian Market" : "Atlas do Mercado Brasileiro") + " — Radar Perene";
+  const desc = en
+    ? "Radar Perene's public, citable archive of the Brazilian market — " + total + " daily readings since 2000, navigable by phenomenon: regimes, extremes, cycle turns, crises. Descriptive, never a forecast."
+    : "O arquivo público e citável do Radar Perene sobre o mercado brasileiro — " + total + " leituras diárias desde 2000, navegável por fenômeno: regimes, extremos, viradas, crises. Descritivo, nunca previsão.";
+  // dados + flags para o cliente (paisagem/gavetas/respira). Localização e link de edição vão embutidos.
+  const client = { start: A.start, P: A.P || [], bands: A.bands || [], years: A.years || [], total: total,
+    ge90: A.ge90 || 0, le10: A.le10 || 0, viradas: A.viradas || 0, dist: A.dist || {}, ultimas: A.ultimas || [],
+    en: en, dpath: dpath };
+  const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", "name": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": true, "creator": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
+  const CSS =
+    ':root{--azul:#2c4a6e;--terra:#a85336;--oliva:#6b6a2e;--slate:#5b6b7a}' +
+    ':root[data-theme="dark"]{--azul:#7aa6d6;--terra:#d68a6e;--oliva:#b6b46e;--slate:#8a98a8}' +
+    '.atlas{max-width:1080px;margin:0 auto;padding:0 6px}' +
+    '.eyb{font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}' +
+    '.a-hero{padding:22px 0 8px}.a-hero .eyb{display:block;margin-bottom:14px}.a-hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,6vw,62px);line-height:1.03;letter-spacing:-.018em;color:var(--txt);max-width:16ch;margin:0}' +
+    '.a-hero .sub{font-family:var(--serif);font-size:clamp(16px,2vw,20px);color:var(--txt2);font-style:italic;margin:14px 0 0;max-width:46ch}' +
+    '.thesis{font-family:var(--serif);font-size:clamp(18px,2.4vw,24px);line-height:1.4;color:var(--txt);max-width:30ch;margin:26px 0 0}.thesis b{color:var(--gold-ink);font-weight:500}' +
+    '.a-stats{font-family:var(--sans);font-size:13px;color:var(--dim);margin:18px 0 0;display:flex;flex-wrap:wrap;align-items:center}.a-stats span{white-space:nowrap}.a-stats .sep{margin:0 11px;color:var(--line)}.a-stats b{color:var(--txt2);font-weight:600}' +
+    '.a-rule{height:1px;background:var(--line);border:0;margin:38px 0}' +
+    '.a-sec{padding:4px 0}.a-sec h2{font-family:var(--serif);font-weight:500;font-size:clamp(21px,3vw,28px);letter-spacing:-.01em;color:var(--txt);margin:0}.a-lead{font-family:var(--serif);font-size:15.5px;color:var(--dim);font-style:italic;max-width:56ch;margin:.3rem 0 1.5rem}' +
+    '.respira{border-top:2px solid var(--gold);padding:16px 0 4px}.respira .lb{font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);display:flex;align-items:center;gap:8px}.respira .body{font-family:var(--serif);font-size:clamp(19px,2.6vw,25px);line-height:1.4;color:var(--txt);max-width:34ch;margin:13px 0 6px}.respira .body b{color:var(--terra);font-weight:500}.respira .cta{font-family:var(--sans);font-size:13.5px}.respira .cta a{color:var(--gold-ink)}.respira .dots{display:inline-flex;gap:5px}.respira .dots i{width:5px;height:5px;border-radius:50%;background:var(--line);display:inline-block;transition:background .3s}.respira .dots i.on{background:var(--gold)}' +
+    '.drawers{border-top:1px solid var(--line)}.drawer{border-bottom:1px solid var(--line)}.drawer>button{width:100%;display:flex;align-items:center;gap:16px;background:none;border:0;cursor:pointer;padding:17px 2px;text-align:left;font-family:inherit;color:var(--txt)}.drawer .idx{font-family:var(--mono);font-size:12px;color:var(--dim);width:26px;flex:none}.drawer .dt{font-family:var(--serif);font-size:clamp(18px,2.3vw,23px);flex:1;color:var(--txt)}.drawer .hint{font-family:var(--sans);font-size:12.5px;color:var(--dim);display:none}@media(min-width:720px){.drawer .hint{display:block}}.drawer .chev{font-family:var(--sans);color:var(--dim);font-size:16px;transition:transform .25s;flex:none}.drawer.open .chev{transform:rotate(90deg);color:var(--gold-ink)}.drawer .panel{overflow:hidden;max-height:0;transition:max-height .35s ease}.drawer.open .panel{max-height:900px}.drawer .panel-in{padding:2px 2px 24px 44px}@media(max-width:520px){.drawer .panel-in{padding-left:2px}}' +
+    '.qrow{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}.qchip{font-family:var(--sans);font-size:13px;color:var(--txt2);border:1px solid var(--line);border-radius:2px;padding:7px 13px;background:var(--bg)}.qchip .n{font-family:var(--mono);color:var(--dim);margin-left:7px}' +
+    '.plist{list-style:none;padding:0;margin:0}.plist li{display:flex;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px dotted var(--line);font-size:14.5px}.plist .sym{font-size:11px;flex:none;width:14px}.plist .sym.ex{color:var(--terra)}.plist .sym.re{color:var(--gold-ink)}.plist .sym.fi{color:var(--dim)}.plist .yr{font-family:var(--mono);font-size:13px;color:var(--txt);width:84px;flex:none}.plist .desc{color:var(--txt2);flex:1}.plist .val{font-family:var(--mono);color:var(--dim);white-space:nowrap}.plist a{color:var(--gold-ink)}' +
+    '.paisagem{margin:6px 0 0}.pais-scale{display:flex;justify-content:space-between;font-family:var(--sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}.pais-box{position:relative;width:100%;overflow:hidden}.pais-box svg{display:block;width:100%;height:auto}.pais-tip{position:absolute;pointer-events:none;background:var(--txt);color:var(--bg);font-family:var(--mono);font-size:11px;padding:5px 9px;border-radius:3px;opacity:0;transform:translate(-50%,-130%);transition:opacity .12s;white-space:nowrap;z-index:5}.pais-tip b{color:var(--gold)}.pais-legend{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--sans);font-size:11.5px;color:var(--dim);margin-top:12px}.pais-legend i{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:6px}.pais-legend .foot{width:100%;font-style:italic;margin-top:2px}' +
+    '.cols{display:grid;grid-template-columns:1fr;border-top:1px solid var(--line)}@media(min-width:760px){.cols{grid-template-columns:1fr 1fr}}.col{padding:22px 0;border-bottom:1px solid var(--line)}@media(min-width:760px){.col{padding:22px 34px 22px 0}.col.r{padding:22px 0 22px 34px;border-left:1px solid var(--line)}}.col .k{font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:8px}.col h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--txt);margin:0 0 4px}.col .big{font-family:var(--serif);font-size:40px;color:var(--terra);line-height:1;font-variant-numeric:tabular-nums}.col .big.blue{color:var(--azul)}.col p{font-size:14.5px;color:var(--dim);margin:8px 0 10px;max-width:46ch}.col p b{color:var(--txt2)}.col .go{font-family:var(--sans);font-size:13px}.col .go a{color:var(--gold-ink)}.classics{display:flex;flex-wrap:wrap;gap:8px}.classics span{font-family:var(--serif);font-size:15px;color:var(--txt2);border-bottom:1px solid var(--line);padding-bottom:1px}.classics span .m{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:5px}' +
+    '.years{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}.yr-cell{background:var(--bg);padding:12px 13px;text-decoration:none;display:block}.yr-cell:hover{background:var(--surface2)}.yr-cell .y{font-family:var(--mono);font-size:17px;color:var(--txt)}.yr-cell .m{font-family:var(--sans);font-size:11px;color:var(--dim);margin-top:3px;line-height:1.5}.yr-cell .bar{height:3px;margin-top:7px;border-radius:2px;background:var(--line)}' +
+    '.entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));border-top:1px solid var(--line)}.entry{padding:15px 20px 15px 0;border-bottom:1px solid var(--line);text-decoration:none;display:block}.entry .e-k{font-family:var(--serif);font-size:16px;color:var(--txt)}.entry:hover .e-k{color:var(--gold-ink)}.entry .e-v{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:3px}' +
+    '.a-note{font-family:var(--sans);font-size:11.5px;color:var(--dim);background:var(--surface2);border-left:2px solid var(--gold);padding:8px 12px;margin:24px 0 0;border-radius:0 3px 3px 0}' +
+    '.legend-sym{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:18px}.legend-sym b.ex{color:var(--terra)}.legend-sym b.re{color:var(--gold-ink)}.legend-sym b.fi{color:var(--dim)}';
+  const head = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
+    "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + _esc(desc) + "\">" +
+    "<link rel=\"canonical\" href=\"" + canon + "\">" +
+    "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/atlas\"><link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/atlas\"><link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/atlas\">" +
+    "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<script type=\"application/ld+json\">" + ld + "</script>" +
+    _chromeCss(CSS) + "</head><body>" + _header(en) + "<main id=\"main\"><div class=\"atlas\">";
+  // corpo: as seções são preenchidas pelo cliente a partir de window.ATLAS (paisagem interativa, gavetas accordion)
+  const body =
+    "<section class=\"a-hero\"><span class=\"eyb\">" + (en ? "Radar Perene · the archive" : "Radar Perene · o arquivo") + "</span>" +
+    "<h1>" + (en ? "Atlas of the Brazilian Market" : "Atlas do Mercado Brasileiro") + "</h1>" +
+    "<p class=\"sub\">" + (en ? "The market seen through time — each edition, a portrait of the market’s state that day." : "O mercado visto através do tempo — cada edição, um retrato do estado do mercado naquele dia.") + "</p>" +
+    "<p class=\"thesis\"><b id=\"a-total\">" + total.toLocaleString(en ? "en-US" : "pt-BR") + "</b> " + (en ? "readings of the Brazilian market since the year 2000." : "leituras do mercado brasileiro desde o ano 2000.") + "</p>" +
+    "<p class=\"a-stats\"><span><b>" + anos + "</b> " + (en ? "years observed" : "anos observados") + "</span><span class=\"sep\">·</span><span><b>" + total.toLocaleString(en ? "en-US" : "pt-BR") + "</b> " + (en ? "readings" : "leituras") + "</span><span class=\"sep\">·</span><span><b>" + (A.viradas || 0) + "</b> " + (en ? "cycle turns" : "grandes viradas") + "</span><span class=\"sep\">·</span><span><b>100%</b> " + (en ? "public" : "públicas") + "</span><span class=\"sep\">·</span><span>" + (en ? "citable archive" : "arquivo citável") + "</span></p></section>" +
+    "<section class=\"respira\" aria-live=\"polite\"><div class=\"lb\">◎ " + (en ? "from the archive" : "do arquivo") + " <span class=\"dots\" id=\"r-dots\"></span></div><p class=\"body\" id=\"r-body\"></p><p class=\"cta\"><a href=\"#\" id=\"r-cta\"></a></p></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "What do you want to discover?" : "O que você quer descobrir?") + "</h2><p class=\"a-lead\">" + (en ? "The archive isn’t browsed by date — it’s browsed by question. The date is just the consequence of the query." : "O arquivo não se navega por data — se navega por pergunta. A data é só a consequência da consulta.") + "</p><div class=\"drawers\" id=\"drawers\"></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "The landscape of risk" : "A paisagem do risco") + "</h2><p class=\"a-lead\">" + (en ? "Twenty-six years of the Perene Risk Index, month by month. Each ridge is a state of the market; each valley, an episode of fear. Hover — click to open the edition." : "Vinte e seis anos do Índice de Risco Perene, mês a mês. Cada relevo é um estado do mercado; cada vale, um episódio de medo. Passe o mouse — clique para abrir a edição.") + "</p><div class=\"paisagem\"><div class=\"pais-scale\"><span>" + (en ? "euphoria · risk-on" : "euforia · risco ligado") + "</span><span>" + (en ? "fear · capitulation" : "medo · capitulação") + "</span></div><div class=\"pais-box\" id=\"pais\"><div class=\"pais-tip\" id=\"tip\"></div></div><div class=\"pais-legend\"><span><i style=\"background:var(--terra)\"></i>" + (en ? "risk-on" : "risco ligado") + "</span><span><i style=\"background:var(--slate)\"></i>" + (en ? "defensive" : "defensivo") + "</span><span><i style=\"background:var(--oliva)\"></i>" + (en ? "neutral" : "neutro") + "</span><span class=\"foot\">" + (en ? "The monthly regime shows in the lower strip; the line is the daily Perene Risk Index, aggregated by month." : "O regime (mensal) aparece na faixa inferior; a linha é o Índice de Risco Perene diário, agregado por mês.") + "</span></div></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "Collections" : "Coleções") + "</h2><p class=\"a-lead\">" + (en ? "The archive organized by phenomenon — not by calendar. This is where the edge lives: how many times it has already happened." : "O arquivo organizado por fenômeno — não por calendário. É aqui que mora o diferencial: quantas vezes já aconteceu.") + "</p>" +
+    "<div class=\"cols\"><div class=\"col\"><span class=\"k\">" + (en ? "Extreme regimes" : "Regimes extremos") + "</span><div class=\"big blue\">" + (A.ge90 || 0).toLocaleString(en ? "en-US" : "pt-BR") + "</div><h3>" + (en ? "times the Perene Index passed 90" : "vezes o Índice Perene passou de 90") + "</h3><p>" + (en ? "Risk appetite at the top of the scale — from January 2000 to today. And <b>" + (A.le10 || 0).toLocaleString('en-US') + "</b> times it hit the floor (≤10): capitulation." : "O apetite ao risco no topo da escala — de janeiro de 2000 à edição de hoje. E <b>" + (A.le10 || 0).toLocaleString('pt-BR') + "</b> vezes ele tocou o piso (≤10): a capitulação.") + "</p><a class=\"go\" href=\"#drawers\">" + (en ? "Explore the extremes →" : "Explorar os extremos →") + "</a></div>" +
+    "<div class=\"col r\"><span class=\"k\">" + (en ? "Cycle turns" : "Viradas de ciclo") + "</span><div class=\"big\">" + (A.viradas || 0) + "</div><h3>" + (en ? "regime changes since 2010" : "mudanças de regime desde 2010") + "</h3><p>" + (en ? "When the market changed its structural mood." : "Quando o mercado trocou de humor estrutural.") + "</p><a class=\"go\" href=\"#drawers\">" + (en ? "Explore the turns →" : "Explorar as viradas →") + "</a></div>" +
+    "<div class=\"col\" style=\"grid-column:1/-1;border-left:0;padding-right:0\"><span class=\"k\">" + (en ? "Classic cases" : "Casos clássicos") + "</span><h3 style=\"margin-bottom:10px\">" + (en ? "The market’s history, by event" : "A história do mercado, por acontecimento") + "</h3><div class=\"classics\" id=\"classics\"></div></div></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "Explore by period" : "Explorar por período") + "</h2><p class=\"a-lead\">" + (en ? "Twenty-six years, not six thousand lines. Each year is a chapter." : "Vinte e seis anos, não seis mil linhas. Cada ano é um capítulo.") + "</p><div class=\"years\" id=\"years\"></div></section>" +
+    "<hr class=\"a-rule\">" +
+    "<section class=\"a-sec\"><h2>" + (en ? "Start here" : "Comece por aqui") + "</h2><p class=\"a-lead\">" + (en ? "Doors in for those who don’t yet know what to look for." : "Portas de entrada para quem não sabe o que procurar.") + "</p><div class=\"entries\" id=\"entries\"></div>" +
+    "<p class=\"legend-sym\"><b class=\"ex\">●</b> " + (en ? "extreme" : "extremo") + " · <b class=\"re\">◐</b> " + (en ? "recurring" : "recorrente") + " · <b class=\"fi\">○</b> " + (en ? "first occurrence" : "primeira ocorrência") + " — " + (en ? "the reader learns the symbols over time, without a legend." : "o leitor aprende os símbolos com o tempo, sem legenda.") + "</p></section>" +
+    "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:30px 0 0\"></div>" +
+    "<p class=\"a-note\">" + (en ? "Public, citable archive · daily Perene Risk Index 2000–2026, monthly regime 2010–2026. Descriptive, never a forecast or recommendation. Public sources." : "Arquivo público e citável · Índice de Risco Perene diário 2000–2026, regime mensal 2010–2026. Descritivo, nunca previsão ou recomendação. Fontes públicas.") + "</p>" +
+    "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← All daily editions" : "← Todas as edições diárias") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · <a href=\"/\">" + (en ? "Full radar" : "Radar completo") + "</a></footer>";
+  const script = "<script>window.ATLAS=" + JSON.stringify(client).replace(/</g, "\\u003c") + ";</script>" + _ATLAS_JS + "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT;
+  return new Response(head + body + script + "</body></html>", { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
 function _renderDiarioIndex(data, origin, lang) {
   const en = lang === "en";
@@ -611,6 +946,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}ul.dlist .mn{color:var(--dim)}") +
     "</head><body>" + _header(en) + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
+    "<p class=\"atlasl\" style=\"margin:.2rem 0 1rem\"><a href=\"/atlas\" style=\"color:var(--gold-ink);font-weight:600;text-decoration:none\">" + (en ? "◎ Explore the archive as an Atlas — by regime, extreme, crisis, landscape →" : "◎ Explore o arquivo como Atlas — por regime, extremo, crise, paisagem →") + "</a></p>" +
     "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on. The BR regime score is monthly by construction — it only moves at month-end, so it repeats within a month; the daily variation (Perene Risk Index, Ânima, intermarket) lives inside each day’s page." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí. O score do regime BR é mensal por construção — só se move no fecho do mês, então repete dentro do mês; a variação diária (Índice de Risco Perene, Ânima, intermercado) está dentro da página de cada dia.") + "</p>" +
     "<ul class=\"dlist\">" + rows + "</ul>" +
     "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 0\"></div>" +
@@ -859,6 +1195,14 @@ async function _route(request, env, ctx) {
       } catch (e) { return new Response('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', { headers: { "content-type": "application/xml" } }); }
     }
     // ── /diario | /daily — índice cronológico do arquivo diário citável (EN usa /daily) ──
+    // ── /atlas — Atlas do Mercado Brasileiro (navegação por fenômeno; /diario cronológico continua existindo) ──
+    if (_url.pathname === "/atlas") {
+      try {
+        const r = await _diarioFetch(ATLAS_API + "?lang=" + (_isEN ? "en" : "pt"));
+        if (!r.ok) return env.ASSETS.fetch(request);
+        return _renderAtlas(await r.json(), _url.origin, _isEN ? "en" : "pt");
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
     if (_url.pathname === "/diario" || _url.pathname === "/daily") {
       try {
         const r = await _diarioFetch(SNAPS_API + "?lang=" + (_isEN ? "en" : "pt"));
@@ -881,7 +1225,33 @@ async function _route(request, env, ctx) {
         const r = await _diarioFetch(SNAP_API + "?date=" + _dm[1] + "&lang=" + (_isEN ? "en" : "pt"));
         if (!r.ok) return new Response((_isEN ? "No reading for " : "Sem leitura para ") + _dm[1], { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
         const nav = {};  // navegação cronológica (lista desc: idx-1 = mais recente = seguinte; idx+1 = anterior)
-        try { const sl = await _diarioFetch(SNAPS_API); if (sl.ok) { const ds = ((await sl.json()).itens || []).map(function (x) { return x.data; }); const ix = ds.indexOf(_dm[1]); if (ix >= 0) { nav.next = ix > 0 ? ds[ix - 1] : null; nav.prev = ix < ds.length - 1 ? ds[ix + 1] : null; nav.num = ds.length - ix; } } } catch (e) { /* opcional */ }
+        try {
+          const sl = await _diarioFetch(SNAPS_API);
+          if (sl.ok) {
+            const itens = (await sl.json()).itens || [];
+            const ds = itens.map(function (x) { return x.data; });
+            const ix = ds.indexOf(_dm[1]);
+            if (ix >= 0) {
+              nav.next = ix > 0 ? ds[ix - 1] : null; nav.prev = ix < ds.length - 1 ? ds[ix + 1] : null; nav.num = ds.length - ix;
+              const cur = itens[ix], prv = itens[ix + 1];
+              if (cur && prv) {  // deltas do Pulso (Perene/Ânima pulsam por dia; o SNAPS já traz por data)
+                if (cur.perene != null && prv.perene != null) nav.dPerene = Math.round(cur.perene - prv.perene);
+                if (cur.anima != null && prv.anima != null) nav.dAnima = Math.round(cur.anima - prv.anima);
+                if (cur.curto != null && prv.curto != null) nav.dCurto = Math.round(cur.curto - prv.curto);
+              }
+              const rl = cur && cur.regime_label;  // "regime · há N dias": corre p/ trás enquanto o label do regime não muda
+              if (rl != null) {
+                let j = ix; while (j + 1 < itens.length && itens[j + 1].regime_label === rl) j++;
+                const d0 = itens[j] && itens[j].data;
+                if (d0) nav.regimeDias = Math.max(0, Math.round((Date.parse(_dm[1]) - Date.parse(d0)) / 86400000));
+              }
+            }
+          }
+        } catch (e) { /* opcional */ }
+        // "O Arquivo Lembra" — acervo maturado inteiro p/ a timeline do mesmo regime (degrada gracioso se falhar)
+        try { const hr = await _diarioFetch(HIST_API + "?limit=600&lang=" + (_isEN ? "en" : "pt")); if (hr.ok) nav.historico = await hr.json(); } catch (e) { /* opcional */ }
+        // recorrência por ESTADO (Perene) daquela data — o rodapé do Arquivo casa 1:1 com a home; date-parametrizada, determinística
+        try { const rr = await _diarioFetch(RECORR_API + "?date=" + _dm[1]); if (rr.ok) { const rj = await rr.json(); if (rj && rj.n) nav.recorrencia = rj; } } catch (e) { /* opcional */ }
         return _renderDiarioDia(await r.json(), _dm[1], _url.origin, _isEN ? "en" : "pt", nav);
       } catch (e) { return env.ASSETS.fetch(request); }
     }
@@ -1046,6 +1416,8 @@ async function _route(request, env, ctx) {
 
       let rw = new HTMLRewriter();
       rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
+      // ★ barra de topo → Atlas do Mercado Brasileiro (o arquivo como instrumento). Aditiva, no topo do body, lang-aware.
+      rw = rw.on("body", { element(e) { e.prepend('<a href="/atlas" style="display:block;background:#1a1a2e;color:#faf9f6;text-decoration:none;font-family:Inter,system-ui,sans-serif;font-size:13px;text-align:center;padding:9px 16px;line-height:1.4">' + (isEN ? '<b style="color:#d9a441;font-weight:600">New</b> &middot; <b>Atlas of the Brazilian Market</b> — 26 years of the archive, navigable by phenomenon <span style="color:#d9a441">&rarr;</span>' : '<b style="color:#d9a441;font-weight:600">Novo</b> &middot; <b>Atlas do Mercado Brasileiro</b> — 26 anos do acervo, navegável por fenômeno <span style="color:#d9a441">&rarr;</span>') + '</a>', { html: true }); } });
       // canonical/og:url da home POR HOST no HTML cru: o index.html estático nasce com ".com" fixo e só o JS
       //   corrigia em runtime — crawler sem JS (Bing 1ª passada, bots de IA) via o .com.br se declarar duplicata
       //   do .com, contradizendo o hreflang pt-br. O renderizado já era self-referente (radar.js); agora o cru também é.
