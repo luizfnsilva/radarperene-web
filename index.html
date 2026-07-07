@@ -704,7 +704,7 @@
   async function refresh(){
     var sess=(await sb.auth.getSession()).data.session;
     var pw=document.getElementById("portal-wrap");
-    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(bibEl)bibEl.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; window.RP_TOKEN=null; try{localStorage.removeItem("rp_premium")}catch(x){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} return; }
+    if(!sess){ if(loginEl)loginEl.textContent=(EN?"Sign in":"Entrar"); if(seal)seal.style.display="none"; if(bibEl)bibEl.style.display="none"; if(pw)pw.style.display="none"; window.RP_PREMIUM=false; window.RP_TOKEN=null; try{localStorage.removeItem("rp_premium");localStorage.removeItem("rp_tier")}catch(x){} try{window.dispatchEvent(new Event("rp-premium-change"))}catch(x){} return; }
     if(loginEl){loginEl.textContent=(EN?"Sign out":"Sair"); loginEl.title=sess.user.email||"";}
     if(pw)pw.style.display="inline";
     try{ var r=await fetch(location.origin+"/api/v1/me",{headers:{apikey:ANON,Authorization:"Bearer "+sess.access_token}}); if(!r.ok) return;  /* CJS-01: resposta ruim (401/500 transitório) NÃO rebaixa Founder — a sessão já provou login; só um 200 autoritativo muda o tier (lapso real = 200 premium:false) */ var d=await r.json();
@@ -716,7 +716,7 @@
   }
   if(loginEl)loginEl.addEventListener("click",async function(e){ e.preventDefault();
     var sess=(await sb.auth.getSession()).data.session;
-    if(sess){ await sb.auth.signOut(); try{localStorage.removeItem("rp_premium")}catch(x){} location.reload(); return; }
+    if(sess){ await sb.auth.signOut(); try{localStorage.removeItem("rp_premium");localStorage.removeItem("rp_tier")}catch(x){} location.reload(); return; }
     var old=document.getElementById("me-menu"); if(old){old.remove();return;}
     var m=document.createElement("div"); m.id="me-menu";
     m.style.cssText="position:absolute;top:46px;right:14px;z-index:10000;background:#13171c;border:1px solid #222a31;border-radius:10px;padding:7px;box-shadow:0 12px 40px rgba(0,0,0,.55);min-width:190px";
@@ -736,7 +736,7 @@
   function ed(){ var f=false,s=false; try{ f=(window.RP_PREMIUM===true)||localStorage.getItem("rp_premium")==="1"; }catch(e){} try{ s=(window.RP_TIER==="semanal")||localStorage.getItem("rp_tier")==="semanal"; }catch(e){} document.body.classList.toggle("rp-founder", f); document.body.classList.toggle("rp-semanal", s&&!f); }
   ed();
   window.addEventListener("rp-premium-change", ed);
-  window.addEventListener("storage", function(e){ if(!e||e.key==="rp_premium"||e.key===null) ed(); });
+  window.addEventListener("storage", function(e){ if(!e||e.key==="rp_premium"||e.key==="rp_tier"||e.key===null) ed(); });
 })();</script>
 <!-- ★ 2026-06-21 (dono): compartilhar a Leitura do Radar — menu PRÓPRIO com os links diretos das redes + API pública (sem o share genérico do sistema). Texto dinâmico via window.RP_LEITURA_SHARE (setado pelo card). -->
 <script>(function(){

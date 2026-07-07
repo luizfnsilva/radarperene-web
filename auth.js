@@ -21,6 +21,7 @@
   async function refresh() {
     var sess = (await sb.auth.getSession()).data.session;
     if (!sess) {
+      try { localStorage.removeItem("rp_tier"); localStorage.removeItem("rp_premium"); } catch (x) {}  // ★ logout/sem-sessão: apaga a flag de tier (senão o gate visual "fica aberto" p/ sempre — CJS-01 preservado: só no ramo !sess, nunca em erro transitório do /v1/me)
       if (loginEl) loginEl.textContent = (EN ? "Sign in" : "Entrar");
       if (seal) seal.style.display = "none";
       if (bibEl) bibEl.style.display = "none";
@@ -81,7 +82,7 @@
   if (loginEl) loginEl.addEventListener("click", async function (e) {
     e.preventDefault();
     var sess = (await sb.auth.getSession()).data.session;
-    if (sess) { await sb.auth.signOut(); location.reload(); return; }
+    if (sess) { await sb.auth.signOut(); try { localStorage.removeItem("rp_tier"); localStorage.removeItem("rp_premium"); } catch (x) {} location.reload(); return; }
     openLogin();
   });
 
