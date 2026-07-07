@@ -36,14 +36,17 @@
       window.RP_TIER = (d && d.tier) || null;
       if (d && d.premium) {  // FOUNDER
         window.RP_PREMIUM = true; window.RP_TOKEN = token;
+        try { localStorage.setItem("rp_tier", "founder"); localStorage.setItem("rp_premium", "1"); } catch (x) {}  // ★ persiste o tier p/ o gate das páginas da Biblioteca (tier() lê localStorage). Sem isto, o Founder logado via /biblioteca não abre — auth.js só setava window.RP_TIER (in-memory), o gate depende de localStorage. Espelha index.html:712.
         if (seal && d.rank) { seal.style.display = "inline-block"; seal.textContent = (EN ? "Founding Member #" : "Membro Fundador #") + d.rank; }
         if (bibEl) bibEl.style.display = "inline";
       } else if (d && d.tier === "semanal") {  // ★ PERENE SEMANAL — NÃO-premium. RP_TOKEN=null → radar/série/digest tratam como anônimo (JOIA do observatório não vaza). A biblioteca semanal lê via RP_AUTH.token() (closure `token`, ainda setado), e a API libera só weeklies ≥ cutoff.
         window.RP_PREMIUM = false; window.RP_TOKEN = null;
+        try { localStorage.setItem("rp_tier", "semanal"); localStorage.removeItem("rp_premium"); } catch (x) {}  // ★ persiste tier=semanal p/ o gate (vê só a aba Semanal). Espelha index.html:713.
         if (seal) seal.style.display = "none";
         if (bibEl) bibEl.style.display = "inline";  // tem a biblioteca semanal → mostra o link
       } else {  // não-assinante logado
         window.RP_PREMIUM = false; window.RP_TOKEN = null;
+        try { localStorage.removeItem("rp_tier"); localStorage.removeItem("rp_premium"); } catch (x) {}  // logado mas sem assinatura → sem tier. Espelha index.html:714.
         if (seal) seal.style.display = "none";
         if (bibEl) bibEl.style.display = "none";
       }
