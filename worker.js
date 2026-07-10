@@ -700,9 +700,15 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const regimeToday = regime ? (regime.classificacao || "") : "";
   const regimeColor = _regimeColor(regime && (regime.classificacao || regime.leitura || ""));
   const fileteHtml = "<div class=\"regime-rule\" style=\"color:" + regimeColor + "\" aria-hidden=\"true\"></div>";
-  // deck (subtítulo) — reusa narr.resumo quando distinto da manchete; senão omite (zero-LLM, sem duplicar)
+  // deck (subtítulo/standfirst). ★ EDITOR determinístico (dono 2026-07-06): quando o pipeline pré-computou a
+  //   voz que RESPIRA (narr.composicao_editor.texto — gramática de microestruturas, reprodutível, P7-limpa),
+  //   ELA é o deck do dia (texto inteiro). Senão, cai no resumo do ghostwriter (1ª frase limpa). PT-only:
+  //   o edge só emite composicao_editor em PT (estado_textual é PT-only), então o EN segue no resumo intocado.
   let deckHtml = "";
-  if (narr.resumo) {
+  const _ceTxt = (narr.composicao_editor && narr.composicao_editor.texto) ? String(narr.composicao_editor.texto).trim() : "";
+  if (_ceTxt) {
+    deckHtml = "<p class=\"deck\">" + _esc(_ceTxt) + "</p>";
+  } else if (narr.resumo) {
     const _rz = String(narr.resumo).replace(/<[^>]+>/g, "").trim();
     const _dot = _rz.indexOf(". ");                                   // deck = 1ª frase LIMPA (não o resumo inteiro)
     const _first = (_dot > 0 ? _rz.slice(0, _dot + 1) : _clampDesc(_rz, 200));
