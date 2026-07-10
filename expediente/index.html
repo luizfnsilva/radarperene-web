@@ -19,9 +19,12 @@
   :root[data-theme="dark"]{--bg:#0e1217;--surface2:#1c222b;--line:#28303a;--txt:#eceef1;--txt2:#c2c8d0;--dim:#8a929e;--gold:#d9a441;--gold-ink:#d9a441}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:640px;margin:0 auto;padding:34px 22px 40px}
-  .brand{font-family:var(--serif);font-size:18px;font-weight:600;text-decoration:none;color:var(--txt)}
-  .brand b{color:var(--gold)}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 22px 40px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1080px;margin:0 auto;padding:18px 22px}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+  .logo-w{display:block;height:35px;width:auto}
+  :root[data-theme="dark"] .logo-w-light{display:none}
+  :root:not([data-theme="dark"]) .logo-w-dark{display:none}
   h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.6vw,40px);letter-spacing:-.01em;margin:26px 0 6px}
   .kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-top:30px}
   p{font-family:var(--serif);font-size:17px;color:var(--txt2);margin:10px 0 0;max-width:60ch}
@@ -36,8 +39,8 @@
 </style>
 </head>
 <body>
+<header class="top"><a class="brand" href="/" aria-label="Radar Perene"><img class="logo-w logo-w-light" src="/logo-light.svg" alt="Radar Perene" width="139" height="35"><img class="logo-w logo-w-dark" src="/logo-dark.svg" alt="Radar Perene" width="139" height="35"></a></header>
 <div class="wrap">
-  <a class="brand" href="/">Radar <b>Perene</b></a>
 
   <h1>Expediente</h1>
   <p>O Radar Perene é uma publicação editorial sobre o regime do mercado brasileiro. Editada diariamente sobre um arquivo que começa em 2000, descreve o presente à luz dos precedentes — regimes, intermercado e memória histórica, de fontes públicas. Método declarado e estável; leitura estritamente descritiva, nunca recomendação.</p>
