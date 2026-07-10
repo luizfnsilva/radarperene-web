@@ -517,6 +517,69 @@ function _arquivoLembraHtml(hist, todayPerene, todayDate, en, dpath, regimeColor
     "<p class=\"arq-intro\">" + intro + "</p><ol class=\"arq-tl\">" + featHtml + oneHtml + "</ol>" +
     "<p class=\"arq-foot\">" + foot + "<a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Explore the archive →" : "Explorar o arquivo →") + "</a></p></section>";
 }
+
+// ── Fase 3 · "Estados semelhantes" — a teia LATERAL do arquivo. Distinto do Arquivo Lembra (que é TEMPORAL:
+//    há um ano/há cinco anos). Aqui: outras edições que o arquivo viu num ESTADO parecido (Índice de Risco
+//    Perene ~ igual), ordenadas pela proximidade — cada uma um <a> real e crawlável p/ /diario/{data}.
+//    Reusa a MESMA banda do Arquivo Lembra (coerência com Atlas + recorrência). Zero termo de motor (P7).
+//    Degrada gracioso: sem histórico/sem vizinhos → "" (a página nunca perde render nem quebra).
+function _estadosSemelhantesHtml(hist, todayPerene, todayDate, en, dpath, regimeColor) {
+  const items = (hist && hist.itens) || [];
+  if (!items.length || todayPerene == null) return "";
+  const _P0 = Number(todayPerene), BANDA = 8;   // banda um pouco mais estreita que o Lembra (10): "semelhante" = mais próximo
+  const cand = items.filter(function (x) {
+    return x && x.perene != null && String(x.data).slice(0, 10) !== todayDate
+      && Math.abs(Number(x.perene) - _P0) <= BANDA;
+  });
+  if (cand.length < 2) return "";
+  // ordena por proximidade de estado (|Δperene|), desempata por data mais recente
+  cand.sort(function (a, b) {
+    const da = Math.abs(Number(a.perene) - _P0), db = Math.abs(Number(b.perene) - _P0);
+    if (da !== db) return da - db;
+    return String(a.data) < String(b.data) ? 1 : -1;
+  });
+  const _MPT = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  const _MEN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const edate = function (d) { const q = String(d).split("-"); const mo = (en ? _MEN : _MPT)[(+q[1]) - 1] || q[1]; return en ? mo + " " + (+q[2]) + ", " + q[0] : (+q[2]) + " de " + mo + " de " + q[0]; };
+  const seen = {}, picks = [];
+  for (let i = 0; i < cand.length && picks.length < 6; i++) {
+    const d = String(cand[i].data).slice(0, 10);
+    if (seen[d]) continue; seen[d] = 1; picks.push(cand[i]);
+  }
+  if (picks.length < 2) return "";
+  const _pv = function (v) { return en ? Math.round(Number(v)) : String(Math.round(Number(v))); };  // Perene inteiro
+  const lis = picks.map(function (x) {
+    const d = String(x.data).slice(0, 10);
+    const reg = x.regime ? " <span class=\"es-reg\">· " + _esc(x.regime) + "</span>" : "";
+    return "<li><a href=\"" + dpath + "/" + d + "\"><span class=\"es-dt\">" + _esc(edate(d)) + "</span>"
+      + "<span class=\"es-p\">" + (en ? "Perene " : "Perene ") + _pv(x.perene) + "</span>" + reg + "</a></li>";
+  }).join("");
+  const intro = en
+    ? "Other editions the archive read in a market state close to today’s — same neighbourhood of the Perene Risk Index."
+    : "Outras edições que o arquivo leu num estado de mercado próximo ao de hoje — a mesma vizinhança do Índice de Risco Perene.";
+  const style = regimeColor ? " style=\"border-left-color:" + regimeColor + "\"" : "";
+  return "<section class=\"estados\" id=\"semelhantes\"" + style + ">"
+    + "<div class=\"es-h\">" + (en ? "Editions in a similar state" : "Edições em estado semelhante") + "</div>"
+    + "<p class=\"es-intro\">" + intro + "</p>"
+    + "<ol class=\"es-list\">" + lis + "</ol></section>";
+}
+
+// ── Fase 3 · Diário → Atlas POR FENÔMENO. Deriva a porta certa do Atlas a partir do dia: extremo (Perene ≥90/≤10)
+//    → coleção de extremos; regime defensivo/risco-ligado → coleção por regime; senão → gavetas gerais. Âncoras que
+//    JÁ existem no /atlas (#drawers, #main). P7: descreve o fenômeno, nunca a medida. Devolve {label, href} ou null.
+function _atlasPorFenomeno(regimeRaw, pP, en) {
+  const r = String(regimeRaw == null ? "" : regimeRaw).toLowerCase();
+  if (pP != null && (Number(pP) >= 90 || Number(pP) <= 10)) {
+    return { href: "/atlas#drawers", label: en ? "See every extreme like this one in the Atlas →" : "Ver no Atlas todos os extremos como este →" };
+  }
+  if (/defens/.test(r)) {
+    return { href: "/atlas#drawers", label: en ? "Every defensive stretch in the Atlas →" : "Todo o defensivo no Atlas →" };
+  }
+  if (/risk[_ ]?on|otimis|exuber|amplo/.test(r)) {
+    return { href: "/atlas#drawers", label: en ? "Every risk-on stretch in the Atlas →" : "Todo o risco-ligado no Atlas →" };
+  }
+  return { href: "/atlas", label: en ? "Browse the archive by phenomenon in the Atlas →" : "Navegar o arquivo por fenômeno no Atlas →" };
+}
 // ★ Direção Editorial do Diário v1.0 (CONGELADA) — CSS das colunas permanentes. Escopado ao /diario (injetado como
 //   'extra' do _chromeCss só aqui): não regride as outras páginas. Paleta base (marfim/serif) é a compartilhada.
 const _DIARIO_CSS_V1 =
@@ -547,7 +610,15 @@ const _DIARIO_CSS_V1 =
   ".voz{margin:.4rem 0 0}.cas{background:none;border:0;border-radius:0;padding:0}.cas>b{display:none}.cas ul{list-style:none;padding:0;margin:.3rem 0 0}.cas .casm{margin-top:.5rem}" +
   ".colofon{font-family:var(--sans);font-size:12px;color:var(--dim);margin-top:1.6rem;letter-spacing:.02em}.colofon .reg{color:var(--txt2)}" +
   ".dt{font-family:var(--sans);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--dim)}.dt b{color:var(--txt2);font-weight:600}" +
-  ".sumario .sum-gate{font-style:italic;color:var(--dim)}.sumario .sum-gate a{color:var(--dim);text-decoration:none}.sumario .sum-gate a:hover{color:var(--gold-ink)}";
+  ".sumario .sum-gate{font-style:italic;color:var(--dim)}.sumario .sum-gate a{color:var(--dim);text-decoration:none}.sumario .sum-gate a:hover{color:var(--gold-ink)}"
+  + ".estados{margin:2.4rem 0;border-left:3px solid var(--gold);padding:.2rem 0 .2rem 1.2rem}"
+  + ".es-h{font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 .3rem}"
+  + ".es-intro{font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--txt2);max-width:58ch;margin:0 0 .9rem}"
+  + ".es-list{list-style:none;padding:0;margin:0;display:grid;gap:.15rem}"
+  + ".es-list li{border-bottom:1px dotted var(--line)}.es-list a{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .8rem;padding:.5rem 0;text-decoration:none;color:var(--txt)}.es-list a:hover .es-dt{color:var(--gold-ink)}"
+  + ".es-dt{font-family:var(--serif);font-size:15px;color:var(--txt)}.es-p{font-family:var(--sans);font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums}.es-reg{font-family:var(--sans);font-size:12px;color:var(--dim)}"
+  + ".atlas-fen{display:inline-block;margin:.2rem 0 0;font-size:13.5px;color:var(--gold-ink);text-decoration:none}.atlas-fen:hover{text-decoration:underline}"
+  + ".cnav-mid{font-size:12.5px;color:var(--dim)}.cnav-mid a{color:var(--gold-ink);text-decoration:none;margin:0 .4rem}.cnav-mid a:hover{text-decoration:underline}";
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
   const en = lang === "en";
@@ -718,6 +789,10 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   // O Arquivo Lembra — timeline do MESMO regime (via nav.historico); degrada p/ os 2 links estáticos se sem dado
   const arquivoHtml = _arquivoLembraHtml(nav.historico, _pP, date, en, dpath, regimeColor, nav.recorrencia) || _lembraHtml(date, en);
   const arquivoIsTimeline = arquivoHtml.indexOf('class="arquivo"') >= 0;
+  // Fase 3 — teia lateral (estados semelhantes) + porta do Atlas por fenômeno. regimeToday/regimeColor/_pP já em escopo.
+  const estadosHtml = _estadosSemelhantesHtml(nav.historico, _pP, date, en, dpath, regimeColor);
+  const _atlasFen = _atlasPorFenomeno(regimeToday, _pP, en);
+  const atlasFenHtml = "<a class=\"atlas-fen\" href=\"" + _atlasFen.href + "\">" + _esc(_atlasFen.label) + "</a>";
   // O Que Costuma Vir Depois (casos análogos) + O Que Chamou Atenção Hoje (voz) — rótulos de coluna
   const costumaHtml = pfHtml ? "<section id=\"depois\"><span class=\"sec-lb\">" + (en ? "What Usually Comes Next" : "O Que Costuma Vir Depois") + "</span>" + pfHtml + "</section>" : "";
   const hojeHtml = vozHtml ? "<section id=\"hoje\"><span class=\"sec-lb\">" + (en ? "Today’s Read" : "O Que Chamou Atenção Hoje") + "</span>" + vozHtml + "</section>" : "";
@@ -731,6 +806,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   if (mancheteHtml) _sum.push(["#pulso", en ? "The Pulse" : "O Pulso"]);
   if (arquivoIsTimeline) _sum.push(["#arquivo", en ? "The Archive Remembers" : "O Arquivo Lembra"]);
   if (costumaHtml) _sum.push(["#depois", en ? "What Usually Comes Next" : "O Que Costuma Vir Depois"]);
+  if (estadosHtml) _sum.push(["#semelhantes", en ? "Editions in a similar state" : "Edições em estado semelhante"]);
   if (hojeHtml) _sum.push(["#hoje", en ? "Today’s Read" : "O Que Chamou Atenção Hoje"]);
   _sum.push(["#proxima", en ? "For the Next Edition" : "Para a Próxima Edição"]);
   const sumarioHtml = _sum.length >= 3 ? "<nav class=\"sumario\" aria-label=\"" + (en ? "In this edition" : "Nesta edição") + "\"><span class=\"sum-lb\">" + (en ? "In this edition" : "Nesta edição") + "</span><ul>" + _sum.map(function (s) { return "<li><span class=\"dot\" style=\"color:" + regimeColor + "\">●</span> <a href=\"" + s[0] + "\">" + _esc(s[1]) + "</a></li>"; }).join("") + "<li class=\"sum-gate\"><em><a href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "Full reading — subscribers" : "Leitura completa — assinantes") + "</a></em></li>" + "</ul></nav>" : "";
@@ -740,13 +816,15 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\"><link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-light.svg\" media=\"(prefers-color-scheme: light)\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/icon-dark.svg\" media=\"(prefers-color-scheme: dark)\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#131521\"><link rel=\"manifest\" href=\"/site.webmanifest\">" +
     "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">" +
     "<link rel=\"canonical\" href=\"" + canon + "\">" +
+    (nav.prev ? "<link rel=\"prev\" href=\"" + origin + dpath + "/" + nav.prev + "\">" : "") +
+    (nav.next ? "<link rel=\"next\" href=\"" + origin + dpath + "/" + nav.next + "\">" : "") +
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/daily/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     "<script type=\"application/ld+json\">" + JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": en ? "Home" : "Início", "item": origin + "/" }, { "@type": "ListItem", "position": 2, "name": en ? "Daily archive" : "Arquivo diário", "item": origin + dpath }, { "@type": "ListItem", "position": 3, "name": date, "item": canon } ] }).replace(/</g, "\\u003c") + "</script>" +
-    _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;gap:12px}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}" + _DIARIO_CSS_V1) +
+    _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}.cnav a{color:var(--gold-ink);text-decoration:none}.cnav a:hover{text-decoration:underline}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}" + _DIARIO_CSS_V1) +
     "</head><body>" + _header(en) + "<div class=\"wrap\">" +
     (_pm ? '<h1 class="h1m">' + _pm.manchete + "</h1>" : "<h1>" + (en ? "Brazil market regime" : "Regime do mercado brasileiro") + "</h1>") +
     "<p class=\"dt\">" + (nav.num ? (en ? "Edition no. " : "Edição nº ") + nav.num + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + (regimeToday ? " · " + (en ? "Regime " : "Regime ") + _esc(regimeToday) : "") + (nav.regimeDias != null && nav.regimeDias > 0 ? " · <b>" + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") + "</b>" : "") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
@@ -758,13 +836,18 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     _pub(inArticleSlot) +
     arquivoHtml +
     costumaHtml +
+    estadosHtml +
     hojeHtml +
     _pub(multiplexSlot) +
     proximaHtml +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0 ? date : (WEEKLY_SAMPLE_DATES[WEEKLY_SAMPLE_DATES.length - 1] || null)) +
     colofonHtml +
-    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a></p>" +
-    ((nav.prev || nav.next) ? "<p class=\"cnav\">" + (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + (en ? "previous edition · " : "edição anterior · ") + nav.prev + "</a>" : "<span></span>") + (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " · " + (en ? "next edition" : "edição seguinte") + " →</a>" : "<span></span>") + "</p>" : "") +
+    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a>" + " · " + atlasFenHtml + "</p>" +
+    "<p class=\"cnav\">" +
+      (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + (en ? "previous edition · " : "edição anterior · ") + nav.prev + "</a>" : "<span></span>") +
+      "<span class=\"cnav-mid\"><a href=\"" + dpath + "\">" + (en ? "all editions" : "todas as edições") + "</a> · <a href=\"/atlas\">Atlas</a></span>" +
+      (nav.next ? "<a href=\"" + dpath + "/" + nav.next + "\">" + nav.next + " · " + (en ? "next edition" : "edição seguinte") + " →</a>" : "<span></span>") +
+    "</p>" +
     "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← all daily readings" : "← todas as leituras diárias") + "</a> · <a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>" +
     "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT + "</body></html>";
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
@@ -852,6 +935,17 @@ function _renderAtlas(atlas, origin, lang) {
   const en = lang === "en";
   const A = atlas || {};
   const dpath = en ? "/daily" : "/diario";
+  // Fase 3 — links recíprocos crawláveis Atlas→edições de virada (server-rendered, não só via JS). Guarda de data futura.
+  const _today = new Date().toISOString().slice(0, 10);
+  const _ult = (A.ultimas || []);
+  const _edLast = _ult.slice().reverse().map(function (v) {
+    const p = String(v.quando).split("-"); if (p.length < 2) return "";
+    const y = +p[0], m = +p[1];                 // m = mês da virada (1-based)
+    const dd = new Date(y, m, 0);               // fim do mês m (consistente c/ edLink do client)
+    const iso = y + "-" + ("0" + m).slice(-2) + "-" + ("0" + dd.getDate()).slice(-2);
+    if (iso > _today) return "";                // nunca linkar edição de data futura (inexistente)
+    return "<a href=\"" + dpath + "/" + iso + "\">" + iso + "</a>";
+  }).filter(Boolean).join(" · ");
   const canon = origin + "/atlas";
   const total = A.total || 0;
   const anos = A.years ? A.years.length : 0;
@@ -916,6 +1010,7 @@ function _renderAtlas(atlas, origin, lang) {
     "<p class=\"legend-sym\"><b class=\"ex\">●</b> " + (en ? "extreme" : "extremo") + " · <b class=\"re\">◐</b> " + (en ? "recurring" : "recorrente") + " · <b class=\"fi\">○</b> " + (en ? "first occurrence" : "primeira ocorrência") + " — " + (en ? "the reader learns the symbols over time, without a legend." : "o leitor aprende os símbolos com o tempo, sem legenda.") + "</p></section>" +
     "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:30px 0 0\"></div>" +
     "<p class=\"a-note\">" + (en ? "Public, citable archive · daily Perene Risk Index 2000–2026, monthly regime 2010–2026. Descriptive, never a forecast or recommendation. Public sources." : "Arquivo público e citável · Índice de Risco Perene diário 2000–2026, regime mensal 2010–2026. Descritivo, nunca previsão ou recomendação. Fontes públicas.") + "</p>" +
+    (_edLast ? "<nav class=\"a-edlinks\" aria-label=\"" + (en ? "Recent cycle-turn editions" : "Edições de virada recentes") + "\" style=\"font-size:13px;color:var(--dim);margin:22px 0 0;line-height:1.9\"><span style=\"font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-right:8px\">" + (en ? "Turn editions" : "Edições de virada") + "</span>" + _edLast + "</nav>" : "") +
     "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← All daily editions" : "← Todas as edições diárias") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · <a href=\"/\">" + (en ? "Full radar" : "Radar completo") + "</a></footer>";
   const script = "<script>window.ATLAS=" + JSON.stringify(client).replace(/</g, "\\u003c") + ";</script>" + _ATLAS_JS + "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT;
   return new Response(head + body + script + "</body></html>", { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
@@ -952,7 +1047,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}ul.dlist .mn{color:var(--dim)}") +
     "</head><body>" + _header(en) + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
-    "<p class=\"atlasl\" style=\"margin:.2rem 0 1rem\"><a href=\"/atlas\" style=\"color:var(--gold-ink);font-weight:600;text-decoration:none\">" + (en ? "◎ Explore the archive as an Atlas — by regime, extreme, crisis, landscape →" : "◎ Explore o arquivo como Atlas — por regime, extremo, crise, paisagem →") + "</a></p>" +
+    "<p class=\"atlasl\" style=\"margin:.2rem 0 1rem\"><a href=\"/atlas\" style=\"color:var(--gold-ink);font-weight:600;text-decoration:none\">" + (en ? "◎ Explore the archive as an Atlas — by regime, extreme, crisis, landscape →" : "◎ Explore o arquivo como Atlas — por regime, extremo, crise, paisagem →") + "</a><br><a href=\"" + (en ? "/track-record" : "/historico") + "\" style=\"color:var(--gold-ink);text-decoration:none;font-size:13px\">" + (en ? "See the track record — readings vs. outcome →" : "Ver o track record — leitura vs. desfecho →") + "</a></p>" +
     "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on. The BR regime score is monthly by construction — it only moves at month-end, so it repeats within a month; the daily variation (Perene Risk Index, Ânima, intermarket) lives inside each day’s page." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí. O score do regime BR é mensal por construção — só se move no fecho do mês, então repete dentro do mês; a variação diária (Índice de Risco Perene, Ânima, intermercado) está dentro da página de cada dia.") + "</p>" +
     "<ul class=\"dlist\">" + rows + "</ul>" +
     "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 0\"></div>" +
