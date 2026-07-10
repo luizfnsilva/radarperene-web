@@ -1,3 +1,5 @@
+> 🗄️ **REGISTRO HISTÓRICO — fase experimental encerrada em 2026-07-10.** Este documento é memória de sessão, não doutrina ativa. A verdade vigente está em RADAR-REGULATORIO/CANONICO_CONSTITUICAO_VIGENTE.md.
+
 # Direção Editorial do Diário — v1.0 (ESTÁVEL · CONGELADA)
 
 **Status:** interface declarada **estável** em 2026-07-06. Direção de arte **congelada**.

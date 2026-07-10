@@ -1,3 +1,5 @@
+> 🗄️ **REGISTRO HISTÓRICO — fase experimental encerrada em 2026-07-10.** Este documento é memória de sessão, não doutrina ativa. A verdade vigente está em RADAR-REGULATORIO/CANONICO_CONSTITUICAO_VIGENTE.md.
+
 # Handoff 2026-06-27 — Migração editorial Newsreader para o site inteiro
 
 Sessão paralela ao catch-up de dados/billing (esse outro lado tem handoff próprio no cérebro:
