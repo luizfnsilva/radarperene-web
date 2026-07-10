@@ -842,7 +842,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     proximaHtml +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0 ? date : (WEEKLY_SAMPLE_DATES[WEEKLY_SAMPLE_DATES.length - 1] || null)) +
     colofonHtml +
-    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a>" + " · " + atlasFenHtml + "</p>" +
+    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Histórico") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a>" + " · " + atlasFenHtml + "</p>" +
     "<p class=\"cnav\">" +
       (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + (en ? "previous edition · " : "edição anterior · ") + nav.prev + "</a>" : "<span></span>") +
       "<span class=\"cnav-mid\"><a href=\"" + dpath + "\">" + (en ? "all editions" : "todas as edições") + "</a> · <a href=\"/atlas\">Atlas</a></span>" +
@@ -1011,7 +1011,7 @@ function _renderAtlas(atlas, origin, lang) {
     "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:30px 0 0\"></div>" +
     "<p class=\"a-note\">" + (en ? "Public, citable archive · daily Perene Risk Index 2000–2026, monthly regime 2010–2026. Descriptive, never a forecast or recommendation. Public sources." : "Arquivo público e citável · Índice de Risco Perene diário 2000–2026, regime mensal 2010–2026. Descritivo, nunca previsão ou recomendação. Fontes públicas.") + "</p>" +
     (_edLast ? "<nav class=\"a-edlinks\" aria-label=\"" + (en ? "Recent cycle-turn editions" : "Edições de virada recentes") + "\" style=\"font-size:13px;color:var(--dim);margin:22px 0 0;line-height:1.9\"><span style=\"font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-right:8px\">" + (en ? "Turn editions" : "Edições de virada") + "</span>" + _edLast + "</nav>" : "") +
-    "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← All daily editions" : "← Todas as edições diárias") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Track record") + "</a> · <a href=\"/\">" + (en ? "Full radar" : "Radar completo") + "</a></footer>";
+    "</div></main><footer><a href=\"" + dpath + "\">" + (en ? "← All daily editions" : "← Todas as edições diárias") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Histórico") + "</a> · <a href=\"/\">" + (en ? "Full radar" : "Radar completo") + "</a></footer>";
   const script = "<script>window.ATLAS=" + JSON.stringify(client).replace(/</g, "\\u003c") + ";</script>" + _ATLAS_JS + "<script src=\"/ads.js\" defer></script>" + _themeScript() + _CONSENT;
   return new Response(head + body + script + "</body></html>", { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
 }
@@ -1047,7 +1047,7 @@ function _renderDiarioIndex(data, origin, lang) {
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     _chromeCss("p.lead{color:var(--txt2);font-size:15px}.cad{font-size:12.5px;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin:14px 0}ul.dlist{list-style:none;padding:0}ul.dlist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}ul.dlist li a{font-variant-numeric:tabular-nums;margin-right:6px}ul.dlist .mn{color:var(--dim)}") +
     "</head><body>" + _header(en) + "<div class=\"wrap\"><h1>" + _esc(title) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
-    "<p class=\"atlasl\" style=\"margin:.2rem 0 1rem\"><a href=\"/atlas\" style=\"color:var(--gold-ink);font-weight:600;text-decoration:none\">" + (en ? "◎ Explore the archive as an Atlas — by regime, extreme, crisis, landscape →" : "◎ Explore o arquivo como Atlas — por regime, extremo, crise, paisagem →") + "</a><br><a href=\"" + (en ? "/track-record" : "/historico") + "\" style=\"color:var(--gold-ink);text-decoration:none;font-size:13px\">" + (en ? "See the track record — readings vs. outcome →" : "Ver o track record — leitura vs. desfecho →") + "</a></p>" +
+    "<p class=\"atlasl\" style=\"margin:.2rem 0 1rem\"><a href=\"/atlas\" style=\"color:var(--gold-ink);font-weight:600;text-decoration:none\">" + (en ? "◎ Explore the archive as an Atlas — by regime, extreme, crisis, landscape →" : "◎ Explore o arquivo como Atlas — por regime, extremo, crise, paisagem →") + "</a><br><a href=\"" + (en ? "/track-record" : "/historico") + "\" style=\"color:var(--gold-ink);text-decoration:none;font-size:13px\">" + (en ? "See the track record — readings vs. outcome →" : "Ver o histórico — leitura vs. desfecho →") + "</a></p>" +
     "<p class=\"cad\">" + (en ? "Cadence: monthly (month-end) through 2026-05-30; daily (business days) from then on. The BR regime score is monthly by construction — it only moves at month-end, so it repeats within a month; the daily variation (Perene Risk Index, Ânima, intermarket) lives inside each day’s page." : "Cadência: mensal (fim de mês) até 30/05/2026; diária (dias úteis) a partir daí. O score do regime BR é mensal por construção — só se move no fecho do mês, então repete dentro do mês; a variação diária (Índice de Risco Perene, Ânima, intermercado) está dentro da página de cada dia.") + "</p>" +
     "<ul class=\"dlist\">" + rows + "</ul>" +
     "<div class=\"ad-slot\" data-ad-type=\"multiplex\" style=\"margin:26px 0 0\"></div>" +
@@ -1065,15 +1065,33 @@ function _renderHistorico(data, origin, lang) {
   const dpath = en ? "/track-record" : "/historico", ddp = en ? "/daily" : "/diario";
   const canon = origin + dpath;
   const conf = data ? data.direcao_confirmada_pct : null, nComp = (data && data.n_comparaveis) || 0;
-  const title = en ? "Track record — readings vs. outcome — Radar Perene" : "Track record — leitura vs. desfecho — Radar Perene";
+  const title = en ? "Track record — readings vs. outcome — Radar Perene" : "Histórico — leitura vs. desfecho — Radar Perene";
   const desc = en
     ? "Matured Radar Perene readings vs. what the IBOV actually did 6 months later — an auditable track record. Descriptive, never a forecast."
-    : "Leituras já maturadas do Radar Perene vs. o que o IBOV de fato fez 6 meses depois — track record auditável. Descritivo, nunca previsão.";
+    : "Leituras já maturadas do Radar Perene vs. o que o IBOV de fato fez 6 meses depois — o histórico completo, leitura por leitura. Descritivo, nunca previsão.";
   const headline = (conf != null && nComp)
     ? (en ? "Across <b>" + nComp + "</b> matured readings, the analog direction was confirmed <b>" + conf + "%</b> of the time (6-month horizon)."
           : "Em <b>" + nComp + "</b> leituras já maturadas, a direção do análogo confirmou <b>" + conf + "%</b> das vezes (horizonte 6 meses).")
     : (en ? "Readings mature as the 6-month outcome becomes known — check back as more accumulate." : "As leituras maturam conforme o desfecho de 6 meses fica conhecido — volte conforme acumulam.");
   const sgn = function (v) { return (v >= 0 ? "+" : "") + v + "%"; };
+  // ── A escada da página viva: hoje → em maturação → maturadas. O topo espelha o mesmo dia de referência do
+  //    mini-radar da home (mesmo gate "após o pregão" no backend); nada de desfecho parcial — a leitura só
+  //    desce para a tabela quando o desfecho de 6 meses fica conhecido. Degrada gracioso se `recentes` faltar.
+  const rec = (data && data.recentes) || [];
+  const hoje = rec[0] || null;
+  const vivo = hoje
+    ? "<div class=\"viva\"><p class=\"vt\">" + (en ? "Today’s reading" : "A leitura de hoje") + "</p>" +
+      "<p class=\"vh\"><a href=\"" + ddp + "/" + hoje.data + "\">" + hoje.data + "</a>" +
+      (hoje.regime ? " · " + _esc(hoje.regime) : "") +
+      (hoje.perene != null ? " · " + (en ? "Perene Risk " : "Perene ") + "<b>" + hoje.perene + "</b>" : "") +
+      (hoje.anima != null ? " · Ânima <b>" + hoje.anima + "</b>" : "") + "</p>" +
+      (rec.length > 1 ? "<p class=\"vm\">" + (en ? "Maturing: " : "Em maturação: ") + rec.slice(1).map(function (s) {
+        return "<a href=\"" + ddp + "/" + s.data + "\"" + (s.matura_em ? " title=\"" + (en ? "matures ~" : "matura ~") + s.matura_em + "\"" : "") + ">" + s.data + "</a>";
+      }).join(" · ") + "</p>" : "") +
+      "<p class=\"vn\">" + (en
+        ? "Each reading is frozen on its date and joins the table below once the 6-month outcome is known" + (hoje.matura_em ? " — this one around " + hoje.matura_em : "") + "."
+        : "Cada leitura é congelada na sua data e entra na tabela abaixo quando o desfecho de 6 meses fica conhecido" + (hoje.matura_em ? " — esta, por volta de " + hoje.matura_em : "") + ".") + "</p></div>"
+    : "";
   const rows = itens.map(function (s) {
     const prev = s.previsto_6m_pct != null ? sgn(s.previsto_6m_pct) : "—";
     const real = s.realizado_6m_pct != null ? sgn(s.realizado_6m_pct) : "—";
@@ -1088,8 +1106,9 @@ function _renderHistorico(data, origin, lang) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/historico\"><link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/track-record\"><link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/historico\">" +
     "<meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + _esc(desc) + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
-    _chromeCss("p.lead{color:var(--txt2);font-size:15px}.hl{font-family:var(--serif);font-size:20px;line-height:1.45;color:var(--txt);margin:.6rem 0 1.1rem}.hl b{color:var(--gold-ink)}table.trk{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}table.trk th{text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);padding:6px 8px}table.trk td{padding:7px 8px;border-bottom:1px solid var(--line)}table.trk td.n,table.trk th.n{text-align:right}.ok{color:#0f7a43;font-weight:600}[data-theme='dark'] .ok{color:#34c97a}.no{color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:18px}") +
+    _chromeCss("p.lead{color:var(--txt2);font-size:15px}.viva{border:1px solid var(--line);border-radius:9px;background:var(--surface2);padding:12px 14px;margin:.4rem 0 1.2rem}.viva .vt{font-family:var(--sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 4px}.viva .vh{font-family:var(--serif);font-size:18px;margin:0}.viva .vh b{color:var(--gold-ink)}.viva .vm{font-size:13px;color:var(--dim);margin:6px 0 0;font-variant-numeric:tabular-nums}.viva .vm a{color:var(--txt2)}.viva .vn{font-size:12.5px;color:var(--dim);margin:6px 0 0}.hl{font-family:var(--serif);font-size:20px;line-height:1.45;color:var(--txt);margin:.6rem 0 1.1rem}.hl b{color:var(--gold-ink)}table.trk{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}table.trk th{text-align:left;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);padding:6px 8px}table.trk td{padding:7px 8px;border-bottom:1px solid var(--line)}table.trk td.n,table.trk th.n{text-align:right}.ok{color:#0f7a43;font-weight:600}[data-theme='dark'] .ok{color:#34c97a}.no{color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:18px}") +
     "</head><body>" + _header(en) + "<div class=\"wrap\"><h1>" + _esc(title.replace(" — Radar Perene", "")) + "</h1><p class=\"lead\">" + _esc(desc) + "</p>" +
+    vivo +
     "<p class=\"hl\">" + headline + "</p>" +
     (rows ? "<table class=\"trk\"><thead><tr>" + thead + "</tr></thead><tbody>" + rows + "</tbody></table>" : "") +
     "<p class=\"ctx\">" + (en ? "Distribution/outcome observed, never a forecast or recommendation. Each reading is frozen on its date; the outcome matures ~6 months later. " : "Distribuição/desfecho observado, nunca previsão ou recomendação. Cada leitura é congelada na sua data; o desfecho matura ~6 meses depois. ") +
