@@ -906,7 +906,8 @@ const _ATLAS_JS = '<script>(function(){' +
 // ---- anos ----
 'var yl=document.getElementById("years");(A.years||[]).forEach(function(y){var reg=y.mean>=60?"risk_on":(y.mean<=48?"defensivo":"neutro");var el=document.createElement("a");el.className="yr-cell";el.href=edLink(+y.y,11);el.innerHTML="<div class=\\"y\\">"+y.y+"</div><div class=\\"m\\">"+y.n+L(" leituras · Perene médio "," readings · avg Perene ")+Math.round(y.mean)+"</div><div class=\\"bar\\" style=\\"background:"+RCOL[reg]+";opacity:.55;width:"+Math.round(y.mean)+"%\\"></div>";yl.appendChild(el);});' +
 // ---- comece por aqui ----
-'var ENTR=EN?[["First edition","31 Jan 2000",2000,0],["Greatest euphoria","Perene 100",2019,0],["Greatest capitulation","Mar 2020 · 5.7",2020,2],["Longest regime","35 mo · 2010",2010,5],["Last turn","Dec 2025",2025,11],["The full archive","6,566 →",-1,-1]]:[["Primeira edição","31 jan 2000",2000,0],["Maior euforia","Perene 100",2019,0],["Maior capitulação","mar 2020 · 5,7",2020,2],["Regime mais longo","35 meses · 2010",2010,5],["Última virada","dez 2025",2025,11],["O acervo completo","6.566 →",-1,-1]];' +
+'var TOT=(A.total?A.total.toLocaleString(EN?"en-US":"pt-BR"):"6.700");' +
+'var ENTR=EN?[["First edition","31 Jan 2000",2000,0],["Greatest euphoria","Perene 100",2019,0],["Greatest capitulation","Mar 2020 · 5.7",2020,2],["Longest regime","35 mo · 2010",2010,5],["Last turn","Dec 2025",2025,11],["The full archive",TOT+" →",-1,-1]]:[["Primeira edição","31 jan 2000",2000,0],["Maior euforia","Perene 100",2019,0],["Maior capitulação","mar 2020 · 5,7",2020,2],["Regime mais longo","35 meses · 2010",2010,5],["Última virada","dez 2025",2025,11],["O acervo completo",TOT+" →",-1,-1]];' +
 'document.getElementById("entries").innerHTML=ENTR.map(function(e){var href=e[2]<0?DP:edLink(e[2],e[3]);return "<a class=\\"entry\\" href=\\""+href+"\\"><div class=\\"e-k\\">"+e[0]+"</div><div class=\\"e-v\\">"+e[1]+"</div></a>";}).join("");' +
 // ---- paisagem (SVG relief) ----
 'var pais=document.getElementById("pais"),tip=document.getElementById("tip");' +
@@ -1372,7 +1373,9 @@ async function _route(request, env, ctx) {
         try { const hr = await _diarioFetch(HIST_API + "?limit=600&lang=" + (_isEN ? "en" : "pt")); if (hr.ok) nav.historico = await hr.json(); } catch (e) { /* opcional */ }
         // recorrência por ESTADO (Perene) daquela data — o rodapé do Arquivo casa 1:1 com a home; date-parametrizada, determinística
         try { const rr = await _diarioFetch(RECORR_API + "?date=" + _dm[1]); if (rr.ok) { const rj = await rr.json(); if (rj && rj.n) nav.recorrencia = rj; } } catch (e) { /* opcional */ }
-        return _renderDiarioDia(await r.json(), _dm[1], _url.origin, _isEN ? "en" : "pt", nav);
+        const _snap = await r.json();
+        if (_snap && _snap.num != null) nav.num = _snap.num;  // nº da edição = ordinal real desde 2000 (v_edicao_num), não a posição na lista esparsa
+        return _renderDiarioDia(_snap, _dm[1], _url.origin, _isEN ? "en" : "pt", nav);
       } catch (e) { return env.ASSETS.fetch(request); }
     }
     // ── /ativos — hub crawlável que DE-ORFANIZA as páginas /ativo (Ahrefs #3): links reais via /v1/tickers. 1 rota, língua por hostname. ──
