@@ -11,7 +11,11 @@ name: OG · Prancha do /diario
 
 on:
   schedule:
-    - cron: "0 14 * * *"   # 11:00 BRT (14:00 UTC) — depois do fechamento/publish do dia
+    # ★ TIMING (2026-07-12): a edição do dia publica ~19:10 BRT (daily_intel, pós-liquidação B3). O cartão TEM que
+    #   ser gerado DEPOIS disso — senão a edição de hoje só ganharia OG no run do dia seguinte (~16h de janela).
+    #   Free plan (sem raster on-demand): esta é a janela mínima grátis → o cartão fica pronto ~30-60min após publicar.
+    - cron: "0 23 * * *"   # 20:00 BRT — logo após o fechamento; edição do dia já publicada + gate 18h liberado
+    - cron: "0 11 * * *"   # 08:00 BRT — backstop (pega o que o run da noite tiver perdido; skip-if-exists = barato)
   workflow_dispatch:
     inputs:
       dates:
