@@ -1,0 +1,82 @@
+name: OG · Prancha do /diario
+
+# ★ 2026-07-12: gera os cartões OG por-/diario (a Prancha do Atlas do dia, 1200×630, PT+EN) a partir da página
+#   /og/diario/{date} (renderizada ao vivo pelo worker) e commita os PNGs → o worker os serve como og:image de cada
+#   /diario/{date}. A edição é IMUTÁVEL → o cartão de uma data passada nunca muda (gera UMA vez, cache imutável; o
+#   shot pula os já gerados). Dois modos:
+#     • schedule diário → janela rolante das últimas ~15 datas (edições NOVAS ganham cartão em <1 dia → fecha a
+#       janela do "1º compartilhamento cai no cartão genérico"). Fim de semana/feriado sem edição: pulados no shot.
+#     • workflow_dispatch com `dates` → backfill landmark-first sob demanda (crises/extremos primeiro).
+# NOTA: requer "Settings → Actions → Workflow permissions = Read and write" (o bot dá push dos PNGs).
+
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 11:00 BRT (14:00 UTC) — depois do fechamento/publish do dia
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: "Datas YYYY-MM-DD por vírgula (backfill landmark). Vazio no schedule = últimas ~15 datas."
+        required: false
+        type: string
+      force:
+        description: "Re-gerar mesmo se o PNG já existe (após re-freeze do gerador)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: og-diario
+  cancel-in-progress: false
+
+jobs:
+  shoot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Resolve dates
+        id: dates
+        run: |
+          if [ -n "${{ inputs.dates }}" ]; then
+            echo "csv=${{ inputs.dates }}" >> "$GITHUB_OUTPUT"
+          else
+            # janela rolante: últimos ~15 dias corridos (datas sem edição publicada são puladas no shot)
+            csv=$(for i in $(seq 0 14); do date -u -d "-$i day" +%F; done | paste -sd, -)
+            echo "csv=$csv" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Playwright (chromium)
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm i -D playwright@1.48.0
+          npx playwright install --with-deps chromium
+
+      - name: Screenshot OG /diario cards
+        env:
+          OG_BASE: https://radarperene.com.br
+          OG_BASE_EN: https://radarperene.com
+          OG_DATES: ${{ steps.dates.outputs.csv }}
+          OG_FORCE: ${{ inputs.force && '1' || '' }}
+        run: node .github/scripts/og-diario-shot.mjs
+
+      - name: Commit generated cards
+        run: |
+          git config user.name "rp-og-bot"
+          git config user.email "og-bot@radarperene"
+          git checkout -- package.json package-lock.json 2>/dev/null || true
+          rm -f package.json package-lock.json
+          git add og/diario/*.png 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Sem cartões novos — nada a commitar."
+          else
+            # SEM [skip ci]: o Cloudflare Workers Builds PULA builds com [skip ci] → os cartões nunca iriam ao ar.
+            git commit -m "chore(og): cartões OG por-/diario (Prancha do Atlas)"
+            git push
+          fi

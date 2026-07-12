@@ -122,6 +122,7 @@ const SNAPS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-a
 const ATLAS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/atlas";  // agregação do acervo p/ a /atlas
 const HIST_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/historico";  // track record (leituras maturadas vs desfecho)
 const RECORR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/recorrencia";  // recorrência descritiva por ESTADO (Perene) — o MESMO número da home
+const PRANCHA_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/prancha";  // Prancha do Atlas: { tipo, input } p/ desenhar a figura editorial do dia (edge compõe, worker desenha)
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
 
@@ -619,6 +620,141 @@ const _DIARIO_CSS_V1 =
   + ".es-dt{font-family:var(--serif);font-size:15px;color:var(--txt)}.es-p{font-family:var(--sans);font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums}.es-reg{font-family:var(--sans);font-size:12px;color:var(--dim)}"
   + ".atlas-fen{display:inline-block;margin:.2rem 0 0;font-size:13.5px;color:var(--gold-ink);text-decoration:none}.atlas-fen:hover{text-decoration:underline}"
   + ".cnav-mid{font-size:12.5px;color:var(--dim)}.cnav-mid a{color:var(--gold-ink);text-decoration:none;margin:0 .4rem}.cnav-mid a:hover{text-decoration:underline}";
+// ── PRANCHAS DO ATLAS — geradores da linguagem visual editorial (CANONICO_GRAFICO_EDITORIAL.md).
+//    COPIADOS VERBATIM de RADAR-REGULATORIO/supabase/functions/radar-api/figuras/ (fonte única +
+//    golden byte-a-byte; NÃO reimplementar — a fidelidade É o contrato anti-drift). A edge (/v1/prancha)
+//    serve o dado { tipo, input }; aqui só desenhamos. Cada IIFE isola NS/esc/STYLE/pct (nomes do original).
+const _pranchaPaisagem = (function () {
+// figuras/paisagem_do_risco.ts — gerador da figura "A Paisagem do Risco".
+// Herói diário da linguagem visual editorial (ver CANONICO_GRAFICO_EDITORIAL.md).
+//
+// FILOSOFIA (decidida 2026-07-11): o Radar não tem GRÁFICO FINANCEIRO — tem INFOGRÁFICO
+// EDITORIAL. A estrela é sempre a FRASE. O número é grande. O desenho é quase um diagrama
+// explicativo — um traço CARTOGRÁFICO que diz apenas "onde no território estamos hoje".
+// Nem a linha inteira (vira eletrocardiograma = comunica volatilidade), nem a distribuição
+// inteira (vira gráfico estatístico = "o que é isso?"). Só o LUGAR. ~90% narrativa, ~10% desenho.
+//
+// FUNÇÃO PURA, zero-dependência: recebe dado já apurado, devolve string SVG.
+// Roda em Deno (edge fn), Node (harness/OG) ou no worker externo (copiar o arquivo).
+// NÃO está wired ao index.ts — capacidade nova, só entra em produção via deploy explícito.
+// Só o índice NOMEADO (Perene) mostra número — nenhuma coordenada de motor entra aqui.
+const NS = "http://www.w3.org/2000/svg";
+const esc = (s)=>String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const STYLE = `
+:root{--ink:#211e19;--muted:#736d63;--faint:#a8a299;--hair:#e6e1d7;--terra:#b4532a;--azul:#3f6d8c;--oliva:#8a8a4a;--sig:#8f8578;}
+@media (prefers-color-scheme:dark){:root{--ink:#ece7df;--muted:#9a938a;--faint:#5f594f;--hair:#3a352f;--terra:#e0885f;--azul:#79a6c6;--oliva:#b6b673;--sig:#7d766b;}}
+:root[data-theme="dark"]{--ink:#ece7df;--muted:#9a938a;--faint:#5f594f;--hair:#3a352f;--terra:#e0885f;--azul:#79a6c6;--oliva:#b6b673;--sig:#7d766b;}
+:root[data-theme="light"]{--ink:#211e19;--muted:#736d63;--faint:#a8a299;--hair:#e6e1d7;--terra:#b4532a;--azul:#3f6d8c;--oliva:#8a8a4a;--sig:#8f8578;}
+.k{font-size:11px;letter-spacing:3px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.h{font-size:30px;fill:var(--ink);}
+.n{font-size:92px;fill:var(--terra);}
+.c{font-size:13px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.z{font-size:10px;letter-spacing:1.5px;fill:var(--faint);font-family:-apple-system,Segoe UI,sans-serif;}
+.zc{font-size:10px;letter-spacing:1.5px;font-family:-apple-system,Segoe UI,sans-serif;}
+.t{font-size:11px;fill:var(--terra);font-family:-apple-system,Segoe UI,sans-serif;letter-spacing:.5px;}
+.s{font-size:10px;letter-spacing:2px;fill:var(--sig);}
+.se{font-size:10px;fill:var(--muted);font-style:italic;}`;
+function paisagemDoRisco(input) {
+  const { hoje, achado, desde } = input;
+  const lang = input.lang ?? "pt";
+  const unidade = hoje.unidade ?? (lang === "en" ? "days" : "dias");
+  const selo = lang === "en" ? "Empirical distribution. Not a forecast." : "Distribuição empírica. Não é previsão.";
+  const hojeRotulo = lang === "en" ? "Today" : "Hoje";
+  const pctTxt = lang === "en" ? `${hoje.percentil}th percentile of the series` : `${hoje.percentil}º percentil da série`;
+  const ocTxt = lang === "en" ? `${hoje.ocorrencias} ${unidade} here (${hoje.ocorrenciasPct}%) since ${desde}` : `${hoje.ocorrencias} ${unidade} aqui (${hoje.ocorrenciasPct}%) desde ${desde}`;
+  const zCap = lang === "en" ? "CAPITULATION" : "CAPITULAÇÃO";
+  const zNeu = lang === "en" ? "NEUTRAL" : "NEUTRO";
+  const zApe = lang === "en" ? "RISK-ON" : "APETITE";
+  // o traço cartográfico — ~10% da peça, embaixo. Uma régua "vale → topo" com o Hoje.
+  const AX = 40, BX = 700, AY = 330;
+  const vx = (v)=>AX + Math.max(0, Math.min(100, v)) / 100 * (BX - AX);
+  const hx = vx(hoje.valor);
+  const t40 = vx(40), t60 = vx(60);
+  return `<svg viewBox="0 0 760 420" xmlns="${NS}" font-family="Georgia,'Times New Roman',serif" role="img">` + `<title>${esc(achado)}</title>` + `<desc>${esc("A Paisagem do Risco — onde o Índice de Risco Perene está hoje no território histórico desde " + desde + ". " + achado)}</desc>` + `<style>${STYLE}</style>` + `<text x="40" y="46" class="k">A PAISAGEM DO RISCO</text>` + `<text x="40" y="96" class="h">${esc(achado)}</text>` + `<text x="40" y="196" class="n" font-family="Georgia,serif">${esc(String(hoje.valor))}</text>` + `<text x="42" y="226" class="c">${esc(pctTxt)}</text>` + `<text x="42" y="245" class="c">${esc(ocTxt)}</text>` + `<line x1="${AX}" y1="${AY}" x2="${t40}" y2="${AY}" stroke="var(--azul)" stroke-width="2"/>` + `<line x1="${t40}" y1="${AY}" x2="${t60}" y2="${AY}" stroke="var(--oliva)" stroke-width="2"/>` + `<line x1="${t60}" y1="${AY}" x2="${BX}" y2="${AY}" stroke="var(--terra)" stroke-width="2"/>` + `<line x1="${t40}" y1="${AY - 4}" x2="${t40}" y2="${AY + 4}" stroke="var(--faint)" stroke-width="1"/>` + `<line x1="${t60}" y1="${AY - 4}" x2="${t60}" y2="${AY + 4}" stroke="var(--faint)" stroke-width="1"/>` + `<text x="${AX}" y="${AY + 22}" class="zc" fill="var(--azul)">${esc(zCap)}</text>` + `<text x="${((t40 + t60) / 2).toFixed(0)}" y="${AY + 22}" text-anchor="middle" class="zc" fill="var(--oliva)">${esc(zNeu)}</text>` + `<text x="${BX}" y="${AY + 22}" text-anchor="end" class="zc" fill="var(--terra)">${esc(zApe)}</text>` + `<text x="${hx.toFixed(1)}" y="${AY - 16}" text-anchor="end" class="t">${esc(hojeRotulo)}</text>` + `<circle cx="${hx.toFixed(1)}" cy="${AY}" r="6" fill="var(--terra)"/>` + `<circle cx="${hx.toFixed(1)}" cy="${AY}" r="11" fill="none" stroke="var(--terra)" stroke-width="1" opacity="0.4"/>` + `<line x1="40" y1="384" x2="720" y2="384" stroke="var(--hair)" stroke-width="1"/>` + `<text x="40" y="406" class="se">${esc(selo)}</text>` + `<text x="720" y="406" text-anchor="end" class="s">RADAR&#160;PERENE</text>` + `</svg>`;
+}
+
+return paisagemDoRisco;
+})();
+const _pranchaDepois = (function () {
+// figuras/depois_do_mesmo_lugar.ts — Prancha do Atlas "Depois do Mesmo Lugar".
+// O CORAÇÃO da família (ver CANONICO_GRAFICO_EDITORIAL.md): responde "o que veio depois?"
+// — a CONSEQUÊNCIA (output), nunca o Perene (input, que o texto já diz).
+//
+// Voz: The Economist, não Our World in Data — o Radar NARRA (deixa espaço para interpretação),
+// não ENSINA (não esgota). Gramática fixa da família: grande frase → grande número →
+// conceito estatístico rotulado → uma figura → assinatura.
+// P7: descreve a distribuição empírica realizada, NUNCA prevê ponto.
+// FUNÇÃO PURA, zero-dependência. NÃO wired ao index.ts — capacidade nova, deploy explícito.
+const NS = "http://www.w3.org/2000/svg";
+const esc = (s)=>String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function pct(v, lang) {
+  const s = (Math.round(v * 10) / 10).toFixed(1);
+  const num = (lang === "en" ? s : s.replace(".", ",")).replace("-", "");
+  return (v > 0 ? "+" : v < 0 ? "−" : "") + num + "%";
+}
+const STYLE = `
+:root{--ink:#211e19;--muted:#736d63;--faint:#a8a299;--hair:#e6e1d7;--dist:#8a8577;--terra:#b4532a;--sig:#8f8578;}
+@media (prefers-color-scheme:dark){:root{--ink:#ece7df;--muted:#9a938a;--faint:#5f594f;--hair:#3a352f;--dist:#7d7768;--terra:#e0885f;--sig:#7d766b;}}
+:root[data-theme="dark"]{--ink:#ece7df;--muted:#9a938a;--faint:#5f594f;--hair:#3a352f;--dist:#7d7768;--terra:#e0885f;--sig:#7d766b;}
+:root[data-theme="light"]{--ink:#211e19;--muted:#736d63;--faint:#a8a299;--hair:#e6e1d7;--dist:#8a8577;--terra:#b4532a;--sig:#8f8578;}
+.k{font-size:11px;letter-spacing:3px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.h{font-size:26px;fill:var(--ink);}
+.n{font-size:82px;fill:var(--terra);}
+.c{font-size:13px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.ml{font-size:10px;letter-spacing:1.5px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.mv{font-size:30px;fill:var(--terra);}
+.z0{font-size:10px;letter-spacing:.5px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.zr{font-size:9px;letter-spacing:1px;fill:var(--faint);font-family:-apple-system,Segoe UI,sans-serif;}
+.axh{font-size:10px;letter-spacing:1.5px;fill:var(--faint);font-family:-apple-system,Segoe UI,sans-serif;}
+.pat{font-size:16px;fill:var(--ink);}
+.patc{font-size:12px;fill:var(--muted);font-family:-apple-system,Segoe UI,sans-serif;}
+.sig1{font-size:10px;letter-spacing:2px;fill:var(--sig);}
+.sig2{font-size:10px;fill:var(--muted);font-style:italic;}`;
+function depoisDoMesmoLugar(input) {
+  const lang = input.lang ?? "pt";
+  const selo = lang === "en" ? "Empirical distribution. Not a forecast." : "Distribuição empírica. Não é previsão.";
+  const subiuTxt = lang === "en" ? `of the time ${input.ativo} rose · ${input.janela} later` : `das vezes o ${input.ativo} subiu · ${input.janela} depois`;
+  const medLab = lang === "en" ? "MEDIAN RETURN" : "RETORNO MEDIANO";
+  const axL = lang === "en" ? "WORSE OUTCOMES" : "PIORES DESFECHOS";
+  const axR = lang === "en" ? "BETTER OUTCOMES" : "MELHORES DESFECHOS";
+  const patN = lang === "en" ? `${input.n} comparable episodes` : `${input.n} episódios comparáveis`;
+  const patC = lang === "en" ? `${input.anos} years of memory · range ${pct(input.pior, lang)} to ${pct(input.melhor, lang)}` : `${input.anos} anos de memória · leque real de ${pct(input.pior, lang)} a ${pct(input.melhor, lang)}`;
+  const { counts, rmin, rmax } = input.hist;
+  // TOPY/BASE (2026-07-12): a faixa do histograma desce p/ o rótulo "RETORNO MEDIANO" (centrado no x da mediana)
+  //   ganhar linha PRÓPRIA abaixo da legenda do número — sem isso, uma mediana à esquerda do centro (ex.: +4,5%,
+  //   dado vivo) fazia o rótulo colidir com "…subiu · N depois". Preserva o design (rótulo no x da mediana), só baixa.
+  const X0 = 60, X1 = 700, BASE = 372, TOPY = 286;
+  const nb = counts.length, bw = (X1 - X0) / nb, maxC = Math.max(...counts, 1);
+  const hy = (c)=>BASE - c / maxC * (BASE - TOPY);
+  const vx = (v)=>X0 + (Math.max(rmin, Math.min(rmax, v)) - rmin) / (rmax - rmin) * (X1 - X0);
+  const x0 = vx(0), xm = vx(input.mediana);
+  // índice do bin onde o VALOR cruza 0 (nb·fração, não px) — a fronteira do tom cai na linha do zero
+  const split = Math.max(0, Math.min(nb, Math.round(nb * (0 - rmin) / (rmax - rmin))));
+  // área em degraus de um intervalo de bins [a,b) — o histograma é PANO DE FUNDO (barras somem)
+  const area = (a, b, attrs)=>{
+    if (b <= a) return "";
+    const p = [
+      `${(X0 + a * bw).toFixed(1)},${BASE}`
+    ];
+    for(let i = a; i < b; i++){
+      p.push(`${(X0 + i * bw).toFixed(1)},${hy(counts[i]).toFixed(1)}`);
+      p.push(`${(X0 + (i + 1) * bw).toFixed(1)},${hy(counts[i]).toFixed(1)}`);
+    }
+    p.push(`${(X0 + b * bw).toFixed(1)},${BASE}`);
+    return `<polygon points="${p.join(" ")}" ${attrs}/>`;
+  };
+  const areaNeg = area(0, split, `fill="var(--faint)" fill-opacity="0.30" stroke="none"`);
+  const areaPos = area(split, nb, `fill="var(--dist)" fill-opacity="0.34" stroke="none"`);
+  return `<svg viewBox="0 0 760 480" xmlns="${NS}" font-family="Georgia,'Times New Roman',serif" role="img">` + `<title>${esc(input.achado)}</title>` + `<desc>${esc("Depois do Mesmo Lugar — distribuição do retorno do " + input.ativo + " " + input.janela + " após " + input.n + " episódios comparáveis, " + input.anos + " anos de memória.")}</desc>` + `<style>${STYLE}</style>` + `<text x="40" y="44" class="k">PRANCHA DO ATLAS · DEPOIS DO MESMO LUGAR</text>` + `<text x="40" y="84" class="h">${esc(input.achado)}</text>` + `<text x="40" y="196" class="n" font-family="Georgia,serif">${esc(String(input.subiuPct))}%</text>` + `<text x="42" y="222" class="c">${esc(subiuTxt)}</text>` + `<line x1="${X0}" y1="${BASE}" x2="${X1}" y2="${BASE}" stroke="var(--hair)" stroke-width="1"/>` + areaNeg + areaPos + `<line x1="${x0.toFixed(1)}" y1="${TOPY - 8}" x2="${x0.toFixed(1)}" y2="${BASE}" stroke="var(--muted)" stroke-width="1"/>` + `<text x="${x0.toFixed(1)}" y="${BASE + 19}" text-anchor="middle" class="z0">0%</text>` + `<text x="${((X0 + x0) / 2).toFixed(1)}" y="${TOPY - 12}" text-anchor="middle" class="zr">CAIU</text>` + `<text x="${((x0 + X1) / 2).toFixed(1)}" y="${TOPY - 12}" text-anchor="middle" class="zr">SUBIU</text>` + `<line x1="${xm.toFixed(1)}" y1="${TOPY - 4}" x2="${xm.toFixed(1)}" y2="${BASE}" stroke="var(--terra)" stroke-width="2"/>` + `<circle cx="${xm.toFixed(1)}" cy="${BASE}" r="6" fill="var(--terra)"/>` + `<text x="${xm.toFixed(1)}" y="${TOPY - 42}" text-anchor="middle" class="ml">${esc(medLab)}</text>` + `<text x="${xm.toFixed(1)}" y="${TOPY - 14}" text-anchor="middle" class="mv" font-family="Georgia,serif">${esc(pct(input.mediana, lang))}</text>` + `<text x="${X0}" y="${BASE + 19}" class="axh">${esc(axL)}</text>` + `<text x="${X1}" y="${BASE + 19}" text-anchor="end" class="axh">${esc(axR)}</text>` + `<text x="40" y="416" class="pat" font-family="Georgia,serif">${esc(patN)}</text>` + `<text x="40" y="436" class="patc">${esc(patC)}</text>` + `<line x1="40" y1="452" x2="720" y2="452" stroke="var(--hair)" stroke-width="1"/>` + `<text x="40" y="472" class="sig1">RADAR&#160;PERENE</text>` + `<text x="720" y="472" text-anchor="end" class="sig2">${esc(selo)}</text>` + `</svg>`;
+}
+
+return depoisDoMesmoLugar;
+})();
+function _renderPrancha(pr) {
+  if (!pr || !pr.input) return "";
+  try { return pr.tipo === "depois" ? _pranchaDepois(pr.input) : _pranchaPaisagem(pr.input); }
+  catch (e) { return ""; }
+}
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
   const en = lang === "en";
@@ -793,6 +929,27 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const estadosHtml = _estadosSemelhantesHtml(nav.historico, _pP, date, en, dpath, regimeColor);
   const _atlasFen = _atlasPorFenomeno(regimeToday, _pP, en);
   const atlasFenHtml = "<a class=\"atlas-fen\" href=\"" + _atlasFen.href + "\">" + _esc(_atlasFen.label) + "</a>";
+  // A PRANCHA DO ATLAS — a figura editorial do dia (a evidência visual, "o que veio depois / onde estamos").
+  //   Isolada como data-URI <img>: o <style> do SVG (:root{--ink…} + classes .h/.n/.c) NÃO vaza p/ o :root da
+  //   página nem colide com --terra/--oliva/classes. Auto-titulada (kicker+achado dentro do SVG). Degrada a "".
+  //   TEMA: a figura é TRANSPARENTE (tinta sobre o fundo da página) → PRECISA seguir o tema da página, senão a
+  //   tinta escura some no fundo escuro. Um <img> isolado só enxerga o prefers-color-scheme do SO, não o toggle
+  //   manual da página. Solução: DUAS variantes do MESMO SVG do gerador (sem tocá-lo) trocadas por CSS conforme
+  //   o tema efetivo da página — clara = sem o @media dark; escura = o bloco [data-theme=dark] vira :root (vence).
+  const pranchaHtml = (nav.prancha && nav.prancha.tipo && nav.prancha.input)
+    ? (function () {
+        const svg = _renderPrancha(nav.prancha);
+        if (!svg) return "";
+        const alt = _esc(nav.prancha.input.achado || (en ? "Atlas plate" : "Prancha do Atlas"));
+        const light = svg.replace(/@media \(prefers-color-scheme:dark\)\{:root\{[^}]*\}\}/, "");
+        const dark = svg.split(':root[data-theme="dark"]').join(":root");
+        const uri = function (s) { return "data:image/svg+xml," + encodeURIComponent(s); };
+        return "<figure class=\"prancha\" id=\"prancha\">"
+          + "<img class=\"pr-l\" loading=\"lazy\" alt=\"" + alt + "\" src=\"" + uri(light) + "\">"
+          + "<img class=\"pr-d\" loading=\"lazy\" alt=\"\" aria-hidden=\"true\" src=\"" + uri(dark) + "\">"
+          + "</figure>";
+      })()
+    : "";
   // O Que Costuma Vir Depois (casos análogos) + O Que Chamou Atenção Hoje (voz) — rótulos de coluna
   const costumaHtml = pfHtml ? "<section id=\"depois\"><span class=\"sec-lb\">" + (en ? "What Usually Comes Next" : "O Que Costuma Vir Depois") + "</span>" + pfHtml + "</section>" : "";
   const hojeHtml = vozHtml ? "<section id=\"hoje\"><span class=\"sec-lb\">" + (en ? "Today’s Read" : "O Que Chamou Atenção Hoje") + "</span>" + vozHtml + "</section>" : "";
@@ -821,10 +978,10 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/daily/" + date + "\">" +
     "<link rel=\"alternate\" hreflang=\"x-default\" href=\"https://radarperene.com.br/diario/" + date + "\">" +
-    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">" +
+    "<meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:locale\" content=\"" + (en ? "en_US" : "pt_BR") + "\"><meta property=\"og:image\" content=\"" + origin + "/ogimg/diario/" + date + (en ? "-en" : "") + ".png\"><meta property=\"og:image:width\" content=\"1200\"><meta property=\"og:image:height\" content=\"630\"><meta name=\"twitter:card\" content=\"summary_large_image\"><meta name=\"twitter:image\" content=\"" + origin + "/ogimg/diario/" + date + (en ? "-en" : "") + ".png\">" +
     "<script type=\"application/ld+json\">" + ld + "</script>" +
     "<script type=\"application/ld+json\">" + JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": en ? "Home" : "Início", "item": origin + "/" }, { "@type": "ListItem", "position": 2, "name": en ? "Daily archive" : "Arquivo diário", "item": origin + dpath }, { "@type": "ListItem", "position": 3, "name": date, "item": canon } ] }).replace(/</g, "\\u003c") + "</script>" +
-    _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}.cnav a{color:var(--gold-ink);text-decoration:none}.cnav a:hover{text-decoration:underline}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}" + _DIARIO_CSS_V1) +
+    _chromeCss(".h1m{font-family:var(--serif);font-weight:500;font-size:clamp(23px,3.4vw,33px);line-height:1.3;max-width:32ch;letter-spacing:-.01em}.lembra{font-size:13px;color:var(--dim);margin-top:20px}.lembra a{color:var(--gold-ink);text-decoration:none}.lembra a:hover{text-decoration:underline}.lembra .lb{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold-ink);margin-right:8px}.ver{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;margin:1.1rem 0}.ver b{color:var(--txt)}.ver ul{margin:.4rem 0 0}.pf{display:flex;flex-wrap:wrap;gap:14px;margin:1.1rem 0}.pf>div{flex:1 1 300px;margin:0}.cas{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem}.cas b{color:var(--txt)}.cas ul{margin:.4rem 0 0}.casl{margin:.45rem 0 .2rem;color:var(--txt2);font-size:14px}.casm{margin:.5rem 0 0;font-size:12px;color:var(--dim)}.ctx{font-size:13px;color:var(--dim);margin-top:20px}.cnav{font-size:13px;margin-top:8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}.cnav a{color:var(--gold-ink);text-decoration:none}.cnav a:hover{text-decoration:underline}.pulse{margin:1rem 0 1.6rem;padding-bottom:1.2rem;border-bottom:1px solid var(--line)}.pulse-eyb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem}.pulse-g{display:flex;gap:2.6rem;flex-wrap:wrap}.pulse-i{display:flex;flex-direction:column;gap:.25rem}.pulse-nm{font-size:13px;color:var(--dim);font-weight:500;letter-spacing:.01em}.pulse-n{font-family:var(--serif);font-size:46px;line-height:1;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}.pulse-u{font-size:15px;color:var(--dim);font-weight:400;margin-left:.15rem}.pulse-help{display:inline-block;margin-top:1.1rem;font-size:12px;color:var(--dim);text-decoration:none}.pulse-help:hover{color:var(--gold-ink);text-decoration:underline}@media(max-width:480px){.pulse-g{gap:1.9rem}.pulse-n{font-size:40px}}.voz{font-family:var(--serif);margin:1rem 0 1.5rem;max-width:64ch}.voz p{font-size:19px;line-height:1.65;color:var(--txt);margin:0 0 .65rem}.voz p.rp-sig{font-size:13px;color:var(--gold-ink);font-style:italic;margin:.15rem 0 1rem}.voz ul.rp-voz-bul{list-style:none;padding:0;margin:.2rem 0 0}.voz ul.rp-voz-bul li{font-family:var(--serif);font-size:15px;color:var(--txt2);padding:.2rem 0 .2rem 1.1rem;position:relative;line-height:1.5}.voz ul.rp-voz-bul li:before{content:'\\2022';color:var(--gold-ink);position:absolute;left:.1rem}.panh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:1.3rem 0 .3rem}.mctx{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:1rem 0}.mctx>b{font-size:13px;color:var(--dim);letter-spacing:.04em}.mctx ul{margin:.35rem 0 0;padding-left:1.1rem}.memo{margin:1.3rem 0}.memohd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memobody{color:var(--txt2);font-size:16px;line-height:1.7;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:21px;color:var(--txt);margin:.4rem 0 .5rem}.memobody h2{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--txt);margin:1.3rem 0 .4rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.2rem 0 .35rem}.memobody p{margin:0 0 .75rem}.memobody ul{margin:0 0 .75rem}.memobody hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}.memobody em{color:var(--dim)}.memobody .selo{display:block;font-size:12px;color:var(--dim);margin-top:.3rem}.memogate{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:1rem 1.1rem}.memogate .gh{font-family:var(--serif);font-size:18px;color:var(--txt);margin-bottom:.3rem}.memogate p{margin:0 0 .7rem;color:var(--dim);font-size:14px}.memogate .ghb{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.memogate .gl{color:var(--gold-ink);font-weight:600;text-decoration:none;font-size:14.5px}.memogate .gl:hover{text-decoration:underline}.memogate .lg{font-size:13px;color:var(--dim)}.wsamplebox{margin:1.3rem 0}.wsample{display:block;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:.8rem 1rem;text-decoration:none}.wsample:hover{border-color:var(--gold-ink)}.wsample .wt{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.25rem}.wsample .wd{display:block;color:var(--txt2);font-size:15px}.memotabs{display:flex;flex-wrap:wrap;gap:18px;margin:.2rem 0 1rem;border-bottom:1px solid var(--line)}.memotab{background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--txt2);padding:6px 2px 8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.memotab:hover{color:var(--gold-ink)}.memotab.on{background:transparent;color:var(--gold-ink);border-bottom-color:var(--gold-ink)}.memohd2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:.5rem}.memografs{margin:1.1rem 0;display:grid;gap:12px}.memograf{width:100%;max-width:520px;border:1px solid var(--line);border-radius:8px;display:block}.prancha{margin:1.7rem 0;max-width:680px}.prancha img{width:100%;height:auto;display:block}.prancha .pr-d{display:none}@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]) .pr-l{display:none}:root:not([data-theme=\"light\"]) .pr-d{display:block}}:root[data-theme=\"dark\"] .pr-l{display:none}:root[data-theme=\"dark\"] .pr-d{display:block}:root[data-theme=\"light\"] .pr-l{display:block}:root[data-theme=\"light\"] .pr-d{display:none}" + _DIARIO_CSS_V1) +
     "</head><body>" + _header(en) + "<div class=\"wrap\">" +
     (_pm ? '<h1 class="h1m">' + _pm.manchete + "</h1>" : "<h1>" + (en ? "Brazil market regime" : "Regime do mercado brasileiro") + "</h1>") +
     "<p class=\"dt\">" + (nav.num ? (en ? "Edition no. " : "Edição nº ") + Number(nav.num).toLocaleString(en ? "en-US" : "pt-BR") + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + (regimeToday ? " · " + (en ? "Regime " : "Regime ") + _esc(regimeToday) : "") + (nav.regimeDias != null && nav.regimeDias > 0 ? " · <b>" + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") + "</b>" : "") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
@@ -833,6 +990,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     sumarioHtml +
     mancheteHtml +
     divergHtml +
+    pranchaHtml +
     _pub(inArticleSlot) +
     arquivoHtml +
     costumaHtml +
@@ -1324,6 +1482,48 @@ async function _route(request, env, ctx) {
         return _renderAtlas(await r.json(), _url.origin, _isEN ? "en" : "pt");
       } catch (e) { return env.ASSETS.fetch(request); }
     }
+    // ── OG por-/diario — página-fonte PURA do cartão 1200×630 (a Prancha do dia). Clona o pipeline og-leitura:
+    //    o GitHub Action (og-diario-shot.mjs) a screenshota → og/diario/{date}[-en].png. Renderizada no worker
+    //    reusando o ÚNICO _renderPrancha (sem 3ª cópia do gerador). Fontes Georgia→Newsreader / sans→Inter SÓ aqui
+    //    (consistência entre runners e com o cartão da Leitura; o gerador fica INTACTO — verbatim). noindex. ──
+    const _ogd = _url.pathname.match(/^\/og\/diario\/(\d{4}-\d{2}-\d{2})$/);
+    if (_ogd) {
+      try {
+        const pr = await _diarioFetch(PRANCHA_API + "?date=" + _ogd[1] + "&lang=" + (_isEN ? "en" : "pt"));
+        if (!pr.ok) return env.ASSETS.fetch(request);
+        const pj = await pr.json();
+        const svg0 = (pj && pj.tipo && pj.input) ? _renderPrancha(pj) : "";
+        if (!svg0) return env.ASSETS.fetch(request);
+        const svg = svg0
+          .replace(/Georgia,'Times New Roman',serif/g, "'Newsreader',Georgia,'Times New Roman',serif")
+          .replace(/Georgia,serif/g, "'Newsreader',Georgia,serif")
+          .replace(/-apple-system,Segoe UI,sans-serif/g, "'Inter',-apple-system,Segoe UI,sans-serif");
+        const html = "<!doctype html><html lang=\"" + (_isEN ? "en" : "pt") + "\" data-theme=\"light\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=1200\">"
+          + "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>"
+          + "<link href=\"https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">"
+          + "<style>*{margin:0;box-sizing:border-box}html,body{width:1200px;height:630px;overflow:hidden;background:#f7f3ea}.og{width:1200px;height:630px;display:flex;align-items:center;justify-content:center;padding:44px 64px;background:#f7f3ea}.og svg{height:534px;width:auto;display:block}</style></head>"
+          + "<body><div class=\"og\">" + svg + "</div>"
+          + "<script>(function(){function r(){document.documentElement.setAttribute('data-og-ready','1');}Promise.resolve(document.fonts&&document.fonts.ready).then(function(){requestAnimationFrame(function(){setTimeout(r,200);});});setTimeout(r,12000);})();</script>"
+          + "</body></html>";
+        return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
+    // ── og:image por-data (URL estável no <head> do /diario). Serve o PNG estático por-data se o Action já gerou
+    //    (imutável — a edição é imutável); senão CAI no cartão genérico da Leitura (TTL curto → troca sozinho quando gerar). ──
+    const _ogi = _url.pathname.match(/^\/ogimg\/diario\/(\d{4}-\d{2}-\d{2})(-en)?\.png$/);
+    if (_ogi) {
+      try {
+        const _sfx = _ogi[2] || "";
+        const _a = await env.ASSETS.fetch(new Request(_url.origin + "/og/diario/" + _ogi[1] + _sfx + ".png"));
+        if (_a && _a.ok && (_a.headers.get("content-type") || "").includes("image")) {
+          const _h = new Headers(_a.headers); _h.set("Cache-Control", "public, max-age=31536000, immutable"); _h.delete("ETag");
+          return new Response(_a.body, { status: 200, headers: _h });
+        }
+        const _fb = await env.ASSETS.fetch(new Request(_url.origin + "/og-leitura-" + (_sfx ? "en" : "pt") + ".png"));
+        const _h2 = new Headers(_fb.headers); _h2.set("Cache-Control", "public, max-age=600"); _h2.delete("ETag");
+        return new Response(_fb.body, { status: _fb.status, headers: _h2 });
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
     if (_url.pathname === "/diario" || _url.pathname === "/daily") {
       try {
         const r = await _diarioFetch(SNAPS_API + "?lang=" + (_isEN ? "en" : "pt"));
@@ -1369,10 +1569,19 @@ async function _route(request, env, ctx) {
             }
           }
         } catch (e) { /* opcional */ }
-        // "O Arquivo Lembra" — acervo maturado inteiro p/ a timeline do mesmo regime (degrada gracioso se falhar)
-        try { const hr = await _diarioFetch(HIST_API + "?limit=600&lang=" + (_isEN ? "en" : "pt")); if (hr.ok) nav.historico = await hr.json(); } catch (e) { /* opcional */ }
-        // recorrência por ESTADO (Perene) daquela data — o rodapé do Arquivo casa 1:1 com a home; date-parametrizada, determinística
-        try { const rr = await _diarioFetch(RECORR_API + "?date=" + _dm[1]); if (rr.ok) { const rj = await rr.json(); if (rj && rj.n) nav.recorrencia = rj; } } catch (e) { /* opcional */ }
+        // As 3 leituras auxiliares em PARALELO (todas OPCIONAIS, degradam gracioso a undefined). Concorrem com o
+        //   snapshot `r` (awaited abaixo) → a Prancha NÃO adiciona round-trip; as três somam 1 ida, não 3.
+        //   "O Arquivo Lembra" (histórico maturado) · recorrência por ESTADO daquela data (casa 1:1 com a home) ·
+        //   Prancha do Atlas ({tipo,input} composto pela edge). Cada .catch isola a falha (a página nunca quebra).
+        const _jok = function (r2) { return r2.ok ? r2.json() : null; };
+        const [_histJ, _recJ, _prJ] = await Promise.all([
+          _diarioFetch(HIST_API + "?limit=600&lang=" + (_isEN ? "en" : "pt")).then(_jok).catch(function () { return null; }),
+          _diarioFetch(RECORR_API + "?date=" + _dm[1]).then(_jok).catch(function () { return null; }),
+          _diarioFetch(PRANCHA_API + "?date=" + _dm[1] + "&lang=" + (_isEN ? "en" : "pt")).then(_jok).catch(function () { return null; }),
+        ]);
+        if (_histJ) nav.historico = _histJ;
+        if (_recJ && _recJ.n) nav.recorrencia = _recJ;
+        if (_prJ && _prJ.tipo && _prJ.input) nav.prancha = _prJ;
         const _snap = await r.json();
         if (_snap && _snap.num != null) nav.num = _snap.num;  // nº da edição = ordinal real desde 2000 (v_edicao_num), não a posição na lista esparsa
         return _renderDiarioDia(_snap, _dm[1], _url.origin, _isEN ? "en" : "pt", nav);
