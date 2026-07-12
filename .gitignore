@@ -6,3 +6,6 @@
 .claude/
 .agents/
 skills-lock.json
+
+# macOS Finder — lixo de sistema, nunca versionar
+.DS_Store
