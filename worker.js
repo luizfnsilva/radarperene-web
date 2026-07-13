@@ -969,7 +969,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   };
   const _pItems =
     _pItem(en ? "Perene Risk Index" : "Índice de Risco Perene", en ? "the market’s structural state" : "o estado estrutural do mercado", _pP, "perene", (nav.dPerene != null ? nav.dPerene : null)) +
-    _pItem(en ? "Ânima · structural" : "Índice Ânima · estrutural", en ? "investors’ prevailing mood" : "o humor predominante dos investidores", _pA, "anima", (nav.dAnima != null ? nav.dAnima : null)) +
+    _pItem(en ? "Ânima · structural" : "Índice Ânima · estrutural", en ? "the market’s prevailing risk appetite" : "o apetite de risco predominante do mercado", _pA, "anima", (nav.dAnima != null ? nav.dAnima : null)) +
     _pItem(en ? "Ânima · short-term" : "Ânima · curto prazo", en ? "the market’s recent move" : "o movimento recente do mercado", _pAc, "curto", (nav.dCurto != null ? nav.dCurto : null));
   const mancheteHtml = _pItems ? "<section class=\"pulse\" id=\"pulso\"><div class=\"pulse-eyb\">" + (en ? "The Pulse" : "O Pulso") + "</div><div class=\"pulse-g\">" + _pItems + "</div><a class=\"pulse-help\" href=\"" + (en ? "/how-to-read-the-radar/" : "/como-ler-o-radar/") + "\">" + (en ? "how to read?" : "como interpretar?") + "</a></section>" : "";
   // chamada de divergência (com respiro) — determinística, do próprio snapshot: a tensão mais saliente do dia.
