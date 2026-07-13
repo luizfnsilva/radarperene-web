@@ -1003,8 +1003,11 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
   const fileteHtml = "<div class=\"regime-rule\" style=\"color:" + regimeColor + "\" aria-hidden=\"true\"></div>";
   // deck (subtítulo/standfirst). ★ EDITOR determinístico (dono 2026-07-06): quando o pipeline pré-computou a
   //   voz que RESPIRA (narr.composicao_editor.texto — gramática de microestruturas, reprodutível, P7-limpa),
-  //   ELA é o deck do dia (texto inteiro). Senão, cai no resumo do ghostwriter (1ª frase limpa). PT-only:
-  //   o edge só emite composicao_editor em PT (estado_textual é PT-only), então o EN segue no resumo intocado.
+  //   ELA é o deck do dia (texto inteiro). Senão, cai no resumo do ghostwriter (1ª frase limpa).
+  //   ★ BILÍNGUE (corrigido 2026-07-13 — o comentário antigo dizia "PT-only", FALSO): o edge emite
+  //   composicao_editor[lang] p/ PT E EN. O editor_gerar grava os 2 idiomas via compor(lang) com seed
+  //   LANG-INDEPENDENTE → mesmas microestruturas, cada uma na sua língua, a $0 (zero Fable/LLM). Verificado
+  //   em prod: EN varia dia a dia como o PT. NÃO adicionar fallback de tradução aqui — o EN já é determinístico.
   let deckHtml = "";
   const _ceTxt = (narr.composicao_editor && narr.composicao_editor.texto) ? String(narr.composicao_editor.texto).trim() : "";
   if (_ceTxt) {
