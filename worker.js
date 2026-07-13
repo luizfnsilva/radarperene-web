@@ -8,7 +8,7 @@
 //   1) criar /semanal/<data>/index.html (+ /weekly/<data>/index.html EN); 2) adicionar "<data>" aqui.
 // Na /diario/<data>, visitante FREE vê um link p/ a amostra — a da própria semana quando existir, senão a mais
 // recente da lista (a estante fica sempre visível); ASSINANTE não (já recebe o semanal completo → sem duplicar).
-const WEEKLY_SAMPLE_DATES = ["2026-06-26"];
+const WEEKLY_SAMPLE_DATES = [];  // ★ 2026-07-13: amostra 100%-aberta APOSENTADA. Agora /semanal/{data} é a TEASER (última edição, 25% + paywall); /semanal/amostra → 302 p/ a última. Ver _renderTeaserSemanal.
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
 const EN_DESC = "A living archive of Brazil's markets: daily, weekly and monthly reports and a library of precedents — to read the present in light of the past.";
 const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, inflation, IPCA, study library, historical analogs, market regime analysis"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
@@ -123,6 +123,9 @@ const ATLAS_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-a
 const HIST_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/historico";  // track record (leituras maturadas vs desfecho)
 const RECORR_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/recorrencia";  // recorrência descritiva por ESTADO (Perene) — o MESMO número da home
 const PRANCHA_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/prancha";  // Prancha do Atlas: { tipo, input } p/ desenhar a figura editorial do dia (edge compõe, worker desenha)
+const PREVIEW_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/biblioteca/preview";  // teaser 25% da última semanal (truncado no servidor = gate-safe)
+const STRIPE_BUY_PT = "https://buy.stripe.com/7sY6oG5QC54f4Lx1VZb3q06";  // Payment Link R$29 (BRL) — o mesmo do /assine
+const STRIPE_BUY_EN = "https://buy.stripe.com/cNi8wObaW9kv6TFeILb3q07";  // Payment Link US$29 (USD) — o mesmo do /subscribe
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
 
@@ -392,7 +395,7 @@ function _memoGate(date, sampleDate) {
     'var box=document.getElementById("rp-memo");if(!box)return;' +
     'var EN=/radarperene\\.com$/i.test(location.hostname)&&!/\\.com\\.br$/i.test(location.hostname);' +
     'var ANON=' + J(NARR_ANON) + ',DATE=' + J(date) + ',WDATE=' + J(sampleDate || null) + ';' +
-    'function showW(){if(!WDATE)return;var w=document.getElementById("rp-weekly");if(!w)return;var u=(EN?"/weekly/":"/semanal/")+WDATE+"/";w.innerHTML=\'<a class="wsample" href="\'+u+\'"><span class="wt">\'+(EN?"Weekly report \\u00b7 free sample":"Relat\\u00f3rio semanal \\u00b7 amostra aberta")+\'</span><span class="wd">\'+(EN?"The week on one page \\u2014 read the free sample \\u2192":"A semana em uma p\\u00e1gina \\u2014 leia a amostra gratuita \\u2192")+\'</span></a>\';w.style.display="block";}' +
+    'function showW(){var w=document.getElementById("rp-weekly");if(!w)return;var u=(EN?"/weekly/amostra":"/semanal/amostra");w.innerHTML=\'<a class="wsample" href="\'+u+\'"><span class="wt">\'+(EN?"Weekly report \\u00b7 open sample":"Relat\\u00f3rio semanal \\u00b7 amostra aberta")+\'</span><span class="wd">\'+(EN?"The latest Friday edition \\u2014 25% open, one click to read it all \\u2192":"A \\u00faltima edi\\u00e7\\u00e3o de sexta \\u2014 25% aberta, um clique pra ler tudo \\u2192")+\'</span></a>\';w.style.display="block";}' +
     'function hideW(){var w=document.getElementById("rp-weekly");if(w)w.style.display="none";}' +
     'var sb=window.supabase.createClient("https://zcjtkgltrxdnlacezpny.supabase.co",ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});' +
     'function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}' +
@@ -755,6 +758,94 @@ function _renderPrancha(pr) {
   try { return pr.tipo === "depois" ? _pranchaDepois(pr.input) : _pranchaPaisagem(pr.input); }
   catch (e) { return ""; }
 }
+// ── TEASER SEMANAL (conversão, 2026-07-13): a ÚLTIMA edição semanal em modo teaser — ~25% aberta (preview
+//    TRUNCADO NO SERVIDOR via /v1/biblioteca/preview → os 75% restantes NUNCA entram no HTML público, gate íntegro)
+//    + fade + cartão de paywall com botão Stripe. Para o ASSINANTE logado, o client busca o corpo COMPLETO (Bearer)
+//    e substitui o preview → a MESMA URL serve todos. Substitui a antiga amostra 100%-aberta (mais conversão). ──
+function _mdLite(t) {
+  var inl = function (s) { return _esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>"); };
+  var bs = String(t || "").replace(/\r/g, "").split(/\n{2,}/), o = [];
+  bs.forEach(function (b) {
+    b = b.trim(); if (!b) return;
+    if (/^#{1,3}\s/.test(b)) { var h = b.match(/^#+/)[0].length; o.push("<h" + h + ">" + inl(b.replace(/^#+\s/, "")) + "</h" + h + ">"); return; }
+    if (/^>\s?/.test(b)) { o.push('<p class="lead">' + inl(b.replace(/^>[ \t]?/gm, "")) + "</p>"); return; }  // standfirst (blockquote) → parágrafo-lead
+    if (/^---+$/.test(b)) { o.push("<hr>"); return; }
+    var ls = b.split("\n");
+    if (ls.every(function (l) { return /^[-*]\s/.test(l.trim()); })) { o.push("<ul>" + ls.map(function (l) { return "<li>" + inl(l.replace(/^[-*]\s/, "")) + "</li>"; }).join("") + "</ul>"); return; }
+    o.push("<p>" + ls.map(inl).join("<br>") + "</p>");
+  });
+  return o.join("");
+}
+var _TEASER_CSS = ".memobody{color:var(--txt2);font-size:17px;line-height:1.75;max-width:66ch}.memobody h1{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.6vw,33px);color:var(--txt);margin:.2rem 0 .9rem;line-height:1.25;letter-spacing:-.01em}.memobody h2{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--txt);margin:1.5rem 0 .5rem}.memobody h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-ink);margin:1.4rem 0 .4rem}.memobody p{margin:0 0 .85rem}.memobody ul{margin:0 0 .85rem;padding-left:1.1rem}.memobody li{margin:.15rem 0}.memobody strong{color:var(--txt)}.memobody em{color:var(--dim)}.memobody .lead{font-family:var(--serif);font-size:19px;color:var(--txt);line-height:1.5;margin:.1rem 0 1.1rem}.tz-wrap{position:relative}.tz-fade{height:130px;margin-top:-130px;position:relative;pointer-events:none;background:linear-gradient(180deg,transparent,var(--bg) 82%)}.pw{border:1px solid var(--gold);background:linear-gradient(180deg,var(--surface2),var(--surface));border-radius:12px;padding:28px 24px;text-align:center;margin:2px 0 10px}.pw .pk{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);font-weight:600;margin-bottom:10px}.pw .ph{font-family:var(--serif);font-weight:500;font-size:clamp(19px,3vw,25px);color:var(--txt);margin:0 0 8px}.pw .pp{color:var(--dim);font-size:14.5px;line-height:1.6;margin:0 auto 16px;max-width:46ch}.pw .amt{font-family:var(--serif);font-size:23px;color:var(--txt);margin-bottom:15px}.pw .amt small{font-size:.55em;color:var(--dim)}.pw .buy{display:inline-block;background:var(--gold-ink);color:#fff;font-weight:600;font-size:16px;text-decoration:none;padding:13px 28px;border-radius:8px}.pw .buy:hover{filter:brightness(1.07)}.pw .lg{display:block;margin-top:15px;font-size:13.5px;color:var(--dim);text-decoration:none}.pw .lg b{color:var(--gold-ink)}.pw .fine{margin-top:15px;font-size:12px;color:var(--dim)}.pw-toc{text-align:left;max-width:34ch;margin:6px auto 20px;padding:14px 16px 12px;background:var(--surface);border:1px solid var(--line);border-radius:9px}.pw-toc-h{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:9px}.pw-toc ul{list-style:none;margin:0;padding:0}.pw-toc li{font-family:var(--serif);font-size:16px;color:var(--txt2);padding:4px 0}.pw-toc li:before{content:\"\\1F512\";font-size:.72em;opacity:.5;margin-right:9px;vertical-align:1px}.pw-val{margin:2px 0 18px}.pw-inc{list-style:none;margin:12px auto 0;padding:0;max-width:34ch;text-align:left;display:inline-block}.pw-inc li{font-size:14.5px;color:var(--txt2);padding:4px 0 4px 24px;position:relative}.pw-inc li:before{content:\"\\2713\";position:absolute;left:0;color:var(--gold-ink);font-weight:700}.tz-dt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:0 0 1rem}";
+function _renderTeaserSemanal(pv, origin, en) {
+  var date = String(pv.data_referencia);
+  var dpath = en ? "/weekly" : "/semanal";
+  var canon = origin + dpath + "/" + date + "/";
+  var MES = en ? ["January","February","March","April","May","June","July","August","September","October","November","December"] : ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  var dp = date.split("-");
+  var dEd = (dp.length === 3 && MES[+dp[1]-1]) ? (en ? MES[+dp[1]-1]+" "+(+dp[2])+", "+dp[0] : (+dp[2])+" de "+MES[+dp[1]-1]+" de "+dp[0]) : date;
+  var title = (en ? "Perene Weekly — week to " : "Perene Semanal — semana até ") + dEd;
+  var desc = _esc(en ? "The Friday edition on Brazil's market — what changed, what persisted, what the archive remembers. Read the open sample; the full edition is one click away." : "A edição de sexta do mercado brasileiro — o que mudou, o que persistiu, o que o arquivo lembra. Leia a amostra aberta; a edição completa está a um clique.").slice(0,155);
+  var buy = en ? STRIPE_BUY_EN : STRIPE_BUY_PT;
+  var previewHtml = _mdLite(pv.preview_md);
+  var ld = JSON.stringify({ "@context": "https://schema.org", "@type": "Article", "headline": title, "description": desc, "url": canon, "inLanguage": en ? "en" : "pt-BR", "isAccessibleForFree": false, "hasPart": { "@type": "WebPageElement", "isAccessibleForFree": false, "cssSelector": ".pw" }, "publisher": { "@type": "Organization", "name": "Radar Perene", "url": origin + "/" } }).replace(/</g, "\\u003c");
+  // TOC TRAVADO — os títulos das seções escondidas (lacuna de curiosidade: o leitor vê exatamente o que perde).
+  var toc = (pv.hidden_headings && pv.hidden_headings.length)
+    ? '<div class="pw-toc"><div class="pw-toc-h">' + (en ? "Behind the paywall, in this edition" : "Atrás do paywall, nesta edição") + '</div><ul>'
+      + pv.hidden_headings.map(function (h) { return "<li>" + _esc(h) + "</li>"; }).join("") + '</ul></div>'
+    : "";
+  var paywall = '<div class="pw" id="tz-pw">'
+    + '<div class="pk">' + (en ? "Continue reading" : "Continue a leitura") + '</div>'
+    + '<div class="ph">' + (en ? "The conclusion of this edition is for subscribers" : "A conclusão desta edição é para assinantes") + '</div>'
+    + '<p class="pp">' + (en ? "The turn, the character of the week and what the archive remembers — the part that pays off." : "A virada, o personagem da semana e o que o arquivo lembra — a parte que fecha o raciocínio.") + '</p>'
+    + toc
+    + '<div class="pw-val"><div class="amt"><b>' + (en ? "US$ 29" : "R$ 29") + '</b> <small>' + (en ? "/month" : "/mês") + '</small></div>'
+    + '<ul class="pw-inc"><li>' + (en ? "This week’s edition, complete" : "A edição desta semana, completa") + '</li><li>' + (en ? "The archive of every Friday edition" : "O arquivo de todas as edições de sexta") + '</li><li>' + (en ? "Every day’s open edition" : "A edição aberta de cada dia") + '</li></ul></div>'
+    + '<a class="buy" href="' + buy + '" target="_blank" rel="noopener" id="tz-buy">' + (en ? "Read this week’s edition →" : "Ler a edição da semana →") + '</a>'
+    + '<a class="lg" href="#" id="tz-login">' + (en ? "Already a subscriber? <b>Sign in to open</b>" : "Já é assinante? <b>Entrar para abrir</b>") + '</a>'
+    + '<div class="fine">' + (en ? "7-day full automatic refund · cancel anytime, 1 click · via Stripe" : "7 dias de arrependimento com estorno integral automático · cancela quando quiser, em 1 clique · via Stripe") + '</div>'
+    + '</div>';
+  var script = '<script src="/vendor/supabase-js/supabase.min.js"></script>'
+    + '<script>(function(){if(!window.supabase)return;try{'
+    + 'var EN=' + (en ? "true" : "false") + ',DATE=' + JSON.stringify(date) + ',ANON=' + JSON.stringify(NARR_ANON) + ',BUY=' + JSON.stringify(buy) + ';'
+    + 'var full=document.getElementById("rp-full"),fade=document.getElementById("tz-fade"),pw=document.getElementById("tz-pw");'
+    + 'var sb=window.supabase.createClient("https://zcjtkgltrxdnlacezpny.supabase.co",ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});'
+    + 'function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}'
+    + 'function inl(s){return esc(s).replace(/\\*\\*([^*]+)\\*\\*/g,"<strong>$1</strong>").replace(/(^|[^*])\\*([^*]+)\\*/g,"$1<em>$2</em>");}'
+    + 'function md(t){var bs=String(t||"").replace(/\\r/g,"").split(/\\n{2,}/),o=[];bs.forEach(function(b){b=b.trim();if(!b)return;if(/^#{1,3}\\s/.test(b)){var h=b.match(/^#+/)[0].length;o.push("<h"+h+">"+inl(b.replace(/^#+\\s/,""))+"</h"+h+">");return;}if(/^>\\s?/.test(b)){o.push("<p class=\\"lead\\">"+inl(b.replace(/^>[ \\t]?/gm,""))+"</p>");return;}if(/^---+$/.test(b)){o.push("<hr>");return;}var ls=b.split("\\n");if(ls.every(function(l){return /^[-*]\\s/.test(l.trim());})){o.push("<ul>"+ls.map(function(l){return "<li>"+inl(l.replace(/^[-*]\\s/,""))+"</li>";}).join("")+"</ul>");return;}o.push("<p>"+ls.map(inl).join("<br>")+"</p>");});return o;}'
+    // ao ABRIR (assinante): injeta um ad no MEIO e outro no FIM do relatório + carrega /ads.js (anônimo+semanal veem, Founder não). Ads SÓ na leitura aberta, nunca no teaser.
+    + 'function openFull(d){if(!full)return;var o=md(d.corpo_md);var mid=Math.max(1,Math.floor(o.length/2));var adM=\'<div class="ad-slot" data-ad-type="in-article" style="margin:26px 0"></div>\';var adE=\'<div class="ad-slot" data-ad-type="multiplex" style="margin:30px 0 8px"></div>\';full.innerHTML=o.slice(0,mid).join("")+adM+o.slice(mid).join("")+adE;if(fade)fade.style.display="none";if(pw)pw.style.display="none";var s=document.createElement("script");s.src="/ads.js";s.defer=true;document.body.appendChild(s);}'
+    + 'var busy=false;function check(){if(busy)return;busy=true;sb.auth.getSession().then(function(r){var s=r&&r.data&&r.data.session;if(!s){busy=false;return;}var tok=s.access_token;fetch(location.origin+"/api/v1/biblioteca/item?tipo=semanal&data="+DATE+(EN?"&lang=en":""),{headers:{apikey:ANON,Authorization:"Bearer "+tok}}).then(function(r){return r.ok?r.json():null;}).then(function(d){busy=false;if(d&&d.corpo_md)openFull(d);}).catch(function(){busy=false;});}).catch(function(){busy=false;});}'
+    + 'var lg=document.getElementById("tz-login"),buyb=document.getElementById("tz-buy");'
+    + 'function stripeUrl(em,uid){return BUY+(BUY.indexOf("?")<0?"?":"&")+"prefilled_email="+encodeURIComponent(em)+"&client_reference_id="+encodeURIComponent(uid||"");}'
+    // COMPRAR = login-antes-de-pagar: logado → abre o Stripe (nova aba) com o E-MAIL PRÉ-PREENCHIDO (garante que a
+    //   assinatura fica no e-mail que ele loga → sem lockout "pagou mas trancou") + client_reference_id; ao voltar, o
+    //   visibilitychange abre a edição SOZINHO. Anônimo → login PRIMEIRO (marca intenção) → volta logado e conclui.
+    + 'function goBuy(){sb.auth.getSession().then(function(r){var s=r&&r.data&&r.data.session,em=s&&s.user&&s.user.email;if(em){try{localStorage.removeItem("rp_gotobuy");}catch(x){}window.open(stripeUrl(em,s.user.id),"_blank","noopener");}else{try{localStorage.setItem("rp_gotobuy","1");}catch(x){}sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});}});}'
+    + 'if(buyb)buyb.onclick=function(e){e.preventDefault();goBuy();};'
+    + 'if(lg)lg.onclick=function(e){e.preventDefault();sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});};'
+    + 'function afterLogin(){try{if(localStorage.getItem("rp_gotobuy")!=="1")return;localStorage.removeItem("rp_gotobuy");sb.auth.getSession().then(function(r){var s=r&&r.data&&r.data.session;if(s&&buyb&&pw&&pw.style.display!=="none"){buyb.textContent=' + (en ? '"Finish subscribing →"' : '"Concluir a assinatura →"') + ';pw.scrollIntoView({behavior:"smooth",block:"center"});}});}catch(x){}}'
+    + 'check();afterLogin();document.addEventListener("visibilitychange",function(){if(!document.hidden)check();});'
+    + '}catch(e){}})();</script>';
+  var html = "<!doctype html><html lang=\"" + (en ? "en" : "pt-BR") + "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+    + "<title>" + _esc(title) + "</title><meta name=\"description\" content=\"" + desc + "\">"
+    + "<link rel=\"canonical\" href=\"" + canon + "\">"
+    + "<link rel=\"alternate\" hreflang=\"pt-br\" href=\"https://radarperene.com.br/semanal/" + date + "/\"><link rel=\"alternate\" hreflang=\"en\" href=\"https://radarperene.com/weekly/" + date + "/\">"
+    + "<meta property=\"og:type\" content=\"article\"><meta property=\"og:title\" content=\"" + _esc(title) + "\"><meta property=\"og:description\" content=\"" + desc + "\"><meta property=\"og:url\" content=\"" + canon + "\"><meta property=\"og:image\" content=\"" + origin + (en ? "/og-image-1200x630-en.png" : "/og-image-1200x630.png") + "\"><meta name=\"twitter:card\" content=\"summary_large_image\">"
+    + "<script type=\"application/ld+json\">" + ld + "</script>"
+    + _chromeCss(_TEASER_CSS) + "</head><body>" + _header(en) + "<div class=\"wrap\">"
+    + "<p class=\"tz-dt\">" + (en ? "Perene Weekly" : "Perene Semanal") + " · " + dEd + "</p>"
+    + "<div class=\"tz-wrap\"><div id=\"rp-full\" class=\"memobody\">" + previewHtml + "</div><div class=\"tz-fade\" id=\"tz-fade\"></div></div>"
+    + paywall
+    + "<p class=\"tz-dt\" style=\"text-transform:none;letter-spacing:0;margin-top:18px\">" + (en ? "The daily regime reading is open to all — " : "A leitura diária do regime é aberta a todos — ") + "<a href=\"/\" style=\"color:var(--gold-ink)\">" + (en ? "read today’s edition →" : "leia a edição de hoje →") + "</a></p>"
+    // ★ SEM ads no TEASER (é página de venda — ad distrai da conversão). Os ads entram SÓ na leitura ABERTA
+    //   (assinante), injetados pelo openFull() no meio e no fim + /ads.js carregado ali. Assinante semanal continua vendo ads.
+    + script
+    + "</div><footer><a href=\"/\">" + (en ? "full radar" : "radar completo") + "</a> · <a href=\"" + (en ? "/subscribe" : "/assine") + "\">" + (en ? "subscriptions" : "assinaturas") + "</a> · " + (en ? "Descriptive, not a forecast. Public sources." : "Descritivo, não previsão. Fontes públicas.") + "</footer>"
+    + _themeScript() + _CONSENT + "</body></html>";
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=600" } });
+}
+
 function _renderDiarioDia(snap, date, origin, lang, nav) {
   nav = nav || {};
   const en = lang === "en";
@@ -1475,6 +1566,30 @@ async function _route(request, env, ctx) {
     }
     // ── /diario | /daily — índice cronológico do arquivo diário citável (EN usa /daily) ──
     // ── /atlas — Atlas do Mercado Brasileiro (navegação por fenômeno; /diario cronológico continua existindo) ──
+    // ── TEASER SEMANAL — /semanal/{data} (·/weekly EN): sempre a ÚLTIMA edição, ~25% aberta + paywall + botão de
+    //    compra (converte melhor que a amostra 100%-aberta). /semanal/amostra → 302 p/ a última datada (link
+    //    ESTÁVEL no /assine). Qualquer data que NÃO é a última (inclui a amostra velha 2026-06-26) → 301 p/ a fresca.
+    if (/^\/(?:semanal|weekly)\/amostra\/?$/.test(_url.pathname)) {
+      try {
+        const pr = await _diarioFetch(PREVIEW_API + "?lang=" + (_isEN ? "en" : "pt"));
+        if (!pr.ok) return env.ASSETS.fetch(request);
+        const pj = await pr.json();
+        if (!pj || !pj.data_referencia) return env.ASSETS.fetch(request);
+        return Response.redirect(_url.origin + (_isEN ? "/weekly/" : "/semanal/") + pj.data_referencia + "/", 302);
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
+    const _wm = _url.pathname.match(/^\/(?:semanal|weekly)\/(\d{4}-\d{2}-\d{2})\/?$/);
+    if (_wm) {
+      try {
+        const pr = await _diarioFetch(PREVIEW_API + "?lang=" + (_isEN ? "en" : "pt"));
+        if (!pr.ok) return env.ASSETS.fetch(request);
+        const pj = await pr.json();
+        if (!pj || !pj.data_referencia) return env.ASSETS.fetch(request);
+        if (_wm[1] !== pj.data_referencia)  // não é a última → 301 p/ a teaser fresca (aposenta amostras velhas)
+          return Response.redirect(_url.origin + (_isEN ? "/weekly/" : "/semanal/") + pj.data_referencia + "/", 301);
+        return _renderTeaserSemanal(pj, _url.origin, _isEN);
+      } catch (e) { return env.ASSETS.fetch(request); }
+    }
     if (_url.pathname === "/atlas") {
       try {
         const r = await _diarioFetch(ATLAS_API + "?lang=" + (_isEN ? "en" : "pt"));
