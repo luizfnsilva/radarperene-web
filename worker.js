@@ -453,7 +453,7 @@ function _regimeColor(regRaw) {
 // ── ★ v1.0 "O Arquivo Lembra" — a COLUNA fixa, o maior patrimônio. Timeline DETERMINÍSTICA do MESMO regime através do
 //    acervo (Há um ano · Há cinco anos · Primeira vez), via /v1/historico (leituras maturadas × desfecho, Ibov em pontos).
 //    O diário público NÃO reescreve. Regra dura: indicava×aconteceu SEMPRE na MESMA janela (6m). Baixas em tom NEUTRO,
-//    nunca vermelho — "78% confirmada, nem sempre pra cima" constrói mais confiança. Degrada gracioso (sem dado → ""). ──
+//    nunca vermelho — "direção confirmada, mas nem sempre pra cima" constrói mais confiança. Degrada gracioso (sem dado → ""). ──
 function _arquivoLembraHtml(hist, todayPerene, todayDate, en, dpath, regimeColor, rec) {
   const items = (hist && hist.itens) || [];
   if (!items.length) return "";
@@ -510,7 +510,8 @@ function _arquivoLembraHtml(hist, todayPerene, todayDate, en, dpath, regimeColor
   const intro = en ? "Other times the archive saw the market in a state like today’s — what came next."
                    : "Outras vezes em que o arquivo viu o mercado num estado como o de hoje — o que veio depois.";
   // RECORRÊNCIA (descritiva, o MESMO número da home): "de N vezes num estado como hoje, o Ibov subiu em X%". Sujeito = o
-  //   MERCADO (não o Radar); o arquivo é a testemunha. O "78% direção confirmada" (acurácia) vive só no /historico.
+  //   MERCADO (não o Radar); o arquivo é a testemunha. A "direção confirmada" (com a régua do baseline ao lado, amostra
+  //   completa ~63% vs ~59% do mercado sozinho) vive só no /historico — nunca vendida como acurácia/edge.
   const _m = rec && rec.mediana_6m != null ? (en ? " — median " : " — mediana ") + (rec.mediana_6m >= 0 ? "+" : "") + (en ? rec.mediana_6m : String(rec.mediana_6m).replace(".", ",")) + "%" : "";
   const foot = (rec && rec.n && rec.alta_pct != null)
     ? (en ? "In <b>" + rec.n + "</b> times the archive saw the market in a state like today’s since 2000, the Ibovespa was higher six months later <b>" + rec.alta_pct + "%</b> of the time" + _m + " — <em>not always upward</em>. "
@@ -1321,13 +1322,19 @@ function _renderHistorico(data, origin, lang) {
   const dpath = en ? "/track-record" : "/historico", ddp = en ? "/daily" : "/diario";
   const canon = origin + dpath;
   const conf = data ? data.direcao_confirmada_pct : null, nComp = (data && data.n_comparaveis) || 0;
+  // ── A RÉGUA (honestidade): das MESMAS leituras comparáveis, com que frequência o IBOV simplesmente esteve mais alto
+  //    em 6m? É o ritmo do próprio mercado (subiu ~6 em cada 10 janelas). Sem a régua ao lado, "direção confirmada" se
+  //    lê como skill; com ela, fica claro que a leitura ACOMPANHA a tendência, não a bate. Calculada aqui sobre os itens
+  //    mostrados (mesmo conjunto do ✓/✗), para ser auditável contra a própria tabela. NUNCA vender edge.
+  const _cmp = itens.filter(function (s) { return s.direcao_confirmou != null && s.realizado_6m_pct != null; });
+  const baseUp = _cmp.length ? Math.round(100 * _cmp.filter(function (s) { return s.realizado_6m_pct >= 0; }).length / _cmp.length) : null;
   const title = en ? "Track record — readings vs. outcome — Radar Perene" : "Histórico — leitura vs. desfecho — Radar Perene";
   const desc = en
     ? "Matured Radar Perene readings vs. what the IBOV actually did 6 months later — an auditable track record. Descriptive, never a forecast."
     : "Leituras já maturadas do Radar Perene vs. o que o IBOV de fato fez 6 meses depois — o histórico completo, leitura por leitura. Descritivo, nunca previsão.";
   const headline = (conf != null && nComp)
-    ? (en ? "Across <b>" + nComp + "</b> matured readings, the analog direction was confirmed <b>" + conf + "%</b> of the time (6-month horizon)."
-          : "Em <b>" + nComp + "</b> leituras já maturadas, a direção do análogo confirmou <b>" + conf + "%</b> das vezes (horizonte 6 meses).")
+    ? (en ? "Across <b>" + nComp + "</b> matured readings, the analog’s suggested direction matched the outcome <b>" + conf + "%</b> of the time" + (baseUp != null ? " — while the IBOV itself was higher six months later in <b>" + baseUp + "%</b> of those same windows" : "") + ". The reading tracks the market’s own drift and names the state; it does not anticipate it."
+          : "Em <b>" + nComp + "</b> leituras já maturadas, a direção sugerida pelo análogo coincidiu com o desfecho em <b>" + conf + "%</b> das vezes" + (baseUp != null ? " — enquanto o próprio IBOV esteve mais alto seis meses depois em <b>" + baseUp + "%</b> dessas mesmas janelas" : "") + ". A leitura acompanha o ritmo do mercado e nomeia o estado; não o antecipa.")
     : (en ? "Readings mature as the 6-month outcome becomes known — check back as more accumulate." : "As leituras maturam conforme o desfecho de 6 meses fica conhecido — volte conforme acumulam.");
   const sgn = function (v) { return (v >= 0 ? "+" : "") + v + "%"; };
   // ── A escada da página viva: hoje → em maturação → maturadas. O topo espelha o mesmo dia de referência do
@@ -1655,7 +1662,7 @@ async function _route(request, env, ctx) {
     // ── /historico (PT) | /track-record (EN) — track record: leituras maturadas vs. desfecho (auditabilidade) ──
     if (_url.pathname === "/historico" || _url.pathname === "/track-record") {
       try {
-        const r = await _diarioFetch(HIST_API + "?lang=" + (_isEN ? "en" : "pt"));
+        const r = await _diarioFetch(HIST_API + "?limit=5000&lang=" + (_isEN ? "en" : "pt"));
         if (!r.ok) return env.ASSETS.fetch(request);
         return _renderHistorico(await r.json(), _url.origin, _isEN ? "en" : "pt");
       } catch (e) { return env.ASSETS.fetch(request); }
