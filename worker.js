@@ -1925,7 +1925,7 @@ async function _route(request, env, ctx) {
           const _fixA = function (attr) { return { element(e) { const v = e.getAttribute(attr); if (v) e.setAttribute(attr, v.replace("/artigos/", "/arquivos/").replace("/articles/", "/archive/")); } }; };
           rw = rw.on('link[rel="canonical"]', _fixA("href")).on('link[rel="alternate"][hreflang]', _fixA("href")).on('meta[property="og:url"]', _fixA("content"));
           const _sub = _arqAlias[2] || "";
-          if (_sub === "" || _sub === "/" || /^\/personagem\//.test(_sub)) {
+          if (_sub === "" || _sub === "/" || /^\/(personagem|character)\//.test(_sub)) {
             // hub/listagem (acervo misto, sem data única) → nota date-agnóstica logo após o título
             rw = rw.on("main h1", { element(e) { e.after(_seloVintageHub(_enArq), { html: true }); } });
           } else {
@@ -1934,7 +1934,8 @@ async function _route(request, env, ctx) {
             const _ldSt = { buf: "" };
             rw = rw
               .on('script[type="application/ld+json"]', { text(t) { if (_ldSt.buf.length < 20000) _ldSt.buf += t.text; } })
-              .on("main h1", { element(e) { const m = _ldSt.buf.match(/"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})/); if (m) e.after(_seloVintage(m[1], _enArq), { html: true }); } });
+              .on("main h1", { element(e) { const m = _ldSt.buf.match(/"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})/); e.after(_seloVintage(m ? m[1] : "2000-01-01", _enArq), { html: true }); } });
+              // ↑ fallback sem datePublished → v1: todo artigo hoje no ar é pré-go-live; novos nascem do regen com JSON-LD datado.
           }
         }
         const _t = rw.transform(res); const _h = new Headers(_t.headers); _h.set("content-type", "text/html; charset=utf-8"); return new Response(_t.body, { status: _t.status, headers: _h });
