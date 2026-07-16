@@ -9,6 +9,49 @@
 // Na /diario/<data>, visitante FREE vê um link p/ a amostra — a da própria semana quando existir, senão a mais
 // recente da lista (a estante fica sempre visível); ASSINANTE não (já recebe o semanal completo → sem duplicar).
 const WEEKLY_SAMPLE_DATES = [];  // ★ 2026-07-13: amostra 100%-aberta APOSENTADA. Agora /semanal/{data} é a TEASER (última edição, 25% + paywall); /semanal/amostra → 302 p/ a última. Ver _renderTeaserSemanal.
+
+// ── ★ 2026-07-16 SELO DE VINTAGE — go-live da metodologia v2 dos índices (Perene + Ânima Estrutural). ──
+// O backfill REESCREVEU as séries históricas: todo conteúdo textual datado ATÉ 2026-07-15 (artigos, diários
+// congelados) foi escrito sob a v1 e pode citar leituras que diferem da série viva (v2). O selo é aplicado
+// NO RENDER (worker) — o conteúdo congelado/estático NUNCA é reescrito. Datas < GO_LIVE_V2 → selo v1;
+// datas ≥ GO_LIVE_V2 → selo v2.2 (working papers com DOI, publicados no Zenodo em 2026-07-16).
+const GO_LIVE_V2 = "2026-07-16";
+function _seloVintage(dateStr, en) {
+  const d = String(dateStr || "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return "";  // sem data confiável → sem selo (defensivo, nunca mente)
+  const txt = d < GO_LIVE_V2
+    ? (en
+      ? 'Written under index methodology v1 (in effect until 15 Jul 2026). The current series is v2 — readings quoted here may differ from those shown today. <a href="/methodology/">See the methodology</a>.'
+      : 'Escrito sob a metodologia v1 dos índices (vigente até 15/07/2026). A série atual é a v2 — leituras citadas podem diferir das exibidas hoje. <a href="/metodologia/">Ver metodologia</a>.')
+    : (en
+      ? 'Index methodology v2.2 (working papers with DOI). <a href="/methodology/">See the methodology</a>.'
+      : 'Metodologia v2.2 dos índices (working papers com DOI). <a href="/metodologia/">Ver metodologia</a>.');
+  return '<p class="vintage" style="font-size:12px;color:var(--dim,#6e6e78);line-height:1.55;margin:.45rem 0 .9rem">◦ ' + txt + '</p>';
+}
+// variante p/ HUBS (listagens sem data única — /arquivos/, /archive/, hubs de personagem): nota date-agnóstica,
+// sempre verdadeira p/ acervo misto (peças antigas = v1; novas = v2.2). Mesmo tom/estilo do selo por página.
+function _seloVintageHub(en) {
+  const txt = en
+    ? 'Pieces dated up to 15 Jul 2026 were written under index methodology v1; the current series is v2.2 (working papers with DOI). <a href="/methodology/">See the methodology</a>.'
+    : 'Textos datados até 15/07/2026 foram escritos sob a metodologia v1 dos índices; a série atual é a v2.2 (working papers com DOI). <a href="/metodologia/">Ver metodologia</a>.';
+  return '<p class="vintage" style="font-size:12px;color:var(--dim,#6e6e78);line-height:1.55;margin:.45rem 0 .9rem">◦ ' + txt + '</p>';
+}
+// ── slug editorial do acervo ("fomos aos arquivos", 2026-07-16): /artigos → /arquivos (PT) · /articles →
+//    /archive (EN). Os ASSETS seguem em ./artigos|./articles (não renomeados); a rota canônica nova é servida
+//    por alias interno + 301 dos slugs antigos. Este rewriter corrige TODO link interno de página HTML servida
+//    pelo worker (footers/crumbs estáticos) p/ já apontar ao destino final (sem "links to redirect" no Ahrefs).
+//    Texto do link: só quando é exatamente o rótulo da seção ("Artigos"/"Articles") vira "Arquivos"/"Archive".
+function _arquivosRw(rw) {
+  return rw
+    .on('a[href^="/artigos"]', {
+      element(e) { const h = e.getAttribute("href"); if (h) e.setAttribute("href", h.replace(/^\/artigos/, "/arquivos")); },
+      text(t) { const s = t.text; if (s.trim() === "Artigos") t.replace(s.replace("Artigos", "Arquivos")); },
+    })
+    .on('a[href^="/articles"]', {
+      element(e) { const h = e.getAttribute("href"); if (h) e.setAttribute("href", h.replace(/^\/articles/, "/archive")); },
+      text(t) { const s = t.text; if (s.trim() === "Articles") t.replace(s.replace("Articles", "Archive")); },
+    });
+}
 const EN_TITLE = "Radar Perene — Brazil, observed and remembered";
 const EN_DESC = "A living archive of Brazil's markets: daily, weekly and monthly reports and a library of precedents — to read the present in light of the past.";
 const EN_KEYWORDS = "market regime, country risk, Brazil macro, interest rates, Selic, intermarket, FX, IFIX, REITs, IBOV, Brazilian Treasury, crypto, real estate liquidity, inflation, IPCA, study library, historical analogs, market regime analysis"; // ★ keywords PT vazavam no .com (worker não reescrevia) — espelha o EN_DESC/Dataset
@@ -49,7 +92,7 @@ const EN_BODY = (function () {
     eyb3: "For your site · free", s3: "Use our mini-radar anywhere", s3s: "A free public endpoint with today&rsquo;s reading (JSON). Embed it, cite the source. Great for portals, newsletters and communities.",
     eyb4: "Principles",
     disc: "Educational and informational content from public sources. Descriptive — NOT investment advice, an offer, solicitation or financial counsel.",
-    ftnav: '<span class="ftcol"><b>Reading</b> <a href="/daily">Daily</a> · <a href="/articles">Articles</a></span><span class="ftcol"><b>The Radar</b> <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">How we read Brazil</a> · <a href="/concepts/">Concepts</a></span><span class="ftcol"><b>For institutions</b> <a href="/founder/">Institutional access</a> · <a href="/lenses/">Lenses</a> · <a href="/widgets/">Embeddable widget</a></span><span class="ftcol"><b>House &amp; legal</b> <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a> · <a href="/masthead/">Masthead</a></span>',
+    ftnav: '<span class="ftcol"><b>Reading</b> <a href="/daily">Daily</a> · <a href="/archive">Archive</a></span><span class="ftcol"><b>The Radar</b> <a href="/how-to-read-the-radar/">How to read</a> · <a href="/methodology/">How we read Brazil</a> · <a href="/concepts/">Concepts</a></span><span class="ftcol"><b>For institutions</b> <a href="/founder/">Institutional access</a> · <a href="/lenses/">Lenses</a> · <a href="/widgets/">Embeddable widget</a></span><span class="ftcol"><b>House &amp; legal</b> <a href="/about">About</a> · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a> · <a href="/masthead/">Masthead</a></span>',
     lenses: [{ n: "Wealth", d: "Succession, estate tax, holdings." },
       { n: "Electoral", d: "Electoral courts, eligibility, finance." },
       { n: "Macro / Rates", d: "Rates, inflation, fiscal, debt." },
@@ -75,7 +118,7 @@ const EN_BODY = (function () {
   const lenses = C.lenses.map((l, i) => '<a class="ln' + (l.v ? ' vx' : '') + '" href="' + LP(LSLUG[i]) + '"><div class="nm">' + (l.v ? '<span style="color:var(--gold-ink)">✦</span> ' : '') + l.n + (l.v ? '<span class="tag">' + expTag + '</span>' : '') + '</div><p>' + l.d + '</p>' + (l.m ? '<span class="micro">' + l.m + '</span>' : '') + '</a>').join("");
   const conDD = CN.map((c) => '<a href="' + CP(c[0]) + '">' + c[1] + '</a>').join("") + '<a href="' + U_CON + '" style="color:var(--gold-ink)">' + NAV.ac + '</a>';
   const lenDD = C.lenses.map((l, i) => '<a href="' + LP(LSLUG[i]) + '">' + l.n + '</a>').join("") + '<a href="' + U_LEN + '" style="color:var(--gold-ink)">' + NAV.al + '</a>';
-  const topnav = '<a href="/articles">Articles</a><a href="' + U_CON + '">' + NAV.con + '</a><a href="/daily">' + NAV.dia + '</a>';
+  const topnav = '<a href="/archive">Archive</a><a href="' + U_CON + '">' + NAV.con + '</a><a href="/daily">' + NAV.dia + '</a>';
   const cgrid = CN.map((c, i) => '<a href="' + CP(c[0]) + '"><span class="cn">' + c[1] + '</span><span class="cd">' + CD[i] + '</span></a>').join("");
   const princ = C.princ.map((p) => '<div><b>' + p[0] + '.</b> ' + p[1] + '</div>').join("");
   const faqbox = C.faq.map((f) => '<div style="border-top:1px solid #222a31;padding:13px 0"><b style="display:block;margin-bottom:5px">' + f[0] + '</b><p style="margin:0;color:#8b97a3;font-size:14px;line-height:1.6">' + f[1] + '</p></div>').join("");
@@ -437,7 +480,7 @@ const _LEMBRA = [
 ];
 function _lembraHtml(date, en) {
   const i = (parseInt(date.slice(8, 10), 10) + parseInt(date.slice(5, 7), 10)) % _LEMBRA.length;
-  const base = en ? "/articles/" : "/artigos/";
+  const base = en ? "/archive/" : "/arquivos/";
   const pick = [_LEMBRA[i], _LEMBRA[(i + 1) % _LEMBRA.length]].map(function (e) { const a = en ? e.en : e.pt; return '<a href="' + base + a[0] + '/">' + a[1] + "</a>"; });
   return '<p class="lembra"><span class="lb">' + (en ? "The archive remembers" : "O arquivo lembra") + "</span> " + pick.join(" · ") + "</p>";
 }
@@ -1083,6 +1126,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     "</head><body>" + _header(en) + "<div class=\"wrap\">" +
     (_pm ? '<h1 class="h1m">' + _pm.manchete + "</h1>" : "<h1>" + (en ? "Brazil market regime" : "Regime do mercado brasileiro") + "</h1>") +
     "<p class=\"dt\">" + (nav.num ? (en ? "Edition no. " : "Edição nº ") + Number(nav.num).toLocaleString(en ? "en-US" : "pt-BR") + " · " : (en ? "Edition of " : "Edição de ")) + _dtEd + (regimeToday ? " · " + (en ? "Regime " : "Regime ") + _esc(regimeToday) : "") + (nav.regimeDias != null && nav.regimeDias > 0 ? " · <b>" + (en ? "for " + nav.regimeDias + " days" : "há " + nav.regimeDias + " dias") + "</b>" : "") + (snap.frozen === false ? " · " + (en ? "reconstructed essentials" : "essencial reconstruído") : "") + "</p>" +
+    _seloVintage(date, en) +  // ★ 2026-07-16 selo de vintage: edição congelada ≤15/07 = v1; novas = v2.2. NO RENDER — o snapshot armazenado nunca é reescrito.
     fileteHtml +
     deckHtml +
     sumarioHtml +
@@ -1098,7 +1142,7 @@ function _renderDiarioDia(snap, date, origin, lang, nav) {
     proximaHtml +
     _memoGate(date, WEEKLY_SAMPLE_DATES.indexOf(date) >= 0 ? date : (WEEKLY_SAMPLE_DATES[WEEKLY_SAMPLE_DATES.length - 1] || null)) +
     colofonHtml +
-    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Histórico") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/articles/" : "/artigos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a>" + " · " + atlasFenHtml + "</p>" +
+    "<p class=\"ctx\">" + (en ? "Concepts: " : "Conceitos: ") + "<a href=\"/conceitos/regime-brasil/\">" + (en ? "Brazil Regime" : "Regime Brasil") + "</a> · <a href=\"/conceitos/intermercado-br/\">" + (en ? "Intermarket BR" : "Intermercado BR") + "</a> · <a href=\"/conceitos/analogos-historicos/\">" + (en ? "Historical Analogs" : "Análogos Históricos") + "</a> · " + (en ? "How to read: " : "Como ler: ") + "<a href=\"/como-ler-o-radar/\">" + (en ? "six steps" : "seis passos") + "</a> · <a href=\"/metodologia/\">" + (en ? "Methodology" : "Metodologia") + "</a> · <a href=\"" + (en ? "/track-record" : "/historico") + "\">" + (en ? "Track record" : "Histórico") + "</a> · " + (en ? "From the archive: " : "Do acervo: ") + "<a href=\"" + (en ? "/archive/" : "/arquivos/") + "\">" + (en ? "essays & precedents" : "artigos e precedentes") + "</a>" + " · " + atlasFenHtml + "</p>" +
     "<p class=\"cnav\">" +
       (nav.prev ? "<a href=\"" + dpath + "/" + nav.prev + "\">← " + (en ? "previous edition · " : "edição anterior · ") + nav.prev + "</a>" : "<span></span>") +
       "<span class=\"cnav-mid\"><a href=\"" + dpath + "\">" + (en ? "all editions" : "todas as edições") + "</a> · <a href=\"/atlas\">Atlas</a></span>" +
@@ -1426,22 +1470,22 @@ async function _route(request, env, ctx) {
     if (/^\/api\/docs(\/|$)/.test(_url.pathname)) return Response.redirect(_url.origin + "/widgets/", 301);
     // ★ 2026-07-02 Segunda edição G3: slugs que fossilizavam medida estatística → 301 (regra de slug v3/§9.9).
     const _G3_SLUG_301 = {
-      "/artigos/o-dolar-em-anomalia-z346-dez-2024": "/artigos/o-dolar-em-anomalia-dez-2024",
-      "/artigos/o-salto-de-2-sigma-em-financas-ibov-mar-2016": "/artigos/o-salto-dos-bancos-mar-2016",
-      "/artigos/a-divida-publica-em-desvio-raro-ago-2015": "/artigos/a-divida-publica-em-anomalia-rara-ago-2015",
-      "/artigos/a-capitulacao-de-quatro-desvios-mai-2025": "/artigos/a-capitulacao-em-financas-mai-2025",
-      "/artigos/o-abrigo-a-dois-desvios-dez-2011": "/artigos/o-abrigo-que-cobrava-caro-dez-2011",
-      "/artigos/o-agio-dos-bancos-a-dois-desvios-nov-2010": "/artigos/o-agio-dos-bancos-esticado-nov-2010",
-      "/artigos/o-ciclo-e-os-bancos-a-quatro-sigmas-out-2018": "/artigos/o-ciclo-e-os-bancos-na-borda-da-escala-out-2018",
-      "/artigos/o-defensivo-a-quase-tres-desvios-fev-2024": "/artigos/o-defensivo-esticado-como-quase-nunca-fev-2024",
-      "/articles/the-dollar-in-anomaly-z346-dec-2024": "/articles/the-dollar-in-anomaly-dec-2024",
-      "/articles/the-2-sigma-leap-in-financials-ibov-mar-2016": "/articles/the-banks-leap-mar-2016",
-      "/articles/public-debt-in-a-rare-deviation-aug-2015": "/articles/public-debt-in-a-rare-anomaly-aug-2015",
-      "/articles/the-four-sigma-capitulation-may-2025": "/articles/the-capitulation-in-financials-may-2025",
-      "/articles/the-two-deviation-shelter-dec-2011": "/articles/the-shelter-that-charged-dearly-dec-2011",
-      "/articles/the-banks-premium-at-two-deviations-nov-2010": "/articles/the-banks-premium-stretched-nov-2010",
-      "/articles/the-cycle-and-the-banks-four-sigmas-out-oct-2018": "/articles/the-cycle-and-the-banks-at-the-edge-oct-2018",
-      "/articles/the-defensive-at-nearly-three-deviations-feb-2024": "/articles/the-defensive-stretched-as-almost-never-feb-2024",
+      "/artigos/o-dolar-em-anomalia-z346-dez-2024": "/arquivos/o-dolar-em-anomalia-dez-2024",
+      "/artigos/o-salto-de-2-sigma-em-financas-ibov-mar-2016": "/arquivos/o-salto-dos-bancos-mar-2016",
+      "/artigos/a-divida-publica-em-desvio-raro-ago-2015": "/arquivos/a-divida-publica-em-anomalia-rara-ago-2015",
+      "/artigos/a-capitulacao-de-quatro-desvios-mai-2025": "/arquivos/a-capitulacao-em-financas-mai-2025",
+      "/artigos/o-abrigo-a-dois-desvios-dez-2011": "/arquivos/o-abrigo-que-cobrava-caro-dez-2011",
+      "/artigos/o-agio-dos-bancos-a-dois-desvios-nov-2010": "/arquivos/o-agio-dos-bancos-esticado-nov-2010",
+      "/artigos/o-ciclo-e-os-bancos-a-quatro-sigmas-out-2018": "/arquivos/o-ciclo-e-os-bancos-na-borda-da-escala-out-2018",
+      "/artigos/o-defensivo-a-quase-tres-desvios-fev-2024": "/arquivos/o-defensivo-esticado-como-quase-nunca-fev-2024",
+      "/articles/the-dollar-in-anomaly-z346-dec-2024": "/archive/the-dollar-in-anomaly-dec-2024",
+      "/articles/the-2-sigma-leap-in-financials-ibov-mar-2016": "/archive/the-banks-leap-mar-2016",
+      "/articles/public-debt-in-a-rare-deviation-aug-2015": "/archive/public-debt-in-a-rare-anomaly-aug-2015",
+      "/articles/the-four-sigma-capitulation-may-2025": "/archive/the-capitulation-in-financials-may-2025",
+      "/articles/the-two-deviation-shelter-dec-2011": "/archive/the-shelter-that-charged-dearly-dec-2011",
+      "/articles/the-banks-premium-at-two-deviations-nov-2010": "/archive/the-banks-premium-stretched-nov-2010",
+      "/articles/the-cycle-and-the-banks-four-sigmas-out-oct-2018": "/archive/the-cycle-and-the-banks-at-the-edge-oct-2018",
+      "/articles/the-defensive-at-nearly-three-deviations-feb-2024": "/archive/the-defensive-stretched-as-almost-never-feb-2024",
     };
     const _g3old = _url.pathname.replace(/\/$/, "");
     if (_G3_SLUG_301[_g3old]) return Response.redirect(_url.origin + _G3_SLUG_301[_g3old] + "/", 301);
@@ -1449,13 +1493,18 @@ async function _route(request, env, ctx) {
     //   opinativa) → 301 p/ a umbrella de conceitos, no idioma do path. Público foca regime/intermercado/índices/análogo.
     const _VAL_301 = { "/conceitos/erp-br": 1, "/concepts/erp-br": 1, "/conceitos/cone-de-regressao-logaritmica": 1, "/concepts/logarithmic-regression-cone": 1 };
     if (_VAL_301[_g3old]) return Response.redirect(_url.origin + (_g3old.indexOf("/concepts/") === 0 ? "/concepts/" : "/conceitos/"), 301);
+    // ★ 2026-07-16 ("fomos aos arquivos"): rota canônica do acervo editorial é /arquivos (PT) · /archive (EN).
+    //   301 dos slugs antigos nos 2 domínios (SEO preservado; o G3 acima já aponta direto p/ os novos — sem cadeia).
+    //   Os assets seguem em ./artigos|./articles; o alias interno (antes do ASSETS.fetch, lá embaixo) serve o conteúdo.
+    if (/^\/artigos(\/|$)/.test(_url.pathname)) return Response.redirect(_url.origin + _url.pathname.replace(/^\/artigos/, "/arquivos") + _url.search, 301);
+    if (/^\/articles(\/|$)/.test(_url.pathname)) return Response.redirect(_url.origin + _url.pathname.replace(/^\/articles/, "/archive") + _url.search, 301);
     // ── Páginas de slug COMPARTILHADO (founder, free, widgets): o PT vive em index.html (default no .com.br), o EN em
     //    index.en.html. Sem isto, o build gerava só inglês nos 2 domínios (colisão de slug). No .com servimos a versão EN. ──
     if (_isEN) {
       const _shm = _url.pathname.match(/^\/(founder|free|widgets)\/?$/);
       if (_shm) {
         const _er = await env.ASSETS.fetch(new Request(_url.origin + "/" + _shm[1] + "/index.en.html"));
-        if (_er.ok) return _enLibraryRw(_enDailyRw(_consentRw(new HTMLRewriter()))).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
+        if (_er.ok) return _enLibraryRw(_enDailyRw(_arquivosRw(_consentRw(new HTMLRewriter())))).transform(new Response(_er.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
       }
       // slug i18n do arquivo diário: no .com (EN) /diario → 301 /daily (o conteúdo é o mesmo, só o slug muda; evita slug PT no domínio EN). /daily não redireciona → sem loop.
       if (/^\/diario(\/|$)/.test(_url.pathname)) {
@@ -1469,7 +1518,7 @@ async function _route(request, env, ctx) {
       //   (EN-aware) e 301 /biblioteca→/library (slug PT não vive no .com). /library não redireciona → sem loop.
       if (/^\/library(\/|$)/.test(_url.pathname)) {
         const _lr = await env.ASSETS.fetch(new Request(_url.origin + "/biblioteca/index.html"));
-        if (_lr.ok) return _enLibraryRw(_enDailyRw(_consentRw(new HTMLRewriter()))).transform(new Response(_lr.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
+        if (_lr.ok) return _enLibraryRw(_enDailyRw(_arquivosRw(_consentRw(new HTMLRewriter())))).transform(new Response(_lr.body, { status: 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } }));
       }
       if (/^\/biblioteca(\/|$)/.test(_url.pathname)) {
         return Response.redirect(_url.origin + _url.pathname.replace(/^\/biblioteca/, "/library") + _url.search, 301);
@@ -1513,6 +1562,18 @@ async function _route(request, env, ctx) {
       const body = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
         kids.map(function (k) { return "<sitemap><loc>" + o + k + "</loc><lastmod>" + lm + "</lastmod></sitemap>"; }).join("") + "</sitemapindex>";
       return new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+    }
+    // ── /sitemap-pages.xml — o filho estático nasceu com URLs /artigos|/articles (gen_artigos.mjs pré-rename);
+    //    reescreve NO RENDER p/ a rota canônica nova (/arquivos|/archive) até o gerador ser regenerado. Defensivo:
+    //    falha → serve o asset original (URLs velhas 301-redirecionam, nada quebra). ──
+    if (_url.pathname === "/sitemap-pages.xml") {
+      const _smr = await env.ASSETS.fetch(request);
+      try {
+        if (!_smr.ok) return _smr;
+        const _smt = await _smr.text();
+        return new Response(_smt.split("/artigos/").join("/arquivos/").split("/articles/").join("/archive/"),
+          { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+      } catch (e) { return env.ASSETS.fetch(request); }
     }
     // ── /sitemap-ativos.xml — VAZIO desde 2026-06-28: /ativo virou founder-gated (público vê só o factual,
     //   noindex). Mantido como urlset vazio (não 404) p/ sinalizar desindexação caso ainda esteja submetido no GSC. ──
@@ -1800,6 +1861,7 @@ async function _route(request, env, ctx) {
           .on("#radar-teaser", { element(e) { e.remove(); } })  // teaser da home não faz sentido na página de um ticker → remove (limpo p/ crawler e usuário)
           .on("#radar-perene", { element(e) { e.setAttribute("data-asset", tk); e.setAttribute("data-classe", cls); } })
           .on("html", { element(e) { if (_isEN) e.setAttribute("lang", "en"); } });
+        rw = _arquivosRw(rw); // shell da home linka o acervo → /arquivos|/archive
         if (_isEN) rw = _enLibraryRw(_enDailyRw(rw)); // /ativo herda a nav da home shell → /diario→/daily e /biblioteca→/library no .com
         // ★ Anúncios REMOVIDOS desta rota /ativo (2026-06-27) — enquadramento regulatório (Res. CVM 20/2021).
         //   /ativo trata de valor mobiliário ESPECÍFICO; veicular AdSense aqui é remuneração indireta e o art. 27-E
@@ -1820,11 +1882,20 @@ async function _route(request, env, ctx) {
         return rw.transform(shell);
       } catch (e) { /* falha → segue normal */ }
     }
-    const res = await env.ASSETS.fetch(request); // serve o asset estático
+    // ── ★ 2026-07-16 alias do acervo: /arquivos|/archive é a rota canônica, mas os assets vivem em ./artigos|
+    //    ./articles (não renomeados — gen_artigos.mjs ainda escreve lá). Reaponta o fetch de asset; o slug antigo
+    //    NUNCA vaza (o 307 de trailing-slash do ASSETS tem a Location mapeada de volta logo abaixo). ──
+    const _arqAlias = _url.pathname.match(/^\/(arquivos|archive)(\/.*)?$/);
+    const _assetReq = _arqAlias
+      ? new Request(_url.origin + (_arqAlias[1] === "arquivos" ? "/artigos" : "/articles") + (_arqAlias[2] || "") + _url.search, request)
+      : request;
+    const res = await env.ASSETS.fetch(_assetReq); // serve o asset estático
     // ★ SEO 2026-06-16: o ASSETS redireciona /path → /path/ com 307 (temporário) — Google/Ahrefs preferem 308
     //   (permanente) p/ consolidar autoridade no canônico com barra. Promove o 307 do trailing-slash a 308.
     if (res.status === 307 && res.headers.get("location")) {
-      return new Response(null, { status: 308, headers: { "Location": res.headers.get("location"), "Cache-Control": "public, max-age=86400" } });
+      let _loc = res.headers.get("location");
+      if (_arqAlias) _loc = _loc.replace(/^\/artigos/, "/arquivos").replace(/^\/articles/, "/archive"); // alias: Location volta pro slug canônico novo
+      return new Response(null, { status: 308, headers: { "Location": _loc, "Cache-Control": "public, max-age=86400" } });
     }
     try {
       const url = new URL(request.url);
@@ -1842,7 +1913,32 @@ async function _route(request, env, ctx) {
       if (url.pathname.startsWith("/og/")) return res; // ★ página-fonte do cartão OG — servida PURA (sem barra de consentimento/cobertura) p/ o screenshot sair limpo
       // cobertura VIVA — injeta em QUALQUER página HTML (about/sobre/metodologia/conceitos…); 1 fetch cacheado, barato
       const cob = await _fetchCobertura();
-      if (!isRoot) { let rw = _consentRw(new HTMLRewriter()); if (cob) rw = _cobRewriter(rw, cob, isEN); if (isEN) rw = _enLibraryRw(_enDailyRw(rw)); const _t = rw.transform(res); const _h = new Headers(_t.headers); _h.set("content-type", "text/html; charset=utf-8"); return new Response(_t.body, { status: _t.status, headers: _h }); } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com). charset EXPLÍCITO: o ASSETS serve "text/html" pelado e webviews (X/LinkedIn in-app) BAIXAM html sem charset em vez de abrir.
+      if (!isRoot) {
+        let rw = _consentRw(new HTMLRewriter());
+        if (cob) rw = _cobRewriter(rw, cob, isEN);
+        rw = _arquivosRw(rw); // links internos /artigos|/articles → /arquivos|/archive em TODA página HTML (footers/crumbs estáticos, sem hop de 301)
+        if (isEN) rw = _enLibraryRw(_enDailyRw(rw));
+        // ── selo de vintage + canônicos do acervo (páginas servidas sob /arquivos|/archive via alias de asset) ──
+        if (_arqAlias) {
+          const _enArq = _arqAlias[1] === "archive";
+          // canonical/hreflang/og:url do asset estático nasceram com /artigos|/articles → reescreve p/ a rota nova
+          const _fixA = function (attr) { return { element(e) { const v = e.getAttribute(attr); if (v) e.setAttribute(attr, v.replace("/artigos/", "/arquivos/").replace("/articles/", "/archive/")); } }; };
+          rw = rw.on('link[rel="canonical"]', _fixA("href")).on('link[rel="alternate"][hreflang]', _fixA("href")).on('meta[property="og:url"]', _fixA("content"));
+          const _sub = _arqAlias[2] || "";
+          if (_sub === "" || _sub === "/" || /^\/personagem\//.test(_sub)) {
+            // hub/listagem (acervo misto, sem data única) → nota date-agnóstica logo após o título
+            rw = rw.on("main h1", { element(e) { e.after(_seloVintageHub(_enArq), { html: true }); } });
+          } else {
+            // página de artigo: a data vem do datePublished do JSON-LD (no <head>, que streama ANTES do <h1> do corpo)
+            // → o selo certo (v1 ou v2.2) é decidido pela MESMA função, nunca hardcoded por página.
+            const _ldSt = { buf: "" };
+            rw = rw
+              .on('script[type="application/ld+json"]', { text(t) { if (_ldSt.buf.length < 20000) _ldSt.buf += t.text; } })
+              .on("main h1", { element(e) { const m = _ldSt.buf.match(/"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})/); if (m) e.after(_seloVintage(m[1], _enArq), { html: true }); } });
+          }
+        }
+        const _t = rw.transform(res); const _h = new Headers(_t.headers); _h.set("content-type", "text/html; charset=utf-8"); return new Response(_t.body, { status: _t.status, headers: _h });
+      } // não-home: consentimento+analytics + cobertura (+ /diario→/daily no .com) + links do acervo. charset EXPLÍCITO: o ASSETS serve "text/html" pelado e webviews (X/LinkedIn in-app) BAIXAM html sem charset em vez de abrir.
 
       // ★ digest do dia (home payload) inlinado no HTML → o teaser/radar pintam SEM o round-trip cliente (~2-4s, o
       //   gargalo do time-to-insight). Token-agnóstico (handler /v1/digest ignora Authorization) → serve anon+Founder
@@ -1876,6 +1972,7 @@ async function _route(request, env, ctx) {
 
       let rw = new HTMLRewriter();
       rw = _cobRewriter(rw, cob, isEN); // cobertura viva também na home (badge/prosa com [data-cob])
+      rw = _arquivosRw(rw); // home PT estática linka /artigos no footer → já sai /arquivos (EN vem do EN_BODY, já atualizado)
       // ★ barra de topo → Atlas do Mercado Brasileiro (o arquivo como instrumento). Aditiva, no topo do body, lang-aware.
       rw = rw.on("body", { element(e) { e.prepend('<a href="/atlas" style="display:block;background:#1a1a2e;color:#faf9f6;text-decoration:none;font-family:Inter,system-ui,sans-serif;font-size:13px;text-align:center;padding:9px 16px;line-height:1.4">' + (isEN ? '<b style="color:#d9a441;font-weight:600">New</b> &middot; <b>Atlas of the Brazilian Market</b> — 26 years of the archive, navigable by phenomenon <span style="color:#d9a441">&rarr;</span>' : '<b style="color:#d9a441;font-weight:600">Novo</b> &middot; <b>Atlas do Mercado Brasileiro</b> — 26 anos do acervo, navegável por fenômeno <span style="color:#d9a441">&rarr;</span>') + '</a>', { html: true }); } });
       // canonical/og:url da home POR HOST no HTML cru: o index.html estático nasce com ".com" fixo e só o JS
