@@ -36,6 +36,7 @@ O Radar confronta leituras passadas com o desfecho real (3/6/12 meses depois) �
 
 ## Páginas principais (PT em .com.br · EN em .com)
 - Como lemos o Brasil (referência editorial canônica — como uma casa editorial lê o país: princípios, fontes e como citar; URL /metodologia mantida): https://radarperene.com.br/metodologia · https://radarperene.com/methodology
+- Pesquisa & Laboratório (biblioteca de working papers com DOI + canal de propostas): https://radarperene.com.br/pesquisa · https://radarperene.com/research
 - A linguagem do Radar (todos os conceitos): https://radarperene.com.br/conceitos · https://radarperene.com/concepts
   - Regime Brasil, Regime Global, Intermercado BR, Índice Ânima, Índice de Risco Perene, Análogos Históricos, Vértice — cada um com página própria (ex.: o Índice de Risco Perene em /conceitos/risk-on-risk-off · /concepts/risk-on-risk-off).
 - As cinco lentes (+ Vértice): https://radarperene.com.br/lentes · https://radarperene.com/lenses

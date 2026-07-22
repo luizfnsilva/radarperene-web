@@ -171,6 +171,23 @@ const STRIPE_BUY_PT = "https://buy.stripe.com/7sY6oG5QC54f4Lx1VZb3q06";  // Paym
 const STRIPE_BUY_EN = "https://buy.stripe.com/cNi8wObaW9kv6TFeILb3q07";  // Payment Link US$29 (USD) — o mesmo do /subscribe
 const LDD_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/leitura-do-dia";
 const COB_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/radar-api/v1/cobertura";
+// ── PESQUISA_API: Edge Function própria (service_role, honeypot+validação+rate-limit) que grava
+//    public.pesquisa_propostas — canal de propostas de /pesquisa e /research. Mesmo padrão de waitlist/estudos:
+//    o worker NUNCA guarda service_role key; quem escreve com privilégio é sempre a Edge Function. ──
+const PESQUISA_API = "https://zcjtkgltrxdnlacezpny.supabase.co/functions/v1/pesquisa";
+// rate-limit best-effort por IP, in-memory (isolate-scoped; este worker não tem KV bindado — ver wrangler.jsonc).
+// Reforça, mais perto do cliente, o limite já aplicado dentro da própria Edge Function.
+const _PESQ_HITS = new Map();
+const _PESQ_WINDOW_MS = 60 * 60 * 1000; // 1h
+const _PESQ_MAX = 5; // 5 propostas/hora/IP
+function _pesqRateLimited(ip) {
+  const now = Date.now();
+  const arr = (_PESQ_HITS.get(ip) || []).filter((t) => now - t < _PESQ_WINDOW_MS);
+  arr.push(now);
+  _PESQ_HITS.set(ip, arr);
+  if (_PESQ_HITS.size > 5000) _PESQ_HITS.clear(); // guarda-chuva contra crescimento ilimitado do Map
+  return arr.length > _PESQ_MAX;
+}
 
 // ── cobertura VIVA: 1 fetch cacheado (1h) → preenche spans [data-cob] em QUALQUER página HTML ──
 // "engrenagem só": adicionou dado no banco → a fn SQL cobertura_radar muda → o número novo flui pro site
@@ -230,7 +247,7 @@ async function _cachedJson(url, key, ttl) { const t = await _cachedText(url, key
 //    token-gating do moat (premiumFromReq valida o JWT real) sobrevive intacto. GET ANON → _cachedText (single-flight
 //    + stale-on-error + cópia limpa sem Set-Cookie); Founder (Bearer≠anon) e POST → pass-through SEM cache (jamais
 //    grava resposta premium na chave anon → casa com o Vary:Authorization do edge, moat preservado). Anti-SSRF: host
-//    fixo + só radar-api/v1/* | estudos | waitlist alcançáveis (regex sem '.' → sem traversal); query sanitizada no edge.
+//    fixo + só radar-api/v1/* | estudos | waitlist | pesquisa alcançáveis (regex sem '.' → sem traversal); query sanitizada no edge.
 const _API_CORS = { "access-control-allow-origin": "*", "access-control-allow-headers": "authorization, apikey, content-type", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-max-age": "86400" };
 function _apiUpstream(sub, search) {
   const u = sub.toLowerCase().indexOf("v1/") === 0 ? "/radar-api/" + sub : "/" + sub;
@@ -1624,11 +1641,28 @@ async function _route(request, env, ctx) {
         return new Response("Not found.", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
       }
     }
+    // ── POST /v1/pesquisa-proposta — canal de propostas de /pesquisa e /research (formulário inline).
+    //    Camada aqui = CORS + rate-limit best-effort por IP (corta ANTES de sair da borda). A validação real
+    //    (honeypot, tamanhos, sanitização, insert com service_role) mora na Edge Function PESQUISA_API. ──
+    if (_url.pathname === "/v1/pesquisa-proposta") {
+      if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: _API_CORS });
+      if (request.method !== "POST") return new Response('{"erro":"use POST"}', { status: 405, headers: Object.assign({ "content-type": "application/json" }, _API_CORS) });
+      const _ip = request.headers.get("cf-connecting-ip") || "desconhecido";
+      if (_pesqRateLimited(_ip)) return new Response('{"erro":"muitas propostas recentes, tente novamente mais tarde"}', { status: 429, headers: Object.assign({ "content-type": "application/json" }, _API_CORS) });
+      try {
+        const _bodyTxt = await request.text();
+        const _pr = await fetch(PESQUISA_API, { method: "POST", headers: { "content-type": "application/json" }, body: _bodyTxt });
+        const _ptxt = await _pr.text();
+        return new Response(_ptxt, { status: _pr.status, headers: Object.assign({ "content-type": "application/json; charset=utf-8" }, _API_CORS) });
+      } catch (e) {
+        return new Response('{"erro":"indisponivel"}', { status: 503, headers: Object.assign({ "content-type": "application/json" }, _API_CORS) });
+      }
+    }
     // ── /api/* — proxy unificado do edge (radar-api/v1/* · estudos · waitlist). Tira o cliente de cima do supabase.co
     //    direto → edge-cache do /v1/serie anon, domínio único, observabilidade. /api/docs (página) e a
     //    /api/leitura-do-dia.json (handler abaixo) NÃO casam o regex (exige v1/ | estudos | waitlist) → intactas. ──
     {
-      const _am = _url.pathname.match(/^\/api\/(v1\/[a-z0-9_\/-]+|estudos|waitlist)$/i);
+      const _am = _url.pathname.match(/^\/api\/(v1\/[a-z0-9_\/-]+|estudos|waitlist|pesquisa)$/i);
       if (_am) return _proxyApi(request, _url, _am[1]);
     }
     // ── /api/leitura-do-dia.json — endpoint público (documentado em /api/docs): proxy do edge, CORS aberto, cache 4h ──
