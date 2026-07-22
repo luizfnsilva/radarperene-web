@@ -1710,7 +1710,9 @@
     var _foldLbl2 = L ? "What else is moving?" : "O que mais está se movendo?";
     var _mktLbl = L ? "Abroad" : "Lá fora";  // ★ 2026-06-20 vocabulário (consultor): era "Mercado global" — mais editorial, menos seção
     var glock = function () { return lockA(L, '<span style="font-size:.72em;opacity:.6;vertical-align:super" title="' + (L ? "Institutional access" : "Acesso institucional") + '">†</span>'); };  // A17: adaga de nota de rodapé, não cadeado de app  // cadeado pequeno/esmaecido — indicador, não paywall protagonista (direção de arte 2026-06-16)
-    var _fcta = '<a class="rp-fcta" href="' + (L ? "/subscribe" : "/assine") + '">' + (L ? "Subscribe to Perene Semanal · US$ 29/mo →" : "Assinar o Perene Semanal · R$ 29/mês →") + '</a>';  // ★ 2026-06-29: fecho público funila p/ o varejo (Semanal R$29); só renderiza no FOLD&GATED same-origin (embeds usam o ramo chrome), então link relativo ok
+    // ★ 2026-07-22 (dono): PAUSA REVERSÍVEL do Perene Semanal — CTA de venda desativado; aponta pra leitura aberta.
+    //   Para retomar: religar o href/texto originais (/subscribe · /assine, "Subscribe/Assinar ... US$/R$ 29").
+    var _fcta = '<a class="rp-fcta" href="' + (L ? "/daily" : "/diario") + '">' + (L ? "Read today’s open edition →" : "Ler a edição aberta de hoje →") + '</a>';
     // ★ catálogo do estúdio: tudo que é cruzável via /v1/serie, por categoria (cresce sozinho com o digest)
     (function () {
       var cat = [], push = function (c, items) { items = (items || []).filter(Boolean); if (items.length) cat.push({ cat: c, items: items }); };
