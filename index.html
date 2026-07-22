@@ -40,7 +40,7 @@
 {"@type":"Organization","@id":"https://radarperene.com.br/#org","name":"Radar Perene","alternateName":"Método Perene","url":"https://radarperene.com.br","email":"contato@radarperene.com.br","logo":"https://radarperene.com.br/avatar-square-800.png","image":"https://radarperene.com.br/og-image-1200x630.png","description":"Publicação editorial que lê o regime do mercado brasileiro e o que costumou seguir episódios parecidos — macro, intermercado e contexto, de fonte pública. Descreve o presente à luz dos precedentes, com uma biblioteca de episódios (\"o que aconteceu depois quando…\") desde 2000. Não prevê preço nem constitui recomendação de investimento.","knowsLanguage":["pt-BR","en"],"areaServed":{"@type":"Country","name":"Brasil"},"sameAs":["https://radarperene.com"],"founder":{"@id":"https://brazilcomplexity.com/about.html#person"}},
 {"@type":"WebSite","@id":"https://radarperene.com.br/#website","url":"https://radarperene.com.br","name":"Radar Perene","publisher":{"@id":"https://radarperene.com.br/#org"},"inLanguage":["pt-BR","en"],"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://radarperene.com.br/?q={search_term_string}"},"query-input":"required name=search_term_string"}},
 {"@type":"Dataset","@id":"https://radarperene.com.br/#dataset","name":"Radar Perene — regime, macro e intermercado do Brasil","description":"Séries e scores descritivos do regime de mercado, juros/Selic, risco Brasil, intermercado, câmbio, FIIs (IFIX), Tesouro, cripto, imóveis (ILI · Índice de Liquidez Imobiliária) e inflação (IPCA/IGP-M/INCC/SINAPI), além de atividade regulatória/judicial. Dados públicos desde 2000, atualização contínua. Descritivo, nunca recomendação nem previsão de preço.","url":"https://radarperene.com.br/","creator":{"@id":"https://radarperene.com.br/#org"},"isAccessibleForFree":true,"license":"https://radarperene.com.br/","inLanguage":["pt-BR","en"],"spatialCoverage":{"@type":"Place","name":"Brasil"},"temporalCoverage":"2000-01-01/..","keywords":["regime de mercado","risco Brasil","macro Brasil","juros","Selic","intermercado","câmbio","IFIX","FIIs","IBOV","Tesouro Direto","liquidez imobiliária","ILI","inflação","IPCA","biblioteca de estudos","casos análogos","comparações de ativos","autoavaliação","distribuições históricas","precedentes de mercado","eventos condicionais","o que aconteceu depois"],"variableMeasured":["regime_br_score","risk_global_score","intermercado","distribuição de casos análogos (3/6/12m)","mediana e faixas p10-p90"],"distribution":{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://radarperene.com.br/INTEGRACAO_RADAR.md"}},
-{"@type":"Service","@id":"https://radarperene.com.br/#service","name":"Radar Perene — Perene Semanal","serviceType":"Publicação editorial sobre o regime do mercado brasileiro","provider":{"@id":"https://radarperene.com.br/#org"},"areaServed":{"@type":"Country","name":"Brasil"},"description":"O Perene Semanal (temporariamente suspenso): a edição de sexta-feira (após o fechamento do mercado) que reúne o que mudou, o que persistiu e o que o arquivo lembra — mais o arquivo das edições e o acesso à edição aberta de cada dia. Descritivo, nunca recomendação."}
+{"@type":"Service","@id":"https://radarperene.com.br/#service","name":"Radar Perene — Diário","serviceType":"Publicação editorial sobre o regime do mercado brasileiro","provider":{"@id":"https://radarperene.com.br/#org"},"areaServed":{"@type":"Country","name":"Brasil"},"description":"O Diário: a leitura do regime de cada dia, pública e gratuita, inserida em série histórica desde 2000. O Perene Semanal está temporariamente suspenso. Descritivo, nunca recomendação."}
 ]}
 </script>
 <script type="application/ld+json" id="rp-faq-ld">
@@ -330,10 +330,10 @@
     <div class="hero-ctas">
       <!-- ★ 2026-06-21 (dono): compartilhar a Leitura do Radar — botão na MESMA linha do "Assinar", do lado OPOSTO (abaixo do card/radar). Menu próprio com os links diretos das redes + API pública (sem o share genérico do sistema). -->
       <div class="hero-cta-row">
-        <a class="herolink lead" href="/assine" id="cta1">Receba a edição de sexta-feira →</a>
+        <a class="herolink lead" href="/diario" id="cta1">Ler o Diário de hoje →</a>
         <button type="button" id="rp-share-btn" class="rp-sharebtn" aria-label="Compartilhar a Leitura do Radar" title="Compartilhar"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><line x1="8.4" y1="10.85" x2="15.6" y2="6.15"/><line x1="8.4" y1="13.15" x2="15.6" y2="17.85"/></svg></button>
       </div>
-      <a class="herolink" href="/diario" id="cta2">Ler a edição aberta de hoje →</a>
+      <a class="herolink" href="/arquivos" id="cta2">Explorar o arquivo →</a>
     </div>
     <div class="micro" id="micro1">Conteúdo educacional de fontes públicas — nunca recomendação.</div>
   </div>
@@ -372,16 +372,16 @@
   <section id="profundidades" class="only-public">
     <div style="max-width:64ch;margin:0 auto">
       <h2 class="sec" id="prof-h" style="text-align:center">Uma publicação, quatro profundidades</h2>
-      <p class="secsub" id="prof-p" style="max-width:none">O <b>Diário</b> é a capa: a leitura do regime de cada dia, aberta a todos, desde 2000. O <b>Perene Semanal</b> (temporariamente suspenso) era a edição de sexta-feira — o que mudou, o que persistiu, o que o arquivo lembra — com seu próprio arquivo. O <b>Mensal</b> e o acervo desde 2010 integram o <a href="/founder/" style="color:inherit">acesso institucional</a>, assim como a leitura completa de cada ativo — concedidos em conversa, a parceiros credenciados. A carta <b>Vértice</b> circula em piloto, para um grupo pequeno de leitores.</p>
-      <p class="micro" id="prof-links" style="margin-top:14px;text-align:center"><a href="/" style="color:var(--gold-ink)">Ler a edição aberta de hoje →</a> · <a href="/assine" style="color:var(--gold-ink)">Receba a edição de sexta-feira →</a> · <a href="/founder/" style="color:var(--gold-ink)">Acesso institucional →</a></p>
+      <p class="secsub" id="prof-p" style="max-width:none">O <b>Diário</b> é a capa: a leitura do regime de cada dia, aberta a todos, desde 2000. O <b>Perene Semanal</b>, o <b>Mensal</b> e a carta <b>Vértice</b> estão temporariamente suspensos. O acervo desde 2010 e a leitura completa de cada ativo integram o <a href="/founder/" style="color:inherit">acesso institucional</a> — concedido em conversa, a parceiros credenciados.</p>
+      <p class="micro" id="prof-links" style="margin-top:14px;text-align:center"><a href="/" style="color:var(--gold-ink)">Ler a edição aberta de hoje →</a> · <a href="/pesquisa/" style="color:var(--gold-ink)">Pesquisa &amp; Laboratório →</a> · <a href="/founder/" style="color:var(--gold-ink)">Acesso institucional →</a></p>
     </div>
   </section>
 
   <section id="semanal" class="only-public">
-    <div class="eyebrow" id="sem-eyb">Assinatura</div>
+    <div class="eyebrow" id="sem-eyb">Publicação</div>
     <h2 class="sec" id="sem-h">Perene Semanal</h2>
-    <p class="secsub" id="sem-s">Toda sexta-feira, uma edição que reúne o que mudou, o que persistiu e o que o arquivo lembra.</p>
-    <p style="margin-top:14px"><a class="herolink lead" id="sem-cta" href="/assine">Receba a edição de sexta-feira →</a></p>
+    <p class="secsub" id="sem-s">Temporariamente suspenso. O Diário permanece público e gratuito, todos os dias.</p>
+    <p style="margin-top:14px"><a class="herolink lead" id="sem-cta" href="/diario">Ler o Diário →</a></p>
   </section>
 
   <section id="faq" class="only-public">
@@ -480,7 +480,7 @@
     kicker:"Since 2000",shareLbl:"Share",
     h1:'Brazil, observed —<br>and <span class="g">remembered</span>.',
     lead:"A living archive of Brazil&rsquo;s markets.<br>What the Radar saw — and what came next.",
-    cta1:"Get the Friday edition →",cta2:"Read today&rsquo;s open edition →",micro:"Educational content from public sources — never a recommendation.",
+    cta1:"Read today&rsquo;s Daily →",cta2:"Explore the archive →",micro:"Educational content from public sources — never a recommendation.",
     eyb7:"Who it&rsquo;s for",s7:"Investors, analysts, managers — and serious newcomers.",s7s:"For anyone who wants to read Brazil&rsquo;s market without noise or guesswork — not the forecast, but the precedent: regimes, historical analogs and a study library of &ldquo;what happened next&rdquo;. Memory since 2000.",
     eyb2:"Methodology",s2:"How the Radar reads Brazil",s2s:"Under the reading, the system combines the country&rsquo;s regulatory domains and a cross-asset experiment — the engine, not the stage. <a href=\"/methodology/\">See the methodology →</a>",
     eyb6:"What&rsquo;s underneath",
@@ -506,7 +506,7 @@
     kicker:"Desde 2000",shareLbl:"Compartilhar",
     h1:'O Brasil observado —<br>e <span class="g">lembrado</span>.',
     lead:"Um arquivo vivo do mercado brasileiro.<br>O que o Radar viu — e o que veio depois.",
-    cta1:"Receba a edição de sexta-feira →",cta2:"Ler a edição aberta de hoje →",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
+    cta1:"Ler o Diário de hoje →",cta2:"Explorar o arquivo →",micro:"Conteúdo educacional de fontes públicas — nunca recomendação.",
     eyb7:"Para quem é",s7:"Investidores, analistas, gestores — e curiosos sérios.",s7s:"Para quem quer ler o mercado brasileiro sem ruído e sem palpite — não a previsão, mas o precedente: regimes, casos análogos e uma biblioteca de estudos do &ldquo;o que aconteceu depois&rdquo;. Memória desde 2000.",
     eyb2:"Metodologia",s2:"Como o Radar lê o Brasil",s2s:"Por baixo da leitura, o sistema combina os domínios regulatórios do país e um experimento cross-asset — o motor, não o palco. <a href=\"/metodologia/\">Conheça a metodologia →</a>",
     eyb6:"O que está por trás",
@@ -635,7 +635,7 @@
   if(_en){set("eyb-lng","The Radar's language");set("s-lng","The concepts behind the reading");set("s-lng-s","Regime, lenses, intermarket, percentile, analog, hypothesis. Those who understand this language read the product — each term has its own page.");set("lng-cta","See the full Radar language →");
     set("eyb-ult","Diary");set("s-ult","The regime, day by day");set("s-ult-s","The Radar publishes the day's regime daily. Each entry is brief, dated and verifiable — set within a historical series built over time.");set("ult-cta","See the full Diaries →");
     // ★ 2026-06-21 EN dos blocos Semanal/Founder (eram PT estático = vazamento no .com)
-    set("sem-eyb","Subscription");set("sem-h","Perene Semanal");set("sem-s","Every Friday, an edition of what changed, what held, and what the archive remembers.");set("sem-cta","Get the Friday edition →");
+    set("sem-eyb","Publication");set("sem-h","Perene Semanal");set("sem-s","Temporarily paused. The Daily remains public and free, every business day.");set("sem-cta","Read the Daily →");
     set("fnd-lead","The complete Radar, by invitation.");set("fnd-s","Full access for credentialed partners: the precedents, the historical analogs and the Radar&rsquo;s full reading of each asset.");set("fnd-cta","Institutional access →");
     set("assine-link","view plans →");}
   var _alk=document.getElementById("assine-link");if(_alk&&_en)_alk.href="/subscribe";  // slug EN da landing de assinatura
@@ -643,7 +643,7 @@
   set("faqbox",C.faq.map(function(f){return '<div style="border-top:1px solid #222a31;padding:13px 0"><b style="display:block;margin-bottom:5px">'+f[0]+'</b><p style="margin:0;color:#8b97a3;font-size:14px;line-height:1.6">'+f[1]+'</p></div>'}).join(""));
   // ★ 2026-06-28: CTA primário → página das assinaturas (Semanal R$29). Vars STRIPE/STRIPEY do Founder removidas
   //   (Founder saiu do varejo → vira acesso institucional em /founder; os elementos #founder-buy não existem mais).
-  var c1=document.getElementById("cta1");if(c1){c1.href=LANG==="en"?"/subscribe":"/assine";}
+  var c1=document.getElementById("cta1");if(c1){c1.href=LANG==="en"?"/daily":"/diario";}
   var pt=document.getElementById("portal");if(pt)pt.textContent=(LANG==="en"?"Manage subscription":"Gerenciar assinatura");
   try{var _of=document.getElementById("rp-faq-ld");if(_of)_of.remove();var ld={"@context":"https://schema.org","@type":"FAQPage","inLanguage":LANG==="en"?"en":"pt-BR","mainEntity":C.faq.map(function(f){return {"@type":"Question","name":f[0].replace(/<[^>]+>/g,""),"acceptedAnswer":{"@type":"Answer","text":f[1].replace(/<[^>]+>/g,"")}}})};var sj=document.createElement("script");sj.type="application/ld+json";sj.id="rp-faq-ld";sj.textContent=JSON.stringify(ld);document.head.appendChild(sj)}catch(e){}
   // contador X/100 REMOVIDO da vitrine (rodada 50 personas 2026-06-10, ~28 leituras como prova social NEGATIVA —
